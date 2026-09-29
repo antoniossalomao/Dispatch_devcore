@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <!-- isso aqui é pra página não ficar minúscula no celular -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dispatch - Login</title>
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+  <!-- essa div só serve pra deixar o cartão no meio da tela -->
+  <div class="login-pagina">
+    <div class="login-card">
+
+      <h1 class="login-titulo">DISPATCH</h1>
+      <p class="login-subtitulo">Gestão de pessoas, alojamentos e frota</p>
+
+      <form id="form-login" class="login-form">
+
+        <!-- o "for" do label tem que ser igual ao id do input, aí clicando no texto já vai pro campo -->
+        <label for="usuario">Usuário</label>
+        <input type="text" id="usuario" autocomplete="username" placeholder="Digite seu usuário">
+
+        <label for="senha">Senha</label>
+        <!-- type password = aparece as bolinhas em vez da senha -->
+        <input type="password" id="senha" autocomplete="current-password" placeholder="Digite sua senha">
+
+        <div class="login-mostrar">
+          <input type="checkbox" id="mostrar-senha">
+          <label for="mostrar-senha">Mostrar senha</label>
+        </div>
+
+        <!-- começa escondido (hidden), o js mostra quando der erro -->
+        <p id="mensagem-erro" class="login-erro" hidden></p>
+
+        <button type="submit" class="login-botao">Entrar</button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- o script fica aqui embaixo pq precisa que o html já tenha carregado antes -->
+  <script src="js/login.js"></script>
+</body>
+</html>

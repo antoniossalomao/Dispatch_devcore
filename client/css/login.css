@@ -1,0 +1,143 @@
+/* zera as margens que o navegador coloca sozinho */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-color: #0e1522; /* azul bem escuro, tema escuro */
+  color: #e5eaf2;
+  color-scheme: dark; /* deixa a caixinha de marcar escura tbm */
+}
+
+/* input e button não pegam a fonte do body, tem que forçar */
+input,
+button {
+  font-family: inherit;
+}
+
+/* garante que o que tiver hidden fica escondido mesmo */
+[hidden] {
+  display: none !important;
+}
+
+
+/* ---- pagina e cartão ---- */
+
+/* flex com center nos dois = cartão bem no meio da tela */
+.login-pagina {
+  min-height: 100vh; /* altura da tela inteira */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.login-card {
+  background-color: #172133; /* um pouco mais claro que o fundo pra destacar */
+  border: 1px solid #2a3850;
+  width: 100%;
+  max-width: 380px; /* pra não ficar enorme no pc */
+  padding: 36px 32px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.login-titulo {
+  text-align: center;
+  color: #e5eaf2;
+  font-size: 30px;
+  letter-spacing: 3px;
+}
+
+.login-subtitulo {
+  text-align: center;
+  color: #9aa6ba;
+  font-size: 14px;
+  margin-top: 4px;
+  margin-bottom: 28px;
+}
+
+
+/* ---- formulario ---- */
+
+/* column deixa um campo embaixo do outro */
+.login-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form label {
+  color: #e5eaf2;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.login-form input[type='text'],
+.login-form input[type='password'] {
+  background-color: #0e1522;
+  color: #e5eaf2;
+  padding: 10px 12px;
+  border: 1px solid #2a3850;
+  border-radius: 6px;
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+/* o texto cinza de exemplo dentro do campo */
+.login-form input::placeholder {
+  color: #6b778c;
+}
+
+/* quando clica no campo a borda fica azul */
+.login-form input[type='text']:focus,
+.login-form input[type='password']:focus {
+  outline: none;
+  border-color: #6e9df2;
+}
+
+.login-mostrar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* esse label não é negrito igual os outros */
+.login-mostrar label {
+  color: #9aa6ba;
+  font-weight: normal;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.login-erro {
+  background-color: #3e1d1c;
+  color: #ee6f68;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+
+/* ---- botão ---- */
+
+/* verde igual no figma */
+.login-botao {
+  background-color: #1d8a58;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-botao:hover {
+  background-color: #23a468;
+}
