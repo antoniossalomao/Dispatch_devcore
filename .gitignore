@@ -1,19 +1,17 @@
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-.Python
-build/
+# Node
+node_modules/
 dist/
-*.spec
+build/
+coverage/
+npm-debug.log*
 
 # Env
 .env
-.venv/
-venv/
+.env.local
 
 # Banco de dados
 *.db
+*.db-journal
 *.sqlite3
 
 # IDE
@@ -22,3 +20,4 @@ venv/
 
 # OS
 .DS_Store
+Thumbs.db
