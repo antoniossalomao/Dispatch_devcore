@@ -47,7 +47,6 @@ button {
 
 .login-titulo {
   text-align: center;
-  color: #e5eaf2;
   font-size: 30px;
   letter-spacing: 3px;
 }
@@ -70,7 +69,6 @@ button {
 }
 
 .login-form label {
-  color: #e5eaf2;
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 6px;
@@ -85,6 +83,7 @@ button {
   border-radius: 6px;
   font-size: 15px;
   margin-bottom: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s; /* a borda e o brilho aparecem devagar */
 }
 
 /* o texto cinza de exemplo dentro do campo */
@@ -96,7 +95,8 @@ button {
 .login-form input[type='text']:focus,
 .login-form input[type='password']:focus {
   outline: none;
-  border-color: #6e9df2;
+  border-color: #6095f6;
+  box-shadow: 0 0 0 3px rgba(96, 149, 246, 0.25); /* brilho azul em volta pra ver onde ta digitando */
 }
 
 .login-mostrar {
@@ -114,8 +114,14 @@ button {
   cursor: pointer;
 }
 
+/* caixinha azul igual a borda do campo */
+.login-mostrar input {
+  accent-color: #6095f6;
+  cursor: pointer;
+}
+
 .login-erro {
-  background-color: #3e1d1c;
+  background-color: #35110f;
   color: #ee6f68;
   font-size: 14px;
   padding: 8px 12px;
@@ -128,7 +134,7 @@ button {
 
 /* verde igual no figma */
 .login-botao {
-  background-color: #1d8a58;
+  background-color: #00793b;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -136,8 +142,9 @@ button {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .login-botao:hover {
-  background-color: #23a468;
+  background-color: #168853;
 }
