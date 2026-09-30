@@ -1,674 +1,385 @@
-# Planejamento — Dispatch
+# Planejamento - Dispatch
 
-Documento único de planejamento do Grupo DevCore. Junta a pesquisa, o modelo de dados, as regras de negócio, o guia de contribuição e a proposta de apresentação em um só lugar.
+Grupo DevCore: Bruno, Antonio, João, Henrique, Kelvin, Matheus e Vinicius.
 
-**De onde vem cada parte:**
+Esse documento junta tudo que a gente decidiu até agora: o problema, o que o sistema vai fazer, as telas, as regras, o banco, como o código vai ser organizado e como vamos dividir o trabalho.
 
-- **Proposta do professor:** o texto "Pessoas, Alojamento e Frota: Gestão operacional e eficiência de ativos" (seção 1). Pede um sistema web que gerencie colaboradores, alojamento e frota, relacione essas entidades, gere relatórios dessas relações e tenha logs para auditoria. É o **núcleo obrigatório**; a seção 3 mostra, ponto a ponto, onde o sistema atende cada item.
-- **Decisões do grupo:** tudo o que vai além disso é diferencial do grupo, e só entra depois do núcleo pronto:
+O tema do trabalho é o texto que o professor passou, "Pessoas, Alojamento e Frota: Gestão operacional e eficiência de ativos", com um problema proposto pela Eficaz Marketing (Marília/SP). A Eficaz só propôs o problema. O cenário e o que vai além do que foi pedido fomos nós que decidimos.
 
-- sistema **web em JavaScript** (Node.js no servidor);
-- repositório com **front e back separados** (`client/` e `server/`);
-- **IA via Groq** (chave gratuita) para relatórios, perguntas, suporte e notificações;
-- **integração com WhatsApp** para enviar avisos quando necessário;
-- banco de dados **ainda em decisão** (seção 7 traz a comparação e a recomendação).
+A ideia é fazer um sistema simples, mas bem feito. Se tiver uma forma complicada e uma simples de resolver alguma coisa, a gente vai pela simples.
 
-Regra geral do projeto: **não precisa ser extremamente trabalhado, mas precisa estar bem feito.** Na dúvida entre uma solução elaborada e uma simples que funciona e está testada, fica a simples.
 
-Grupo DevCore: Bruno, Antonio, João, Henrique, Kelvin, Matheus, Vinicius.
-Problema proposto por: Eficaz Marketing (Marília/SP), usado pelo professor como tema do trabalho. É um trabalho de faculdade: a Eficaz só propôs o problema, e o cenário e o que vai além da proposta são decisão do grupo.
+## 1. O problema
 
----
+Empresas que têm equipes trabalhando em campo, alojamentos e carros da empresa geralmente não sabem direito quem está onde e quem está usando o quê. O controle é feito em planilha ou "de cabeça" (o famoso "alguém sabe onde está quem"), sem histórico e sem registro de quem mudou o quê.
 
-## Sumário
+Isso causa vários problemas:
 
-1. [Problema](#1-problema)
-2. [Cenário de uso](#2-cenário-de-uso)
-3. [Solução proposta](#3-solução-proposta)
-4. [Telas (Figma)](#4-telas-figma)
-5. [Regras de negócio](#5-regras-de-negócio)
-6. [Arquitetura e stack](#6-arquitetura-e-stack)
-7. [Banco de dados](#7-banco-de-dados)
-8. [IA com Groq](#8-ia-com-groq)
-9. [Notificações e WhatsApp](#9-notificações-e-whatsapp)
-10. [Organização do repositório](#10-organização-do-repositório)
-11. [Divisão de trabalho e fluxo de git](#11-divisão-de-trabalho-e-fluxo-de-git)
-12. [Cronograma](#12-cronograma)
-13. [Roteiro da apresentação](#13-roteiro-da-apresentação)
-14. [LGPD](#14-lgpd)
-15. [Decisões em aberto](#15-decisões-em-aberto)
-16. [Fontes](#16-fontes)
+- **Segurança e responsabilidade:** não dá pra provar quem estava com um carro ou em qual alojamento uma pessoa estava.
+- **Custo:** carro parado sem uso, viagem desnecessária, retrabalho.
+- **Dependência de uma pessoa:** se quem "controla no braço" sai, ninguém sabe mais nada.
+- **Conflitos:** briga por leito e por carro.
+- **Falta de números:** o gestor não tem relatório confiável pra tomar decisão.
 
----
+Na pesquisa a gente achou dois exemplos que mostram que isso custa dinheiro de verdade:
 
-## 1. Problema
+- **Multa NIC (Não Indicação do Condutor):** quando um carro da empresa leva multa, a empresa tem de 15 a 30 dias pra dizer quem estava dirigindo. Se não disser, leva outra multa de 2 vezes o valor da original.
+- **NR-24:** é a norma que diz como tem que ser o alojamento de trabalhadores. No máximo 8 pessoas por quarto, 3 m² por cama (4,5 m² por beliche), e ela pode ser fiscalizada a qualquer momento.
 
-Em operações com equipes em campo, alojamentos e frota, falta **visão integrada sobre quem está onde e quem usa cada ativo** (leito, veículo). O controle costuma ser informal ("alguém sabe onde está quem") ou em planilha, sem histórico nem registro de quem alterou o quê.
 
-Riscos apontados no problema da Eficaz:
+## 2. Cenário que a gente escolheu
 
-| Risco | Exemplo |
+Uma construtora inventada, a **Construtora Aguapeí**, com obras no interior de SP. Os funcionários ficam em repúblicas pagas pela empresa e usam carros e vans que são divididos entre as obras.
+
+Pra testar e apresentar, o banco vai ter uns 15 colaboradores, 3 alojamentos (uns 22 leitos), 6 veículos e 6 meses de histórico inventado, criados por um script (`seed.js`). Sem histórico os relatórios ficariam vazios.
+
+Quem usa o sistema tem um de dois perfis:
+
+- **admin:** vê e faz tudo, incluindo a auditoria e as configurações;
+- **operador:** faz os cadastros e registros do dia a dia.
+
+
+## 3. O que o sistema faz
+
+1. **Cadastros:** colaboradores (com CNH), alojamentos (com quartos, leitos e um responsável) e veículos (com validade do licenciamento e do seguro).
+2. **Alojamento:** registra quem está em qual leito e de quando até quando, sem deixar passar da capacidade. Também registra ocorrências (chuveiro quebrado, briga, reclamação...).
+3. **Frota:** registra a saída e a volta do veículo (motorista, passageiros, destino e km) e as manutenções. O sistema não deixa sair com CNH vencida, com licenciamento vencido ou com o carro na oficina.
+4. **"Quem estava dirigindo?":** escolhe o carro e o dia/hora e o sistema mostra o motorista. Resolve o problema da multa NIC.
+5. **Relatórios:** ocupação dos alojamentos, uso de cada veículo, movimentação (quem trocou de alojamento, viagens por destino) e gargalos (horários em que todos os carros estão na rua, alojamentos sempre cheios).
+6. **Auditoria:** toda alteração fica registrada (quem fez, quando, como era antes e como ficou).
+7. **IA (Groq):** responder perguntas sobre os dados, escrever um resumo dos relatórios, ajudar a usar o sistema e escrever as notificações.
+8. **Notificações:** avisos no sistema (CNH vencendo, carro que não voltou...) e os mais importantes também por WhatsApp.
+
+Os itens 7 e 8 são extras que o grupo quis colocar. O sistema tem que funcionar sem eles.
+
+### O que o professor pediu x onde o sistema atende
+
+A gente pegou cada ponto do texto do professor e ligou com uma parte do sistema. Essa tabela vai ser o slide principal da apresentação.
+
+| O que o texto pede | Onde o sistema atende |
 |---|---|
-| Segurança e responsabilidade | Não conseguir comprovar quem dirigia um veículo ou quem estava em um alojamento |
-| Custo | Frota ociosa, deslocamentos desnecessários, retrabalho |
-| Continuidade | Dependência de uma pessoa que "controla no braço" |
-| Clima e conflitos | Disputa por leito e por veículo |
-| Gerencial | Sem indicadores confiáveis para decidir |
-
-Dois exemplos concretos mostram que o problema tem custo real:
-
-- **Multa NIC (Não Indicação do Condutor):** quando um veículo da empresa é multado, ela tem de 15 a 30 dias para informar quem dirigia. Se não informar, recebe uma nova multa de 2 vezes o valor da original. A pergunta "quem dirigia o carro X no dia Y às Z horas?" precisa ter resposta imediata.
-- **NR-24 (alojamento de trabalhadores):** fiscalizada por auditores do trabalho. No máximo 8 pessoas por quarto, 3 m² por cama simples ou 4,5 m² por beliche, e nada de 3 camas na mesma vertical.
-
-## 2. Cenário de uso
-
-**Construtora Aguapeí** (fictícia), com obras no interior de SP, equipes alojadas em repúblicas mantidas pela empresa e uma frota compartilhada entre as obras.
-
-Dados de exemplo (os mesmos do protótipo): cerca de 15 colaboradores, 3 alojamentos com cerca de 22 leitos, 6 veículos (carros e vans) e 6 meses de histórico simulado. Os dados são gerados por um script de seed com `@faker-js/faker` em `pt_BR`. Sem histórico, os relatórios e a IA não têm o que mostrar na apresentação.
-
-Perfis de usuário:
-
-| Perfil | Usa principalmente |
-|---|---|
-| `rh` | Colaboradores, alojamentos |
-| `frota` | Frota, saída e retorno de veículos |
-| `admin` | Tudo, incluindo auditoria e configuração de avisos |
-
-## 3. Solução proposta
-
-Um **sistema web** que centraliza pessoas, alojamentos e frota, valida as regras antes de gravar e registra toda alteração para auditoria.
-
-O que o sistema faz:
-
-1. **Cadastros:** colaboradores (com CNH), alojamentos (com quartos, leitos e **responsável**) e veículos (com **documentação**: licenciamento e seguro).
-2. **Alojamento:** registra quem está em qual leito e por quanto tempo, respeitando a capacidade (e a metragem da NR-24). Registra **ocorrências** (manutenção, conflito, reclamação, regra descumprida) com status aberta/resolvida.
-3. **Frota:** registra saída e retorno de veículo (motorista, passageiros, destino, km), validando CNH e a continuidade do km entre usos. Registra **manutenções**; veículo em manutenção fica indisponível. **Status** do veículo (disponível, em uso, manutenção) é calculado a partir desses registros.
-4. **Consulta "quem estava dirigindo":** dado um veículo e um horário, mostra o condutor. Resolve a multa NIC.
-5. **Relatórios:** ocupação por alojamento, uso por veículo (utilização, ociosidade, km), **padrões de movimentação** (trocas de alojamento, viagens por destino) e **gargalos** (horários com a frota toda em uso, alojamentos sempre cheios, veículos parados em manutenção, ocorrências acumuladas).
-6. **Auditoria:** log de toda alteração (quem, quando, antes e depois), com hash encadeado para detectar edição feita por fora do sistema.
-7. **IA (Groq):** perguntas em linguagem natural sobre os dados, resumo em texto dos relatórios, chat de suporte de uso do sistema e redação das notificações.
-8. **Notificações:** alertas dentro do sistema (CNH ou licenciamento vencendo, km sem registro, veículo não devolvido etc.) e envio por **WhatsApp** dos que forem críticos.
-
-A IA é uma camada **em cima** dos dados, não o núcleo: cadastros, regras e relatórios funcionam sem ela. Se a Groq ficar fora do ar ou estourar o limite gratuito, o sistema continua funcionando.
-
-### Proposta do professor → onde o sistema atende
-
-Cada item citado no texto da proposta tem uma funcionalidade correspondente. Esta tabela é a base do slide principal da apresentação.
-
-| O que a proposta diz | Onde o sistema atende |
-|---|---|
-| "Sistema web" | Client em HTML/CSS/JavaScript + server Node.js (seção 6) |
-| "Gerenciar colaboradores, alojamento e frota, relacionando cada uma dessas entidades" | Cadastros + `estadia` (pessoa ↔ leito) + `uso_veiculo` (pessoa ↔ veículo ↔ passageiros) |
-| "Gerando relatórios destas relações" | Tela de Relatórios (seção 7, indicadores) |
-| "Com logs para auditoria" | `log_auditoria` com antes/depois, usuário e hash encadeado |
+| Sistema web | Front em HTML/CSS/JS e back em Node.js |
+| Gerenciar colaboradores, alojamento e frota, relacionando cada um | Cadastros + estadia (pessoa no leito) + uso do veículo (pessoa no carro) |
+| Relatórios dessas relações | Tela de relatórios |
+| Logs para auditoria | Log de toda alteração, com proteção contra edição por fora |
 | "Alguém sabe onde está quem" | Histórico da pessoa: onde dormiu e o que dirigiu em qualquer data |
-| Alojamento: **capacidade** | Leito como unidade; regras A1, A4, A5 |
-| Alojamento: **responsáveis** | `alojamento.responsavel_id` |
-| Alojamento: **histórico de ocupação** | Tabela `estadia` (nada é apagado) |
-| Alojamento: **regras e ocorrências** | Tabela `ocorrencia`; regras de capacidade e NR-24 |
-| Frota: **motorista, passageiros, disponibilidade** | `uso_veiculo` + `uso_passageiro`; regras F1, F2, F6, F7 |
-| Frota: **documentação** | Validade de licenciamento e seguro no veículo; regra F12 |
-| Frota: **manutenção, status** | Tabela `manutencao`; status calculado; regra F13 |
-| Frota: **quilometragem** | km de saída e retorno; regras F9 e F10 |
-| Relatório: **ocupação por alojamento** | Indicador de ocupação (noites-leito) |
-| Relatório: **uso por veículo** | Utilização, ociosidade e km por veículo |
-| Relatório: **padrões de movimentação e gargalos** | Relatório de movimentação e relatório de gargalos |
-| Risco de **segurança e responsabilidade** | Auditoria + consulta "quem estava dirigindo" |
-| Risco de **custo** / direcionador **eficiência de ativos** | Ociosidade da frota e gargalos |
-| Risco de **continuidade** ("controlar no braço") | Tudo registrado no sistema, não na cabeça de alguém |
-| Risco de **clima e conflitos** | Bloqueio de dupla alocação de leito e de veículo; ocorrências |
-| Risco **gerencial** / direcionador **visão gerencial confiável** | Resumo Operacional e relatórios |
+| Alojamento: capacidade | Controle por leito + limite da NR-24 |
+| Alojamento: responsáveis | Campo responsável no alojamento |
+| Alojamento: histórico de ocupação | Estadias com entrada e saída (nada é apagado) |
+| Alojamento: regras e ocorrências | Registro de ocorrências |
+| Frota: motorista, passageiros, disponibilidade | Registro de saída/volta; não deixa usar o mesmo carro 2x ao mesmo tempo |
+| Frota: documentação | Validade do licenciamento e do seguro |
+| Frota: manutenção e status | Registro de manutenção; status disponível / em uso / manutenção |
+| Frota: quilometragem | Km de saída e volta; aviso se aparecer km sem registro |
+| Relatório de ocupação por alojamento | % de ocupação dos leitos |
+| Relatório de uso por veículo | Uso, tempo parado e km de cada carro |
+| Padrões de movimentação e gargalos | Relatórios de movimentação e de gargalos |
 
-### Prioridades
+### Ordem de prioridade
 
-| Camada | O que entra | Quando |
-|---|---|---|
-| **1. Núcleo (pedido pelo professor)** | Cadastros com responsável e documentação, estadias, usos de veículo, ocorrências, manutenções, regras de disponibilidade e capacidade (A1–A3, A6, A7, F1–F3, F6–F9, F12, F13), relatórios (ocupação, uso por veículo, movimentação, gargalos), log de auditoria, login | Semanas 1 a 4. **Tem que estar pronto antes de qualquer diferencial** |
-| **2. Diferenciais baratos** | Regras de CNH (F4, F5), NR-24 (A4, A5), km sem registro (F10, F11), consulta "quem estava dirigindo", hash encadeado | Junto com o núcleo, quando a tela correspondente já existir |
-| **3. Diferenciais do grupo** | IA (Groq), central de notificações, WhatsApp | Semanas 5 e 6, só com o núcleo pronto |
+1. **Primeiro, o que o professor pediu:** cadastros, estadias, uso de veículo, ocorrências, manutenções, relatórios, auditoria e login. Isso tem que estar pronto antes de qualquer outra coisa.
+2. **Junto, os extras fáceis:** regras de CNH e NR-24, aviso de km sem registro, "quem estava dirigindo" e a proteção do log. Cada um é uma função pequena.
+3. **Por último, os extras maiores:** IA, notificações e WhatsApp.
 
-**Fora do escopo:** GPS e telemetria, custos de manutenção e combustível, checklist de vistoria, reserva futura de veículo (ver [decisões em aberto](#15-decisões-em-aberto)).
+Não vamos fazer: GPS, controle de combustível e custos, checklist de vistoria e reserva de veículo com antecedência.
 
-## 4. Telas (Figma)
 
-**Figma:** https://www.figma.com/design/4ma1oH2S8GnmS6A7NNQTqk/Telas---Dispatch
-**Protótipo navegável (HTML, dados fictícios, regras já simuladas):** https://claude.ai/artifact/MNFq4skaifZLm8sqmrGWuJ (link privado; peça acesso a quem publicou)
+## 4. Telas
 
-| Tela | Conteúdo |
+- Figma: https://www.figma.com/design/4ma1oH2S8GnmS6A7NNQTqk/Telas---Dispatch
+- Protótipo navegável (HTML com dados de exemplo): https://claude.ai/artifact/MNFq4skaifZLm8sqmrGWuJ (pedir acesso pro Antonio)
+
+| Tela | O que tem |
 |---|---|
-| Login | Usuário e senha; o perfil define o que aparece no menu |
-| Resumo Operacional | Indicadores (colaboradores, veículos disponíveis, alojamentos, vagas), alertas, movimentações recentes, ocupação e utilização da frota |
-| Colaboradores | Busca e tabela (nome, matrícula, cargo, telefone); clique abre o histórico da pessoa |
-| Cadastro de Colaborador | Nome, matrícula, cargo, contato, CNH (categorias e validade) |
-| Gestão de Alojamentos | Tabela de ocupação (alojamento, colaborador, entrada, saída prevista, status), mapa de leitos para alocar e liberar, e aba **Ocorrências** (abrir, acompanhar e resolver) |
-| Cadastro de Alojamento | Nome, **responsável**, CEP, rua, cidade, número, bairro, observações; quartos (área) e leitos (tipo) |
-| Gestão de Frota | Tabela de veículos (placa, modelo, km atual, documentação, status) com paginação; registro de saída e retorno; aba **Manutenções** (abrir e encerrar) |
-| Cadastro de Veículo | Placa, modelo, lugares, categoria de CNH exigida, km inicial, **validade do licenciamento e do seguro** |
-| Relatórios e Auditoria | Aba **Relatórios** (ocupação, uso por veículo, **movimentação**, **gargalos**, "quem estava dirigindo", filtros, exportação, pergunta em linguagem natural, resumo por IA) e aba **Auditoria** (histórico de alterações com verificação de integridade) |
+| Login | Usuário e senha (**já feita**, em `client/index.html`) |
+| Resumo | Números gerais, avisos, últimas movimentações e gráficos de ocupação e uso da frota |
+| Colaboradores | Lista com busca; clicando abre o histórico da pessoa; formulário de cadastro |
+| Alojamentos | Ocupação, mapa de leitos pra alocar/liberar, aba de ocorrências, cadastro com responsável, quartos e leitos |
+| Frota | Lista de veículos com status, saída e volta, aba de manutenções, cadastro com licenciamento e seguro |
+| Relatórios e Auditoria | Relatórios (ocupação, uso, movimentação, gargalos, quem estava dirigindo, pergunta pra IA) e o log de alterações |
 
-**Telas ou elementos que ainda faltam no Figma.** Os do núcleo vêm primeiro, porque respondem direto à proposta do professor:
+Ainda falta colocar no Figma: aba de ocorrências, campo de responsável, cadastro de veículo com documentação, aba de manutenções, relatórios de movimentação e gargalos, sininho de notificações e o chat de ajuda.
 
-- [ ] **Aba Ocorrências** em Gestão de Alojamentos (lista com tipo, data, status; formulário de nova ocorrência).
-- [ ] **Campo Responsável** no cadastro de alojamento.
-- [ ] **Cadastro de Veículo** com validade de licenciamento e seguro.
-- [ ] **Aba Manutenções** em Gestão de Frota.
-- [ ] **Relatórios de movimentação e de gargalos** (ver o mapa de calor na seção 7).
-- [ ] **Central de notificações:** ícone de sino no cabeçalho com contador e lista de alertas (lido/não lido, severidade).
-- [ ] **Chat de suporte (IA):** botão flutuante que abre um painel de conversa.
-- [ ] **Configuração de avisos (admin):** quais alertas vão para o WhatsApp e para qual número.
-- [ ] **Campo "Resumo por IA"** na aba Relatórios (texto gerado abaixo dos gráficos).
+Visual: tema escuro, azul-marinho, conteúdo em cartões, títulos em maiúsculo, etiquetas coloridas de status (verde = ok, azul = em uso, amarelo = atenção, vermelho = problema) e botão verde pra ação principal.
 
-Identidade visual (já definida): cabeçalho e barra lateral em azul-marinho escuro, fundo cinza claro com conteúdo em cartão branco, títulos em caixa alta, pílulas de status coloridas (verde = ativo/ok, azul = em uso, âmbar = atenção, vermelho = crítico, cinza = concluído), botão verde para ação primária e escuro para secundária. Cadastros abrem em tela cheia (cartão centralizado sobre fundo escuro), não em modal pequeno.
 
-## 5. Regras de negócio
+## 5. Regras
 
-Validações que o **server** aplica antes de gravar. O client pode repetir algumas para dar feedback rápido no formulário, mas quem decide é sempre o server. Cada regra já está demonstrada no protótipo e deve virar um teste automatizado.
+Essas são as validações que o back-end faz antes de salvar. O front pode avisar antes também, mas quem decide é o back. Todas já funcionam no protótipo, então dá pra conferir lá como tem que ficar.
 
-"Onde validar": **service** significa código no server (precisa consultar outras linhas); **banco** significa que um `CHECK` ou `UNIQUE` na tabela já resolve.
+**Alojamento**
 
-### Alojamento
+- A1. Um leito não pode ter duas pessoas no mesmo período.
+- A2. Uma pessoa não pode estar em dois leitos ao mesmo tempo.
+- A3. A saída tem que ser depois da entrada (o próprio banco já bloqueia).
+- A4. No máximo 8 leitos por quarto (NR-24).
+- A5. A área do quarto tem que caber os leitos: 3 m² por cama, 4,5 m² por beliche (NR-24).
+- A6. O responsável pelo alojamento tem que ser um colaborador ativo.
+- A7. A data de resolução da ocorrência tem que ser depois da abertura (o banco já bloqueia).
 
-| # | Regra | Onde | Mensagem sugerida |
-|---|---|---|---|
-| A1 | Um leito não pode ter duas estadias com período sobreposto | service | "O leito {codigo} estava ocupado por {nome} até {data}. Escolha uma entrada depois disso." |
-| A2 | Uma pessoa não pode estar em dois leitos ao mesmo tempo | service | "{nome} já estava no leito {leito} de {inicio} a {fim}." |
-| A3 | Saída depois da entrada | banco | "A saída precisa ser depois da entrada ({data})." |
-| A4 | No máximo 8 leitos por quarto (NR-24) | service | "{quarto} tem {n} leitos (máximo 8, NR-24)." |
-| A5 | Área do quarto comporta os leitos: 3 m² por cama simples, 4,5 m² por beliche (NR-24) | service | "{quarto} tem {area} m², mas a NR-24 exige {exigido} m²." |
-| A6 | O responsável pelo alojamento precisa ser um colaborador ativo | service | "{nome} está arquivado e não pode ser responsável por um alojamento." |
-| A7 | Ocorrência resolvida precisa de data de resolução posterior à abertura; não se reabre ocorrência resolvida (abre-se outra) | banco (`CHECK`) + service | "A resolução precisa ser depois da abertura ({data})." |
+**Frota**
 
-### Frota
+- F1. O mesmo carro não pode ter dois usos no mesmo horário.
+- F2. Uma pessoa não pode estar em dois carros ao mesmo tempo.
+- F3. O motorista precisa ter CNH cadastrada.
+- F4. A CNH tem que estar válida no dia da saída.
+- F5. A categoria da CNH tem que servir pro veículo. Quem tem C ou D também dirige B, e quem tem E dirige tudo, mas quem só tem B não dirige van de passageiro (D).
+- F6. O motorista não pode estar na lista de passageiros.
+- F7. Não pode ter mais passageiros que lugares (tirando o motorista).
+- F8. A volta tem que ser depois da saída (o banco já bloqueia).
+- F9. O km da volta não pode ser menor que o da saída (o banco já bloqueia).
+- F10. O km da saída tem que bater com o km da última volta do mesmo carro. Se for maior, alguém usou o carro sem registrar. Isso não bloqueia, só gera um aviso.
+- F11. Uso com mais de 2.000 km pede pra confirmar (pode ser erro de digitação).
+- F12. Licenciamento vencido não deixa o carro sair. Seguro vencido só gera aviso.
+- F13. Carro com manutenção em aberto não pode sair.
 
-| # | Regra | Onde | Mensagem sugerida |
-|---|---|---|---|
-| F1 | Um veículo não pode ter dois usos sobrepostos | service | "Este veículo já tem um uso registrado nesse horário." |
-| F2 | Uma pessoa (motorista ou passageiro) não pode estar em dois usos sobrepostos | service | "{nome} já está no {modelo} {placa} desde {data}." |
-| F3 | Motorista precisa ter CNH cadastrada | service | "{nome} não tem CNH cadastrada." |
-| F4 | CNH válida **na data da saída** (não na data de hoje) | service | "A CNH de {nome} venceu em {data}." |
-| F5 | Categoria da CNH compatível com o veículo | service | "{modelo} exige CNH categoria {cat}. {nome} tem {categorias}." |
-| F6 | Motorista não pode estar também na lista de passageiros | service | "O motorista não pode estar também na lista de passageiros." |
-| F7 | Passageiros ≤ lugares − 1 | service | "{modelo} tem {lugares} lugares: cabem {n} passageiros além do motorista." |
-| F8 | Retorno depois da saída | banco | "O retorno precisa ser depois da saída ({data})." |
-| F9 | Km de retorno ≥ km de saída | banco | "O km de retorno não pode ser menor que o de saída ({km})." |
-| F10 | Km de saída deve bater com o km de retorno do uso anterior do mesmo veículo; se for maior, houve uso sem registro | service, **alerta** (não bloqueia; gera notificação) | "{modelo} {placa}: {diferença} km sem registro entre {data anterior} e {data atual}." |
-| F11 | Uso com mais de 2.000 km pede confirmação | service, alerta | "Mais de 2.000 km num único uso. Confira o valor digitado." |
-| F12 | Licenciamento vencido na data da saída bloqueia o uso; seguro vencido gera alerta | service | "O licenciamento do {modelo} {placa} venceu em {data}. Regularize antes de liberar o veículo." |
-| F13 | Veículo com manutenção aberta no período não pode ter uso registrado | service | "{modelo} {placa} está em manutenção desde {data}." |
+**Auditoria**
 
-**Categorias de CNH:** A (motos), B (carros), C (carga), D (passageiros, mais de 8 lugares fora o motorista), E (combinações/carretas). Subsunção usada em F5: quem tem C ou D também dirige veículo B; quem tem E dirige tudo. O contrário não vale.
+- U1. Toda criação ou alteração gera uma linha no log com quem fez, quando, como estava antes e como ficou.
+- U2. Nada é apagado de verdade, só marcado como inativo.
+- U3. Cada linha do log guarda um código (hash) calculado a partir da linha anterior. Se alguém mexer no banco por fora do sistema, os códigos param de bater e a tela de auditoria mostra onde foi.
 
-### Auditoria
+**Quem estava dirigindo:** procura o uso daquele carro em que a data/hora escolhida fica entre a saída e a volta. Se não achar nada, mas o km tiver aumentado nesse período, avisa que o carro foi usado sem registro.
 
-| # | Regra | Onde |
-|---|---|---|
-| U1 | Toda criação e alteração em `pessoa`, `alojamento`, `quarto`, `leito`, `estadia`, `ocorrencia`, `veiculo`, `uso_veiculo` e `manutencao` gera uma linha em `log_auditoria` com usuário logado, antes e depois | service, **na mesma transação** da alteração |
-| U2 | Nada é apagado de verdade; usa-se a coluna `ativo` | Não existe rota `DELETE` para essas tabelas |
-| U3 | Cada linha do log guarda o hash da anterior; a verificação percorre o log e recalcula | Rota `GET /api/auditoria/verificar`, botão na tela de Auditoria |
 
-### Consulta "quem estava dirigindo" (multa NIC)
+## 6. Tecnologias
 
-Dado um veículo e um instante, buscar o uso cujo período `[saida, retorno)` contém o instante (ou `retorno` vazio, se ainda em andamento). Se não houver uso registrado mas houver diferença de km em volta desse instante, avisar que há uma lacuna sem condutor identificado (regra F10).
+- **Front (`client/`):** HTML, CSS e JavaScript puro, uma página pra cada tela. Os gráficos com Chart.js.
+- **Back (`server/`):** Node.js com Express.
+- **Banco:** SQLite (ver seção 7).
+- **Login:** senha salva com `bcrypt` (nunca a senha pura) e sessão com `express-session`.
+- **IA:** Groq, que tem chave grátis.
+- **WhatsApp:** WhatsApp Cloud API da Meta, que é oficial e tem número de teste grátis.
 
-## 6. Arquitetura e stack
+O front nunca fala direto com a Groq nem com o WhatsApp, quem faz isso é o back. Assim as chaves ficam só no back, no arquivo `.env`, que não vai pro git.
 
 ```mermaid
 flowchart LR
-    B["Navegador<br/>client (HTML + JS)"] -- "HTTP/JSON<br/>/api/..." --> S["server<br/>(Node.js + Express)"]
-    S --> DB[("Banco de dados")]
-    S -- "pergunta + estrutura das tabelas" --> G["Groq API"]
-    S -- "avisos críticos" --> W["WhatsApp"]
-    J["Agendador diário<br/>(node-cron, dentro do server)"] --> S
+    B["Navegador<br/>(client)"] --> S["Servidor<br/>(Node.js + Express)"]
+    S --> DB[("SQLite")]
+    S --> G["Groq (IA)"]
+    S --> W["WhatsApp"]
 ```
 
-O client **nunca** fala direto com a Groq nem com o WhatsApp. As chaves ficam só no `.env` do server. Esse é um dos motivos concretos para separar front e back.
-
-| Camada | Escolha | Motivo |
-|---|---|---|
-| Client | **HTML + CSS + JavaScript puro** (uma página por tela, `fetch` para a API) | Decisão do grupo: mais simples de aprender, sem build nem framework |
-| Estilo | CSS simples seguindo o Figma, tema escuro | A identidade visual já está definida |
-| Gráficos | Chart.js (um `<script>` na página) | Ocupação, utilização da frota e mapa de calor em Relatórios; funciona sem framework |
-| Server | **Node.js (LTS) + Express** | Simples, mesmo idioma do front |
-| Acesso ao banco | **Knex** (query builder + migrations + seeds) | SQL próximo do real (a IA gera SQL sobre as mesmas tabelas) e troca de SQLite para Postgres mudando só a configuração |
-| Autenticação | `bcrypt` (senha) + JWT | Login com perfis; o usuário do token alimenta a auditoria |
-| Validação de entrada | `zod` | Valida o corpo das requisições antes de chegar nas regras |
-| IA | SDK `groq-sdk` | Chave gratuita |
-| Validação do SQL da IA | `node-sql-parser` | Garante que a IA só gera um único `SELECT` |
-| WhatsApp | A decidir (seção 9) | Atrás de uma interface, com modo "console" para desenvolvimento |
-| Agendamento | `node-cron` | Checagem diária de CNH vencendo, veículos não devolvidos etc. |
-| Testes | **Vitest** no server | As regras de negócio ficam no server, então é lá que os testes importam |
-| Dados fictícios | `@faker-js/faker` (`pt_BR`) | Seed da Construtora Aguapeí |
-
-### Rotas principais da API
-
-| Método e rota | Faz |
-|---|---|
-| `POST /api/auth/login` | Login, devolve o token |
-| `GET/POST/PUT /api/pessoas` | Colaboradores (sem `DELETE`; arquivar = `ativo: false`) |
-| `GET /api/pessoas/:id/historico` | Estadias e usos de veículo da pessoa |
-| `GET/POST/PUT /api/alojamentos` (+ quartos e leitos) | Alojamentos |
-| `POST /api/estadias`, `PUT /api/estadias/:id/saida` | Alocar e liberar leito |
-| `GET/POST /api/ocorrencias`, `PUT /api/ocorrencias/:id/resolver` | Ocorrências do alojamento |
-| `GET/POST/PUT /api/veiculos` | Frota |
-| `POST /api/usos`, `PUT /api/usos/:id/retorno` | Saída e retorno de veículo |
-| `GET/POST /api/manutencoes`, `PUT /api/manutencoes/:id/encerrar` | Manutenções |
-| `GET /api/relatorios/ocupacao`, `/frota`, `/movimentacao`, `/gargalos`, `/quem-dirigia` | Relatórios |
-| `GET /api/auditoria`, `GET /api/auditoria/verificar` | Log e verificação do hash |
-| `POST /api/ia/pergunta`, `/ia/resumo`, `/ia/suporte` | IA |
-| `GET /api/notificacoes`, `PUT /api/notificacoes/:id/lida` | Central de notificações |
 
 ## 7. Banco de dados
 
-### Opções
+Vamos usar **SQLite** com o pacote `better-sqlite3`, escrevendo o SQL na mão, igual a gente vê na aula. O banco é só um arquivo, então ninguém precisa instalar nada.
 
-| | **SQLite** (via Knex + `better-sqlite3`) | **PostgreSQL** (via Knex + `pg`) | MongoDB |
-|---|---|---|---|
-| Instalação | Nenhuma; é um arquivo | Instalar local, Docker ou serviço grátis (Neon, Supabase) | Instalar ou Atlas grátis |
-| Cada integrante roda sozinho | Sim, cada um gera o próprio arquivo com o seed | Precisa de instância local ou banco compartilhado | Igual ao Postgres |
-| Vários usuários ao mesmo tempo | Suficiente para a demonstração | Sim, é o padrão para web | Sim |
-| Sobreposição de períodos | Checada no código (service) | Pode ter restrição `EXCLUDE` no próprio banco, além do código | Checada no código |
-| Encaixa no modelo | Sim (relacional) | Sim (relacional) | Mal: o problema é todo de relacionamentos e períodos |
-| Texto para SQL (IA) | Sim | Sim | Não (não é SQL) |
+As tabelas estão em [server/src/db/schema.sql](../server/src/db/schema.sql), e o banco é criado com `npm run criar-banco` (dentro da pasta `server`). Cada um do grupo tem o próprio banco no seu computador. Pra todo mundo ter os mesmos dados de teste tem o `seed.js` (ainda a fazer).
 
-### Recomendação
+O banco fica numa pasta fora do projeto (`C:\Users\<seu usuário>\dispatch-dados\`), porque o projeto está no OneDrive e ele pode estragar o arquivo do banco enquanto sincroniza.
 
-**Começar com SQLite e deixar a porta aberta para PostgreSQL**, usando Knex. As migrations e os seeds são os mesmos; trocar de banco é mudar o `client` no `knexfile.js` e a string de conexão no `.env`. Isso deixa os 7 integrantes desenvolvendo sem configurar nada, e se o professor exigir banco "de verdade" ou deploy, a troca não obriga a refazer nada.
+Algumas decisões:
 
-MongoDB está descartado: o domínio é relacional (pessoa ↔ leito ↔ período, veículo ↔ motorista ↔ passageiros) e a IA de perguntas depende de SQL.
-
-Cuidado: **não deixar o arquivo do banco dentro de pasta sincronizada do OneDrive**. A sincronização pode corromper um SQLite aberto. Colocar o `.db` fora da pasta (caminho configurável no `.env`) ou pausar a sincronização.
-
-### Modelo de dados
-
-Princípios:
-
-- **Tudo é um período de tempo.** Estadia = pessoa + leito + início + fim. Uso de veículo = veículo + motorista (+ passageiros) + saída + retorno + km. Ocupação, ociosidade e "onde estava fulano no dia X" saem das mesmas consultas.
-- **Leito é a unidade**, não o quarto. Sem capacidade por leito não dá para calcular % de ocupação.
-- **Período com início incluído e fim excluído.** Uma estadia que termina no dia 10 não conflita com outra que começa no dia 10. Fim vazio (`NULL`) = em andamento.
-- **Dois relógios:** quando aconteceu (fica em `estadia`/`uso_veiculo`) e quando foi registrado (fica em `log_auditoria`).
-- **Nada é apagado:** coluna `ativo`.
-- Datas em ISO 8601, IDs em texto (UUID gerado com `crypto.randomUUID()`).
+- Estadia, uso de veículo e manutenção têm um início e um fim. Fim vazio quer dizer que ainda está acontecendo (a pessoa ainda está no leito, o carro ainda não voltou).
+- A ocupação é contada por **leito**, não por quarto.
+- Nada é apagado, só marcado como inativo (`ativo = 0`).
+- O status do veículo não é salvo numa coluna: ele é calculado. Se tem manutenção aberta está "em manutenção", se tem uso sem volta está "em uso", senão está "disponível". Assim ele nunca fica errado.
 
 ```mermaid
 erDiagram
     USUARIO ||--o{ LOG_AUDITORIA : registra
-    USUARIO ||--o{ NOTIFICACAO : recebe
     PESSOA ||--o{ ESTADIA : ocupa
     PESSOA ||--o{ USO_VEICULO : dirige
     PESSOA ||--o{ USO_PASSAGEIRO : viaja
-    PESSOA ||--o{ ALOJAMENTO : responsavel_por
+    PESSOA ||--o{ ALOJAMENTO : responsavel
     ALOJAMENTO ||--o{ QUARTO : tem
-    ALOJAMENTO ||--o{ OCORRENCIA : registra
+    ALOJAMENTO ||--o{ OCORRENCIA : tem
     QUARTO ||--o{ LEITO : tem
-    LEITO ||--o{ ESTADIA : hospeda
-    VEICULO ||--o{ USO_VEICULO : usado_em
-    VEICULO ||--o{ MANUTENCAO : passa_por
+    LEITO ||--o{ ESTADIA : recebe
+    VEICULO ||--o{ USO_VEICULO : tem
+    VEICULO ||--o{ MANUTENCAO : tem
     USO_VEICULO ||--o{ USO_PASSAGEIRO : leva
 ```
 
-| Tabela | Campos principais | Restrições |
-|---|---|---|
-| `usuario` | id, nome, login, senha_hash, perfil, telefone, ativo | `login` único; `perfil` em (`rh`, `frota`, `admin`) |
-| `pessoa` | id, nome, matricula, cargo, obra, telefone, cnh_categorias, cnh_validade, ativo | `matricula` única |
-| `alojamento` | id, nome, **responsavel_id**, cidade, cep, rua, numero, bairro, observacoes, ativo | `responsavel_id` → `pessoa` |
-| `ocorrencia` | id, alojamento_id, pessoa_id (opcional), tipo, descricao, aberta_em, resolvida_em, solucao | `tipo` em (`manutencao`, `conflito`, `reclamacao`, `regra`, `outro`); `resolvida_em IS NULL OR resolvida_em > aberta_em` |
-| `quarto` | id, alojamento_id, nome, area_m2 | `area_m2 > 0` |
-| `leito` | id, quarto_id, codigo, tipo | `tipo` em (`cama`, `beliche_baixo`, `beliche_cima`); (`quarto_id`, `codigo`) único |
-| `estadia` | id, pessoa_id, leito_id, inicio, fim | `fim IS NULL OR fim > inicio`; índices por pessoa e por leito |
-| `veiculo` | id, placa, modelo, lugares, categoria_cnh_exigida, km_base, **licenciamento_validade**, **seguro_validade**, ativo | `placa` única; `lugares > 0` |
-| `manutencao` | id, veiculo_id, tipo, descricao, inicio, fim, km | `tipo` em (`preventiva`, `corretiva`); `fim IS NULL OR fim > inicio` |
-| `uso_veiculo` | id, veiculo_id, motorista_id, destino, saida, retorno, km_saida, km_retorno | `retorno > saida`; `km_retorno >= km_saida`; índices por veículo e motorista |
-| `uso_passageiro` | uso_veiculo_id, pessoa_id | chave composta |
-| `log_auditoria` | id, quando, usuario_id, acao, tabela, registro_id, resumo, antes_json, depois_json, hash_anterior, hash | só recebe `INSERT` |
-| `notificacao` | id, tipo, severidade, mensagem, entidade, entidade_id, criada_em, lida, enviada_whatsapp | **nova** (seção 9) |
+As tabelas são: `usuario`, `pessoa`, `alojamento`, `quarto`, `leito`, `estadia`, `ocorrencia`, `veiculo`, `uso_veiculo`, `uso_passageiro`, `manutencao`, `log_auditoria` e `notificacao`.
 
-**Status do veículo não é gravado, é calculado.** Com manutenção aberta (`fim` vazio) → "manutenção"; com uso em andamento → "em uso"; senão → "disponível". Documentação vencida aparece como pílula âmbar/vermelha ao lado. Guardar o status numa coluna criaria o risco de ele ficar diferente do que os registros dizem.
-
-Consulta de sobreposição (a mesma serve para leito, pessoa, veículo, motorista e manutenção, trocando a tabela e a coluna):
+Pra saber se um leito (ou carro) já está ocupado num período, a consulta é essa (é só trocar a tabela e a coluna pros outros casos):
 
 ```sql
 SELECT 1 FROM estadia
-WHERE leito_id = :leito_id
-  AND id != COALESCE(:id_atual, '')
-  AND :inicio < COALESCE(fim, '9999-12-31 23:59:59')
-  AND inicio  < COALESCE(:fim, '9999-12-31 23:59:59')
+WHERE leito_id = ?
+  AND ? < COALESCE(fim, '9999-12-31')   -- o novo começa antes do existente terminar
+  AND inicio < COALESCE(?, '9999-12-31') -- e o existente começa antes do novo terminar
 LIMIT 1;
 ```
 
-### Auditoria no server
+### Relatórios
 
-A versão anterior (Python) usava triggers no SQLite. Com um server Node.js fica mais simples fazer no código: o usuário logado já vem do token (`req.usuario`), e a gravação do log acontece **na mesma transação** da alteração. Se uma falhar, as duas voltam atrás.
+- **Ocupação do alojamento:** leitos ocupados ÷ leitos totais, por dia.
+- **Uso da frota:** horas que o carro ficou fora ÷ horas disponíveis. O resto é o tempo parado.
+- **Km por veículo:** soma de (km da volta − km da saída).
+- **Movimentação:** quem trocou de alojamento, entradas e saídas por semana, viagens por destino.
+- **Gargalos:** um mapa de calor com dia da semana × hora mostrando quantos carros estavam na rua, alojamentos acima de 90% de ocupação, carros muito tempo na oficina e ocorrências abertas há muito tempo.
 
-```js
-// server/src/services/auditoria.service.js (esboço)
-import { createHash, randomUUID } from 'node:crypto';
+Os números são sempre calculados com SQL. A IA só escreve o texto em cima deles.
 
-export async function registrar(trx, { usuarioId, acao, tabela, registroId, resumo, antes, depois }) {
-  const ultima = await trx('log_auditoria').orderBy('quando', 'desc').first('hash');
-  const hashAnterior = ultima?.hash ?? 'inicio';
-  const linha = {
-    id: randomUUID(),
-    quando: new Date().toISOString(),
-    usuario_id: usuarioId, acao, tabela, registro_id: registroId, resumo,
-    antes_json: antes ? JSON.stringify(antes) : null,
-    depois_json: depois ? JSON.stringify(depois) : null,
-    hash_anterior: hashAnterior,
-  };
-  linha.hash = createHash('sha256').update(JSON.stringify(linha)).digest('hex');
-  await trx('log_auditoria').insert(linha);
-}
-```
 
-A verificação (U3) percorre o log em ordem, recalcula cada hash e aponta a primeira linha que não bate. Isso não impede que alguém edite o banco por fora, mas deixa a edição **detectável**, e é uma boa demonstração na apresentação.
+## 8. IA (Groq)
 
-### Indicadores dos relatórios
+A chave é grátis (https://console.groq.com/keys) e fica no `.env` do server.
 
-**Ocupação por alojamento e uso por veículo**
+A IA vai ser usada em 4 lugares:
 
-| Indicador | Fórmula |
-|---|---|
-| Ocupação do alojamento | noites-leito ocupadas ÷ noites-leito disponíveis × 100 |
-| Utilização da frota | horas em uso ÷ horas disponíveis × 100 (horas em manutenção não contam como disponíveis) |
-| Ociosidade da frota | 100 − utilização |
-| Km por veículo | soma de (km_retorno − km_saida) |
-| Usos por veículo | quantidade de registros em `uso_veiculo` no período |
+- **Perguntas:** a pessoa digita algo tipo "quantas pessoas estão no alojamento Centro?". A gente vai ter umas 8 consultas SQL prontas (ocupação de um alojamento, quem estava dirigindo, CNHs vencendo, km por veículo...), e a IA só escolhe qual consulta usar e com quais valores. Ela nunca escreve SQL sozinha, então não tem risco de apagar ou estragar nada.
+- **Resumo dos relatórios:** o server calcula os números e pede pra IA escrever um parágrafo explicando.
+- **Ajuda:** um chat que responde dúvidas de como usar o sistema, com base num manualzinho que a gente vai escrever.
+- **Notificações:** a IA escreve a mensagem do aviso de um jeito mais claro.
 
-**Padrões de movimentação** (quem se desloca, para onde e com que frequência)
+Cuidados: o plano grátis tem limite de uso por minuto, então se der erro mostra uma mensagem tipo "tente de novo em alguns segundos". E se não tiver chave configurada, os botões de IA ficam desligados e o resto funciona normal.
 
-| Indicador | Como sai do banco |
-|---|---|
-| Trocas de alojamento | Estadias de uma mesma pessoa em alojamentos diferentes dentro do período. Lista quem mais trocou |
-| Entradas e saídas por semana | Contagem de `estadia.inicio` e `estadia.fim` por semana, por alojamento |
-| Viagens por destino/obra | `uso_veiculo` agrupado por `destino`: quantidade de viagens e km total |
-| Motoristas mais frequentes | `uso_veiculo` agrupado por `motorista_id` |
-
-**Gargalos** (onde falta recurso ou onde o problema se acumula)
-
-| Indicador | Como sai do banco | Por que é gargalo |
-|---|---|---|
-| Mapa de calor da frota | Para cada dia da semana × faixa de hora, média de veículos em uso ÷ frota ativa | Células perto de 100% mostram horários em que ninguém consegue carro |
-| Frota esgotada | Intervalos em que todos os veículos ativos estavam em uso ou em manutenção | Momentos concretos de falta de veículo |
-| Alojamento saturado | Dias com ocupação ≥ 90%, por alojamento | Onde vai faltar leito na próxima contratação |
-| Veículo parado | Dias em manutenção por veículo | Veículo que custa e não roda |
-| Ocorrências acumuladas | Ocorrências abertas por alojamento e tempo médio até resolver | Onde a gestão do alojamento está travando |
-
-Os números são sempre calculados por SQL no server. A IA só redige o texto em cima deles (seção 8).
-
-## 8. IA com Groq
-
-Chave gratuita criada em https://console.groq.com/keys, guardada em `GROQ_API_KEY` no `.env` do server. Modelo configurável por variável de ambiente (ex.: `llama-3.3-70b-versatile`; conferir a lista atual de modelos no console da Groq antes de fixar).
-
-A IA atende quatro usos, todos a partir do server:
-
-| Uso | Onde aparece | Como funciona | O que vai para a Groq |
-|---|---|---|---|
-| **Perguntas** ("quantas pessoas estão no alojamento Centro?") | Aba Relatórios | Texto para SQL: a IA gera a consulta, o server valida e roda | Pergunta + estrutura das tabelas. **Nunca os dados** |
-| **Relatórios** (resumo em texto) | Aba Relatórios, abaixo dos gráficos | O server calcula os indicadores por SQL e pede à IA um parágrafo de resumo | Só os números agregados (sem nome de pessoa) |
-| **Suporte** ("como registro o retorno de um veículo?") | Chat flutuante | Prompt de sistema com um manual curto de uso (`server/src/ia/manual.md`) | Pergunta + manual. Sem acesso ao banco |
-| **Notificações** | Central de notificações e WhatsApp | A partir de um alerta já estruturado, a IA redige uma mensagem curta e clara | Tipo do alerta + dados mínimos |
-
-### Proteções do texto para SQL
-
-1. Enviar só a estrutura das tabelas e a pergunta, nunca os dados.
-2. Validar com `node-sql-parser` que a resposta é **um único `SELECT`**, sem `INSERT`, `UPDATE`, `DELETE`, `DROP`, `PRAGMA` nem `ATTACH`.
-3. Rodar numa **conexão só de leitura** (`better-sqlite3` com `{ readonly: true }`; no Postgres, um usuário com permissão apenas de `SELECT`).
-4. Limitar o resultado (ex.: 200 linhas) e o tempo de execução.
-5. Se a consulta der erro, devolver a mensagem à IA para uma segunda tentativa, no máximo uma vez.
-6. Mostrar ao usuário o SQL gerado junto com a resposta (transparência, e ajuda a explicar na apresentação).
-
-### Cuidados
-
-- **Limite do plano gratuito:** a Groq limita requisições por minuto e por dia. Tratar o erro 429 com uma mensagem amigável ("A IA está sobrecarregada, tente em alguns segundos") e nunca travar a tela.
-- **Tudo funciona sem IA:** se `GROQ_API_KEY` estiver vazia, os botões de IA ficam desativados e as notificações usam um texto fixo.
-- **A IA não faz conta nem decide regra.** Números vêm do SQL; validações vêm do service.
 
 ## 9. Notificações e WhatsApp
 
-### Quais alertas o sistema gera
+Os avisos são verificados quando o server liga e toda vez que alguém abre a tela de Resumo:
 
-| Alerta | Quando | Severidade | Vai para WhatsApp? |
-|---|---|---|---|
-| CNH vencendo | 30 dias antes do vencimento (checagem diária) | atenção | Não |
-| CNH vencida com uso em andamento | Checagem diária | crítico | Sim |
-| Km sem registro (F10) | Ao registrar uma saída | crítico | Sim |
-| Veículo não devolvido | Uso em andamento há mais de X horas (configurável) | atenção | Sim |
-| Alojamento lotado | Ocupação chegou a 100% | atenção | Não |
-| Licenciamento ou seguro vencendo | 30 dias antes (checagem diária) | atenção | Não |
-| Ocorrência parada | Ocorrência aberta há mais de 7 dias | atenção | Não |
-| Manutenção longa | Veículo em manutenção há mais de 7 dias | atenção | Não |
-| Falha na verificação de integridade do log | Ao rodar a verificação | crítico | Sim |
+- CNH, licenciamento ou seguro vencendo nos próximos 30 dias;
+- km sem registro (regra F10);
+- carro que saiu e não voltou depois de X horas;
+- alojamento lotado;
+- ocorrência aberta há mais de 7 dias;
+- carro na oficina há mais de 7 dias;
+- log de auditoria adulterado.
 
-Todos os alertas aparecem na **central de notificações** (sino). Só os marcados como "vai para WhatsApp" são enviados, e só se o admin tiver ativado e cadastrado um número.
+Todos aparecem no sininho. Os mais graves (km sem registro, carro que não voltou, CNH vencida com o carro na rua e log adulterado) também vão por WhatsApp pro admin.
 
-### Como integrar o WhatsApp
+Pro WhatsApp vamos usar a **WhatsApp Cloud API** da Meta, que é a oficial e tem um número de teste grátis. Enquanto ninguém configurar isso, a mensagem só aparece no terminal do server. Assim todo mundo consegue testar sem precisar de conta.
 
-O envio fica atrás de uma interface simples, com dois modos escolhidos no `.env`:
-
-```js
-// server/src/notificacoes/whatsapp.js (esboço)
-export async function enviarWhatsApp(telefone, texto) {
-  if (process.env.WHATSAPP_MODO !== 'api') {
-    console.log(`[whatsapp:console] para ${telefone}: ${texto}`);
-    return;
-  }
-  // chamada real ao provedor escolhido
-}
-```
-
-Assim, ninguém do grupo precisa de conta no provedor para desenvolver; só quem for demonstrar.
-
-Opções de provedor (decisão em aberto):
-
-| Opção | Prós | Contras |
-|---|---|---|
-| **WhatsApp Cloud API (Meta)** | Oficial e gratuita para teste, com número de teste da própria Meta. A Eficaz é parceira da Meta, o que conversa bem com a apresentação | Precisa de conta de desenvolvedor Meta; mensagens iniciadas pela empresa usam modelos (templates) aprovados; no número de teste só se envia para números cadastrados |
-| Twilio (sandbox de WhatsApp) | Configuração rápida, boa documentação | Conta de teste; quem vai receber precisa entrar no sandbox mandando um código |
-| `whatsapp-web.js` (não oficial) | Mais fácil de fazer funcionar: lê um QR code e envia | Viola os termos do WhatsApp e o número pode ser bloqueado. Só com chip descartável, e deixar claro que é para demonstração |
-
-**Recomendação:** WhatsApp Cloud API com número de teste. Conferir na documentação da Meta, na hora de implementar, os limites atuais do número de teste e as regras de template.
 
 ## 10. Organização do repositório
 
-Front e back separados. O `client/` é HTML, CSS e JavaScript puro, sem `package.json` nem build: cada tela é uma página HTML com seu CSS e seu JS. O `server/` tem o próprio `package.json`, `.env.example` e testes. A raiz só tem documentação e configurações comuns.
-
 ```
 dispatch/
-├── client/                      # front-end (HTML + CSS + JavaScript puro)
-│   ├── index.html               # tela de login (já existe)
+├── client/                 # front-end (HTML, CSS e JS)
+│   ├── index.html          # login (já feito)
 │   ├── resumo.html
 │   ├── colaboradores.html
 │   ├── alojamentos.html
 │   ├── frota.html
 │   ├── relatorios.html
-│   ├── css/
-│   │   ├── base.css             # cores, fontes, botões, pílulas de status (padrão do Figma)
-│   │   ├── login.css            # (já existe)
-│   │   └── ...                  # um arquivo por tela
-│   └── js/
-│       ├── api.js               # todas as chamadas fetch() ao server num lugar só
-│       ├── menu.js              # monta a barra lateral e o cabeçalho em todas as páginas
-│       ├── login.js             # (já existe)
-│       └── ...                  # um arquivo por tela
+│   ├── css/                # base.css (cores e botões) + um css por tela
+│   └── js/                 # api.js (chamadas pro server), menu.js + um js por tela
 │
-├── server/                      # back-end (Node.js + Express)
+├── server/                 # back-end (Node.js)
 │   ├── src/
-│   │   ├── routes/              # define as rotas e chama o controller
-│   │   ├── controllers/         # lê a requisição, chama o service, devolve JSON
-│   │   ├── services/            # regras de negócio (seção 5) e auditoria; sem Express aqui
-│   │   │   ├── disponibilidade.service.js
-│   │   │   ├── cnh.service.js
-│   │   │   ├── nr24.service.js
-│   │   │   ├── documentacao.service.js
-│   │   │   ├── relatorios.service.js
-│   │   │   ├── auditoria.service.js
-│   │   │   └── ...
-│   │   ├── db/
-│   │   │   ├── knexfile.js
-│   │   │   ├── migrations/
-│   │   │   └── seeds/           # dados da Construtora Aguapeí
-│   │   ├── ia/                  # cliente Groq, textoParaSql, resumo, suporte, manual.md
-│   │   ├── notificacoes/        # geração de alertas, agendador (node-cron), whatsapp
-│   │   ├── middlewares/         # autenticação, perfil, tratamento de erro
-│   │   ├── app.js               # monta o Express
-│   │   └── server.js            # sobe o servidor
-│   ├── tests/                   # Vitest: uma suíte por grupo de regras (A, F, U)
+│   │   ├── server.js       # liga o servidor e entrega a pasta client
+│   │   ├── routes/         # uma rota por assunto: pessoas.js, alojamentos.js, frota.js, relatorios.js...
+│   │   ├── regras/         # as validações da seção 5: cnh.js, nr24.js, disponibilidade.js, auditoria.js
+│   │   ├── db/             # schema.sql, criar-banco.js (já feitos), conexao.js, seed.js
+│   │   ├── ia/             # chamadas pra Groq
+│   │   └── whatsapp.js
 │   ├── .env.example
 │   └── package.json
 │
-├── docs/
-│   └── planejamento.md          # este documento
-├── .gitignore
-└── README.md                    # o que é, como rodar client e server
+├── docs/planejamento.md    # esse arquivo
+└── README.md
 ```
 
-Por que `services/` separado de `routes/` e `controllers/`: as regras da seção 5 precisam de teste automatizado, e testar uma função que recebe dados e devolve "ok" ou "erro" é muito mais fácil do que testar uma rota HTTP inteira.
+As regras ficam separadas das rotas pra ficar mais fácil de achar e de testar cada uma.
 
-### Variáveis de ambiente do server (`server/.env.example`)
+Pra rodar o projeto precisa do **Node.js 22 ou mais novo**:
 
 ```bash
-PORT=3001
-DB_CLIENT=better-sqlite3           # ou pg
-DB_CAMINHO=../dispatch.db          # fora de pasta sincronizada
-# DATABASE_URL=postgres://...      # se usar Postgres
-JWT_SEGREDO=troque-isto
-GROQ_API_KEY=                      # vazio = IA desativada
-GROQ_MODELO=llama-3.3-70b-versatile
-WHATSAPP_MODO=console              # console | api
-WHATSAPP_TOKEN=
-WHATSAPP_NUMERO_ID=
+cd server
+npm install
+npm run criar-banco
 ```
 
-### Como rodar
+O próprio server vai entregar as páginas do `client`, então front e back abrem no mesmo endereço (`http://localhost:3001`). Enquanto o server não existe, dá pra abrir o login com a extensão Live Server do VS Code.
 
-O client não precisa de instalação. Enquanto o server não existe, dá para abrir o `client/index.html` com a extensão **Live Server** do VS Code (ou qualquer servidor estático).
 
-Quando o server existir, ele mesmo entrega a pasta `client/` com `express.static`. Assim front e back ficam no mesmo endereço (`http://localhost:3001`), o `fetch('/api/...')` funciona sem configurar CORS, e as pastas continuam separadas no repositório.
+## 11. Divisão do trabalho
 
-```bash
-cd server && npm install && npm run migrate && npm run seed && npm run dev
-# abrir http://localhost:3001
-```
+Cada um pega uma parte e faz o front e o back dela, pra ninguém ficar esperando o outro.
 
-O `.gitignore` da raiz já ignora `node_modules/`, `.env` e `*.db`.
+| Parte | O que faz |
+|---|---|
+| Base do server | Express, conexão com o banco, `seed.js`, login e a função do log de auditoria |
+| Base do front | `base.css`, menu lateral, `api.js` e ligar a tela de login no server |
+| Colaboradores | Tela, cadastro, histórico da pessoa e regras de CNH |
+| Alojamentos | Tela, cadastro, mapa de leitos, estadias, ocorrências e regras A1 a A7 |
+| Frota | Tela, cadastro, saída e volta, manutenções e regras F1 a F13 |
+| Relatórios e auditoria | Relatórios, gráficos, "quem estava dirigindo" e tela do log |
+| IA e notificações | IA, sininho e WhatsApp. Até a base ficar pronta, ajuda no seed e em Alojamentos/Frota |
 
-## 11. Divisão de trabalho e fluxo de git
+Alojamentos e Frota são as partes maiores. Se alguém tiver menos tempo, vale colocar duas pessoas nelas.
 
-Sugestão por frente; o grupo distribui os nomes conforme a disponibilidade. Cada frente de tela faz **front e back** da própria funcionalidade, para ninguém ficar esperando outra pessoa terminar a API.
+**Git:**
 
-| Frente | Entrega | Depende de |
-|---|---|---|
-| 1. Base do server | Express, Knex, migrations, seed, login/JWT, middleware de erro, `auditoria.service` | Nada; é a base |
-| 2. Base do client | `base.css` (cores e componentes do Figma), `menu.js` (barra lateral e cabeçalho), `api.js`, ligar a tela de Login (já feita) ao server | Nada; em paralelo com a 1 |
-| 3. Colaboradores | Telas + rotas + histórico da pessoa + `cnh.service` (F3–F5) | 1, 2 |
-| 4. Alojamentos | Telas + responsável + mapa de leitos + estadias + **ocorrências** + regras A1–A7 | 1, 2 |
-| 5. Frota | Telas + documentação + saída e retorno + **manutenções** + status calculado + regras F1, F2, F6–F13 | 1, 2, 3 (CNH) |
-| 6. Relatórios e Auditoria | Ocupação, uso por veículo, **movimentação**, **gargalos** (mapa de calor), "quem dirigia", tela de log e verificação de hash | 4, 5 |
-| 7. IA e notificações | `ia/` (os 4 usos), central de notificações, agendador, WhatsApp. Até o núcleo ficar pronto, ajuda as frentes 4 e 5 e faz o seed com 6 meses de histórico (os relatórios de gargalo dependem dele) | 1, 6 |
+- Ninguém faz commit direto na `main`. Cada um trabalha na sua branch (ex.: `frota-saida-volta`) e abre um pull request.
+- Outra pessoa do grupo dá uma olhada antes de juntar na `main`.
+- Commits pequenos e em português (ex.: `valida cnh vencida na saida`).
+- Se mudar o `schema.sql`, avisa no grupo, porque todo mundo vai ter que apagar o banco e rodar o `criar-banco` de novo.
 
-Com 7 pessoas, cada frente pode ter um responsável. Se alguém tiver menos tempo, Alojamentos e Frota são as frentes maiores e as que mais se beneficiam de dupla.
+**Testes:** antes de abrir o pull request, testar na mão os casos da regra que você fez (um que passa e um que bloqueia) e comparar com o protótipo.
 
-### Fluxo de git
-
-- `main` sempre funcionando. Ninguém commita direto nela.
-- Uma branch por tarefa: `feat/frota-saida-retorno`, `fix/cnh-validade`, `docs/planejamento`.
-- Commits pequenos, em português, dizendo o que mudou (ex.: `valida sobreposicao de estadia`).
-- Pull request para `main` com revisão de pelo menos uma pessoa do grupo.
-- Mudou migration? Avise no grupo antes de abrir o PR. É o arquivo que mais gera conflito.
-
-### Checklist antes de abrir PR
-
-- [ ] A regra implementada está na tabela da seção 5? Se for nova, adicionar lá.
-- [ ] Tem teste para a regra (caso que passa e caso que bloqueia)?
-- [ ] A alteração passa pelo `auditoria.service` na mesma transação?
-- [ ] Nenhuma chave (Groq, WhatsApp, JWT) no código ou no client?
-- [ ] O comportamento bate com o protótipo navegável?
 
 ## 12. Cronograma
 
-Semanas contadas a partir da apresentação. O prazo final da faculdade ainda precisa ser confirmado; se for mais curto, corta-se de baixo para cima: primeiro o WhatsApp real (fica o modo console), depois o resumo por IA. **O núcleo (semanas 1 a 4) não é cortado.**
+| Semana | O que entregar |
+|---|---|
+| 0 | Apresentação (telas do Figma + solução) |
+| 1 | Base do server e do front, login funcionando, banco com dados de exemplo |
+| 2 | Cadastros (colaboradores, alojamentos, veículos) com log de auditoria |
+| 3 | Estadias, ocorrências, saída/volta de veículo, manutenções e as regras |
+| 4 | Relatórios, "quem estava dirigindo" e tela de auditoria. **Aqui tudo que o professor pediu tem que estar pronto** |
+| 5 | IA e notificações |
+| 6 | WhatsApp, ajustes visuais e ensaio da apresentação |
 
-| Semana | Camada | Entrega |
-|---|---|---|
-| 0 | — | **Apresentação:** telas do Figma + solução proposta (seção 13). Repositório com `client/` e `server/` criados e rodando um "olá" |
-| 1 | Núcleo | Bases (frentes 1 e 2): login, layout, migrations, seed. Cada frente começa o próprio cadastro |
-| 2 | Núcleo | Cadastros completos (colaboradores, alojamentos com responsável, veículos com documentação) com auditoria |
-| 3 | Núcleo | Estadias, ocorrências, uso de veículo e manutenções, com as regras A e F e seus testes |
-| 4 | Núcleo | Relatórios (ocupação, uso por veículo, movimentação, gargalos), "quem dirigia", tela de auditoria com verificação de hash. **Aqui a proposta do professor está 100% atendida** |
-| 5 | Diferencial | IA (perguntas, resumo, suporte) e central de notificações |
-| 6 | Diferencial | WhatsApp, polimento visual, ensaio da demonstração com os dados de exemplo |
+Se o prazo apertar, corta do fim pro começo: primeiro o WhatsApp, depois a IA. As semanas 1 a 4 não podem ser cortadas.
+
 
 ## 13. Roteiro da apresentação
 
-Documento para a apresentação da semana que vem: **telas do Figma + solução proposta para o problema.** Estrutura sugerida (serve para os slides e para o documento escrito):
+1. Quem somos e quem propôs o problema (Eficaz Marketing).
+2. O problema, com os exemplos da multa NIC e da NR-24.
+3. O cenário: Construtora Aguapeí.
+4. O que o sistema faz.
+5. **O que o professor pediu x onde o sistema atende** (tabela da seção 3). É o slide mais importante.
+6. As telas do Figma, seguindo o uso real: login, resumo, cadastrar colaborador, colocar num leito, abrir ocorrência, registrar saída de carro, manutenção, relatórios e auditoria.
+7. Os extras do grupo: IA e WhatsApp.
+8. Como vai ser feito: tecnologias, banco e organização das pastas.
+9. Cronograma e divisão do grupo.
 
-1. **Quem somos e quem propôs o problema:** Grupo DevCore; Eficaz Marketing (Marília/SP, Google Partner Premier, parceira da Meta, sediada no CIEM).
-2. **O problema:** falta de visão integrada sobre quem está onde e quem usa cada ativo (seção 1), com os riscos e os dois exemplos concretos: multa NIC e NR-24.
-3. **Cenário escolhido:** Construtora Aguapeí (seção 2).
-4. **Solução proposta:** o que o sistema faz, em 8 itens (seção 3).
-5. **Proposta → solução:** o slide mais importante. A tabela da seção 3 ("Proposta do professor → onde o sistema atende"), mostrando que cada ponto do texto tem uma resposta concreta.
-6. **Telas do Figma:** percorrer as telas na ordem do fluxo real (Login → Resumo → cadastrar colaborador → alocar leito → abrir ocorrência → registrar saída de veículo → manutenção → relatórios de movimentação e gargalos → auditoria), apontando em cada uma qual regra ela aplica.
-7. **Diferenciais do grupo (IA e WhatsApp):** os 4 usos da IA (seção 8) e a tabela de alertas (seção 9). Apresentar como "além do que foi pedido" e deixar claro que a IA não substitui cadastro nem regra.
-8. **Como vai ser construído:** diagrama de arquitetura (seção 6), estrutura `client/` e `server/` (seção 10) e a decisão de banco (seção 7).
-9. **Cronograma e divisão do grupo** (seções 11 e 12), mostrando que o núcleo vem antes dos diferenciais.
+Três coisas pra mostrar funcionando no protótipo:
 
-Três momentos de demonstração que convencem, todos já funcionando no protótipo navegável:
+- tentar tirar uma van com um motorista que só tem CNH B, e o sistema bloquear;
+- registrar uma saída com km maior que a última volta, e aparecer o aviso de uso sem registro;
+- mexer no banco por fora e a auditoria mostrar a linha adulterada.
 
-- **CNH bloqueando:** tentar registrar a saída de uma van com um motorista que só tem categoria B. O sistema bloqueia e explica por quê.
-- **Km sem registro:** registrar uma saída com km maior que o último retorno. O sistema gera o alerta (e, na versão final, o aviso no WhatsApp).
-- **Log adulterado:** alterar um registro "por fora" e rodar a verificação de integridade. O sistema aponta a linha adulterada.
 
 ## 14. LGPD
 
-Os dados são fictícios, mas vale mostrar que o grupo pensou nisso:
+Os dados são inventados, mas a gente levou em conta:
 
-- a empresa é a controladora dos dados; a base legal é o contrato de trabalho (ou legítimo interesse), não o consentimento;
-- os colaboradores precisam ser avisados por escrito sobre o controle;
-- perfis de acesso: nem todo usuário vê tudo (`rh`, `frota`, `admin`);
-- histórico de "quem esteve onde" é dado de localização de pessoas e merece cuidado;
-- definir por quanto tempo os dados ficam guardados;
-- **IA e WhatsApp:** mandar para serviços externos só o mínimo necessário. Texto para SQL envia só a estrutura; o resumo envia só números agregados; mensagens de WhatsApp evitam dados pessoais além do nome.
+- os funcionários precisam saber que esses dados são registrados;
+- nem todo usuário vê tudo (admin x operador);
+- saber onde uma pessoa dormiu é informação sensível, então só quem precisa deve ver;
+- pra IA e pro WhatsApp vai só o mínimo necessário (a IA recebe números, não nomes).
 
-## 15. Decisões em aberto
 
-- [ ] **Banco de dados:** recomendação é SQLite com Knex, pronto para migrar a Postgres (seção 7). Confirmar com o grupo e com o professor.
-- [ ] **Provedor de WhatsApp:** recomendação é WhatsApp Cloud API com número de teste (seção 9).
-- [ ] Prazo final e entregáveis da faculdade.
-- [ ] Divisão das frentes entre os 7 integrantes (seção 11).
-- [ ] Definição de "hora disponível" nos indicadores de frota: 24 h por dia ou só horário comercial. Muda bastante o resultado.
-- [ ] Reserva futura de veículo entra no escopo ou só o uso real?
-- [ ] Hash encadeado no log: em Node é barato de fazer (seção 7). Recomendação: entra.
-- [ ] Deploy (ex.: client na Vercel, server no Render) ou só rodar local na apresentação.
-- [ ] Atualizar o Figma com os elementos novos (seção 4), começando pelos do núcleo (ocorrências, responsável, documentação, manutenções, movimentação e gargalos).
-- [ ] Perguntas por IA: SQL livre gerado pela IA (seção 8) ou um conjunto de consultas prontas que a IA só escolhe e preenche. Consultas prontas são mais seguras para a demonstração.
+## 15. O que ainda falta decidir
 
-Já decidido: cenário (Construtora Aguapeí), telas e identidade visual (Figma), linguagem (JavaScript/Node.js), repositório com `client/` e `server/` separados, IA via Groq, integração com WhatsApp, prioridade do núcleo pedido pelo professor sobre os diferenciais.
+- [ ] Confirmar com o professor se SQLite serve ou se ele quer MySQL/PostgreSQL.
+- [ ] Prazo final e o que tem que ser entregue.
+- [ ] Quem fica com cada parte (seção 11).
+- [ ] No relatório de uso da frota, contar o dia todo (24 h) ou só o horário comercial?
+- [ ] Atualizar o Figma com o que falta (seção 4).
+- [ ] Publicar na internet ou só rodar no computador na apresentação.
+
 
 ## 16. Fontes
 
-**Normas e legislação**
 - [NR-24 (Guia Trabalhista)](https://www.guiatrabalhista.com.br/legislacao/nr/nr24.htm)
 - [NR-24: capacidade e metragem](https://www.asapcontabilidade.com.br/nr-24-alojamentos-capacidade-maxima-metragem-regras-especificas-condicoes-de-uso-areas-minimas/)
 - [Camas e beliches na NR-24](https://conexaotrabalho.portaldaindustria.com.br/publicacoes/detalhe/seguranca-e-saude-do-trabalho/normas-regulamentadoras-nr/novas-exigencias-para-camas-e-beliches-na-nr-24/)
-- [Alojamento para trabalhadores (Conjur)](https://conjur.com.br/2024-out-23/alojamento-para-trabalhadores-solucao-que-exige-atencao-das-empresas/)
 - [Multa NIC (Detran-GO)](https://goias.gov.br/detran/1465/)
 - [Multa NIC: valor e como evitar](https://www.frota162.com.br/blog/multa-nic-o-que-e/)
 - [Categorias da CNH (Exame)](https://exame.com/brasil/guia-do-cidadao/categoria-a-b-c-d-e-quais-veiculos-cada-carteira-de-habilitacao-pode-dirigir/)
-- [LGPD e geolocalização](https://lgpdsolucoes.com.br/blog/lgpd-geolocalizacao/)
 - [LGPD nas relações de trabalho](https://www.barbieriadvogados.com/barbieri-advogados-lgpd-nas-relacoes-de-trabalho/)
-
-**Frota e alojamento (referências de produto)**
-- [Planilha de controle diário (Cobli)](https://www.cobli.co/conteudo/planilha-controle-diario-de-veiculos/) e [taxa de utilização da frota](https://www.cobli.co/blog/taxa-utilizacao-frota/)
-- [Ociosidade da frota](https://golfleet.com.br/ociosidade-da-frota)
-- [Contele Fleet](https://contelefleet.com.br/checklist-do-veiculo-online), [DriveList](https://www.drivelist.com.br/), [Frota Control](https://frotacontrol.com.br/conheca-o-sistema/)
-- [RMS Workforce](https://www.rmscloud.com/solutions/workforce), [CampLogistiks](https://camplogistiks.com/camp-logistiks/workforce-housing/), [Camps & Crew](https://www.campsandcrew.com/software-for-workforce-camp)
-
-**Modelagem e auditoria**
-- [Fowler: Temporal Object](https://martinfowler.com/eaaDev/TemporalObject.html)
-- [Fowler: Bitemporal History](https://martinfowler.com/articles/bitemporal-history.html)
-- [Log de auditoria em JSON (Simon Willison)](https://til.simonwillison.net/sqlite/json-audit-log)
-
-**Stack**
-- [Groq: chaves de API](https://console.groq.com/keys)
-- [Text-to-SQL com Groq](https://github.com/smaoui-me/self-correcting-text-to-sql) e [sql-guardrails](https://github.com/darrshangovender/sql-guardrails)
-- [Knex](https://knexjs.org/)
-- [WhatsApp Cloud API (Meta)](https://developers.facebook.com/docs/whatsapp/cloud-api)
+- [Planilha de controle diário de veículos (Cobli)](https://www.cobli.co/conteudo/planilha-controle-diario-de-veiculos/)
+- [Taxa de utilização da frota (Cobli)](https://www.cobli.co/blog/taxa-utilizacao-frota/)
+- [better-sqlite3](https://github.com/WiseLibs/better-sqlite3)
+- [Groq](https://console.groq.com/docs)
+- [WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api)

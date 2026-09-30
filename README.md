@@ -32,11 +32,10 @@ Telas: Login, Resumo Operacional, Colaboradores, Gestão de Alojamentos, Gestão
 | Parte | Tecnologia |
 |---|---|
 | `client/` | HTML + CSS + JavaScript puro (sem framework), Chart.js para gráficos |
-| `server/` | Node.js + Express, Knex, JWT + bcrypt, zod |
-| Banco | SQLite no desenvolvimento, pronto para migrar a PostgreSQL (decisão em aberto) |
+| `server/` | Node.js (22+) + Express, express-session + bcrypt |
+| Banco | SQLite com `better-sqlite3`, SQL puro (tabelas em `server/src/db/schema.sql`) |
 | IA | Groq (`groq-sdk`), chave gratuita, usada só pelo server |
 | Avisos | WhatsApp (provedor em aberto), com modo console para desenvolvimento |
-| Testes | Vitest (server) |
 
 ## Estrutura
 
@@ -49,16 +48,21 @@ dispatch/
 
 ## Como rodar
 
-Por enquanto só existe a tela de login (`client/index.html`). Para ver, abra o arquivo com a extensão **Live Server** do VS Code. O client não precisa de `npm install`.
+Precisa do **Node.js 22 ou mais novo**.
 
-Quando o server existir, ele também vai entregar a pasta `client/`:
+**Tela de login:** abra `client/index.html` com a extensão **Live Server** do VS Code. O client não precisa de `npm install`.
+
+**Banco de dados:**
 
 ```bash
-cd server && npm install && npm run migrate && npm run seed && npm run dev
-# abrir http://localhost:3001
+cd server
+npm install
+npm run criar-banco
 ```
 
-Copie `server/.env.example` para `server/.env` e preencha `GROQ_API_KEY` só se for testar a IA.
+Isso cria o banco vazio, por padrão em `C:\Users\<seu usuário>\dispatch-dados\dispatch.db` (fora do OneDrive, que pode corromper o arquivo). Para mudar o lugar, copie `server/.env.example` para `server/.env` e preencha `DB_CAMINHO`.
+
+Quando o server existir, ele também vai entregar a pasta `client/` em `http://localhost:3001`.
 
 ## Documentação
 

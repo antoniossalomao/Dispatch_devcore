@@ -1,0 +1,12 @@
+{
+  "name": "dispatch-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Back-end do Dispatch",
+  "scripts": {
+    "criar-banco": "node --env-file-if-exists=.env src/db/criar-banco.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3"
+  }
+}
