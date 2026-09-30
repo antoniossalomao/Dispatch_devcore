@@ -23,7 +23,7 @@ Construtora fictícia (Construtora Aguapeí) com obras no interior de SP, equipe
 
 ## Protótipo
 
-Telas desenhadas no [Figma](https://www.figma.com/design/4ma1oH2S8GnmS6A7NNQTqk/Telas---Dispatch) e um protótipo navegável (HTML) com dados fictícios e as regras de negócio já simuladas: https://claude.ai/artifact/MNFq4skaifZLm8sqmrGWuJ (link privado).
+Telas desenhadas no [Figma](https://www.figma.com/design/4ma1oH2S8GnmS6A7NNQTqk/Telas---Dispatch) e um protótipo navegável (HTML) com dados fictícios e as regras de negócio já simuladas (o link é privado, pedir no grupo).
 
 Telas: Login, Resumo Operacional, Colaboradores, Gestão de Alojamentos, Gestão de Frota, Relatórios e Auditoria (Log).
 

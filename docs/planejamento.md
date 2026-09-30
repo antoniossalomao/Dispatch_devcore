@@ -87,7 +87,7 @@ Não vamos fazer: GPS, controle de combustível e custos, checklist de vistoria 
 ## 4. Telas
 
 - Figma: https://www.figma.com/design/4ma1oH2S8GnmS6A7NNQTqk/Telas---Dispatch
-- Protótipo navegável (HTML com dados de exemplo): https://claude.ai/artifact/MNFq4skaifZLm8sqmrGWuJ (pedir acesso pro Antonio)
+- Protótipo navegável (HTML com dados de exemplo): pedir acesso pro Antonio
 
 | Tela | O que tem |
 |---|---|
