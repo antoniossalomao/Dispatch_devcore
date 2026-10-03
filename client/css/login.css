@@ -1,27 +1,4 @@
-/* zera as margens que o navegador coloca sozinho */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background-color: #0e1522; /* azul bem escuro, tema escuro */
-  color: #e5eaf2;
-  color-scheme: dark; /* deixa a caixinha de marcar escura tbm */
-}
-
-/* input e button não pegam a fonte do body, tem que forçar */
-input,
-button {
-  font-family: inherit;
-}
-
-/* garante que o que tiver hidden fica escondido mesmo */
-[hidden] {
-  display: none !important;
-}
+/* as cores (var(--...)) ficam no base.css. o login usa sempre as do tema claro */
 
 
 /* ---- pagina e cartão ---- */
@@ -35,32 +12,72 @@ button {
   padding: 16px;
 }
 
+/* o flex aqui deixa os dois lados do cartão um do lado do outro */
 .login-card {
-  background-color: #172133; /* um pouco mais claro que o fundo pra destacar */
-  border: 1px solid #2a3850;
+  display: flex;
   width: 100%;
-  max-width: 380px; /* pra não ficar enorme no pc */
-  padding: 36px 32px;
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  max-width: 860px;
+  min-height: 520px;
+  background-color: var(--cartao);
+  border-radius: 16px;
+  overflow: hidden; /* sem isso o lado azul passa por cima do canto arredondado */
+  box-shadow: 0 8px 24px var(--sombra);
+}
+
+
+/* ---- lado azul (esquerda) ---- */
+
+/* space-between joga o nome pra cima e o texto pra baixo */
+.login-lado {
+  flex: 1; /* os dois lados com flex 1 ficam do mesmo tamanho */
+  background-color: var(--marinho);
+  color: #fff;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.login-logo {
+  font-size: 26px;
+  margin-bottom: 24px;
+}
+
+.login-chamada {
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.login-texto {
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* ---- lado do formulario (direita) ---- */
+
+.login-entrar {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* deixa o formulario no meio da altura */
 }
 
 .login-titulo {
-  text-align: center;
-  font-size: 30px;
-  letter-spacing: 3px;
+  font-size: 22px;
+  letter-spacing: 1px;
 }
 
 .login-subtitulo {
-  text-align: center;
-  color: #9aa6ba;
+  color: var(--texto-fraco);
   font-size: 14px;
   margin-top: 4px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
-
-
-/* ---- formulario ---- */
 
 /* column deixa um campo embaixo do outro */
 .login-form {
@@ -76,11 +93,11 @@ button {
 
 .login-form input[type='text'],
 .login-form input[type='password'] {
-  background-color: #0e1522;
-  color: #e5eaf2;
+  background-color: var(--fundo);
+  color: var(--texto);
   padding: 10px 12px;
-  border: 1px solid #2a3850;
-  border-radius: 6px;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
   font-size: 15px;
   margin-bottom: 16px;
   transition: border-color 0.2s, box-shadow 0.2s; /* a borda e o brilho aparecem devagar */
@@ -88,15 +105,15 @@ button {
 
 /* o texto cinza de exemplo dentro do campo */
 .login-form input::placeholder {
-  color: #6b778c;
+  color: var(--placeholder);
 }
 
 /* quando clica no campo a borda fica azul */
 .login-form input[type='text']:focus,
 .login-form input[type='password']:focus {
   outline: none;
-  border-color: #6095f6;
-  box-shadow: 0 0 0 3px rgba(96, 149, 246, 0.25); /* brilho azul em volta pra ver onde ta digitando */
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2); /* brilho azul em volta pra ver onde ta digitando */
 }
 
 .login-mostrar {
@@ -108,7 +125,7 @@ button {
 
 /* esse label não é negrito igual os outros */
 .login-mostrar label {
-  color: #9aa6ba;
+  color: var(--texto-fraco);
   font-weight: normal;
   margin-bottom: 0;
   cursor: pointer;
@@ -116,28 +133,24 @@ button {
 
 /* caixinha azul igual a borda do campo */
 .login-mostrar input {
-  accent-color: #6095f6;
+  accent-color: var(--azul);
   cursor: pointer;
 }
 
 .login-erro {
-  background-color: #35110f;
-  color: #ee6f68;
+  background-color: var(--erro-fundo);
+  color: var(--erro-texto);
   font-size: 14px;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   margin-bottom: 16px;
 }
 
-
-/* ---- botão ---- */
-
-/* verde igual no figma */
 .login-botao {
-  background-color: #00793b;
+  background-color: var(--verde);
   color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 12px;
   font-size: 16px;
   font-weight: 600;
@@ -146,5 +159,38 @@ button {
 }
 
 .login-botao:hover {
-  background-color: #168853;
+  background-color: var(--verde-hover);
+}
+
+.login-ajuda {
+  text-align: center;
+  color: var(--texto-fraco);
+  font-size: 13px;
+  margin-top: 20px;
+}
+
+
+/* ---- celular ---- */
+
+/* tela pequena: um lado embaixo do outro em vez de lado a lado */
+@media (max-width: 700px) {
+  .login-card {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .login-lado,
+  .login-entrar {
+    padding: 28px 24px;
+  }
+
+  .login-chamada {
+    font-size: 22px;
+    margin-bottom: 0;
+  }
+
+  /* no celular esconde o texto menor pra não empurrar o formulario muito pra baixo */
+  .login-texto {
+    display: none;
+  }
 }

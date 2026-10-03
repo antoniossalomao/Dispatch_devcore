@@ -1,0 +1,60 @@
+/* cores do sistema. o escuro é o padrão, e quando o html tem a classe tema-claro
+   as variaveis trocam de valor e a tela toda muda junto */
+:root {
+  --fundo: #0e1522;
+  --cartao: #172133;
+  --borda: #2a3850;
+  --texto: #e5eaf2;
+  --texto-fraco: #9aa6ba;
+  --placeholder: #6b778c;
+  --azul: #6095f6;
+  --erro-fundo: #35110f;
+  --erro-texto: #ee6f68;
+  --sombra: rgba(0, 0, 0, 0.4);
+
+  /* essas não mudam com o tema (o topo e o menu são azul-marinho nos dois) */
+  --marinho: #0b0f19;
+  --verde: #00793b;
+  --verde-hover: #168853;
+
+  color-scheme: dark; /* deixa a caixinha de marcar escura tbm */
+}
+
+/* cores tiradas do figma */
+html.tema-claro {
+  --fundo: #f2f2f2;
+  --cartao: #ffffff;
+  --borda: #d9d9d9;
+  --texto: #0f172a;
+  --texto-fraco: #64748b;
+  --placeholder: #94a3b8;
+  --azul: #1e40af;
+  --erro-fundo: #fee2e2;
+  --erro-texto: #b91c1c;
+  --sombra: rgba(0, 0, 0, 0.1); /* no claro a sombra forte fica feia */
+  color-scheme: light;
+}
+
+/* zera as margens que o navegador coloca sozinho */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background-color: var(--fundo);
+  color: var(--texto);
+}
+
+/* input e button não pegam a fonte do body, tem que forçar */
+input,
+button {
+  font-family: inherit;
+}
+
+/* garante que o que tiver hidden fica escondido mesmo */
+[hidden] {
+  display: none !important;
+}

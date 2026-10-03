@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<!-- o login é sempre claro (a classe tema-claro já vem fixa aqui), o escuro é só dentro do sistema -->
+<html lang="pt-BR" class="tema-claro">
 <head>
   <meta charset="UTF-8">
   <!-- isso aqui é pra página não ficar minúscula no celular -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dispatch - Login</title>
+  <title>Dispatch</title>
+  <!-- o base.css vem antes pq tem as cores que o login.css usa -->
+  <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
@@ -13,29 +16,44 @@
   <div class="login-pagina">
     <div class="login-card">
 
-      <h1 class="login-titulo">DISPATCH</h1>
-      <p class="login-subtitulo">Gestão de pessoas, alojamentos e frota</p>
+      <!-- lado esquerdo, azul-marinho, só pra apresentar o sistema -->
+      <div class="login-lado">
+        <h1 class="login-logo">Dispatch</h1>
 
-      <form id="form-login" class="login-form">
-
-        <!-- o "for" do label tem que ser igual ao id do input, aí clicando no texto já vai pro campo -->
-        <label for="usuario">Usuário</label>
-        <input type="text" id="usuario" autocomplete="username" placeholder="Digite seu usuário">
-
-        <label for="senha">Senha</label>
-        <!-- type password = aparece as bolinhas em vez da senha -->
-        <input type="password" id="senha" autocomplete="current-password" placeholder="Digite sua senha">
-
-        <div class="login-mostrar">
-          <input type="checkbox" id="mostrar-senha">
-          <label for="mostrar-senha">Mostrar senha</label>
+        <div>
+          <p class="login-chamada">Pessoas, alojamentos e frota num lugar só.</p>
+          <p class="login-texto">Controle total de pessoas, alojamentos e frota, sem planilhas. Saiba quem está em qual leito, quem está com qual veículo, quando e com quantos km. Tudo registrado, validado e pronto para auditoria.</p>
         </div>
+      </div>
 
-        <!-- começa escondido (hidden), o js mostra quando der erro -->
-        <p id="mensagem-erro" class="login-erro" hidden></p>
+      <!-- lado direito, o formulario de login -->
+      <div class="login-entrar">
+        <h2 class="login-titulo">ENTRAR</h2>
+        <p class="login-subtitulo">Use o usuário e a senha que o administrador passou</p>
 
-        <button type="submit" class="login-botao">Entrar</button>
-      </form>
+        <form id="form-login" class="login-form">
+
+          <!-- o "for" do label tem que ser igual ao id do input, aí clicando no texto já vai pro campo -->
+          <label for="usuario">Usuário</label>
+          <input type="text" id="usuario" autocomplete="username" placeholder="Digite seu usuário">
+
+          <label for="senha">Senha</label>
+          <!-- type password = aparece as bolinhas em vez da senha -->
+          <input type="password" id="senha" autocomplete="current-password" placeholder="Digite sua senha">
+
+          <div class="login-mostrar">
+            <input type="checkbox" id="mostrar-senha">
+            <label for="mostrar-senha">Mostrar senha</label>
+          </div>
+
+          <!-- começa escondido (hidden), o js mostra quando der erro -->
+          <p id="mensagem-erro" class="login-erro" hidden></p>
+
+          <button type="submit" class="login-botao">Entrar</button>
+        </form>
+
+        <p class="login-ajuda">Esqueceu a senha? Fale com o administrador.</p>
+      </div>
 
     </div>
   </div>

@@ -91,7 +91,7 @@ Não vamos fazer: GPS, controle de combustível e custos, checklist de vistoria 
 
 | Tela | O que tem |
 |---|---|
-| Login | Usuário e senha (**já feita**, em `client/index.html`) |
+| Login | Cartão dividido: na esquerda um painel azul-marinho apresentando o sistema, na direita usuário e senha (**já feita**, em `client/index.html`) |
 | Resumo | Números gerais, avisos, últimas movimentações e gráficos de ocupação e uso da frota |
 | Colaboradores | Lista com busca; clicando abre o histórico da pessoa; formulário de cadastro |
 | Alojamentos | Ocupação, mapa de leitos pra alocar/liberar, aba de ocorrências, cadastro com responsável, quartos e leitos |
@@ -101,6 +101,8 @@ Não vamos fazer: GPS, controle de combustível e custos, checklist de vistoria 
 Ainda falta colocar no Figma: aba de ocorrências, campo de responsável, cadastro de veículo com documentação, aba de manutenções, relatórios de movimentação e gargalos, sininho de notificações e o chat de ajuda.
 
 Visual: tema escuro, azul-marinho, conteúdo em cartões, títulos em maiúsculo, etiquetas coloridas de status (verde = ok, azul = em uso, amarelo = atenção, vermelho = problema) e botão verde pra ação principal.
+
+O login é sempre claro. Dentro do sistema o escuro é o padrão, com um botão pra trocar pro claro (vai ficar no topo quando o menu existir) e a escolha fica salva no navegador. Por isso as cores ficam em variáveis no `base.css` (`var(--fundo)`, `var(--texto)`, `var(--marinho)`, `var(--verde)`...) e as telas usam elas em vez de escrever a cor direto no CSS, senão a tela não muda junto com o tema. As cores do tema claro foram tiradas do Figma.
 
 
 ## 5. Regras
@@ -258,8 +260,8 @@ dispatch/
 │   ├── alojamentos.html
 │   ├── frota.html
 │   ├── relatorios.html
-│   ├── css/                # base.css (cores e botões) + um css por tela
-│   └── js/                 # api.js (chamadas pro server), menu.js + um js por tela
+│   ├── css/                # base.css (cores dos dois temas e botões) + um css por tela
+│   └── js/                 # api.js (chamadas pro server), menu.js, tema.js (em todas as telas) + um js por tela
 │
 ├── server/                 # back-end (Node.js)
 │   ├── src/
