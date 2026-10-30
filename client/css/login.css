@@ -1,6 +1,3 @@
-/* as cores (var(--...)) ficam no base.css. o login usa sempre as do tema claro */
-
-
 /* ---- pagina e cartão ---- */
 
 /* flex com center nos dois = cartão bem no meio da tela */
@@ -93,7 +90,7 @@
 
 .login-form input[type='text'],
 .login-form input[type='password'] {
-  background-color: var(--fundo);
+  background-color: var(--campo);
   color: var(--texto);
   padding: 10px 12px;
   border: 1px solid var(--borda);
@@ -113,7 +110,7 @@
 .login-form input[type='password']:focus {
   outline: none;
   border-color: var(--azul);
-  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2); /* brilho azul em volta pra ver onde ta digitando */
+  box-shadow: 0 0 0 3px rgba(96, 149, 246, 0.25); /* brilho azul em volta pra ver onde ta digitando */
 }
 
 .login-mostrar {
@@ -146,6 +143,15 @@
   margin-bottom: 16px;
 }
 
+.login-sucesso {
+  background-color: var(--sucesso-fundo);
+  color: var(--sucesso-texto);
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
 .login-botao {
   background-color: var(--verde);
   color: #fff;
@@ -162,17 +168,31 @@
   background-color: var(--verde-hover);
 }
 
+.login-botao:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .login-ajuda {
   text-align: center;
   color: var(--texto-fraco);
   font-size: 13px;
-  margin-top: 20px;
+  margin-top: 16px;
+}
+
+.login-link {
+  color: var(--azul);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-link:hover {
+  text-decoration: underline;
 }
 
 
 /* ---- celular ---- */
 
-/* tela pequena: um lado embaixo do outro em vez de lado a lado */
 @media (max-width: 700px) {
   .login-card {
     flex-direction: column;
@@ -189,7 +209,6 @@
     margin-bottom: 0;
   }
 
-  /* no celular esconde o texto menor pra não empurrar o formulario muito pra baixo */
   .login-texto {
     display: none;
   }

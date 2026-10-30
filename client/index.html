@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<!-- o login é sempre claro (a classe tema-claro já vem fixa aqui), o escuro é só dentro do sistema -->
-<html lang="pt-BR" class="tema-claro">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <!-- isso aqui é pra página não ficar minúscula no celular -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dispatch</title>
+  <title>Dispatch - Login</title>
   <!-- o base.css vem antes pq tem as cores que o login.css usa -->
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/login.css">
@@ -29,9 +28,12 @@
       <!-- lado direito, o formulario de login -->
       <div class="login-entrar">
         <h2 class="login-titulo">ENTRAR</h2>
-        <p class="login-subtitulo">Use o usuário e a senha que o administrador passou</p>
+        <p class="login-subtitulo">Use o usuário e a senha para acessar o painel</p>
 
         <form id="form-login" class="login-form">
+
+          <!-- aparece quando a pessoa acabou de criar a conta -->
+          <p id="mensagem-sucesso" class="login-sucesso" hidden></p>
 
           <!-- o "for" do label tem que ser igual ao id do input, aí clicando no texto já vai pro campo -->
           <label for="usuario">Usuário</label>
@@ -49,16 +51,17 @@
           <!-- começa escondido (hidden), o js mostra quando der erro -->
           <p id="mensagem-erro" class="login-erro" hidden></p>
 
-          <button type="submit" class="login-botao">Entrar</button>
+          <button type="submit" id="botao-entrar" class="login-botao">Entrar</button>
         </form>
 
-        <p class="login-ajuda">Esqueceu a senha? Fale com o administrador.</p>
+        <p class="login-ajuda">Não tem uma conta? <a href="cadastro.html" class="login-link">Cadastre-se</a></p>
       </div>
 
     </div>
   </div>
 
   <!-- o script fica aqui embaixo pq precisa que o html já tenha carregado antes -->
+  <script src="js/api.js"></script>
   <script src="js/login.js"></script>
 </body>
 </html>
