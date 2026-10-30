@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dispatch — Resumo Operacional</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/resumo.css">
+</head>
+<body class="painel-corpo">
+
+  <!-- menu lateral fixo em azul-marinho -->
+  <aside class="menu-lateral">
+    <div>
+      <div class="menu-marca">
+        <span class="menu-logo">Dispatch</span>
+        <span id="nome-empresa-menu" class="menu-empresa">Construtora Aguapeí</span>
+      </div>
+
+      <p class="menu-secao">OPERAÇÃO</p>
+
+      <nav class="menu-lista">
+        <a href="resumo.html" class="menu-item ativo">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          <span>Visão Geral</span>
+        </a>
+
+        <a href="#" class="menu-item menu-em-breve" data-tela="Colaboradores">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Colaboradores</span>
+        </a>
+
+        <a href="#" class="menu-item menu-em-breve" data-tela="Alojamentos">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18"/>
+            <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
+            <path d="M9 7h1.5M13.5 7H15M9 11h1.5M13.5 11H15M9 15h1.5M13.5 15H15"/>
+          </svg>
+          <span>Alojamentos</span>
+        </a>
+
+        <a href="#" class="menu-item menu-em-breve" data-tela="Frota">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="6" width="14" height="10" rx="1"/>
+            <path d="M15 9h4l3 3.5V16h-7V9z"/>
+            <circle cx="5.5" cy="17.5" r="2"/>
+            <circle cx="18.5" cy="17.5" r="2"/>
+          </svg>
+          <span>Frota</span>
+        </a>
+
+        <a href="#" class="menu-item menu-em-breve" data-tela="Movimentações">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"/>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+            <polyline points="7 23 3 19 7 15"/>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+          </svg>
+          <span>Movimentações</span>
+        </a>
+
+        <a href="#" class="menu-item menu-em-breve" data-tela="Relatórios">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <span>Relatórios</span>
+        </a>
+      </nav>
+
+      <div id="bloco-menu-admin" class="menu-admin-bloco" hidden>
+        <p class="menu-secao menu-secao-espaco">SISTEMA</p>
+        <nav class="menu-lista">
+          <a href="configuracoes.html" class="menu-item">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.02 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span>Configurações</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <!-- usuário logado + botão de sair fixos no rodapé do menu -->
+    <div class="menu-rodape">
+      <div id="usuario-iniciais" class="usuario-avatar">AD</div>
+      <div class="usuario-dados">
+        <p id="perfil-nome" class="usuario-nome">Administrador</p>
+        <p id="perfil-tipo" class="usuario-cargo">admin</p>
+      </div>
+      <button type="button" id="botao-sair" class="botao-sair" title="Sair do sistema">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- área principal clara -->
+  <div class="area-conteudo">
+
+    <header class="topo">
+      <div class="topo-esquerda">
+        <h1 class="topo-titulo">Resumo operacional</h1>
+        <span id="data-hoje" class="topo-data"></span>
+        <span id="aviso-tela" class="topo-aviso" hidden></span>
+      </div>
+
+      <div class="topo-direita">
+        <div class="busca-caixa">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+          </svg>
+          <input type="text" id="campo-busca" placeholder="Buscar colaborador, placa ou alojamento...">
+        </div>
+
+        <button type="button" id="botao-notificacoes" class="botao-notif" title="Ver pendências">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span id="ponto-alerta" class="notif-ponto"></span>
+        </button>
+      </div>
+    </header>
+
+    <main class="conteudo">
+
+      <!-- linha de indicadores -->
+      <section class="indicadores">
+
+        <div class="cartao-kpi">
+          <div class="kpi-topo">
+            <span class="kpi-rotulo">Veículos em uso</span>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M5 17H3v-5l2-5h12l2 5v5h-2"/>
+              <circle cx="7.5" cy="17.5" r="2"/>
+              <circle cx="16.5" cy="17.5" r="2"/>
+            </svg>
+          </div>
+          <div class="kpi-valor-linha">
+            <strong id="num-veiculos-uso" class="kpi-numero">25</strong>
+            <span id="sub-veiculos-uso" class="kpi-complemento">de 34 na frota</span>
+          </div>
+          <div class="barra-fundo">
+            <div id="barra-frota" class="barra-preenchimento barra-azul" style="width: 74%"></div>
+          </div>
+          <p id="detalhe-veiculos-uso" class="kpi-detalhe">2 veículos em manutenção no momento</p>
+        </div>
+
+        <div class="cartao-kpi">
+          <div class="kpi-topo">
+            <span class="kpi-rotulo">Veículos disponíveis</span>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div class="kpi-valor-linha">
+            <strong id="num-veiculos-disp" class="kpi-numero">7</strong>
+            <span class="kpi-complemento">prontos para saída</span>
+          </div>
+          <div class="barra-fundo">
+            <div id="barra-disp" class="barra-preenchimento barra-verde" style="width: 21%"></div>
+          </div>
+          <p id="detalhe-veiculos-disp" class="kpi-detalhe">Documentação e CNH validadas na saída</p>
+        </div>
+
+        <div class="cartao-kpi">
+          <div class="kpi-topo">
+            <span class="kpi-rotulo">Alojamentos ativos</span>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M3 21h18"/>
+              <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
+            </svg>
+          </div>
+          <div class="kpi-valor-linha">
+            <strong id="num-alojamentos" class="kpi-numero">3</strong>
+            <span id="sub-alojamentos" class="kpi-complemento">42 leitos no total</span>
+          </div>
+          <div class="barra-fundo">
+            <div id="barra-ocupacao" class="barra-preenchimento barra-marinho" style="width: 55%"></div>
+          </div>
+          <p id="detalhe-alojamentos" class="kpi-detalhe">23 leitos ocupados hoje (55%)</p>
+        </div>
+
+        <div class="cartao-kpi">
+          <div class="kpi-topo">
+            <span class="kpi-rotulo">Vagas disponíveis</span>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M2 4v16"/>
+              <path d="M2 8h18a2 2 0 0 1 2 2v10"/>
+              <path d="M2 17h20"/>
+              <path d="M6 8v9"/>
+            </svg>
+          </div>
+          <div class="kpi-valor-linha">
+            <strong id="num-vagas" class="kpi-numero">19</strong>
+            <span class="kpi-complemento">leitos livres</span>
+          </div>
+          <div class="barra-fundo">
+            <div id="barra-vagas" class="barra-preenchimento barra-verde" style="width: 45%"></div>
+          </div>
+          <p class="kpi-detalhe">Capacidade dentro do limite da NR-24</p>
+        </div>
+
+      </section>
+
+      <!-- grade principal: movimentações à esquerda e lateral de acompanhamento à direita -->
+      <div class="grade-operacional">
+
+        <section class="bloco">
+          <div class="bloco-cabecalho">
+            <div>
+              <h2 class="bloco-titulo">Movimentações recentes</h2>
+              <p class="bloco-subtitulo">Últimas entradas, retiradas e devoluções registradas</p>
+            </div>
+
+            <div class="filtro-abas">
+              <button type="button" class="aba-item ativa" data-filtro="todos">Todas</button>
+              <button type="button" class="aba-item" data-filtro="frota">Frota</button>
+              <button type="button" class="aba-item" data-filtro="alojamento">Alojamentos</button>
+            </div>
+          </div>
+
+          <div class="tabela-area">
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th>Colaborador</th>
+                  <th>Tipo</th>
+                  <th>Recurso</th>
+                  <th>Horário</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="lista-movimentacoes"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="coluna-lateral">
+
+          <section class="bloco">
+            <div class="bloco-cabecalho bloco-cabecalho-simples">
+              <h2 class="bloco-titulo">Ocupação por unidade</h2>
+            </div>
+            <div id="lista-alojamentos" class="lista-unidades"></div>
+          </section>
+
+          <section id="secao-alertas" class="bloco">
+            <div class="bloco-cabecalho bloco-cabecalho-simples">
+              <h2 class="bloco-titulo">Atenção operacional</h2>
+            </div>
+            <div id="lista-alertas" class="lista-alertas"></div>
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/resumo.js"></script>
+</body>
+</html>
