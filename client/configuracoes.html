@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dispatch — Configurações</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/resumo.css">
+  <link rel="stylesheet" href="css/configuracoes.css">
+</head>
+<body class="painel-corpo">
+
+  <!-- menu lateral igual ao do resumo -->
+  <aside class="menu-lateral">
+    <div>
+      <div class="menu-marca">
+        <span class="menu-logo">Dispatch</span>
+        <span id="nome-empresa-menu" class="menu-empresa">Construtora Aguapeí</span>
+      </div>
+
+      <p class="menu-secao">OPERAÇÃO</p>
+
+      <nav class="menu-lista">
+        <a href="resumo.html" class="menu-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          <span>Visão Geral</span>
+        </a>
+
+        <a href="#" class="menu-item menu-em-breve" data-tela="Colaboradores">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Colaboradores</span>
+        </a>
+
+        <a href="#" class="menu-item menu-em-breve" data-tela="Alojamentos">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18"/>
+            <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
+            <path d="M9 7h1.5M13.5 7H15M9 11h1.5M13.5 11H15M9 15h1.5M13.5 15H15"/>
+          </svg>
+          <span>Alojamentos</span>
+        </a>
+
+        <a href="#" class="menu-item menu-em-breve" data-tela="Frota">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="6" width="14" height="10" rx="1"/>
+            <path d="M15 9h4l3 3.5V16h-7V9z"/>
+            <circle cx="5.5" cy="17.5" r="2"/>
+            <circle cx="18.5" cy="17.5" r="2"/>
+          </svg>
+          <span>Frota</span>
+        </a>
+
+        <a href="#" class="menu-item menu-em-breve" data-tela="Movimentações">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"/>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+            <polyline points="7 23 3 19 7 15"/>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+          </svg>
+          <span>Movimentações</span>
+        </a>
+
+        <a href="#" class="menu-item menu-em-breve" data-tela="Relatórios">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <span>Relatórios</span>
+        </a>
+      </nav>
+
+      <div class="menu-admin-bloco">
+        <p class="menu-secao menu-secao-espaco">SISTEMA</p>
+        <nav class="menu-lista">
+          <a href="configuracoes.html" class="menu-item ativo">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.02 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span>Configurações</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <div class="menu-rodape">
+      <div id="usuario-iniciais" class="usuario-avatar">AD</div>
+      <div class="usuario-dados">
+        <p id="perfil-nome" class="usuario-nome">Administrador</p>
+        <p id="perfil-tipo" class="usuario-cargo">admin</p>
+      </div>
+      <button type="button" id="botao-sair" class="botao-sair" title="Sair do sistema">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- área principal -->
+  <div class="area-conteudo">
+
+    <header class="topo">
+      <div class="topo-esquerda">
+        <h1 class="topo-titulo">Configurações</h1>
+        <span class="topo-data">Administração do sistema, regras e acessos</span>
+        <span id="aviso-tela" class="topo-aviso" hidden></span>
+      </div>
+    </header>
+
+    <!-- navegação interna das configurações -->
+    <div class="config-barra-abas">
+      <button type="button" class="config-aba ativa" data-aba="parametros">Parâmetros operacionais</button>
+      <button type="button" class="config-aba" data-aba="usuarios">Usuários e permissões</button>
+      <button type="button" class="config-aba" data-aba="conta">Minha conta</button>
+    </div>
+
+    <main class="conteudo config-conteudo">
+
+      <div id="retorno-geral" class="config-retorno" hidden></div>
+
+      <!-- ABA 1: PARÂMETROS OPERACIONAIS -->
+      <section id="painel-parametros" class="config-secao">
+
+        <form id="form-parametros" class="bloco config-bloco">
+          <div class="bloco-cabecalho">
+            <div>
+              <h2 class="bloco-titulo">Regras da operação e alertas</h2>
+              <p class="bloco-subtitulo">Limites usados nas validações de frota, alojamentos e avisos automáticos</p>
+            </div>
+          </div>
+
+          <div class="config-linhas">
+            <div class="config-linha">
+              <div class="config-info">
+                <label for="cfg-empresa" class="config-rotulo">Nome da operação / empresa</label>
+                <p class="config-ajuda">Aparece na identificação do painel lateral e nos cabeçalhos de relatório.</p>
+              </div>
+              <div class="config-controle">
+                <input type="text" id="cfg-empresa" class="config-input" placeholder="Ex: Construtora Aguapeí">
+              </div>
+            </div>
+
+            <div class="config-linha">
+              <div class="config-info">
+                <label for="cfg-dias-vencimento" class="config-rotulo">Antecedência de alerta de documentos</label>
+                <p class="config-ajuda">Quantos dias antes avisar sobre CNH, licenciamento ou seguro vencendo.</p>
+              </div>
+              <div class="config-controle config-controle-curto">
+                <input type="number" id="cfg-dias-vencimento" class="config-input" min="1" max="180">
+                <span class="config-unidade">dias</span>
+              </div>
+            </div>
+
+            <div class="config-linha">
+              <div class="config-info">
+                <label for="cfg-horas-retorno" class="config-rotulo">Tempo máximo de veículo sem retorno</label>
+                <p class="config-ajuda">Gera alerta quando um veículo passa desse período na rua sem devolução.</p>
+              </div>
+              <div class="config-controle config-controle-curto">
+                <input type="number" id="cfg-horas-retorno" class="config-input" min="1" max="168">
+                <span class="config-unidade">horas</span>
+              </div>
+            </div>
+
+            <div class="config-linha">
+              <div class="config-info">
+                <label for="cfg-km-confirmacao" class="config-rotulo">Limite de km por viagem sem confirmação (F11)</label>
+                <p class="config-ajuda">Acima dessa distância o sistema pede confirmação para evitar erro de digitação.</p>
+              </div>
+              <div class="config-controle config-controle-curto">
+                <input type="number" id="cfg-km-confirmacao" class="config-input" min="50" step="50">
+                <span class="config-unidade">km</span>
+              </div>
+            </div>
+
+            <div class="config-linha">
+              <div class="config-info">
+                <label for="cfg-dias-pendencia" class="config-rotulo">Prazo para ocorrências e oficina em aberto</label>
+                <p class="config-ajuda">Destaca no painel manutenções ou ocorrências abertas há mais que esse prazo.</p>
+              </div>
+              <div class="config-controle config-controle-curto">
+                <input type="number" id="cfg-dias-pendencia" class="config-input" min="1" max="90">
+                <span class="config-unidade">dias</span>
+              </div>
+            </div>
+
+            <div class="config-linha">
+              <div class="config-info">
+                <span class="config-rotulo">Validações obrigatórias</span>
+                <p class="config-ajuda">Travas aplicadas pelo servidor antes de registrar estadias ou saídas.</p>
+              </div>
+              <div class="config-controle config-checks">
+                <label class="check-linha">
+                  <input type="checkbox" id="cfg-bloquear-doc">
+                  <span>Bloquear saída com CNH ou licenciamento vencido (F4 / F12)</span>
+                </label>
+                <label class="check-linha">
+                  <input type="checkbox" id="cfg-validar-nr24">
+                  <span>Exigir limite de leitos e metragem mínima da NR-24 (A4 / A5)</span>
+                </label>
+                <label class="check-linha">
+                  <input type="checkbox" id="cfg-whatsapp">
+                  <span>Disparar alertas críticos no WhatsApp dos administradores</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="config-rodape-form">
+            <button type="submit" class="btn-primario">Salvar parâmetros</button>
+          </div>
+        </form>
+
+        <!-- diagnóstico rápido das integrações do servidor -->
+        <div class="bloco config-bloco">
+          <div class="bloco-cabecalho bloco-cabecalho-simples">
+            <h2 class="bloco-titulo">Ambiente e integrações</h2>
+          </div>
+          <div class="ambiente-grade">
+            <div class="ambiente-item">
+              <span class="ambiente-rotulo">Banco de dados</span>
+              <strong id="amb-banco" class="ambiente-valor">SQLite ativo</strong>
+            </div>
+            <div class="ambiente-item">
+              <span class="ambiente-rotulo">IA (Groq API)</span>
+              <strong id="amb-ia" class="ambiente-valor">Verificando...</strong>
+            </div>
+            <div class="ambiente-item">
+              <span class="ambiente-rotulo">Avisos WhatsApp</span>
+              <strong id="amb-whats" class="ambiente-valor">Verificando...</strong>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ABA 2: USUÁRIOS E PERMISSÕES -->
+      <section id="painel-usuarios" class="config-secao" hidden>
+
+        <div class="usuarios-grade">
+
+          <div class="bloco">
+            <div class="bloco-cabecalho">
+              <div>
+                <h2 class="bloco-titulo">Usuários cadastrados</h2>
+                <p class="bloco-subtitulo">Nenhum registro é apagado do banco; desativar bloqueia o login mantendo o histórico (U2)</p>
+              </div>
+            </div>
+
+            <!-- barra que aparece só quando clica em Redefinir senha de alguém -->
+            <div id="caixa-redefinir" class="redefinir-barra" hidden>
+              <span id="redefinir-rotulo" class="redefinir-texto">Nova senha:</span>
+              <input type="password" id="redefinir-input" class="config-input redefinir-campo" placeholder="Mínimo 4 caracteres">
+              <button type="button" id="redefinir-salvar" class="btn-primario btn-pequeno">Salvar senha</button>
+              <button type="button" id="redefinir-cancelar" class="btn-secundario btn-pequeno">Cancelar</button>
+            </div>
+
+            <div class="tabela-area">
+              <table class="tabela">
+                <thead>
+                  <tr>
+                    <th>Usuário</th>
+                    <th>WhatsApp</th>
+                    <th>Perfil</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-usuarios"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <form id="form-novo-usuario" class="bloco">
+            <div class="bloco-cabecalho bloco-cabecalho-simples">
+              <h2 class="bloco-titulo">Cadastrar usuário</h2>
+            </div>
+
+            <div class="form-pilha">
+              <div>
+                <label for="novo-nome" class="campo-label">Nome completo</label>
+                <input type="text" id="novo-nome" class="config-input" placeholder="Ex: João Vitor">
+              </div>
+
+              <div>
+                <label for="novo-login" class="campo-label">Login de acesso</label>
+                <input type="text" id="novo-login" class="config-input" placeholder="Ex: joao">
+              </div>
+
+              <div>
+                <label for="novo-telefone" class="campo-label">WhatsApp (opcional)</label>
+                <input type="text" id="novo-telefone" class="config-input" placeholder="Ex: 14999990000">
+              </div>
+
+              <div>
+                <label for="novo-perfil" class="campo-label">Perfil de permissão</label>
+                <select id="novo-perfil" class="config-select">
+                  <option value="operador">Operador (cadastros e rotina)</option>
+                  <option value="admin">Administrador (acesso total)</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="novo-senha" class="campo-label">Senha inicial</label>
+                <input type="password" id="novo-senha" class="config-input" placeholder="Mínimo de 4 caracteres">
+              </div>
+
+              <button type="submit" class="btn-primario btn-cheio">Criar usuário</button>
+            </div>
+          </form>
+
+        </div>
+
+      </section>
+
+      <!-- ABA 3: MINHA CONTA -->
+      <section id="painel-conta" class="config-secao" hidden>
+
+        <div class="conta-grade">
+
+          <form id="form-minha-conta" class="bloco">
+            <div class="bloco-cabecalho bloco-cabecalho-simples">
+              <h2 class="bloco-titulo">Meus dados</h2>
+            </div>
+
+            <div class="form-pilha">
+              <div>
+                <label for="conta-login" class="campo-label">Login</label>
+                <input type="text" id="conta-login" class="config-input" disabled>
+              </div>
+
+              <div>
+                <label for="conta-nome" class="campo-label">Nome de exibição</label>
+                <input type="text" id="conta-nome" class="config-input">
+              </div>
+
+              <div>
+                <label for="conta-telefone" class="campo-label">WhatsApp para alertas críticos</label>
+                <input type="text" id="conta-telefone" class="config-input" placeholder="Ex: 14999990000">
+              </div>
+
+              <button type="submit" class="btn-primario">Atualizar dados</button>
+            </div>
+          </form>
+
+          <form id="form-minha-senha" class="bloco">
+            <div class="bloco-cabecalho bloco-cabecalho-simples">
+              <h2 class="bloco-titulo">Alterar minha senha</h2>
+            </div>
+
+            <div class="form-pilha">
+              <div>
+                <label for="senha-atual" class="campo-label">Senha atual</label>
+                <input type="password" id="senha-atual" class="config-input" autocomplete="current-password">
+              </div>
+
+              <div>
+                <label for="senha-nova" class="campo-label">Nova senha</label>
+                <input type="password" id="senha-nova" class="config-input" autocomplete="new-password" placeholder="Mínimo de 4 caracteres">
+              </div>
+
+              <div>
+                <label for="senha-confirmar" class="campo-label">Confirmar nova senha</label>
+                <input type="password" id="senha-confirmar" class="config-input" autocomplete="new-password">
+              </div>
+
+              <button type="submit" class="btn-primario">Trocar senha</button>
+            </div>
+          </form>
+
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/configuracoes.js"></script>
+</body>
+</html>

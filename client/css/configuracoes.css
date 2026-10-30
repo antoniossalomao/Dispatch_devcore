@@ -1,0 +1,348 @@
+/* ---- abas superiores da tela de configurações ---- */
+
+.config-barra-abas {
+  background-color: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0 32px;
+  display: flex;
+  gap: 24px;
+}
+
+.config-aba {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 13px 2px 12px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.config-aba:hover {
+  color: #0f172a;
+}
+
+.config-aba.ativa {
+  color: #0f172a;
+  font-weight: 600;
+  border-bottom-color: var(--verde);
+}
+
+.config-conteudo {
+  max-width: 1180px;
+}
+
+.config-secao {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+
+/* ---- mensagens de retorno ---- */
+
+.config-retorno {
+  padding: 11px 16px;
+  border-radius: 7px;
+  font-size: 13.5px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  border: 1px solid transparent;
+}
+
+.retorno-ok {
+  background-color: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.retorno-erro {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+
+/* ---- linhas de parâmetros (rótulo à esquerda, campo à direita) ---- */
+
+.config-linhas {
+  display: flex;
+  flex-direction: column;
+}
+
+.config-linha {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.config-linha:last-child {
+  border-bottom: none;
+}
+
+.config-rotulo {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.config-ajuda {
+  font-size: 12.5px;
+  color: #64748b;
+  margin-top: 3px;
+  line-height: 1.4;
+}
+
+.config-controle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.config-controle-curto .config-input {
+  width: 110px;
+}
+
+.config-unidade {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.config-checks {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.check-linha {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  color: #334155;
+  cursor: pointer;
+}
+
+.check-linha input {
+  accent-color: var(--verde);
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+
+/* ---- campos e botões ---- */
+
+.config-input,
+.config-select {
+  width: 100%;
+  height: 36px;
+  padding: 0 11px;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: #0f172a;
+  background-color: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  transition: border-color 0.15s;
+}
+
+.config-input:focus,
+.config-select:focus {
+  outline: none;
+  border-color: #475569;
+}
+
+.config-input:disabled {
+  background-color: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.config-rodape-form {
+  padding: 14px 20px;
+  background-color: #f8fafc;
+  border-top: 1px solid #edf1f5;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-primario {
+  background-color: var(--verde);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.btn-primario:hover {
+  background-color: var(--verde-hover);
+}
+
+.btn-secundario {
+  background-color: #fff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 6px 11px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-secundario:hover {
+  background-color: #f8fafc;
+}
+
+.btn-pequeno {
+  padding: 6px 11px;
+  font-size: 12px;
+}
+
+.btn-cheio {
+  width: 100%;
+  margin-top: 4px;
+}
+
+
+/* ---- bloco de ambiente ---- */
+
+.ambiente-grade {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 16px 20px;
+}
+
+.ambiente-item {
+  padding: 12px 14px;
+  border: 1px solid #edf1f5;
+  border-radius: 7px;
+  background-color: #f8fafc;
+}
+
+.ambiente-rotulo {
+  display: block;
+  font-size: 11.5px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.ambiente-valor {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+
+/* ---- aba de usuários ---- */
+
+.usuarios-grade {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 18px;
+  align-items: start;
+}
+
+.form-pilha {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.campo-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 5px;
+}
+
+.acoes-linha {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.perfil-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.perfil-admin {
+  background-color: #0f172a;
+  color: #fff;
+}
+
+.perfil-operador {
+  background-color: #e2e8f0;
+  color: #334155;
+}
+
+.redefinir-barra {
+  padding: 12px 20px;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.redefinir-texto {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.redefinir-campo {
+  width: 200px;
+  height: 32px;
+}
+
+
+/* ---- aba minha conta ---- */
+
+.conta-grade {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+
+/* ---- responsivo ---- */
+
+@media (max-width: 1020px) {
+  .config-linha,
+  .usuarios-grade,
+  .conta-grade,
+  .ambiente-grade {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 780px) {
+  .config-barra-abas {
+    padding: 0 18px;
+    overflow-x: auto;
+  }
+
+  .config-aba {
+    white-space: nowrap;
+  }
+}
