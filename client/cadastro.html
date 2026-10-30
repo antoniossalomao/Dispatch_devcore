@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dispatch - Cadastro</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/cadastro.css">
+</head>
+<body>
+
+  <div class="login-pagina">
+    <div class="login-card cadastro-card">
+
+      <!-- lado esquerdo igual ao do login pra manter a identidade visual -->
+      <div class="login-lado">
+        <h1 class="login-logo">Dispatch</h1>
+
+        <div>
+          <p class="login-chamada">Crie seu acesso no sistema.</p>
+          <p class="login-texto">Cadastre seu usuário para acompanhar em tempo real os colaboradores, a ocupação dos alojamentos e a movimentação da frota.</p>
+        </div>
+      </div>
+
+      <!-- lado direito com o formulario de cadastro -->
+      <div class="login-entrar cadastro-entrar">
+        <h2 class="login-titulo">CADASTRO</h2>
+        <p class="login-subtitulo cadastro-subtitulo">Preencha os campos abaixo para criar sua conta</p>
+
+        <form id="form-cadastro" class="login-form cadastro-form">
+
+          <label for="nome">Nome completo</label>
+          <input type="text" id="nome" autocomplete="name" placeholder="Digite seu nome">
+
+          <label for="usuario">Usuário</label>
+          <input type="text" id="usuario" autocomplete="username" placeholder="Escolha um nome de usuário">
+
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" autocomplete="new-password" placeholder="Mínimo de 4 caracteres">
+
+          <label for="confirmar-senha">Confirmar senha</label>
+          <input type="password" id="confirmar-senha" autocomplete="new-password" placeholder="Repita a senha">
+
+          <div class="login-mostrar">
+            <input type="checkbox" id="mostrar-senha">
+            <label for="mostrar-senha">Mostrar senhas</label>
+          </div>
+
+          <p id="mensagem-erro" class="login-erro" hidden></p>
+
+          <button type="submit" id="botao-cadastrar" class="login-botao">Criar conta</button>
+        </form>
+
+        <p class="login-ajuda">Já tem uma conta? <a href="index.html" class="login-link">Entrar</a></p>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/cadastro.js"></script>
+</body>
+</html>

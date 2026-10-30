@@ -1,0 +1,22 @@
+/* ajustes da tela de cadastro em cima do layout do login */
+/* como tem 4 campos em vez de 2, diminui um pouco o espaço entre eles */
+
+.cadastro-entrar {
+  padding: 32px 40px;
+}
+
+.cadastro-subtitulo {
+  margin-bottom: 18px;
+}
+
+.cadastro-form input[type='text'],
+.cadastro-form input[type='password'] {
+  margin-bottom: 12px;
+  padding: 9px 12px;
+}
+
+@media (max-width: 700px) {
+  .cadastro-entrar {
+    padding: 28px 24px;
+  }
+}
