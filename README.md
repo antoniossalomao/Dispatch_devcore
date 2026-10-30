@@ -48,21 +48,16 @@ dispatch/
 
 ## Como rodar
 
-Precisa do **Node.js 22 ou mais novo**.
-
-**Tela de login:** abra `client/index.html` com a extensão **Live Server** do VS Code. O client não precisa de `npm install`.
-
-**Banco de dados:**
+Precisa do **Node.js 22.5+** (ou **Bun**).
 
 ```bash
 cd server
 npm install
 npm run criar-banco
+npm start
 ```
 
-Isso cria o banco vazio, por padrão em `C:\Users\<seu usuário>\dispatch-dados\dispatch.db` (fora do OneDrive, que pode corromper o arquivo). Para mudar o lugar, copie `server/.env.example` para `server/.env` e preencha `DB_CAMINHO`.
-
-Quando o server existir, ele também vai entregar a pasta `client/` em `http://localhost:3001`.
+Isso cria o banco em `server/data/dispatch.db` já com o usuário administrador inicial e sobe o sistema (front + back) em `http://localhost:3001`. Para mudar o lugar do banco, copie `server/.env.example` para `server/.env` e preencha `DB_CAMINHO`.
 
 ## Documentação
 
