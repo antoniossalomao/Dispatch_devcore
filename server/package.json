@@ -4,9 +4,12 @@
   "private": true,
   "description": "Back-end do Dispatch",
   "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.js",
     "criar-banco": "node --env-file-if-exists=.env src/db/criar-banco.js"
   },
   "dependencies": {
-    "better-sqlite3": "^13.0.3"
+    "bcryptjs": "^3.0.3",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1"
   }
 }
