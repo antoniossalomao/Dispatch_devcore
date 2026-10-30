@@ -1,37 +1,74 @@
-/* ---- abas superiores da tela de configurações ---- */
+/* ---- estrutura em duas colunas (submenu + conteúdo) ---- */
 
-.config-barra-abas {
-  background-color: #fff;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 0 32px;
-  display: flex;
+.config-layout {
+  display: grid;
+  grid-template-columns: 224px 1fr;
   gap: 24px;
+  align-items: start;
+  max-width: 1260px;
 }
 
-.config-aba {
+.config-nav {
+  position: sticky;
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.config-nav-item {
+  width: 100%;
   background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  padding: 13px 2px 12px;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: #64748b;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  text-align: left;
+  color: #475569;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: background-color 0.15s, color 0.15s;
 }
 
-.config-aba:hover {
+.config-nav-item svg {
+  margin-top: 2px;
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.config-nav-item:hover {
+  background-color: #e8ecf2;
   color: #0f172a;
 }
 
-.config-aba.ativa {
+.config-nav-item.ativa {
+  background-color: #fff;
+  border-color: #e2e8f0;
   color: #0f172a;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.config-nav-item.ativa svg {
+  color: var(--verde);
+}
+
+.nav-item-titulo {
+  display: block;
+  font-size: 13.5px;
   font-weight: 600;
-  border-bottom-color: var(--verde);
+  line-height: 1.2;
 }
 
-.config-conteudo {
-  max-width: 1180px;
+.nav-item-sub {
+  display: block;
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.config-paineis {
+  min-width: 0;
 }
 
 .config-secao {
@@ -40,109 +77,60 @@
   gap: 18px;
 }
 
-
-/* ---- mensagens de retorno ---- */
-
-.config-retorno {
-  padding: 11px 16px;
-  border-radius: 7px;
-  font-size: 13.5px;
-  font-weight: 500;
-  margin-bottom: 16px;
-  border: 1px solid transparent;
-}
-
-.retorno-ok {
-  background-color: #ecfdf5;
-  border-color: #a7f3d0;
-  color: #065f46;
-}
-
-.retorno-erro {
-  background-color: #fef2f2;
-  border-color: #fecaca;
-  color: #991b1b;
-}
-
-
-/* ---- linhas de parâmetros (rótulo à esquerda, campo à direita) ---- */
-
-.config-linhas {
-  display: flex;
-  flex-direction: column;
-}
-
-.config-linha {
-  display: grid;
-  grid-template-columns: 1fr 360px;
-  gap: 24px;
-  align-items: center;
-  padding: 18px 20px;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.config-linha:last-child {
-  border-bottom: none;
-}
-
-.config-rotulo {
-  display: block;
-  font-size: 13.5px;
+.selo-pendente {
+  font-size: 12px;
   font-weight: 600;
-  color: #0f172a;
+  color: #92400e;
+  background-color: #fef3c7;
+  border: 1px solid #fde68a;
+  padding: 4px 10px;
+  border-radius: 6px;
 }
 
-.config-ajuda {
-  font-size: 12.5px;
-  color: #64748b;
-  margin-top: 3px;
-  line-height: 1.4;
+
+/* ---- grades internas de campos ---- */
+
+.grade-campos {
+  padding: 18px 20px;
+  display: grid;
+  gap: 16px;
 }
 
-.config-controle {
+.duas-colunas {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.tres-colunas {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.borda-abaixo {
+  border-bottom: 1px solid #edf1f5;
+}
+
+.campo-grupo {
   display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.config-controle-curto .config-input {
-  width: 110px;
-}
-
-.config-unidade {
-  font-size: 13px;
-  color: #64748b;
-}
-
-.config-checks {
   flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
 }
 
-.check-linha {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 13px;
+.campo-label {
+  font-size: 12.5px;
+  font-weight: 600;
   color: #334155;
-  cursor: pointer;
+  margin-bottom: 6px;
 }
 
-.check-linha input {
-  accent-color: var(--verde);
-  width: 15px;
-  height: 15px;
-  cursor: pointer;
+.campo-dica {
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 5px;
+  line-height: 1.35;
 }
-
-
-/* ---- campos e botões ---- */
 
 .config-input,
 .config-select {
   width: 100%;
-  height: 36px;
+  height: 37px;
   padding: 0 11px;
   font-family: inherit;
   font-size: 13.5px;
@@ -159,18 +147,153 @@
   border-color: #475569;
 }
 
-.config-input:disabled {
-  background-color: #f1f5f9;
+/* campo numérico com unidade acoplada na direita */
+.campo-sufixo {
+  display: flex;
+  align-items: stretch;
+  height: 37px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #fff;
+  transition: border-color 0.15s;
+}
+
+.campo-sufixo:focus-within {
+  border-color: #475569;
+}
+
+.campo-sufixo input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  padding: 0 11px;
+  font-size: 13.5px;
+  color: #0f172a;
+  background: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.campo-sufixo span {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  background-color: #f8fafc;
+  border-left: 1px solid #e2e8f0;
+  font-size: 12.5px;
   color: #64748b;
-  cursor: not-allowed;
+  user-select: none;
+}
+
+
+/* ---- chaves seletoras (toggle switches) ---- */
+
+.lista-switches {
+  display: flex;
+  flex-direction: column;
+}
+
+.switch-linha {
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+}
+
+.switch-linha:last-child {
+  border-bottom: none;
+}
+
+.switch-linha:hover {
+  background-color: #fafbfc;
+}
+
+.switch-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.switch-titulo {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.switch-desc {
+  font-size: 12.5px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.chave {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.chave input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.chave-trilho {
+  position: absolute;
+  inset: 0;
+  background-color: #cbd5e1;
+  border-radius: 999px;
+  transition: background-color 0.18s;
+}
+
+.chave-trilho::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 3px;
+  top: 3px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.18s;
+}
+
+.chave input:checked + .chave-trilho {
+  background-color: var(--verde);
+}
+
+.chave input:checked + .chave-trilho::before {
+  transform: translateX(18px);
+}
+
+
+/* ---- rodapés e botões ---- */
+
+.barra-salvar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 2px;
 }
 
 .config-rodape-form {
-  padding: 14px 20px;
+  padding: 13px 20px;
   background-color: #f8fafc;
   border-top: 1px solid #edf1f5;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+}
+
+.rodape-entre {
+  justify-content: space-between;
 }
 
 .btn-primario {
@@ -194,10 +317,12 @@
   color: #334155;
   border: 1px solid #cbd5e1;
   border-radius: 6px;
-  padding: 6px 11px;
-  font-size: 12px;
+  padding: 7px 13px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s;
 }
 
 .btn-secundario:hover {
@@ -209,64 +334,112 @@
   font-size: 12px;
 }
 
-.btn-cheio {
-  width: 100%;
-  margin-top: 4px;
+.link-botao {
+  display: inline-flex;
+  align-items: center;
 }
 
 
-/* ---- bloco de ambiente ---- */
+/* ---- integrações e prévia ---- */
 
-.ambiente-grade {
+.integracoes-lista {
+  padding: 18px 20px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  padding: 16px 20px;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
 }
 
-.ambiente-item {
-  padding: 12px 14px;
-  border: 1px solid #edf1f5;
-  border-radius: 7px;
-  background-color: #f8fafc;
+.integracao-card {
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #fafbfc;
 }
 
-.ambiente-rotulo {
-  display: block;
-  font-size: 11.5px;
-  color: #64748b;
-  margin-bottom: 4px;
+.integracao-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
 }
 
-.ambiente-valor {
-  font-size: 13px;
+.integracao-nome {
+  font-size: 13.5px;
   font-weight: 600;
   color: #0f172a;
 }
 
-
-/* ---- aba de usuários ---- */
-
-.usuarios-grade {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 18px;
-  align-items: start;
+.integracao-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.45;
 }
 
-.form-pilha {
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-}
-
-.campo-label {
-  display: block;
+.previa-alerta {
+  margin: 0 20px 18px;
+  padding: 12px 14px;
+  background-color: #0f172a;
+  color: #e2e8f0;
+  border-radius: 7px;
   font-size: 12.5px;
-  font-weight: 600;
-  color: #334155;
+}
+
+.previa-titulo {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #94a3b8;
   margin-bottom: 5px;
+}
+
+.previa-alerta code {
+  font-family: Consolas, monospace;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+
+/* ---- usuários e mini indicadores ---- */
+
+.resumo-usuarios,
+.resumo-banco-grade {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.resumo-banco-grade {
+  padding: 18px 20px;
+}
+
+.mini-kpi {
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 13px 16px;
+}
+
+.resumo-banco-grade .mini-kpi {
+  background-color: #f8fafc;
+}
+
+.mini-rotulo {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.mini-valor {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.busca-usuarios {
+  width: 280px;
 }
 
 .acoes-linha {
@@ -315,34 +488,139 @@
 }
 
 
-/* ---- aba minha conta ---- */
+/* ---- banco e integridade ---- */
 
-.conta-grade {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  align-items: start;
+.integridade-status {
+  margin: 16px 20px;
+  padding: 13px 16px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+}
+
+.integridade-status strong {
+  display: block;
+  font-size: 13.5px;
+}
+
+.integridade-status p {
+  font-size: 12.5px;
+  margin-top: 2px;
+}
+
+.integridade-ok {
+  background-color: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+.integridade-erro {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+
+/* ---- minha conta ---- */
+
+.conta-topo-perfil {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.conta-avatar-grande {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background-color: var(--marinho);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mostrar-senha-conta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+}
+
+.mostrar-senha-conta input {
+  accent-color: var(--verde);
+  cursor: pointer;
+}
+
+
+/* ---- toast discreto ---- */
+
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  max-width: 380px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background-color: #0f172a;
+  color: #f8fafc;
+  font-size: 13.5px;
+  font-weight: 500;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.25);
+  border-left: 4px solid var(--verde);
+  z-index: 50;
+}
+
+.toast.toast-erro {
+  border-left-color: #ef4444;
 }
 
 
 /* ---- responsivo ---- */
 
 @media (max-width: 1020px) {
-  .config-linha,
-  .usuarios-grade,
-  .conta-grade,
-  .ambiente-grade {
+  .config-layout {
     grid-template-columns: 1fr;
+  }
+
+  .config-nav {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .config-nav-item {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .nav-item-sub {
+    display: none;
+  }
+
+  .tres-colunas,
+  .duas-colunas,
+  .integracoes-lista,
+  .resumo-usuarios,
+  .resumo-banco-grade {
+    grid-template-columns: 1fr 1fr;
   }
 }
 
-@media (max-width: 780px) {
-  .config-barra-abas {
-    padding: 0 18px;
-    overflow-x: auto;
+@media (max-width: 680px) {
+  .tres-colunas,
+  .duas-colunas,
+  .integracoes-lista,
+  .resumo-usuarios,
+  .resumo-banco-grade {
+    grid-template-columns: 1fr;
   }
 
-  .config-aba {
-    white-space: nowrap;
+  .busca-usuarios {
+    width: 100%;
   }
 }

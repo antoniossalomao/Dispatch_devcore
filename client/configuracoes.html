@@ -10,7 +10,7 @@
 </head>
 <body class="painel-corpo">
 
-  <!-- menu lateral igual ao do resumo -->
+  <!-- menu lateral principal -->
   <aside class="menu-lateral">
     <div>
       <div class="menu-marca">
@@ -116,156 +116,393 @@
     <header class="topo">
       <div class="topo-esquerda">
         <h1 class="topo-titulo">Configurações</h1>
-        <span class="topo-data">Administração do sistema, regras e acessos</span>
+        <span class="topo-data">Regras operacionais, acessos e manutenção do sistema</span>
         <span id="aviso-tela" class="topo-aviso" hidden></span>
+      </div>
+
+      <div class="topo-direita">
+        <span id="selo-alterado" class="selo-pendente" hidden>Alterações não salvas</span>
       </div>
     </header>
 
-    <!-- navegação interna das configurações -->
-    <div class="config-barra-abas">
-      <button type="button" class="config-aba ativa" data-aba="parametros">Parâmetros operacionais</button>
-      <button type="button" class="config-aba" data-aba="usuarios">Usuários e permissões</button>
-      <button type="button" class="config-aba" data-aba="conta">Minha conta</button>
-    </div>
+    <main class="conteudo config-layout">
 
-    <main class="conteudo config-conteudo">
-
-      <div id="retorno-geral" class="config-retorno" hidden></div>
-
-      <!-- ABA 1: PARÂMETROS OPERACIONAIS -->
-      <section id="painel-parametros" class="config-secao">
-
-        <form id="form-parametros" class="bloco config-bloco">
-          <div class="bloco-cabecalho">
-            <div>
-              <h2 class="bloco-titulo">Regras da operação e alertas</h2>
-              <p class="bloco-subtitulo">Limites usados nas validações de frota, alojamentos e avisos automáticos</p>
-            </div>
+      <!-- submenu lateral das configurações -->
+      <nav class="config-nav">
+        <button type="button" class="config-nav-item ativa" data-aba="regras">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+            <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/>
+            <line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/>
+            <line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>
+          </svg>
+          <div>
+            <span class="nav-item-titulo">Operação e Regras</span>
+            <span class="nav-item-sub">Empresa, frota e NR-24</span>
           </div>
+        </button>
 
-          <div class="config-linhas">
-            <div class="config-linha">
-              <div class="config-info">
-                <label for="cfg-empresa" class="config-rotulo">Nome da operação / empresa</label>
-                <p class="config-ajuda">Aparece na identificação do painel lateral e nos cabeçalhos de relatório.</p>
-              </div>
-              <div class="config-controle">
-                <input type="text" id="cfg-empresa" class="config-input" placeholder="Ex: Construtora Aguapeí">
-              </div>
-            </div>
-
-            <div class="config-linha">
-              <div class="config-info">
-                <label for="cfg-dias-vencimento" class="config-rotulo">Antecedência de alerta de documentos</label>
-                <p class="config-ajuda">Quantos dias antes avisar sobre CNH, licenciamento ou seguro vencendo.</p>
-              </div>
-              <div class="config-controle config-controle-curto">
-                <input type="number" id="cfg-dias-vencimento" class="config-input" min="1" max="180">
-                <span class="config-unidade">dias</span>
-              </div>
-            </div>
-
-            <div class="config-linha">
-              <div class="config-info">
-                <label for="cfg-horas-retorno" class="config-rotulo">Tempo máximo de veículo sem retorno</label>
-                <p class="config-ajuda">Gera alerta quando um veículo passa desse período na rua sem devolução.</p>
-              </div>
-              <div class="config-controle config-controle-curto">
-                <input type="number" id="cfg-horas-retorno" class="config-input" min="1" max="168">
-                <span class="config-unidade">horas</span>
-              </div>
-            </div>
-
-            <div class="config-linha">
-              <div class="config-info">
-                <label for="cfg-km-confirmacao" class="config-rotulo">Limite de km por viagem sem confirmação (F11)</label>
-                <p class="config-ajuda">Acima dessa distância o sistema pede confirmação para evitar erro de digitação.</p>
-              </div>
-              <div class="config-controle config-controle-curto">
-                <input type="number" id="cfg-km-confirmacao" class="config-input" min="50" step="50">
-                <span class="config-unidade">km</span>
-              </div>
-            </div>
-
-            <div class="config-linha">
-              <div class="config-info">
-                <label for="cfg-dias-pendencia" class="config-rotulo">Prazo para ocorrências e oficina em aberto</label>
-                <p class="config-ajuda">Destaca no painel manutenções ou ocorrências abertas há mais que esse prazo.</p>
-              </div>
-              <div class="config-controle config-controle-curto">
-                <input type="number" id="cfg-dias-pendencia" class="config-input" min="1" max="90">
-                <span class="config-unidade">dias</span>
-              </div>
-            </div>
-
-            <div class="config-linha">
-              <div class="config-info">
-                <span class="config-rotulo">Validações obrigatórias</span>
-                <p class="config-ajuda">Travas aplicadas pelo servidor antes de registrar estadias ou saídas.</p>
-              </div>
-              <div class="config-controle config-checks">
-                <label class="check-linha">
-                  <input type="checkbox" id="cfg-bloquear-doc">
-                  <span>Bloquear saída com CNH ou licenciamento vencido (F4 / F12)</span>
-                </label>
-                <label class="check-linha">
-                  <input type="checkbox" id="cfg-validar-nr24">
-                  <span>Exigir limite de leitos e metragem mínima da NR-24 (A4 / A5)</span>
-                </label>
-                <label class="check-linha">
-                  <input type="checkbox" id="cfg-whatsapp">
-                  <span>Disparar alertas críticos no WhatsApp dos administradores</span>
-                </label>
-              </div>
-            </div>
+        <button type="button" class="config-nav-item" data-aba="alertas">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <div>
+            <span class="nav-item-titulo">Alertas e Integrações</span>
+            <span class="nav-item-sub">Prazos, Groq e WhatsApp</span>
           </div>
+        </button>
 
-          <div class="config-rodape-form">
-            <button type="submit" class="btn-primario">Salvar parâmetros</button>
+        <button type="button" class="config-nav-item" data-aba="usuarios">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <div>
+            <span class="nav-item-titulo">Usuários e Acessos</span>
+            <span class="nav-item-sub">Perfis admin e operador</span>
           </div>
-        </form>
+        </button>
 
-        <!-- diagnóstico rápido das integrações do servidor -->
-        <div class="bloco config-bloco">
-          <div class="bloco-cabecalho bloco-cabecalho-simples">
-            <h2 class="bloco-titulo">Ambiente e integrações</h2>
+        <button type="button" class="config-nav-item" data-aba="banco">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <ellipse cx="12" cy="5" rx="9" ry="3"/>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+          </svg>
+          <div>
+            <span class="nav-item-titulo">Banco e Auditoria</span>
+            <span class="nav-item-sub">Backup e hash do log</span>
           </div>
-          <div class="ambiente-grade">
-            <div class="ambiente-item">
-              <span class="ambiente-rotulo">Banco de dados</span>
-              <strong id="amb-banco" class="ambiente-valor">SQLite ativo</strong>
-            </div>
-            <div class="ambiente-item">
-              <span class="ambiente-rotulo">IA (Groq API)</span>
-              <strong id="amb-ia" class="ambiente-valor">Verificando...</strong>
-            </div>
-            <div class="ambiente-item">
-              <span class="ambiente-rotulo">Avisos WhatsApp</span>
-              <strong id="amb-whats" class="ambiente-valor">Verificando...</strong>
-            </div>
+        </button>
+
+        <button type="button" class="config-nav-item" data-aba="conta">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <div>
+            <span class="nav-item-titulo">Minha Conta</span>
+            <span class="nav-item-sub">Perfil pessoal e senha</span>
           </div>
-        </div>
+        </button>
+      </nav>
 
-      </section>
+      <!-- área direita dos painéis -->
+      <div class="config-paineis">
 
-      <!-- ABA 2: USUÁRIOS E PERMISSÕES -->
-      <section id="painel-usuarios" class="config-secao" hidden>
-
-        <div class="usuarios-grade">
+        <!-- 1. OPERAÇÃO E REGRAS -->
+        <form id="painel-regras" class="config-secao">
 
           <div class="bloco">
             <div class="bloco-cabecalho">
               <div>
-                <h2 class="bloco-titulo">Usuários cadastrados</h2>
-                <p class="bloco-subtitulo">Nenhum registro é apagado do banco; desativar bloqueia o login mantendo o histórico (U2)</p>
+                <h2 class="bloco-titulo">Identificação da operação</h2>
+                <p class="bloco-subtitulo">Dados exibidos no menu lateral e no cabeçalho dos relatórios gerenciais</p>
               </div>
             </div>
 
-            <!-- barra que aparece só quando clica em Redefinir senha de alguém -->
+            <div class="grade-campos tres-colunas">
+              <div class="campo-grupo">
+                <label for="cfg-empresa" class="campo-label">Nome da empresa / operação</label>
+                <input type="text" id="cfg-empresa" class="config-input" placeholder="Ex: Construtora Aguapeí">
+              </div>
+
+              <div class="campo-grupo">
+                <label for="cfg-cidade" class="campo-label">Base operacional</label>
+                <input type="text" id="cfg-cidade" class="config-input" placeholder="Ex: Marília/SP">
+              </div>
+
+              <div class="campo-grupo">
+                <label for="cfg-documento" class="campo-label">CNPJ / Identificador</label>
+                <input type="text" id="cfg-documento" class="config-input" placeholder="00.000.000/0001-00">
+              </div>
+            </div>
+          </div>
+
+          <div class="bloco">
+            <div class="bloco-cabecalho">
+              <div>
+                <h2 class="bloco-titulo">Frota e controle de saída</h2>
+                <p class="bloco-subtitulo">Parâmetros de validação de CNH, documentação e quilometragem</p>
+              </div>
+            </div>
+
+            <div class="grade-campos duas-colunas borda-abaixo">
+              <div class="campo-grupo">
+                <label for="cfg-km-confirmacao" class="campo-label">Confirmação de quilometragem por uso (Regra F11)</label>
+                <div class="campo-sufixo">
+                  <input type="number" id="cfg-km-confirmacao" min="50" step="50">
+                  <span>km</span>
+                </div>
+                <p class="campo-dica">Pede confirmação caso a diferença entre saída e volta passe desse valor.</p>
+              </div>
+
+              <div class="campo-grupo">
+                <label for="cfg-horas-retorno" class="campo-label">Tempo máximo na rua sem devolução</label>
+                <div class="campo-sufixo">
+                  <input type="number" id="cfg-horas-retorno" min="1" max="168">
+                  <span>horas</span>
+                </div>
+                <p class="campo-dica">Destaca veículos que saíram e ainda não tiveram retorno registrado.</p>
+              </div>
+            </div>
+
+            <div class="lista-switches">
+              <label class="switch-linha">
+                <div class="switch-texto">
+                  <span class="switch-titulo">Bloquear saída com CNH ou licenciamento vencido</span>
+                  <span class="switch-desc">Impede registrar retirada quando a carteira do motorista ou o documento do veículo venceu (Regras F4 e F12).</span>
+                </div>
+                <span class="chave">
+                  <input type="checkbox" id="cfg-bloquear-doc">
+                  <span class="chave-trilho"></span>
+                </span>
+              </label>
+
+              <label class="switch-linha">
+                <div class="switch-texto">
+                  <span class="switch-titulo">Exibir aviso quando o seguro estiver vencido</span>
+                  <span class="switch-desc">Não bloqueia a saída do veículo, mas registra alerta operacional na retirada (Regra F12).</span>
+                </div>
+                <span class="chave">
+                  <input type="checkbox" id="cfg-avisar-seguro">
+                  <span class="chave-trilho"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="bloco">
+            <div class="bloco-cabecalho">
+              <div>
+                <h2 class="bloco-titulo">Alojamentos e norma NR-24</h2>
+                <p class="bloco-subtitulo">Limites legais de capacidade e metragem mínima por dormitório</p>
+              </div>
+            </div>
+
+            <div class="grade-campos tres-colunas borda-abaixo">
+              <div class="campo-grupo">
+                <label for="cfg-max-leitos" class="campo-label">Máx. de leitos por quarto (A4)</label>
+                <div class="campo-sufixo">
+                  <input type="number" id="cfg-max-leitos" min="1" max="20">
+                  <span>leitos</span>
+                </div>
+              </div>
+
+              <div class="campo-grupo">
+                <label for="cfg-area-cama" class="campo-label">Área mínima por cama (A5)</label>
+                <div class="campo-sufixo">
+                  <input type="number" id="cfg-area-cama" min="1" step="0.5">
+                  <span>m²</span>
+                </div>
+              </div>
+
+              <div class="campo-grupo">
+                <label for="cfg-area-beliche" class="campo-label">Área mínima por beliche (A5)</label>
+                <div class="campo-sufixo">
+                  <input type="number" id="cfg-area-beliche" min="1" step="0.5">
+                  <span>m²</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="lista-switches">
+              <label class="switch-linha">
+                <div class="switch-texto">
+                  <span class="switch-titulo">Exigir conformidade com a NR-24 no cadastro de quartos</span>
+                  <span class="switch-desc">Bloqueia adicionar leitos acima da metragem do dormitório para evitar autuação trabalhista.</span>
+                </div>
+                <span class="chave">
+                  <input type="checkbox" id="cfg-validar-nr24">
+                  <span class="chave-trilho"></span>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="barra-salvar">
+            <button type="button" id="botao-restaurar" class="btn-secundario">Restaurar padrão</button>
+            <button type="submit" class="btn-primario">Salvar alterações</button>
+          </div>
+
+        </form>
+
+        <!-- 2. ALERTAS E INTEGRAÇÕES -->
+        <div id="painel-alertas" class="config-secao" hidden>
+
+          <form id="form-alertas" class="bloco">
+            <div class="bloco-cabecalho">
+              <div>
+                <h2 class="bloco-titulo">Gatilhos de notificação</h2>
+                <p class="bloco-subtitulo">Quando o sistema deve gerar avisos preventivos na central e no WhatsApp</p>
+              </div>
+            </div>
+
+            <div class="grade-campos tres-colunas borda-abaixo">
+              <div class="campo-grupo">
+                <label for="cfg-dias-vencimento" class="campo-label">Aviso prévio de documentos</label>
+                <div class="campo-sufixo">
+                  <input type="number" id="cfg-dias-vencimento" min="1" max="180">
+                  <span>dias</span>
+                </div>
+                <p class="campo-dica">CNH, licenciamento e apólice de seguro.</p>
+              </div>
+
+              <div class="campo-grupo">
+                <label for="cfg-dias-pendencia" class="campo-label">Oficina ou ocorrência aberta</label>
+                <div class="campo-sufixo">
+                  <input type="number" id="cfg-dias-pendencia" min="1" max="90">
+                  <span>dias</span>
+                </div>
+                <p class="campo-dica">Destaca reparos demorados no painel.</p>
+              </div>
+
+              <div class="campo-grupo">
+                <label for="cfg-lotacao-pct" class="campo-label">Alerta de alojamento cheio</label>
+                <div class="campo-sufixo">
+                  <input type="number" id="cfg-lotacao-pct" min="50" max="100">
+                  <span>%</span>
+                </div>
+                <p class="campo-dica">Sinaliza gargalo de vagas por unidade.</p>
+              </div>
+            </div>
+
+            <div class="lista-switches">
+              <label class="switch-linha">
+                <div class="switch-texto">
+                  <span class="switch-titulo">Enviar alertas críticos por WhatsApp aos administradores</span>
+                  <span class="switch-desc">Dispara mensagem quando houver uso sem registro de km, veículo não devolvido ou adulteração no log.</span>
+                </div>
+                <span class="chave">
+                  <input type="checkbox" id="cfg-whatsapp">
+                  <span class="chave-trilho"></span>
+                </span>
+              </label>
+            </div>
+
+            <div class="config-rodape-form">
+              <button type="submit" class="btn-primario">Salvar gatilhos</button>
+            </div>
+          </form>
+
+          <div class="bloco">
+            <div class="bloco-cabecalho">
+              <div>
+                <h2 class="bloco-titulo">Serviços conectados</h2>
+                <p class="bloco-subtitulo">Chaves lidas do arquivo <code>server/.env</code> (nunca expostas no navegador)</p>
+              </div>
+              <button type="button" id="botao-testar-alerta" class="btn-secundario">Simular disparo WhatsApp</button>
+            </div>
+
+            <div class="integracoes-lista">
+              <div class="integracao-card">
+                <div class="integracao-topo">
+                  <span class="integracao-nome">Groq Cloud (IA)</span>
+                  <span id="badge-ia" class="status-tag status-concluido"><span class="status-ponto"></span>Desligada</span>
+                </div>
+                <p id="desc-ia" class="integracao-desc">Defina GROQ_API_KEY no .env para habilitar resumos e consultas em linguagem natural.</p>
+              </div>
+
+              <div class="integracao-card">
+                <div class="integracao-topo">
+                  <span class="integracao-nome">WhatsApp Cloud API</span>
+                  <span id="badge-whats" class="status-tag status-uso"><span class="status-ponto"></span>Modo terminal</span>
+                </div>
+                <p id="desc-whats" class="integracao-desc">Sem token oficial configurado: os alertas aparecem formatados no terminal do servidor.</p>
+              </div>
+            </div>
+
+            <div id="caixa-previa-alerta" class="previa-alerta" hidden>
+              <span class="previa-titulo">Saída gerada pelo servidor:</span>
+              <code id="texto-previa-alerta"></code>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 3. USUÁRIOS E ACESSOS -->
+        <div id="painel-usuarios" class="config-secao" hidden>
+
+          <div class="resumo-usuarios">
+            <div class="mini-kpi">
+              <span class="mini-rotulo">Contas ativas</span>
+              <strong id="cont-ativos" class="mini-valor">1</strong>
+            </div>
+            <div class="mini-kpi">
+              <span class="mini-rotulo">Administradores</span>
+              <strong id="cont-admins" class="mini-valor">1</strong>
+            </div>
+            <div class="mini-kpi">
+              <span class="mini-rotulo">Operadores</span>
+              <strong id="cont-operadores" class="mini-valor">0</strong>
+            </div>
+            <div class="mini-kpi">
+              <span class="mini-rotulo">Inativos</span>
+              <strong id="cont-inativos" class="mini-valor">0</strong>
+            </div>
+          </div>
+
+          <!-- formulário expansível de novo usuário -->
+          <form id="form-novo-usuario" class="bloco" hidden>
+            <div class="bloco-cabecalho bloco-cabecalho-simples">
+              <h2 class="bloco-titulo">Novo usuário do sistema</h2>
+              <button type="button" id="fechar-novo-usuario" class="btn-secundario">Fechar</button>
+            </div>
+
+            <div class="grade-campos duas-colunas">
+              <div class="campo-grupo">
+                <label for="novo-nome" class="campo-label">Nome completo</label>
+                <input type="text" id="novo-nome" class="config-input" placeholder="Ex: João Vitor">
+              </div>
+
+              <div class="campo-grupo">
+                <label for="novo-login" class="campo-label">Login de acesso</label>
+                <input type="text" id="novo-login" class="config-input" placeholder="Ex: joao">
+              </div>
+
+              <div class="campo-grupo">
+                <label for="novo-telefone" class="campo-label">WhatsApp (opcional)</label>
+                <input type="text" id="novo-telefone" class="config-input" placeholder="Ex: 14999990000">
+              </div>
+
+              <div class="campo-grupo">
+                <label for="novo-perfil" class="campo-label">Perfil de permissão</label>
+                <select id="novo-perfil" class="config-select">
+                  <option value="operador">Operador — cadastros e rotina diária</option>
+                  <option value="admin">Administrador — acesso total, auditoria e configs</option>
+                </select>
+              </div>
+
+              <div class="campo-grupo">
+                <label for="novo-senha" class="campo-label">Senha inicial</label>
+                <input type="password" id="novo-senha" class="config-input" placeholder="Mínimo de 4 caracteres">
+              </div>
+            </div>
+
+            <div class="config-rodape-form">
+              <button type="submit" class="btn-primario">Cadastrar acesso</button>
+            </div>
+          </form>
+
+          <div class="bloco">
+            <div class="bloco-cabecalho">
+              <div class="busca-caixa busca-usuarios">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>
+                </svg>
+                <input type="text" id="busca-usuario" placeholder="Filtrar por nome ou @login...">
+              </div>
+
+              <button type="button" id="abrir-novo-usuario" class="btn-primario">+ Novo usuário</button>
+            </div>
+
             <div id="caixa-redefinir" class="redefinir-barra" hidden>
               <span id="redefinir-rotulo" class="redefinir-texto">Nova senha:</span>
               <input type="password" id="redefinir-input" class="config-input redefinir-campo" placeholder="Mínimo 4 caracteres">
-              <button type="button" id="redefinir-salvar" class="btn-primario btn-pequeno">Salvar senha</button>
+              <button type="button" id="redefinir-salvar" class="btn-primario btn-pequeno">Confirmar</button>
               <button type="button" id="redefinir-cancelar" class="btn-secundario btn-pequeno">Cancelar</button>
             </div>
 
@@ -285,109 +522,145 @@
             </div>
           </div>
 
-          <form id="form-novo-usuario" class="bloco">
-            <div class="bloco-cabecalho bloco-cabecalho-simples">
-              <h2 class="bloco-titulo">Cadastrar usuário</h2>
+        </div>
+
+        <!-- 4. BANCO E AUDITORIA -->
+        <div id="painel-banco" class="config-secao" hidden>
+
+          <div class="bloco">
+            <div class="bloco-cabecalho">
+              <div>
+                <h2 class="bloco-titulo">Armazenamento SQLite</h2>
+                <p id="banco-caminho" class="bloco-subtitulo">server/data/dispatch.db</p>
+              </div>
+              <a href="/api/configuracoes/backup" id="link-backup" class="btn-secundario link-botao">Baixar cópia (.db)</a>
             </div>
 
-            <div class="form-pilha">
-              <div>
-                <label for="novo-nome" class="campo-label">Nome completo</label>
-                <input type="text" id="novo-nome" class="config-input" placeholder="Ex: João Vitor">
+            <div class="resumo-banco-grade">
+              <div class="mini-kpi">
+                <span class="mini-rotulo">Tamanho do arquivo</span>
+                <strong id="db-tamanho" class="mini-valor">—</strong>
               </div>
-
-              <div>
-                <label for="novo-login" class="campo-label">Login de acesso</label>
-                <input type="text" id="novo-login" class="config-input" placeholder="Ex: joao">
+              <div class="mini-kpi">
+                <span class="mini-rotulo">Tabelas ativas</span>
+                <strong id="db-tabelas" class="mini-valor">13</strong>
               </div>
-
-              <div>
-                <label for="novo-telefone" class="campo-label">WhatsApp (opcional)</label>
-                <input type="text" id="novo-telefone" class="config-input" placeholder="Ex: 14999990000">
+              <div class="mini-kpi">
+                <span class="mini-rotulo">Colaboradores</span>
+                <strong id="db-pessoas" class="mini-valor">0</strong>
               </div>
-
-              <div>
-                <label for="novo-perfil" class="campo-label">Perfil de permissão</label>
-                <select id="novo-perfil" class="config-select">
-                  <option value="operador">Operador (cadastros e rotina)</option>
-                  <option value="admin">Administrador (acesso total)</option>
-                </select>
+              <div class="mini-kpi">
+                <span class="mini-rotulo">Registros no log</span>
+                <strong id="db-logs" class="mini-valor">0</strong>
               </div>
-
-              <div>
-                <label for="novo-senha" class="campo-label">Senha inicial</label>
-                <input type="password" id="novo-senha" class="config-input" placeholder="Mínimo de 4 caracteres">
-              </div>
-
-              <button type="submit" class="btn-primario btn-cheio">Criar usuário</button>
             </div>
-          </form>
+          </div>
+
+          <div class="bloco">
+            <div class="bloco-cabecalho">
+              <div>
+                <h2 class="bloco-titulo">Integridade da cadeia de auditoria (Regra U3)</h2>
+                <p class="bloco-subtitulo">Cada alteração gera um hash SHA-256 encadeado com a linha anterior para detectar edição externa</p>
+              </div>
+              <button type="button" id="botao-verificar-log" class="btn-secundario">Verificar agora</button>
+            </div>
+
+            <div id="caixa-integridade" class="integridade-status integridade-ok">
+              <strong id="integridade-titulo">Verificando cadeia de hashes...</strong>
+              <p id="integridade-motivo"></p>
+            </div>
+
+            <div class="tabela-area">
+              <table class="tabela">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Quando</th>
+                    <th>Autor</th>
+                    <th>Resumo da alteração</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-logs-recentes"></tbody>
+              </table>
+            </div>
+          </div>
 
         </div>
 
-      </section>
-
-      <!-- ABA 3: MINHA CONTA -->
-      <section id="painel-conta" class="config-secao" hidden>
-
-        <div class="conta-grade">
+        <!-- 5. MINHA CONTA -->
+        <div id="painel-conta" class="config-secao" hidden>
 
           <form id="form-minha-conta" class="bloco">
-            <div class="bloco-cabecalho bloco-cabecalho-simples">
-              <h2 class="bloco-titulo">Meus dados</h2>
+            <div class="bloco-cabecalho">
+              <div class="conta-topo-perfil">
+                <div id="conta-avatar-previa" class="conta-avatar-grande">AD</div>
+                <div>
+                  <h2 id="conta-titulo-previa" class="bloco-titulo">Administrador</h2>
+                  <p id="conta-login-previa" class="bloco-subtitulo">@admin · Perfil administrador</p>
+                </div>
+              </div>
             </div>
 
-            <div class="form-pilha">
-              <div>
-                <label for="conta-login" class="campo-label">Login</label>
-                <input type="text" id="conta-login" class="config-input" disabled>
-              </div>
-
-              <div>
+            <div class="grade-campos duas-colunas">
+              <div class="campo-grupo">
                 <label for="conta-nome" class="campo-label">Nome de exibição</label>
                 <input type="text" id="conta-nome" class="config-input">
               </div>
 
-              <div>
-                <label for="conta-telefone" class="campo-label">WhatsApp para alertas críticos</label>
+              <div class="campo-grupo">
+                <label for="conta-telefone" class="campo-label">WhatsApp para receber alertas</label>
                 <input type="text" id="conta-telefone" class="config-input" placeholder="Ex: 14999990000">
               </div>
+            </div>
 
-              <button type="submit" class="btn-primario">Atualizar dados</button>
+            <div class="config-rodape-form">
+              <button type="submit" class="btn-primario">Salvar meus dados</button>
             </div>
           </form>
 
           <form id="form-minha-senha" class="bloco">
-            <div class="bloco-cabecalho bloco-cabecalho-simples">
-              <h2 class="bloco-titulo">Alterar minha senha</h2>
+            <div class="bloco-cabecalho">
+              <div>
+                <h2 class="bloco-titulo">Segurança e senha</h2>
+                <p class="bloco-subtitulo">Sua senha é armazenada apenas como hash criptográfico (bcrypt)</p>
+              </div>
             </div>
 
-            <div class="form-pilha">
-              <div>
+            <div class="grade-campos tres-colunas">
+              <div class="campo-grupo">
                 <label for="senha-atual" class="campo-label">Senha atual</label>
                 <input type="password" id="senha-atual" class="config-input" autocomplete="current-password">
               </div>
 
-              <div>
+              <div class="campo-grupo">
                 <label for="senha-nova" class="campo-label">Nova senha</label>
-                <input type="password" id="senha-nova" class="config-input" autocomplete="new-password" placeholder="Mínimo de 4 caracteres">
+                <input type="password" id="senha-nova" class="config-input" autocomplete="new-password" placeholder="Mínimo 4 caracteres">
               </div>
 
-              <div>
+              <div class="campo-grupo">
                 <label for="senha-confirmar" class="campo-label">Confirmar nova senha</label>
                 <input type="password" id="senha-confirmar" class="config-input" autocomplete="new-password">
               </div>
+            </div>
 
-              <button type="submit" class="btn-primario">Trocar senha</button>
+            <div class="config-rodape-form rodape-entre">
+              <label class="mostrar-senha-conta">
+                <input type="checkbox" id="mostrar-senhas-conta">
+                <span>Mostrar senhas digitadas</span>
+              </label>
+              <button type="submit" class="btn-primario">Alterar senha</button>
             </div>
           </form>
 
         </div>
 
-      </section>
+      </div>
 
     </main>
   </div>
+
+  <!-- aviso discreto no canto inferior direito -->
+  <div id="toast-retorno" class="toast" hidden></div>
 
   <script src="js/api.js"></script>
   <script src="js/configuracoes.js"></script>

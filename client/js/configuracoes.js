@@ -1,4 +1,4 @@
-// tela de Configurações do sistema (acesso do perfil admin)
+// tela de Configurações do sistema
 
 const nomeEmpresaMenu = document.getElementById('nome-empresa-menu')
 const usuarioIniciais = document.getElementById('usuario-iniciais')
@@ -6,34 +6,61 @@ const perfilNome = document.getElementById('perfil-nome')
 const perfilTipo = document.getElementById('perfil-tipo')
 const botaoSair = document.getElementById('botao-sair')
 const avisoTela = document.getElementById('aviso-tela')
-const retornoGeral = document.getElementById('retorno-geral')
+const seloAlterado = document.getElementById('selo-alterado')
+const toast = document.getElementById('toast-retorno')
 
-// abas
-const botoesAba = document.querySelectorAll('.config-aba')
-const paineisAba = {
-  parametros: document.getElementById('painel-parametros'),
+// navegação lateral das seções
+const botoesNav = document.querySelectorAll('.config-nav-item')
+const paineis = {
+  regras: document.getElementById('painel-regras'),
+  alertas: document.getElementById('painel-alertas'),
   usuarios: document.getElementById('painel-usuarios'),
+  banco: document.getElementById('painel-banco'),
   conta: document.getElementById('painel-conta')
 }
 
-// campos de parâmetros
-const formParametros = document.getElementById('form-parametros')
+// campos de operação, frota, alojamento e alertas
+const formRegras = document.getElementById('painel-regras')
+const formAlertas = document.getElementById('form-alertas')
+const botaoRestaurar = document.getElementById('botao-restaurar')
+
 const cfgEmpresa = document.getElementById('cfg-empresa')
-const cfgDiasVencimento = document.getElementById('cfg-dias-vencimento')
-const cfgHorasRetorno = document.getElementById('cfg-horas-retorno')
+const cfgCidade = document.getElementById('cfg-cidade')
+const cfgDocumento = document.getElementById('cfg-documento')
 const cfgKmConfirmacao = document.getElementById('cfg-km-confirmacao')
-const cfgDiasPendencia = document.getElementById('cfg-dias-pendencia')
+const cfgHorasRetorno = document.getElementById('cfg-horas-retorno')
 const cfgBloquearDoc = document.getElementById('cfg-bloquear-doc')
+const cfgAvisarSeguro = document.getElementById('cfg-avisar-seguro')
+const cfgMaxLeitos = document.getElementById('cfg-max-leitos')
+const cfgAreaCama = document.getElementById('cfg-area-cama')
+const cfgAreaBeliche = document.getElementById('cfg-area-beliche')
 const cfgValidarNr24 = document.getElementById('cfg-validar-nr24')
+
+const cfgDiasVencimento = document.getElementById('cfg-dias-vencimento')
+const cfgDiasPendencia = document.getElementById('cfg-dias-pendencia')
+const cfgLotacaoPct = document.getElementById('cfg-lotacao-pct')
 const cfgWhatsapp = document.getElementById('cfg-whatsapp')
 
-const ambBanco = document.getElementById('amb-banco')
-const ambIa = document.getElementById('amb-ia')
-const ambWhats = document.getElementById('amb-whats')
+// integrações
+const badgeIa = document.getElementById('badge-ia')
+const descIa = document.getElementById('desc-ia')
+const badgeWhats = document.getElementById('badge-whats')
+const descWhats = document.getElementById('desc-whats')
+const botaoTestarAlerta = document.getElementById('botao-testar-alerta')
+const caixaPreviaAlerta = document.getElementById('caixa-previa-alerta')
+const textoPreviaAlerta = document.getElementById('texto-previa-alerta')
 
 // usuários
-const tabelaUsuarios = document.getElementById('tabela-usuarios')
+const contAtivos = document.getElementById('cont-ativos')
+const contAdmins = document.getElementById('cont-admins')
+const contOperadores = document.getElementById('cont-operadores')
+const contInativos = document.getElementById('cont-inativos')
+const abrirNovoUsuario = document.getElementById('abrir-novo-usuario')
+const fecharNovoUsuario = document.getElementById('fechar-novo-usuario')
 const formNovoUsuario = document.getElementById('form-novo-usuario')
+const buscaUsuario = document.getElementById('busca-usuario')
+const tabelaUsuarios = document.getElementById('tabela-usuarios')
+
 const novoNome = document.getElementById('novo-nome')
 const novoLogin = document.getElementById('novo-login')
 const novoTelefone = document.getElementById('novo-telefone')
@@ -46,9 +73,23 @@ const redefinirInput = document.getElementById('redefinir-input')
 const redefinirSalvar = document.getElementById('redefinir-salvar')
 const redefinirCancelar = document.getElementById('redefinir-cancelar')
 
+// banco e auditoria
+const linkBackup = document.getElementById('link-backup')
+const dbTamanho = document.getElementById('db-tamanho')
+const dbTabelas = document.getElementById('db-tabelas')
+const dbPessoas = document.getElementById('db-pessoas')
+const dbLogs = document.getElementById('db-logs')
+const botaoVerificarLog = document.getElementById('botao-verificar-log')
+const caixaIntegridade = document.getElementById('caixa-integridade')
+const integridadeTitulo = document.getElementById('integridade-titulo')
+const integridadeMotivo = document.getElementById('integridade-motivo')
+const tabelaLogsRecentes = document.getElementById('tabela-logs-recentes')
+
 // minha conta
 const formMinhaConta = document.getElementById('form-minha-conta')
-const contaLogin = document.getElementById('conta-login')
+const contaAvatarPrevia = document.getElementById('conta-avatar-previa')
+const contaTituloPrevia = document.getElementById('conta-titulo-previa')
+const contaLoginPrevia = document.getElementById('conta-login-previa')
 const contaNome = document.getElementById('conta-nome')
 const contaTelefone = document.getElementById('conta-telefone')
 
@@ -56,16 +97,40 @@ const formMinhaSenha = document.getElementById('form-minha-senha')
 const senhaAtual = document.getElementById('senha-atual')
 const senhaNova = document.getElementById('senha-nova')
 const senhaConfirmar = document.getElementById('senha-confirmar')
+const mostrarSenhasConta = document.getElementById('mostrar-senhas-conta')
 
 let meuId = null
+let meuLogin = ''
+let todosUsuarios = []
 let usuarioRedefinindoId = null
+let timerToast = null
+
+// ajusta o link de download do backup caso esteja no Live Server
+linkBackup.href = baseApi + '/api/configuracoes/backup'
 
 function pegarIniciais(nome) {
-  const partes = nome.trim().split(' ')
+  const texto = (nome || '').trim()
+  if (texto === '') {
+    return '--'
+  }
+  const partes = texto.split(' ')
   if (partes.length === 1) {
     return partes[0].slice(0, 2).toUpperCase()
   }
   return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase()
+}
+
+function mostrarToast(texto, tipo) {
+  toast.textContent = texto
+  toast.className = tipo === 'erro' ? 'toast toast-erro' : 'toast'
+  toast.hidden = false
+
+  if (timerToast) {
+    clearTimeout(timerToast)
+  }
+  timerToast = setTimeout(function () {
+    toast.hidden = true
+  }, 3200)
 }
 
 function mostrarAvisoTopo(texto) {
@@ -73,44 +138,192 @@ function mostrarAvisoTopo(texto) {
   avisoTela.hidden = false
   setTimeout(function () {
     avisoTela.hidden = true
-  }, 2800)
+  }, 2600)
 }
 
-function mostrarRetorno(texto, tipo) {
-  retornoGeral.textContent = texto
-  retornoGeral.className = 'config-retorno ' + (tipo === 'erro' ? 'retorno-erro' : 'retorno-ok')
-  retornoGeral.hidden = false
-  window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-function esconderRetorno() {
-  retornoGeral.hidden = true
-}
-
-// troca entre as 3 abas
-botoesAba.forEach(function (botao) {
+// troca entre os 5 painéis do submenu
+botoesNav.forEach(function (botao) {
   botao.addEventListener('click', function () {
-    esconderRetorno()
-    botoesAba.forEach(function (b) {
+    botoesNav.forEach(function (b) {
       b.classList.remove('ativa')
     })
     botao.classList.add('ativa')
 
     const alvo = botao.dataset.aba
-    Object.keys(paineisAba).forEach(function (chave) {
-      paineisAba[chave].hidden = chave !== alvo
+    Object.keys(paineis).forEach(function (chave) {
+      paineis[chave].hidden = chave !== alvo
     })
   })
 })
 
-function desenharUsuarios(lista) {
-  tabelaUsuarios.innerHTML = ''
+// avisa no topo quando algum parâmetro foi editado e ainda não salvo
+const camposMonitorados = [
+  cfgEmpresa, cfgCidade, cfgDocumento, cfgKmConfirmacao, cfgHorasRetorno,
+  cfgBloquearDoc, cfgAvisarSeguro, cfgMaxLeitos, cfgAreaCama, cfgAreaBeliche,
+  cfgValidarNr24, cfgDiasVencimento, cfgDiasPendencia, cfgLotacaoPct, cfgWhatsapp
+]
+
+camposMonitorados.forEach(function (campo) {
+  campo.addEventListener('input', function () {
+    seloAlterado.hidden = false
+  })
+  campo.addEventListener('change', function () {
+    seloAlterado.hidden = false
+  })
+})
+
+function lerFormularioParametros() {
+  return {
+    nomeEmpresa: cfgEmpresa.value,
+    cidadeBase: cfgCidade.value,
+    documentoEmpresa: cfgDocumento.value,
+    diasAvisoVencimento: cfgDiasVencimento.value,
+    horasAlertaRetorno: cfgHorasRetorno.value,
+    kmConfirmacaoViagem: cfgKmConfirmacao.value,
+    diasAlertaPendencia: cfgDiasPendencia.value,
+    maxLeitosQuarto: cfgMaxLeitos.value,
+    areaMinimaCama: cfgAreaCama.value,
+    areaMinimaBeliche: cfgAreaBeliche.value,
+    lotacaoAlertaPct: cfgLotacaoPct.value,
+    bloquearDocVencido: cfgBloquearDoc.checked,
+    avisarSeguroVencido: cfgAvisarSeguro.checked,
+    validarNr24: cfgValidarNr24.checked,
+    whatsappCriticos: cfgWhatsapp.checked
+  }
+}
+
+function preencherParametros(p) {
+  nomeEmpresaMenu.textContent = p.nomeEmpresa
+  cfgEmpresa.value = p.nomeEmpresa || ''
+  cfgCidade.value = p.cidadeBase || ''
+  cfgDocumento.value = p.documentoEmpresa || ''
+  cfgDiasVencimento.value = p.diasAvisoVencimento
+  cfgHorasRetorno.value = p.horasAlertaRetorno
+  cfgKmConfirmacao.value = p.kmConfirmacaoViagem
+  cfgDiasPendencia.value = p.diasAlertaPendencia
+  cfgMaxLeitos.value = p.maxLeitosQuarto
+  cfgAreaCama.value = p.areaMinimaCama
+  cfgAreaBeliche.value = p.areaMinimaBeliche
+  cfgLotacaoPct.value = p.lotacaoAlertaPct
+  cfgBloquearDoc.checked = Boolean(p.bloquearDocVencido)
+  cfgAvisarSeguro.checked = Boolean(p.avisarSeguroVencido)
+  cfgValidarNr24.checked = Boolean(p.validarNr24)
+  cfgWhatsapp.checked = Boolean(p.whatsappCriticos)
+  seloAlterado.hidden = true
+}
+
+async function salvarParametros(e) {
+  e.preventDefault()
+
+  const r = await chamarApi('/api/configuracoes/parametros', {
+    metodo: 'PUT',
+    corpo: lerFormularioParametros()
+  })
+
+  if (!r.ok) {
+    mostrarToast(r.dados.erro || 'Erro ao salvar configurações.', 'erro')
+    return
+  }
+
+  preencherParametros(r.dados.parametros)
+  mostrarToast(r.dados.mensagem, 'ok')
+  carregarDados()
+}
+
+formRegras.addEventListener('submit', salvarParametros)
+formAlertas.addEventListener('submit', salvarParametros)
+
+botaoRestaurar.addEventListener('click', async function () {
+  const r = await chamarApi('/api/configuracoes/restaurar-padrao', { metodo: 'POST' })
+  if (!r.ok) {
+    mostrarToast(r.dados.erro || 'Não foi possível restaurar.', 'erro')
+    return
+  }
+  preencherParametros(r.dados.parametros)
+  mostrarToast(r.dados.mensagem, 'ok')
+  carregarDados()
+})
+
+botaoTestarAlerta.addEventListener('click', async function () {
+  const r = await chamarApi('/api/configuracoes/testar-alerta', { metodo: 'POST' })
+  if (!r.ok) {
+    mostrarToast(r.dados.erro || 'Erro ao simular alerta.', 'erro')
+    return
+  }
+  textoPreviaAlerta.textContent = r.dados.previa
+  caixaPreviaAlerta.hidden = false
+  mostrarToast(r.dados.mensagem, 'ok')
+})
+
+// ---- usuários ----
+
+abrirNovoUsuario.addEventListener('click', function () {
+  formNovoUsuario.hidden = false
+  novoNome.focus()
+})
+
+fecharNovoUsuario.addEventListener('click', function () {
+  formNovoUsuario.hidden = true
+})
+
+buscaUsuario.addEventListener('input', function () {
+  desenharUsuarios()
+})
+
+function atualizarResumoUsuarios(lista) {
+  let ativos = 0
+  let admins = 0
+  let operadores = 0
+  let inativos = 0
 
   lista.forEach(function (u) {
+    if (u.ativo === 1) {
+      ativos++
+      if (u.perfil === 'admin') {
+        admins++
+      } else {
+        operadores++
+      }
+    } else {
+      inativos++
+    }
+  })
+
+  contAtivos.textContent = ativos
+  contAdmins.textContent = admins
+  contOperadores.textContent = operadores
+  contInativos.textContent = inativos
+}
+
+function desenharUsuarios() {
+  tabelaUsuarios.innerHTML = ''
+  const termo = buscaUsuario.value.trim().toLowerCase()
+
+  const filtrados = todosUsuarios.filter(function (u) {
+    if (termo === '') {
+      return true
+    }
+    return (
+      u.nome.toLowerCase().indexOf(termo) !== -1 ||
+      u.login.toLowerCase().indexOf(termo) !== -1
+    )
+  })
+
+  if (filtrados.length === 0) {
+    const tr = document.createElement('tr')
+    const td = document.createElement('td')
+    td.colSpan = 5
+    td.className = 'texto-vazio'
+    td.textContent = 'Nenhum usuário encontrado.'
+    tr.appendChild(td)
+    tabelaUsuarios.appendChild(tr)
+    return
+  }
+
+  filtrados.forEach(function (u) {
     const tr = document.createElement('tr')
     const ehEu = u.id === meuId
 
-    // nome + login
     const tdPessoa = document.createElement('td')
     const sNome = document.createElement('span')
     sNome.className = 'pessoa-nome'
@@ -121,18 +334,15 @@ function desenharUsuarios(lista) {
     tdPessoa.appendChild(sNome)
     tdPessoa.appendChild(sLogin)
 
-    // telefone
     const tdTel = document.createElement('td')
     tdTel.textContent = u.telefone || '—'
 
-    // perfil
     const tdPerfil = document.createElement('td')
     const badge = document.createElement('span')
     badge.className = 'perfil-badge ' + (u.perfil === 'admin' ? 'perfil-admin' : 'perfil-operador')
     badge.textContent = u.perfil === 'admin' ? 'Admin' : 'Operador'
     tdPerfil.appendChild(badge)
 
-    // status
     const tdStatus = document.createElement('td')
     const tag = document.createElement('span')
     tag.className = u.ativo === 1 ? 'status-tag status-ativo' : 'status-tag status-concluido'
@@ -142,14 +352,13 @@ function desenharUsuarios(lista) {
     tag.appendChild(document.createTextNode(u.ativo === 1 ? 'Ativo' : 'Inativo'))
     tdStatus.appendChild(tag)
 
-    // botões de ação
     const tdAcoes = document.createElement('td')
     const box = document.createElement('div')
     box.className = 'acoes-linha'
 
     const btnSenha = document.createElement('button')
     btnSenha.type = 'button'
-    btnSenha.className = 'btn-secundario'
+    btnSenha.className = 'btn-secundario btn-pequeno'
     btnSenha.textContent = 'Nova senha'
     btnSenha.addEventListener('click', function () {
       usuarioRedefinindoId = u.id
@@ -163,7 +372,7 @@ function desenharUsuarios(lista) {
     if (!ehEu) {
       const btnPerfil = document.createElement('button')
       btnPerfil.type = 'button'
-      btnPerfil.className = 'btn-secundario'
+      btnPerfil.className = 'btn-secundario btn-pequeno'
       const outroPerfil = u.perfil === 'admin' ? 'operador' : 'admin'
       btnPerfil.textContent = u.perfil === 'admin' ? 'Tornar operador' : 'Tornar admin'
       btnPerfil.addEventListener('click', async function () {
@@ -172,17 +381,17 @@ function desenharUsuarios(lista) {
           corpo: { perfil: outroPerfil }
         })
         if (!r.ok) {
-          mostrarRetorno(r.dados.erro || 'Erro ao alterar perfil.', 'erro')
+          mostrarToast(r.dados.erro || 'Erro ao alterar perfil.', 'erro')
           return
         }
-        mostrarRetorno(r.dados.mensagem, 'ok')
+        mostrarToast(r.dados.mensagem, 'ok')
         carregarDados()
       })
       box.appendChild(btnPerfil)
 
       const btnAtivo = document.createElement('button')
       btnAtivo.type = 'button'
-      btnAtivo.className = 'btn-secundario'
+      btnAtivo.className = 'btn-secundario btn-pequeno'
       btnAtivo.textContent = u.ativo === 1 ? 'Desativar' : 'Reativar'
       btnAtivo.addEventListener('click', async function () {
         const r = await chamarApi('/api/configuracoes/usuarios/' + u.id + '/ativo', {
@@ -190,10 +399,10 @@ function desenharUsuarios(lista) {
           corpo: { ativo: u.ativo === 1 ? 0 : 1 }
         })
         if (!r.ok) {
-          mostrarRetorno(r.dados.erro || 'Erro ao alterar status.', 'erro')
+          mostrarToast(r.dados.erro || 'Erro ao alterar acesso.', 'erro')
           return
         }
-        mostrarRetorno(r.dados.mensagem, 'ok')
+        mostrarToast(r.dados.mensagem, 'ok')
         carregarDados()
       })
       box.appendChild(btnAtivo)
@@ -225,38 +434,13 @@ redefinirSalvar.addEventListener('click', async function () {
     corpo: { novaSenha: redefinirInput.value }
   })
   if (!r.ok) {
-    mostrarRetorno(r.dados.erro || 'Erro ao redefinir a senha.', 'erro')
+    mostrarToast(r.dados.erro || 'Erro ao redefinir a senha.', 'erro')
     return
   }
   caixaRedefinir.hidden = true
   usuarioRedefinindoId = null
-  mostrarRetorno(r.dados.mensagem, 'ok')
-})
-
-formParametros.addEventListener('submit', async function (e) {
-  e.preventDefault()
-
-  const r = await chamarApi('/api/configuracoes/parametros', {
-    metodo: 'PUT',
-    corpo: {
-      nomeEmpresa: cfgEmpresa.value,
-      diasAvisoVencimento: cfgDiasVencimento.value,
-      horasAlertaRetorno: cfgHorasRetorno.value,
-      kmConfirmacaoViagem: cfgKmConfirmacao.value,
-      diasAlertaPendencia: cfgDiasPendencia.value,
-      bloquearDocVencido: cfgBloquearDoc.checked,
-      validarNr24: cfgValidarNr24.checked,
-      whatsappCriticos: cfgWhatsapp.checked
-    }
-  })
-
-  if (!r.ok) {
-    mostrarRetorno(r.dados.erro || 'Erro ao salvar parâmetros.', 'erro')
-    return
-  }
-
-  nomeEmpresaMenu.textContent = r.dados.parametros.nomeEmpresa
-  mostrarRetorno(r.dados.mensagem, 'ok')
+  mostrarToast(r.dados.mensagem, 'ok')
+  carregarDados()
 })
 
 formNovoUsuario.addEventListener('submit', async function (e) {
@@ -274,13 +458,98 @@ formNovoUsuario.addEventListener('submit', async function (e) {
   })
 
   if (!r.ok) {
-    mostrarRetorno(r.dados.erro || 'Erro ao cadastrar usuário.', 'erro')
+    mostrarToast(r.dados.erro || 'Erro ao cadastrar usuário.', 'erro')
     return
   }
 
   formNovoUsuario.reset()
-  mostrarRetorno(r.dados.mensagem, 'ok')
+  formNovoUsuario.hidden = true
+  mostrarToast(r.dados.mensagem, 'ok')
   carregarDados()
+})
+
+// ---- banco e auditoria ----
+
+function desenharBanco(b) {
+  dbTamanho.textContent = b.tamanhoKb + ' KB'
+  dbTabelas.textContent = b.totalTabelas
+  dbPessoas.textContent = b.contagens.colaboradores
+  dbLogs.textContent = b.contagens.logs
+
+  const intg = b.integridade
+  if (intg.integro) {
+    caixaIntegridade.className = 'integridade-status integridade-ok'
+    integridadeTitulo.textContent = 'Cadeia íntegra (' + intg.totalLinhas + ' registros verificados)'
+    integridadeMotivo.textContent = intg.motivo
+  } else {
+    caixaIntegridade.className = 'integridade-status integridade-erro'
+    integridadeTitulo.textContent = 'Adulteração detectada na linha #' + intg.linhaComProblema
+    integridadeMotivo.textContent = intg.motivo
+  }
+
+  tabelaLogsRecentes.innerHTML = ''
+  const logs = b.ultimosLogs || []
+
+  if (logs.length === 0) {
+    const tr = document.createElement('tr')
+    const td = document.createElement('td')
+    td.colSpan = 4
+    td.className = 'texto-vazio'
+    td.textContent = 'Nenhuma alteração registrada ainda no log.'
+    tr.appendChild(td)
+    tabelaLogsRecentes.appendChild(tr)
+    return
+  }
+
+  logs.forEach(function (l) {
+    const tr = document.createElement('tr')
+
+    const tdId = document.createElement('td')
+    tdId.className = 'celula-horario'
+    tdId.textContent = '#' + l.id
+
+    const tdQuando = document.createElement('td')
+    tdQuando.className = 'celula-horario'
+    tdQuando.textContent = l.quando.slice(0, 16)
+
+    const tdAutor = document.createElement('td')
+    tdAutor.textContent = '@' + l.autor
+
+    const tdResumo = document.createElement('td')
+    tdResumo.textContent = l.resumo
+
+    tr.appendChild(tdId)
+    tr.appendChild(tdQuando)
+    tr.appendChild(tdAutor)
+    tr.appendChild(tdResumo)
+
+    tabelaLogsRecentes.appendChild(tr)
+  })
+}
+
+botaoVerificarLog.addEventListener('click', async function () {
+  const r = await chamarApi('/api/configuracoes/verificar-log')
+  if (!r.ok) {
+    mostrarToast('Não foi possível verificar o log.', 'erro')
+    return
+  }
+  desenharBanco(r.dados.banco)
+  mostrarToast('Verificação de integridade concluída.', 'ok')
+})
+
+// ---- minha conta ----
+
+contaNome.addEventListener('input', function () {
+  const nome = contaNome.value.trim() || 'Administrador'
+  contaTituloPrevia.textContent = nome
+  contaAvatarPrevia.textContent = pegarIniciais(nome)
+})
+
+mostrarSenhasConta.addEventListener('change', function () {
+  const tipo = mostrarSenhasConta.checked ? 'text' : 'password'
+  senhaAtual.type = tipo
+  senhaNova.type = tipo
+  senhaConfirmar.type = tipo
 })
 
 formMinhaConta.addEventListener('submit', async function (e) {
@@ -295,20 +564,25 @@ formMinhaConta.addEventListener('submit', async function (e) {
   })
 
   if (!r.ok) {
-    mostrarRetorno(r.dados.erro || 'Erro ao atualizar seus dados.', 'erro')
+    mostrarToast(r.dados.erro || 'Erro ao atualizar dados.', 'erro')
     return
   }
 
-  perfilNome.textContent = r.dados.usuario.nome
-  usuarioIniciais.textContent = pegarIniciais(r.dados.usuario.nome)
-  mostrarRetorno(r.dados.mensagem, 'ok')
+  const novoNome = r.dados.usuario.nome
+  perfilNome.textContent = novoNome
+  usuarioIniciais.textContent = pegarIniciais(novoNome)
+  contaTituloPrevia.textContent = novoNome
+  contaAvatarPrevia.textContent = pegarIniciais(novoNome)
+
+  mostrarToast(r.dados.mensagem, 'ok')
+  carregarDados()
 })
 
 formMinhaSenha.addEventListener('submit', async function (e) {
   e.preventDefault()
 
   if (senhaNova.value !== senhaConfirmar.value) {
-    mostrarRetorno('A confirmação da nova senha não confere.', 'erro')
+    mostrarToast('A confirmação da nova senha não confere.', 'erro')
     return
   }
 
@@ -321,12 +595,16 @@ formMinhaSenha.addEventListener('submit', async function (e) {
   })
 
   if (!r.ok) {
-    mostrarRetorno(r.dados.erro || 'Erro ao alterar a senha.', 'erro')
+    mostrarToast(r.dados.erro || 'Erro ao alterar a senha.', 'erro')
     return
   }
 
   formMinhaSenha.reset()
-  mostrarRetorno(r.dados.mensagem, 'ok')
+  senhaAtual.type = 'password'
+  senhaNova.type = 'password'
+  senhaConfirmar.type = 'password'
+  mostrarToast(r.dados.mensagem, 'ok')
+  carregarDados()
 })
 
 const linksEmBreve = document.querySelectorAll('.menu-em-breve')
@@ -341,6 +619,28 @@ botaoSair.addEventListener('click', async function () {
   await chamarApi('/api/auth/sair', { metodo: 'POST' })
   window.location.href = 'index.html'
 })
+
+function desenharAmbiente(amb) {
+  if (amb.iaConfigurada) {
+    badgeIa.className = 'status-tag status-ativo'
+    badgeIa.innerHTML = '<span class="status-ponto"></span>Conectada'
+    descIa.textContent = 'Chave GROQ_API_KEY presente no servidor. Consultas e resumos prontos para uso.'
+  } else {
+    badgeIa.className = 'status-tag status-concluido'
+    badgeIa.innerHTML = '<span class="status-ponto"></span>Desligada'
+    descIa.textContent = 'Defina GROQ_API_KEY no arquivo server/.env para ativar os recursos de IA.'
+  }
+
+  if (amb.whatsappAtivo) {
+    badgeWhats.className = 'status-tag status-ativo'
+    badgeWhats.innerHTML = '<span class="status-ponto"></span>API ativa'
+    descWhats.textContent = 'Conectado à WhatsApp Cloud API para envio real de alertas.'
+  } else {
+    badgeWhats.className = 'status-tag status-uso'
+    badgeWhats.innerHTML = '<span class="status-ponto"></span>Modo terminal'
+    descWhats.textContent = 'Sem token oficial configurado: os alertas aparecem formatados no terminal do servidor.'
+  }
+}
 
 async function carregarDados() {
   try {
@@ -357,40 +657,36 @@ async function carregarDados() {
     }
 
     meuId = user.id
+    meuLogin = user.login
     perfilNome.textContent = user.nome
     perfilTipo.textContent = user.perfil
     usuarioIniciais.textContent = pegarIniciais(user.nome)
 
     const res = await chamarApi('/api/configuracoes')
     if (!res.ok) {
-      mostrarRetorno(res.dados.erro || 'Não foi possível carregar as configurações.', 'erro')
+      mostrarToast(res.dados.erro || 'Erro ao carregar configurações.', 'erro')
       return
     }
 
-    const p = res.dados.parametros
-    nomeEmpresaMenu.textContent = p.nomeEmpresa
-    cfgEmpresa.value = p.nomeEmpresa
-    cfgDiasVencimento.value = p.diasAvisoVencimento
-    cfgHorasRetorno.value = p.horasAlertaRetorno
-    cfgKmConfirmacao.value = p.kmConfirmacaoViagem
-    cfgDiasPendencia.value = p.diasAlertaPendencia
-    cfgBloquearDoc.checked = p.bloquearDocVencido
-    cfgValidarNr24.checked = p.validarNr24
-    cfgWhatsapp.checked = p.whatsappCriticos
+    preencherParametros(res.dados.parametros)
+    desenharAmbiente(res.dados.ambiente)
 
-    const amb = res.dados.ambiente
-    ambBanco.textContent = amb.banco
-    ambIa.textContent = amb.iaConfigurada ? 'Chave GROQ ativa' : 'Desligada (sem chave no .env)'
-    ambWhats.textContent = amb.whatsappModo
+    todosUsuarios = res.dados.usuarios || []
+    atualizarResumoUsuarios(todosUsuarios)
+    desenharUsuarios()
+
+    if (res.dados.banco) {
+      desenharBanco(res.dados.banco)
+    }
 
     const eu = res.dados.meuUsuario
-    contaLogin.value = eu.login
     contaNome.value = eu.nome
     contaTelefone.value = eu.telefone || ''
-
-    desenharUsuarios(res.dados.usuarios || [])
+    contaTituloPrevia.textContent = eu.nome
+    contaLoginPrevia.textContent = '@' + eu.login + ' · Perfil administrador'
+    contaAvatarPrevia.textContent = pegarIniciais(eu.nome)
   } catch (erro) {
-    mostrarRetorno('Sem conexão com o servidor.', 'erro')
+    mostrarToast('Sem conexão com o servidor.', 'erro')
   }
 }
 
