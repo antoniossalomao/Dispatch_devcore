@@ -1,0 +1,507 @@
+/* ---- estilos especificos da tela de colaboradores ---- */
+
+.colab-filtros-topo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.busca-larga {
+  width: 320px;
+}
+
+.seletor-status {
+  display: flex;
+  align-items: center;
+}
+
+.select-curto {
+  height: 35px;
+  width: 170px;
+  font-size: 13px;
+}
+
+/* coluna do colaborador na tabela com avatar */
+.colab-celula {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.colab-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  background-color: #172133;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.colab-inativo .colab-avatar {
+  background-color: #94a3b8;
+}
+
+.colab-dados-nome {
+  display: flex;
+  flex-direction: column;
+}
+
+.colab-nome {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+.colab-nome:hover {
+  color: var(--verde);
+  text-decoration: underline;
+}
+
+.colab-matricula {
+  font-size: 11.5px;
+  color: #64748b;
+  font-family: Consolas, monospace;
+}
+
+.colab-cargo {
+  font-size: 13px;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.colab-obra {
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+/* celula de CNH */
+.cnh-celula {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.cnh-categorias-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #0f172a;
+  background-color: #e2e8f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: fit-content;
+  letter-spacing: 0.5px;
+}
+
+.cnh-validade-txt {
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+/* celula de situacao operacional */
+.situacao-celula {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12.5px;
+}
+
+.situacao-alojamento {
+  color: #0369a1;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.situacao-veiculo {
+  color: #15803d;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.situacao-livre {
+  color: #64748b;
+}
+
+.coluna-acoes {
+  text-align: right;
+  width: 140px;
+}
+
+.botoes-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* ---- MODAL DE CADASTRO / EDICAO ---- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-card {
+  background-color: #fff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.modal-cabecalho {
+  padding: 18px 24px;
+  border-bottom: 1px solid #edf1f5;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.modal-titulo {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.modal-subtitulo {
+  font-size: 12.5px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.modal-fechar {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.modal-fechar:hover {
+  color: #0f172a;
+}
+
+.modal-corpo {
+  padding: 20px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.caixa-cnh-modal {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  overflow: hidden;
+}
+
+.campos-cnh-detalhe {
+  padding: 16px 20px;
+  border-top: 1px solid #edf1f5;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  background-color: #fff;
+}
+
+.categorias-seletor {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.check-categoria {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #334155;
+}
+
+.check-categoria input {
+  accent-color: var(--verde);
+}
+
+.campo-data {
+  height: 37px;
+}
+
+.modal-rodape {
+  padding: 14px 24px;
+  background-color: #f8fafc;
+  border-top: 1px solid #edf1f5;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ---- GAVETA LATERAL DE HISTORICO ---- */
+
+.gaveta-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(1px);
+  z-index: 90;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.gaveta-painel {
+  width: 100%;
+  max-width: 580px;
+  background-color: #f8fafc;
+  height: 100%;
+  box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  animation: deslizarGaveta 0.2s ease-out;
+}
+
+@keyframes deslizarGaveta {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.gaveta-topo {
+  padding: 20px 24px;
+  background-color: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gaveta-perfil {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.gaveta-titulo {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.gaveta-subtitulo {
+  font-size: 12.5px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.gaveta-abas {
+  display: flex;
+  background-color: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0 24px;
+  gap: 18px;
+}
+
+.gaveta-aba {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 12px 2px 11px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.gaveta-aba:hover {
+  color: #0f172a;
+}
+
+.gaveta-aba.ativa {
+  color: #0f172a;
+  font-weight: 600;
+  border-bottom-color: var(--verde);
+}
+
+.gaveta-corpo {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.gaveta-conteudo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.gaveta-card {
+  padding: 18px 20px;
+}
+
+.gaveta-grade-status {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.status-caixa {
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-caixa-rotulo {
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+.status-caixa-valor {
+  font-size: 13.5px;
+  color: #0f172a;
+  margin: 4px 0 2px;
+}
+
+.status-caixa-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+.gaveta-lista-dados {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.dado-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dado-linha:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dado-rotulo {
+  color: #64748b;
+}
+
+.dado-linha strong {
+  color: #0f172a;
+}
+
+/* linha do tempo de estadias e viagens */
+.timeline-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 20px;
+  border-left: 2px solid #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 2px solid #64748b;
+}
+
+.timeline-item.timeline-ativo {
+  border-left-color: var(--verde);
+}
+
+.timeline-item.timeline-ativo::before {
+  border-color: var(--verde);
+  background-color: var(--verde);
+}
+
+.timeline-titulo {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.timeline-detalhe {
+  font-size: 12px;
+  color: #475569;
+}
+
+.timeline-data {
+  font-size: 11.5px;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+.gaveta-rodape {
+  padding: 14px 24px;
+  background-color: #fff;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* responsivo */
+@media (max-width: 860px) {
+  .colab-filtros-topo {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .busca-larga {
+    width: 100%;
+  }
+  .gaveta-painel {
+    max-width: 100%;
+  }
+}
