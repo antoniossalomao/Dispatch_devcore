@@ -6,6 +6,7 @@ const session = require('express-session')
 const rotasAuth = require('./routes/auth')
 const rotasResumo = require('./routes/resumo')
 const rotasConfiguracoes = require('./routes/configuracoes')
+const rotasPessoas = require('./routes/pessoas')
 
 const app = express()
 const porta = process.env.PORT || 3001
@@ -41,6 +42,8 @@ app.use(session({
 app.use('/api/auth', rotasAuth)
 app.use('/api/resumo', rotasResumo)
 app.use('/api/configuracoes', rotasConfiguracoes)
+app.use('/api/pessoas', rotasPessoas)
+app.use('/api/colaboradores', rotasPessoas)
 
 // entrega os arquivos html, css e js da pasta client
 const pastaClient = path.join(__dirname, '..', '..', 'client')
