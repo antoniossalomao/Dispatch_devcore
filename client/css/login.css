@@ -66,6 +66,7 @@
 
 .login-titulo {
   font-size: 22px;
+  font-weight: 600;
   letter-spacing: 1px;
 }
 
@@ -83,19 +84,20 @@
 }
 
 .login-form label {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  margin-bottom: 8px;
 }
 
 .login-form input[type='text'],
 .login-form input[type='password'] {
   background-color: var(--campo);
   color: var(--texto);
-  padding: 10px 12px;
+  height: 40px;
+  padding: 0 12px;
   border: 1px solid var(--borda);
   border-radius: 8px;
-  font-size: 15px;
+  font-size: 14px;
   margin-bottom: 16px;
   transition: border-color 0.2s, box-shadow 0.2s; /* a borda e o brilho aparecem devagar */
 }
@@ -135,6 +137,7 @@
 }
 
 .login-erro {
+  border: 1px solid #5c1d1a;
   background-color: var(--erro-fundo);
   color: var(--erro-texto);
   font-size: 14px;
@@ -144,6 +147,7 @@
 }
 
 .login-sucesso {
+  border: 1px solid #14532d;
   background-color: var(--sucesso-fundo);
   color: var(--sucesso-texto);
   font-size: 14px;
@@ -157,11 +161,17 @@
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 12px;
-  font-size: 16px;
-  font-weight: 600;
+  height: 40px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+/* anel verde quando chega no botão pelo tab */
+.login-botao:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(22, 136, 83, 0.4);
 }
 
 .login-botao:hover {

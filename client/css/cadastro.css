@@ -12,7 +12,7 @@
 .cadastro-form input[type='text'],
 .cadastro-form input[type='password'] {
   margin-bottom: 12px;
-  padding: 9px 12px;
+  height: 38px;
 }
 
 @media (max-width: 700px) {

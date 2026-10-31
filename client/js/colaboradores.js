@@ -100,10 +100,10 @@ function tagCnh(info) {
     return '<span class="status-tag status-ativo"><span class="status-ponto"></span>' + info.rotulo + '</span>'
   }
   if (info.status === 'vencendo') {
-    return '<span class="status-tag" style="background-color: #fef3c7; color: #92400e;"><span class="status-ponto" style="background-color: #d97706;"></span>' + info.rotulo + '</span>'
+    return '<span class="status-tag status-atencao"><span class="status-ponto"></span>' + info.rotulo + '</span>'
   }
   if (info.status === 'vencida') {
-    return '<span class="status-tag" style="background-color: #fee2e2; color: #b91c1c;"><span class="status-ponto" style="background-color: #ef4444;"></span>' + info.rotulo + '</span>'
+    return '<span class="status-tag status-problema"><span class="status-ponto"></span>' + info.rotulo + '</span>'
   }
   return '<span class="status-tag status-concluido"><span class="status-ponto"></span>Sem CNH</span>'
 }

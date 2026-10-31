@@ -3,7 +3,7 @@
 .colab-filtros-topo {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   flex: 1;
   flex-wrap: wrap;
 }
@@ -18,7 +18,6 @@
 }
 
 .select-curto {
-  height: 35px;
   width: 170px;
   font-size: 13px;
 }
@@ -30,14 +29,15 @@
   gap: 12px;
 }
 
+/* bolinha com as iniciais (Avatar do shadcn) */
 .colab-avatar {
   width: 34px;
   height: 34px;
-  border-radius: 7px;
-  background-color: #172133;
+  border-radius: 50%;
+  background-color: var(--marinho);
   color: #fff;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,7 +45,8 @@
 }
 
 .colab-inativo .colab-avatar {
-  background-color: #94a3b8;
+  background-color: #cbd5e1;
+  color: #475569;
 }
 
 .colab-dados-nome {
@@ -55,19 +56,20 @@
 
 .colab-nome {
   font-size: 13.5px;
-  font-weight: 600;
-  color: #0f172a;
+  font-weight: 500;
+  color: var(--claro-texto);
   cursor: pointer;
 }
 
 .colab-nome:hover {
   color: var(--verde);
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .colab-matricula {
   font-size: 11.5px;
-  color: #64748b;
+  color: var(--claro-texto-fraco);
   font-family: Consolas, monospace;
 }
 
@@ -78,8 +80,8 @@
 }
 
 .colab-obra {
-  font-size: 11.5px;
-  color: #64748b;
+  font-size: 12px;
+  color: var(--claro-texto-fraco);
   margin-top: 1px;
 }
 
@@ -87,24 +89,25 @@
 .cnh-celula {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .cnh-categorias-badge {
   display: inline-block;
   font-size: 11px;
-  font-weight: 700;
-  color: #0f172a;
-  background-color: #e2e8f0;
-  padding: 2px 6px;
-  border-radius: 4px;
+  font-weight: 600;
+  color: var(--claro-texto);
+  background-color: var(--claro-suave);
+  border: 1px solid var(--claro-borda);
+  padding: 1px 7px;
+  border-radius: 6px;
   width: fit-content;
   letter-spacing: 0.5px;
 }
 
 .cnh-validade-txt {
-  font-size: 11.5px;
-  color: #64748b;
+  font-size: 12px;
+  color: var(--claro-texto-fraco);
 }
 
 /* celula de situacao operacional */
@@ -116,7 +119,7 @@
 }
 
 .situacao-alojamento {
-  color: #0369a1;
+  color: #1d4ed8;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -132,12 +135,12 @@
 }
 
 .situacao-livre {
-  color: #64748b;
+  color: var(--claro-texto-fraco);
 }
 
 .coluna-acoes {
   text-align: right;
-  width: 140px;
+  width: 160px;
 }
 
 .botoes-acoes {
@@ -146,149 +149,178 @@
   gap: 6px;
 }
 
-/* ---- MODAL DE CADASTRO / EDICAO ---- */
+
+/* ---- modal de cadastro / edicao (Dialog do shadcn) ---- */
 
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(2px);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
+  animation: aparecer 0.15s ease-out;
 }
 
 .modal-card {
-  background-color: #fff;
+  background-color: var(--claro-cartao);
+  border: 1px solid var(--claro-borda);
   border-radius: 12px;
   width: 100%;
   max-width: 640px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
   overflow: hidden;
+  animation: crescer 0.18s ease-out; /* abre crescendo um pouquinho, igual o do shadcn */
+}
+
+@keyframes aparecer {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes crescer {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .modal-cabecalho {
-  padding: 18px 24px;
-  border-bottom: 1px solid #edf1f5;
+  padding: 22px 24px 16px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 16px;
 }
 
 .modal-titulo {
   font-size: 17px;
-  font-weight: 700;
-  color: #0f172a;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--claro-texto);
 }
 
 .modal-subtitulo {
-  font-size: 12.5px;
-  color: #64748b;
-  margin-top: 2px;
+  font-size: 13px;
+  color: var(--claro-texto-fraco);
+  margin-top: 4px;
 }
 
+/* o X de fechar, um botão fantasminha */
 .modal-fechar {
   background: none;
   border: none;
-  font-size: 24px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 20px;
   line-height: 1;
-  color: #94a3b8;
+  color: var(--claro-texto-fraco);
   cursor: pointer;
-  padding: 0 4px;
+  flex-shrink: 0;
+  transition: background-color 0.15s, color 0.15s;
 }
 
 .modal-fechar:hover {
-  color: #0f172a;
+  background-color: var(--claro-suave);
+  color: var(--claro-texto);
 }
 
 .modal-corpo {
-  padding: 20px 24px;
+  padding: 4px 24px 20px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .caixa-cnh-modal {
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background-color: #f8fafc;
+  border: 1px solid var(--claro-borda);
+  border-radius: var(--raio);
   overflow: hidden;
 }
 
 .campos-cnh-detalhe {
   padding: 16px 20px;
-  border-top: 1px solid #edf1f5;
+  border-top: 1px solid var(--claro-borda);
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  background-color: #fff;
+  background-color: #fafbfc;
 }
 
 .categorias-seletor {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
-  margin-top: 4px;
 }
 
+/* cada categoria parece um botão de liga/desliga (Toggle do shadcn) */
 .check-categoria {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  height: 32px;
   font-size: 12.5px;
-  background-color: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 6px 10px;
+  background-color: var(--claro-cartao);
+  border: 1px solid var(--claro-borda);
+  border-radius: var(--raio);
+  padding: 0 10px;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 500;
   color: #334155;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.check-categoria:hover {
+  background-color: var(--claro-suave);
+}
+
+/* :has deixa mudar a cor do label quando o checkbox de dentro ta marcado */
+.check-categoria:has(input:checked) {
+  background-color: #f0fdf4;
+  border-color: #86efac;
+  color: #166534;
 }
 
 .check-categoria input {
   accent-color: var(--verde);
 }
 
-.campo-data {
-  height: 37px;
-}
-
 .modal-rodape {
   padding: 14px 24px;
-  background-color: #f8fafc;
-  border-top: 1px solid #edf1f5;
+  border-top: 1px solid var(--claro-borda);
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 8px;
 }
 
-/* ---- GAVETA LATERAL DE HISTORICO ---- */
+
+/* ---- gaveta lateral de historico (Sheet do shadcn) ---- */
 
 .gaveta-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(1px);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 90;
   display: flex;
   justify-content: flex-end;
+  animation: aparecer 0.15s ease-out;
 }
 
 .gaveta-painel {
   width: 100%;
   max-width: 580px;
-  background-color: #f8fafc;
+  background-color: var(--claro-fundo);
   height: 100%;
-  box-shadow: -8px 0 25px rgba(0, 0, 0, 0.15);
+  border-left: 1px solid var(--claro-borda);
+  box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15);
   display: flex;
   flex-direction: column;
-  animation: deslizarGaveta 0.2s ease-out;
+  animation: deslizarGaveta 0.25s ease-out;
 }
 
 @keyframes deslizarGaveta {
@@ -298,8 +330,7 @@
 
 .gaveta-topo {
   padding: 20px 24px;
-  background-color: #fff;
-  border-bottom: 1px solid #e2e8f0;
+  background-color: var(--claro-cartao);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -313,43 +344,22 @@
 
 .gaveta-titulo {
   font-size: 17px;
-  font-weight: 700;
-  color: #0f172a;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--claro-texto);
 }
 
 .gaveta-subtitulo {
-  font-size: 12.5px;
-  color: #64748b;
+  font-size: 13px;
+  color: var(--claro-texto-fraco);
   margin-top: 2px;
 }
 
+/* as abas em si vem do resumo.css (filtro-abas), aqui é só a faixa branca em volta */
 .gaveta-abas {
-  display: flex;
-  background-color: #fff;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 0 24px;
-  gap: 18px;
-}
-
-.gaveta-aba {
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  padding: 12px 2px 11px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #64748b;
-  cursor: pointer;
-}
-
-.gaveta-aba:hover {
-  color: #0f172a;
-}
-
-.gaveta-aba.ativa {
-  color: #0f172a;
-  font-weight: 600;
-  border-bottom-color: var(--verde);
+  background-color: var(--claro-cartao);
+  border-bottom: 1px solid var(--claro-borda);
+  padding: 0 24px 14px;
 }
 
 .gaveta-corpo {
@@ -365,7 +375,7 @@
 }
 
 .gaveta-card {
-  padding: 18px 20px;
+  padding: 20px;
 }
 
 .gaveta-grade-status {
@@ -377,26 +387,26 @@
 
 .status-caixa {
   padding: 12px 14px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  background-color: #f8fafc;
+  border-radius: var(--raio);
+  border: 1px solid var(--claro-borda);
+  background-color: #fafbfc;
   display: flex;
   flex-direction: column;
 }
 
 .status-caixa-rotulo {
-  font-size: 11.5px;
-  color: #64748b;
+  font-size: 12px;
+  color: var(--claro-texto-fraco);
 }
 
 .status-caixa-valor {
   font-size: 13.5px;
-  color: #0f172a;
+  color: var(--claro-texto);
   margin: 4px 0 2px;
 }
 
 .status-caixa-sub {
-  font-size: 11.5px;
+  font-size: 12px;
   color: #94a3b8;
 }
 
@@ -412,8 +422,8 @@
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--claro-borda);
 }
 
 .dado-linha:last-child {
@@ -422,25 +432,26 @@
 }
 
 .dado-rotulo {
-  color: #64748b;
+  color: var(--claro-texto-fraco);
 }
 
 .dado-linha strong {
-  color: #0f172a;
+  color: var(--claro-texto);
+  font-weight: 500;
 }
 
 /* linha do tempo de estadias e viagens */
 .timeline-lista {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   margin-top: 14px;
 }
 
 .timeline-item {
   position: relative;
   padding-left: 20px;
-  border-left: 2px solid #cbd5e1;
+  border-left: 2px solid var(--claro-borda);
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -455,7 +466,7 @@
   height: 10px;
   border-radius: 50%;
   background-color: #fff;
-  border: 2px solid #64748b;
+  border: 2px solid #94a3b8;
 }
 
 .timeline-item.timeline-ativo {
@@ -469,27 +480,28 @@
 
 .timeline-titulo {
   font-size: 13.5px;
-  font-weight: 600;
-  color: #0f172a;
+  font-weight: 500;
+  color: var(--claro-texto);
 }
 
 .timeline-detalhe {
-  font-size: 12px;
+  font-size: 12.5px;
   color: #475569;
 }
 
 .timeline-data {
-  font-size: 11.5px;
+  font-size: 12px;
   color: #94a3b8;
   margin-top: 1px;
 }
 
 .gaveta-rodape {
   padding: 14px 24px;
-  background-color: #fff;
-  border-top: 1px solid #e2e8f0;
+  background-color: var(--claro-cartao);
+  border-top: 1px solid var(--claro-borda);
   display: flex;
   justify-content: space-between;
+  gap: 8px;
 }
 
 /* responsivo */
@@ -498,10 +510,16 @@
     flex-direction: column;
     align-items: stretch;
   }
+
   .busca-larga {
     width: 100%;
   }
+
   .gaveta-painel {
     max-width: 100%;
+  }
+
+  .campos-cnh-detalhe {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,41 +1,46 @@
 /* ---- layout base do painel ---- */
+/* esse css tbm é usado por colaboradores e configuracoes (menu, topo, cartão e tabela) */
 
 .painel-corpo {
   min-height: 100vh;
   display: flex;
-  background-color: #f3f5f8;
-  color: #0f172a;
+  background-color: var(--claro-fundo);
+  color: var(--claro-texto);
   color-scheme: light;
 }
 
 
-/* ---- menu lateral azul-marinho ---- */
+/* ---- menu lateral azul-marinho (no jeito do Sidebar do shadcn) ---- */
 
 .menu-lateral {
-  width: 232px;
+  width: 236px;
   flex-shrink: 0;
   background-color: var(--marinho);
   color: #cbd5e1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 22px 14px 16px;
+  padding: 20px 12px 14px;
   border-right: 1px solid #172033;
+  position: sticky;
+  top: 0;
+  height: 100vh; /* o menu fica parado enquanto a pagina rola */
+  overflow-y: auto;
 }
 
 .menu-marca {
-  padding: 0 10px 22px;
+  padding: 0 10px 20px;
   border-bottom: 1px solid #192338;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
   display: flex;
   flex-direction: column;
 }
 
 .menu-logo {
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 700;
   color: #fff;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.4px;
 }
 
 .menu-empresa {
@@ -45,12 +50,12 @@
 }
 
 .menu-secao {
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.8px;
-  color: #475569;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.6px;
+  color: #556274;
   padding: 0 10px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .menu-secao-espaco {
@@ -60,15 +65,16 @@
 .menu-lista {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 9px 11px;
-  border-radius: 7px;
+  gap: 10px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: var(--raio);
   color: #94a3b8;
   text-decoration: none;
   font-size: 13.5px;
@@ -81,15 +87,19 @@
   color: #e2e8f0;
 }
 
+/* tela atual: fundo mais claro e o icone verde */
 .menu-item.ativo {
-  background-color: #172133;
+  background-color: #1a2436;
   color: #fff;
-  box-shadow: inset 3px 0 0 var(--verde);
+}
+
+.menu-item.ativo svg {
+  color: #34d399;
 }
 
 .menu-rodape {
   border-top: 1px solid #192338;
-  padding: 14px 6px 2px;
+  padding: 12px 6px 0;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -98,12 +108,11 @@
 .usuario-avatar {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
-  background-color: #172133;
-  border: 1px solid #2a3850;
+  border-radius: 50%;
+  background-color: #1e293b;
   color: #e2e8f0;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -125,17 +134,18 @@
 }
 
 .usuario-cargo {
-  font-size: 11.5px;
+  font-size: 12px;
   color: #64748b;
   text-transform: capitalize;
 }
 
 .botao-sair {
   background: none;
-  border: 1px solid transparent;
+  border: none;
   color: #94a3b8;
-  padding: 6px;
-  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--raio);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -159,66 +169,74 @@
 }
 
 .topo {
-  height: 62px;
-  background-color: #fff;
-  border-bottom: 1px solid #e2e8f0;
+  height: 60px;
+  background-color: var(--claro-cartao);
+  border-bottom: 1px solid var(--claro-borda);
   padding: 0 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .topo-esquerda {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
   flex-wrap: wrap;
 }
 
 .topo-titulo {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
-  color: #0f172a;
+  letter-spacing: -0.2px;
+  color: var(--claro-texto);
 }
 
 .topo-data {
   font-size: 13px;
-  color: #64748b;
+  color: var(--claro-texto-fraco);
 }
 
+/* Badge cinza do shadcn (variante secondary) */
 .topo-aviso {
   font-size: 12px;
   font-weight: 500;
-  color: #0f172a;
-  background-color: #e2e8f0;
-  padding: 3px 10px;
-  border-radius: 5px;
+  color: var(--claro-texto);
+  background-color: var(--claro-suave);
+  border: 1px solid var(--claro-borda);
+  padding: 2px 8px;
+  border-radius: 6px;
 }
 
 .topo-direita {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
+/* campo de busca com a lupa dentro, mesmo visual do Input */
 .busca-caixa {
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #f8fafc;
-  border: 1px solid #cbd5e1;
-  border-radius: 7px;
-  padding: 0 11px;
-  height: 35px;
+  background-color: var(--claro-cartao);
+  border: 1px solid var(--claro-borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-leve);
+  padding: 0 12px;
+  height: 36px;
   width: 280px;
-  color: #64748b;
-  transition: border-color 0.15s, background-color 0.15s;
+  color: #94a3b8;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .busca-caixa:focus-within {
-  background-color: #fff;
-  border-color: #64748b;
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 3px var(--claro-anel);
 }
 
 .busca-caixa input {
@@ -226,21 +244,23 @@
   background: none;
   outline: none;
   width: 100%;
-  font-size: 13px;
-  color: #0f172a;
+  font-size: 13.5px;
+  color: var(--claro-texto);
 }
 
 .busca-caixa input::placeholder {
   color: #94a3b8;
 }
 
+/* botão quadrado só com icone (Button outline size icon) */
 .botao-notif {
   position: relative;
-  width: 35px;
-  height: 35px;
-  border-radius: 7px;
-  border: 1px solid #e2e8f0;
-  background-color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--raio);
+  border: 1px solid var(--claro-borda);
+  background-color: var(--claro-cartao);
+  box-shadow: var(--sombra-leve);
   color: #475569;
   cursor: pointer;
   display: flex;
@@ -250,7 +270,7 @@
 }
 
 .botao-notif:hover {
-  background-color: #f8fafc;
+  background-color: var(--claro-suave);
 }
 
 .notif-ponto {
@@ -261,13 +281,14 @@
   height: 7px;
   border-radius: 50%;
   background-color: #d97706;
+  border: 1.5px solid #fff;
 }
 
 
 /* ---- conteúdo e indicadores ---- */
 
 .conteudo {
-  padding: 26px 32px 36px;
+  padding: 28px 32px 40px;
   max-width: 1360px;
   width: 100%;
 }
@@ -279,11 +300,13 @@
   margin-bottom: 22px;
 }
 
+/* cartão de numero (Card do shadcn) */
 .cartao-kpi {
-  background-color: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 18px 20px;
+  background-color: var(--claro-cartao);
+  border: 1px solid var(--claro-borda);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--sombra-leve);
 }
 
 .kpi-topo {
@@ -297,44 +320,47 @@
 .kpi-rotulo {
   font-size: 13px;
   font-weight: 500;
-  color: #475569;
+  color: var(--claro-texto-fraco);
 }
 
 .kpi-valor-linha {
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .kpi-numero {
   font-size: 30px;
-  font-weight: 700;
-  color: #0f172a;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+  color: var(--claro-texto);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
 .kpi-complemento {
   font-size: 12.5px;
-  color: #64748b;
+  color: var(--claro-texto-fraco);
 }
 
+/* barrinha de progresso (Progress), redonda nas pontas */
 .barra-fundo {
-  height: 4px;
-  background-color: #edf1f5;
-  border-radius: 2px;
+  height: 6px;
+  background-color: var(--claro-suave);
+  border-radius: 999px;
   overflow: hidden;
   margin-bottom: 10px;
 }
 
 .barra-preenchimento {
   height: 100%;
-  border-radius: 2px;
+  border-radius: 999px;
+  transition: width 0.4s;
 }
 
 .barra-azul {
-  background-color: #1d4ed8;
+  background-color: #2563eb;
 }
 
 .barra-verde {
@@ -347,7 +373,7 @@
 
 .kpi-detalhe {
   font-size: 12px;
-  color: #64748b;
+  color: var(--claro-texto-fraco);
 }
 
 
@@ -361,15 +387,16 @@
 }
 
 .bloco {
-  background-color: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  background-color: var(--claro-cartao);
+  border: 1px solid var(--claro-borda);
+  border-radius: 12px;
+  box-shadow: var(--sombra-leve);
   overflow: hidden;
 }
 
 .bloco-cabecalho {
   padding: 18px 20px;
-  border-bottom: 1px solid #edf1f5;
+  border-bottom: 1px solid var(--claro-borda);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -378,52 +405,56 @@
 }
 
 .bloco-cabecalho-simples {
-  padding: 15px 18px;
+  padding: 16px 20px;
 }
 
 .bloco-titulo {
   font-size: 15px;
   font-weight: 600;
-  color: #0f172a;
+  letter-spacing: -0.2px;
+  color: var(--claro-texto);
 }
 
 .bloco-subtitulo {
-  font-size: 12.5px;
-  color: #64748b;
+  font-size: 13px;
+  color: var(--claro-texto-fraco);
   margin-top: 2px;
 }
 
+/* abas (Tabs do shadcn): fundo cinza e a aba ativa branca */
 .filtro-abas {
-  display: flex;
-  background-color: #f1f5f9;
+  display: inline-flex;
+  background-color: var(--claro-suave);
   padding: 3px;
-  border-radius: 7px;
+  border-radius: 10px;
   gap: 2px;
 }
 
 .aba-item {
   border: none;
   background: none;
-  padding: 5px 11px;
-  font-size: 12.5px;
+  height: 30px;
+  padding: 0 12px;
+  font-size: 13px;
   font-weight: 500;
-  color: #64748b;
-  border-radius: 5px;
+  color: var(--claro-texto-fraco);
+  border-radius: 7px;
   cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
 }
 
 .aba-item:hover {
-  color: #0f172a;
+  color: var(--claro-texto);
 }
 
 .aba-item.ativa {
-  background-color: #fff;
-  color: #0f172a;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+  background-color: var(--claro-cartao);
+  color: var(--claro-texto);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
 }
 
 
-/* ---- tabela de movimentações ---- */
+/* ---- tabela (Table do shadcn) ---- */
 
 .tabela-area {
   overflow-x: auto;
@@ -436,21 +467,21 @@
 
 .tabela th {
   text-align: left;
-  font-size: 11.5px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: #64748b;
-  background-color: #f8fafc;
-  padding: 11px 20px;
-  border-bottom: 1px solid #e2e8f0;
+  height: 40px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--claro-texto-fraco);
+  background-color: #fafbfc;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--claro-borda);
+  white-space: nowrap;
 }
 
 .tabela td {
-  padding: 13px 20px;
+  padding: 12px 20px;
   font-size: 13.5px;
   color: #334155;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid var(--claro-borda);
   vertical-align: middle;
 }
 
@@ -458,36 +489,43 @@
   border-bottom: none;
 }
 
+.tabela tbody tr {
+  transition: background-color 0.15s;
+}
+
 .tabela tbody tr:hover {
-  background-color: #fafbfc;
+  background-color: #f8fafc;
 }
 
 .pessoa-nome {
-  font-weight: 600;
-  color: #0f172a;
+  font-weight: 500;
+  color: var(--claro-texto);
   display: block;
 }
 
 .pessoa-cargo {
   font-size: 12px;
-  color: #64748b;
+  color: var(--claro-texto-fraco);
   display: block;
   margin-top: 1px;
 }
 
 .celula-horario {
-  color: #64748b;
+  color: var(--claro-texto-fraco);
   font-variant-numeric: tabular-nums;
 }
 
+/* etiqueta de status (Badge com borda) */
 .status-tag {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 9px;
-  border-radius: 5px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid transparent;
   font-size: 12px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .status-ponto {
@@ -496,17 +534,21 @@
   border-radius: 50%;
 }
 
+/* verde = ok */
 .status-ativo {
-  background-color: #ecfdf5;
-  color: #065f46;
+  background-color: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
 }
 
 .status-ativo .status-ponto {
-  background-color: #10b981;
+  background-color: #16a34a;
 }
 
+/* azul = em uso */
 .status-uso {
   background-color: #eff6ff;
+  border-color: #bfdbfe;
   color: #1e40af;
 }
 
@@ -514,8 +556,31 @@
   background-color: #2563eb;
 }
 
+/* amarelo = atenção */
+.status-atencao {
+  background-color: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.status-atencao .status-ponto {
+  background-color: #d97706;
+}
+
+/* vermelho = problema */
+.status-problema {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.status-problema .status-ponto {
+  background-color: #ef4444;
+}
+
 .status-concluido {
-  background-color: #f1f5f9;
+  background-color: var(--claro-suave);
+  border-color: var(--claro-borda);
   color: #475569;
 }
 
@@ -533,28 +598,28 @@
 }
 
 .lista-unidades {
-  padding: 16px 18px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
 }
 
 .unidade-topo {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .unidade-nome {
-  font-size: 13px;
-  font-weight: 600;
-  color: #0f172a;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--claro-texto);
 }
 
 .unidade-cidade {
-  font-size: 11.5px;
-  color: #64748b;
+  font-size: 12px;
+  color: var(--claro-texto-fraco);
   margin-left: 4px;
   font-weight: normal;
 }
@@ -566,43 +631,52 @@
 }
 
 .lista-alertas {
-  padding: 14px 18px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
+/* caixinha de aviso (Alert do shadcn) com a cor do nivel */
 .alerta-item {
-  padding: 10px 12px;
-  border-radius: 6px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-left-width: 3px;
+  padding: 12px 14px;
+  border-radius: var(--raio);
+  border: 1px solid var(--claro-borda);
 }
 
 .alerta-atencao {
-  border-left-color: #d97706;
+  background-color: #fffbeb;
+  border-color: #fde68a;
+}
+
+.alerta-atencao .alerta-titulo {
+  color: #92400e;
 }
 
 .alerta-problema {
-  border-left-color: #dc2626;
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
+.alerta-problema .alerta-titulo {
+  color: #991b1b;
 }
 
 .alerta-titulo {
   font-size: 13px;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--claro-texto);
 }
 
 .alerta-detalhe {
-  font-size: 12px;
-  color: #64748b;
+  font-size: 12.5px;
+  color: #475569;
   margin-top: 2px;
 }
 
 .texto-vazio {
   font-size: 13px;
-  color: #64748b;
+  color: var(--claro-texto-fraco);
 }
 
 
@@ -625,6 +699,8 @@
 
   .menu-lateral {
     width: 100%;
+    height: auto;
+    position: static;
     padding: 14px 16px;
     gap: 12px;
   }
@@ -649,6 +725,7 @@
 
   .topo {
     height: auto;
+    position: static;
     padding: 14px 18px;
     flex-direction: column;
     align-items: stretch;

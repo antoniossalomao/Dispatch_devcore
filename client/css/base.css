@@ -1,3 +1,6 @@
+/* fonte Inter, a mesma pegada dos componentes do shadcn/ui */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 /* cores padrão do sistema */
 :root {
   --fundo: #c4c8d0;
@@ -19,6 +22,18 @@
   --verde: #00793b;
   --verde-hover: #168853;
 
+  /* cores das telas de dentro (claras), tiradas da paleta slate do shadcn */
+  --claro-fundo: #f4f6f9;
+  --claro-cartao: #fff;
+  --claro-texto: #0f172a;
+  --claro-texto-fraco: #64748b;
+  --claro-borda: #e2e8f0;
+  --claro-suave: #f1f5f9; /* fundo de aba, hover de linha etc */
+  --claro-anel: rgba(100, 116, 139, 0.25); /* brilho em volta do campo com foco */
+  --vermelho: #dc2626;
+  --raio: 8px;
+  --sombra-leve: 0 1px 2px rgba(15, 23, 42, 0.05);
+
   color-scheme: dark;
 }
 
@@ -30,13 +45,16 @@
 }
 
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
   background-color: var(--fundo);
   color: var(--texto);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* input e button não pegam a fonte do body, tem que forçar */
+/* input, select e button não pegam a fonte do body, tem que forçar */
 input,
+select,
+textarea,
 button {
   font-family: inherit;
 }
@@ -44,4 +62,343 @@ button {
 /* garante que o que tiver hidden fica escondido mesmo */
 [hidden] {
   display: none !important;
+}
+
+
+/* ---- botões (iguais ao Button do shadcn) ---- */
+
+.btn-primario,
+.btn-secundario,
+.btn-fantasma,
+.btn-destrutivo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--raio);
+  border: 1px solid transparent;
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, box-shadow 0.15s;
+}
+
+.btn-primario {
+  background-color: var(--verde);
+  color: #fff;
+  box-shadow: var(--sombra-leve);
+}
+
+.btn-primario:hover {
+  background-color: var(--verde-hover);
+}
+
+/* o "outline" do shadcn: fundo branco com borda */
+.btn-secundario {
+  background-color: var(--claro-cartao);
+  color: var(--claro-texto);
+  border-color: var(--claro-borda);
+  box-shadow: var(--sombra-leve);
+}
+
+.btn-secundario:hover {
+  background-color: var(--claro-suave);
+}
+
+/* sem fundo nenhum, só aparece no hover */
+.btn-fantasma {
+  background: none;
+  color: var(--claro-texto);
+}
+
+.btn-fantasma:hover {
+  background-color: var(--claro-suave);
+}
+
+.btn-destrutivo {
+  background-color: var(--vermelho);
+  color: #fff;
+}
+
+.btn-destrutivo:hover {
+  background-color: #b91c1c;
+}
+
+.btn-pequeno {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12.5px;
+}
+
+/* anel em volta quando chega no botão pelo tab do teclado */
+.btn-primario:focus-visible,
+.btn-secundario:focus-visible,
+.btn-fantasma:focus-visible,
+.btn-destrutivo:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--claro-anel);
+}
+
+.btn-primario:disabled,
+.btn-secundario:disabled,
+.btn-fantasma:disabled,
+.btn-destrutivo:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* ---- campos de formulário (Input, Select e Label) ---- */
+
+.grade-campos {
+  display: grid;
+  gap: 16px;
+}
+
+.duas-colunas {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.tres-colunas {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.campo-grupo {
+  display: flex;
+  flex-direction: column;
+}
+
+.campo-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--claro-texto);
+  margin-bottom: 8px;
+}
+
+.campo-dica {
+  font-size: 12px;
+  color: var(--claro-texto-fraco);
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.config-input,
+.config-select {
+  width: 100%;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 13.5px;
+  color: var(--claro-texto);
+  background-color: var(--claro-cartao);
+  border: 1px solid var(--claro-borda);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-leve);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.config-input::placeholder {
+  color: #94a3b8;
+}
+
+/* tira a setinha padrão do select e coloca uma igual a do shadcn */
+.config-select {
+  appearance: none;
+  padding-right: 34px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.config-input:focus,
+.config-select:focus {
+  outline: none;
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 3px var(--claro-anel);
+}
+
+.config-input:disabled,
+.config-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* ---- chave liga/desliga (Switch) ---- */
+
+.lista-switches {
+  display: flex;
+  flex-direction: column;
+}
+
+.switch-linha {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  border-bottom: 1px solid var(--claro-borda);
+  cursor: pointer;
+}
+
+.switch-linha:last-child {
+  border-bottom: none;
+}
+
+.switch-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.switch-titulo {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--claro-texto);
+}
+
+.switch-desc {
+  font-size: 12.5px;
+  color: var(--claro-texto-fraco);
+  line-height: 1.45;
+}
+
+.chave {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* o checkbox de verdade fica invisivel, quem aparece é o trilho */
+.chave input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.chave-trilho {
+  position: absolute;
+  inset: 0;
+  background-color: #cbd5e1;
+  border-radius: 999px;
+  transition: background-color 0.18s;
+}
+
+/* a bolinha branca */
+.chave-trilho::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 2px;
+  top: 2px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: transform 0.18s;
+}
+
+.chave input:checked + .chave-trilho {
+  background-color: var(--verde);
+}
+
+.chave input:checked + .chave-trilho::before {
+  transform: translateX(16px);
+}
+
+.chave input:focus-visible + .chave-trilho {
+  box-shadow: 0 0 0 3px var(--claro-anel);
+}
+
+
+/* ---- avatar com as iniciais ---- */
+
+.conta-avatar-grande {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--marinho);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+
+/* ---- aviso que aparece no canto (parecido com o Sonner do shadcn) ---- */
+
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  max-width: 380px;
+  padding: 14px 16px 14px 40px;
+  border-radius: var(--raio);
+  background-color: var(--claro-cartao);
+  color: var(--claro-texto);
+  border: 1px solid var(--claro-borda);
+  font-size: 13.5px;
+  font-weight: 500;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  z-index: 200;
+  animation: toastSubir 0.25s ease-out;
+}
+
+/* bolinha com o check na esquerda */
+.toast::before {
+  content: '✓';
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--verde);
+  color: #fff;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast.toast-erro {
+  color: #991b1b;
+  border-color: #fecaca;
+  background-color: #fef2f2;
+}
+
+.toast.toast-erro::before {
+  content: '!';
+  background-color: var(--vermelho);
+  font-weight: 700;
+}
+
+@keyframes toastSubir {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+@media (max-width: 680px) {
+  .tres-colunas,
+  .duas-colunas {
+    grid-template-columns: 1fr;
+  }
+
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-width: none;
+  }
 }

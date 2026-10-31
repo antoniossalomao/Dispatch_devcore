@@ -346,10 +346,13 @@
         <button type="button" id="fechar-gaveta" class="modal-fechar">&times;</button>
       </div>
 
+      <!-- usa as mesmas abas do resumo (filtro-abas e aba-item) -->
       <div class="gaveta-abas">
-        <button type="button" class="gaveta-aba ativa" data-gaveta="visao">Visão Geral</button>
-        <button type="button" class="gaveta-aba" data-gaveta="alojamentos">Alojamentos (<span id="cont-estadias">0</span>)</button>
-        <button type="button" class="gaveta-aba" data-gaveta="frota">Viagens / Frota (<span id="cont-viagens">0</span>)</button>
+        <div class="filtro-abas">
+          <button type="button" class="aba-item gaveta-aba ativa" data-gaveta="visao">Visão Geral</button>
+          <button type="button" class="aba-item gaveta-aba" data-gaveta="alojamentos">Alojamentos (<span id="cont-estadias">0</span>)</button>
+          <button type="button" class="aba-item gaveta-aba" data-gaveta="frota">Viagens / Frota (<span id="cont-viagens">0</span>)</button>
+        </div>
       </div>
 
       <div class="gaveta-corpo">
