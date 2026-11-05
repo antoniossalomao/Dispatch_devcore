@@ -254,23 +254,19 @@ Pro Telegram vamos usar a **Bot API**, que é gratuita: cria-se um bot no @BotFa
 ```
 dispatch/
 ├── client/                 # front-end (HTML, CSS e JS)
-│   ├── index.html          # login (já feito)
-│   ├── resumo.html
-│   ├── colaboradores.html
-│   ├── alojamentos.html
-│   ├── frota.html
-│   ├── relatorios.html
-│   ├── css/                # base.css (cores dos dois temas e botões) + um css por tela
-│   └── js/                 # api.js (chamadas pro server), menu.js, tema.js (em todas as telas) + um js por tela
+│   ├── index.html          # login
+│   ├── resumo.html, colaboradores.html, alojamentos.html, frota.html
+│   ├── relatorios.html, auditoria.html, configuracoes.html
+│   ├── css/                # base.css (cores e botões) + um css por tela (+ extras.css do sininho e do chat)
+│   └── js/                 # api.js (chamadas pro server), extras.js (sininho e chat de ajuda) + um js por tela
 │
 ├── server/                 # back-end (Node.js)
 │   ├── src/
-│   │   ├── server.js       # liga o servidor e entrega a pasta client
-│   │   ├── routes/         # uma rota por assunto: pessoas.js, alojamentos.js, frota.js, relatorios.js...
-│   │   ├── regras/         # as validações da seção 5: cnh.js, nr24.js, disponibilidade.js, auditoria.js
-│   │   ├── db/             # schema.sql, criar-banco.js (já feitos), conexao.js, seed.js
-│   │   ├── ia/             # chamadas pra Groq
-│   │   └── telegram.js
+│   │   ├── server.js       # liga o servidor, confere os avisos e entrega a pasta client
+│   │   ├── routes/         # uma rota por assunto: auth, pessoas, alojamentos, frota, relatorios,
+│   │   │                   # auditoria, notificacoes, ia, resumo, configuracoes
+│   │   ├── regras/         # cnh.js, auditoria.js (hash encadeado), datas.js, notificacoes.js, ia.js (Groq), telegram.js
+│   │   └── db/             # schema.sql, criar-banco.js, conexao.js, seed.js
 │   ├── .env.example
 │   └── package.json
 │
@@ -286,6 +282,8 @@ Pra rodar o projeto precisa do **Node.js 22 ou mais novo**:
 cd server
 npm install
 npm run criar-banco
+npm run seed   # opcional: dados de exemplo
+npm start
 ```
 
 O próprio server vai entregar as páginas do `client`, então front e back abrem no mesmo endereço (`http://localhost:3001`). Enquanto o server não existe, dá pra abrir o login com a extensão Live Server do VS Code.
