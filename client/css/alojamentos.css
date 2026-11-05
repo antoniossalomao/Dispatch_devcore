@@ -1,0 +1,158 @@
+/* ---- estilos especificos da tela de alojamentos ---- */
+
+.aloj-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  padding: 18px 20px 20px;
+}
+
+.aloj-cartao {
+  background-color: var(--claro-cartao);
+  border: 1px solid var(--claro-borda);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: var(--sombra-leve);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--claro-texto);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.aloj-cartao:hover {
+  border-color: #94a3b8;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.aloj-cartao.aloj-inativo {
+  opacity: 0.6;
+}
+
+.aloj-cartao-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.aloj-nome {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.aloj-local,
+.aloj-resp {
+  font-size: 12.5px;
+  color: var(--claro-texto-fraco);
+  margin-top: 3px;
+}
+
+.aloj-barra {
+  height: 8px;
+  background-color: var(--claro-suave);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 16px 0 8px;
+}
+
+.aloj-barra-preench {
+  height: 100%;
+  background-color: var(--verde);
+  border-radius: 999px;
+}
+
+.aloj-barra-preench.cheio {
+  background-color: var(--vermelho);
+}
+
+.aloj-numeros {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--claro-texto-fraco);
+}
+
+.aloj-numeros strong {
+  color: var(--claro-texto);
+}
+
+/* ---- gaveta: quartos e leitos ---- */
+
+.quarto-card {
+  border: 1px solid var(--claro-borda);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 14px;
+  background-color: var(--claro-cartao);
+}
+
+.quarto-titulo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.quarto-titulo span {
+  font-weight: 400;
+  font-size: 12.5px;
+  color: var(--claro-texto-fraco);
+}
+
+.leitos-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.leito {
+  border: 1px solid var(--claro-borda);
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  background-color: var(--claro-cartao);
+  color: var(--claro-texto);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.leito-codigo {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.leito-tipo {
+  font-size: 11px;
+  color: var(--claro-texto-fraco);
+}
+
+.leito-pessoa {
+  font-size: 12px;
+}
+
+.leito.livre {
+  border-style: dashed;
+}
+
+.leito.livre:hover {
+  border-color: var(--verde);
+  background-color: #f0fdf4;
+}
+
+.leito.ocupado {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
+.leito.ocupado:hover {
+  border-color: var(--vermelho);
+}
+
+.ocor-acoes {
+  margin-top: 6px;
+}
