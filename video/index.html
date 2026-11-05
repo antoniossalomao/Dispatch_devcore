@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Dispatch — Apresentação</title>
+<style>
+:root{--navy:#05070d;--navy2:#0b0f19;--green:#00a152;--green2:#19d27a;--blue:#6095f6;--red:#ff4d4d;--amber:#f5b83d;--txt:#e9eef7;--dim:#8d9ab0}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;background:#000;overflow:hidden;font-family:'Inter','Inter Display',sans-serif;color:var(--txt)}
+#stage{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;background:radial-gradient(1200px 700px at 70% 20%,#0d2a22 0%,transparent 60%),radial-gradient(1000px 700px at 15% 90%,#0e1d44 0%,transparent 60%),var(--navy)}
+canvas#fx{position:absolute;inset:0}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.72) 100%);pointer-events:none;z-index:50}
+.grain{position:absolute;inset:-50px;z-index:51;pointer-events:none;opacity:.07;mix-blend-mode:overlay}
+.scene{position:absolute;inset:0;opacity:0}
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.big{font-size:104px;font-weight:800;letter-spacing:-3px;line-height:1.05}
+.mid{font-size:64px;font-weight:700;letter-spacing:-1.5px}
+.sm{font-size:30px;color:var(--dim);font-weight:500;letter-spacing:.5px}
+.g{color:var(--green2)}.r{color:var(--red)}.b{color:var(--blue)}
+.line{position:absolute;left:0;right:0;text-align:center;opacity:0}
+.mock{position:absolute;width:1500px;height:972px;border-radius:16px;overflow:visible;background:#fff;box-shadow:0 60px 160px rgba(0,0,0,.7),0 0 120px rgba(25,210,122,.18),0 0 0 1px rgba(255,255,255,.12)}
+.mock .bar{position:absolute;left:0;right:0;top:0;height:36px;background:#161c2b;border-radius:16px 16px 0 0;display:flex;align-items:center;gap:8px;padding-left:16px}
+.mock .bar i{width:12px;height:12px;border-radius:50%;background:#3a4560;display:block}
+.mock .bar span{margin-left:18px;font-size:14px;color:#7e8aa3;background:#0d1220;padding:4px 16px;border-radius:6px}
+.mock .shot{position:absolute;left:0;top:36px;width:1500px;height:937.5px;border-radius:0 0 16px 16px;overflow:hidden}
+.mock img{width:100%;height:100%;display:block}
+.hl{position:absolute;border:3px solid var(--green2);border-radius:12px;box-shadow:0 0 0 9999px rgba(3,6,12,0),0 0 40px rgba(25,210,122,.7),inset 0 0 30px rgba(25,210,122,.15);opacity:0}
+.tag{position:absolute;background:rgba(5,9,16,.92);border:1px solid rgba(25,210,122,.6);color:#fff;font-weight:700;font-size:30px;padding:12px 22px;border-radius:12px;white-space:nowrap;opacity:0;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.tag b{color:var(--green2)}
+#cap{position:absolute;left:0;right:0;bottom:70px;text-align:center;z-index:60;font-size:38px;font-weight:600;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.9);padding:0 220px;line-height:1.3}
+.logo{font-weight:800;letter-spacing:-6px;font-size:230px;background:linear-gradient(180deg,#fff 30%,#9db3d9);-webkit-background-clip:text;color:transparent;filter:drop-shadow(0 0 40px rgba(25,210,122,.55))}
+.chip{display:inline-block;border:2px solid #2a3850;border-radius:18px;padding:22px 44px;font-size:64px;font-weight:800;margin:0 14px;background:rgba(15,22,36,.8)}
+.foot{position:absolute;bottom:150px;left:0;right:0;text-align:center;font-size:20px;color:#5f6c85;letter-spacing:2px;text-transform:uppercase;opacity:.9}
+.blk{position:absolute;width:480px;padding:22px 26px;border-radius:16px;background:linear-gradient(180deg,#121a2b,#0c1220);border:1px solid #2a3a58;box-shadow:0 20px 60px rgba(0,0,0,.5);opacity:0}
+.blk .h{font-family:'DejaVu Sans Mono',monospace;font-size:20px;color:var(--green2)}
+.blk .w{font-size:25px;font-weight:600;margin:8px 0 6px}
+.blk .d{font-size:21px;color:var(--dim)}
+.chain{position:absolute;height:6px;background:linear-gradient(90deg,var(--green2),var(--blue));border-radius:3px;opacity:0;box-shadow:0 0 20px var(--green2)}
+.chat{position:absolute;left:1040px;width:760px;opacity:0}
+.bub{padding:24px 30px;border-radius:24px;font-size:30px;font-weight:500;line-height:1.35;margin-bottom:22px}
+.q{background:#1e2c48;border-bottom-right-radius:6px;margin-left:120px}
+.a{background:#0f3d2a;border:1px solid var(--green);border-bottom-left-radius:6px}
+.phone{position:absolute;left:660px;top:90px;width:600px;height:900px;border-radius:70px;background:#06090f;border:10px solid #1c2538;box-shadow:0 50px 140px rgba(0,0,0,.7),0 0 120px rgba(37,211,102,.2);overflow:hidden;opacity:0}
+.phone .top{height:120px;background:#075e54;display:flex;align-items:flex-end;padding:0 30px 18px;font-size:30px;font-weight:700}
+.phone .body{position:absolute;top:120px;bottom:0;left:0;right:0;background:#0b141a;padding:26px}
+.wm{background:#202c33;border-radius:18px;border-top-left-radius:4px;padding:18px 22px;font-size:25px;line-height:1.35;margin-bottom:20px;opacity:0;width:500px}
+.wm small{display:block;color:#7e8f99;font-size:17px;text-align:right;margin-top:6px}
+.num{font-size:200px;font-weight:800;letter-spacing:-6px;line-height:1;background:linear-gradient(180deg,#fff,#7fe9b2);-webkit-background-clip:text;color:transparent}
+.cell{position:absolute;width:520px;text-align:center;opacity:0}
+.cell .l{font-size:34px;color:var(--dim);font-weight:600;margin-top:14px}
+</style></head><body>
+<div id="stage">
+<canvas id="fx" width="1920" height="1080"></canvas>
+
+<div class="scene" id="s1">
+ <div class="line mid" id="s1a" style="top:300px">Quem estava dirigindo?</div>
+ <div class="line mid" id="s1b" style="top:430px">Em qual alojamento ele dormiu?</div>
+ <div class="line mid" id="s1c" style="top:560px">Quando a <span class="r">multa</span> chegou…</div>
+ <div class="line big r" id="s1d" style="top:690px;font-size:92px">ninguém soube responder.</div>
+</div>
+
+<div class="scene" id="s2">
+ <div class="line" id="s2a" style="top:250px"><span class="chip" id="c1">PLANILHAS</span><span class="chip" id="c2">MENSAGENS</span><span class="chip" id="c3">MEMÓRIA</span></div>
+ <div class="cell" id="s2b" style="left:200px;top:430px;width:700px"><div class="num r" id="n2x" style="background:linear-gradient(180deg,#fff,#ff8a8a);-webkit-background-clip:text">2×</div><div class="l" style="font-size:36px">o valor da multa por<br>não indicação do condutor</div></div>
+ <div class="cell" id="s2c" style="left:1020px;top:430px;width:700px"><div class="num" id="n8" style="background:linear-gradient(180deg,#fff,#ffd27a);-webkit-background-clip:text">NR-24</div><div class="l" style="font-size:36px">máx. 8 por quarto · 3 m² por cama<br>fiscalização a qualquer momento</div></div>
+</div>
+
+<div class="scene center" id="s3">
+ <div class="logo" id="logo3">Dispatch</div>
+ <div class="mid" id="s3a" style="margin-top:20px;opacity:0;font-size:48px;letter-spacing:8px;font-weight:600;color:#cfe;text-transform:uppercase">Pessoas · Alojamentos · Frota</div>
+ <div class="sm g" id="s3b" style="margin-top:26px;opacity:0;font-size:40px;font-weight:700">Rastreabilidade total.</div>
+</div>
+
+<div class="scene" id="s4"><div class="mock" id="m4"><div class="bar"><i></i><i></i><i></i><span>dispatch · resumo operacional</span></div><div class="shot"><img src="shots/resumo.png">
+ <div class="hl" id="h4a" style="left:18.6%;top:9.8%;width:79.2%;height:17.6%"></div>
+ <div class="hl" id="h4b" style="left:74.9%;top:58.8%;width:22.9%;height:34.6%"></div></div>
+ <div class="tag" id="t4a" style="left:300px;top:250px">Frota e leitos <b>em tempo real</b></div>
+ <div class="tag" id="t4b" style="left:900px;top:820px">Alertas <b>que pedem ação agora</b></div></div></div>
+
+<div class="scene" id="s5"><div class="mock" id="m5"><div class="bar"><i></i><i></i><i></i><span>dispatch · colaboradores</span></div><div class="shot"><img src="shots/colaboradores.png">
+ <div class="hl" id="h5a" style="left:58.8%;top:9.8%;width:18.9%;height:14.1%"></div>
+ <div class="hl" id="h5b" style="left:60.8%;top:39%;width:12.7%;height:59%"></div></div>
+ <div class="tag" id="t5a" style="left:640px;top:200px">3 CNHs <b>vencendo ou vencidas</b></div>
+ <div class="tag" id="t5b" style="left:560px;top:640px">Aviso <b>antes de virar multa</b></div></div></div>
+
+<div class="scene" id="s6"><div class="mock" id="m6"><div class="bar"><i></i><i></i><i></i><span>dispatch · movimentações</span></div><div class="shot"><img src="shots/resumo.png">
+ <div class="hl" id="h6a" style="left:18.6%;top:30%;width:55%;height:44.5%"></div>
+ <div class="hl" id="h6b" style="left:74.9%;top:30%;width:22.9%;height:26.8%"></div></div>
+ <div class="tag" id="t6a" style="left:250px;top:800px">Quem, onde, <b>quando e km</b></div>
+ <div class="tag" id="t6b" style="left:1000px;top:230px">Ocupação <b>dentro da NR-24</b></div></div></div>
+
+<div class="scene" id="s7">
+ <div class="mid" id="s7t" style="position:absolute;left:90px;top:90px;opacity:0;font-size:46px">Auditoria <span class="g">com hash encadeado</span></div>
+ <div class="blk" id="b1" style="left:90px;top:230px"><div class="h">#a91f…3c07</div><div class="w">Admin criou veículo ABC-1234</div><div class="d">quem · quando · depois</div></div>
+ <div class="chain" id="c71" style="left:330px;top:392px;width:6px;height:70px;transform:none"></div>
+ <div class="blk" id="b2" style="left:90px;top:470px"><div class="h">#7be2…09df ← a91f</div><div class="w">Kelvin retirou ABC-1234 · km 48.210</div><div class="d">antes: disponível → depois: em uso</div></div>
+ <div class="chain" id="c72" style="left:330px;top:632px;width:6px;height:70px"></div>
+ <div class="blk" id="b3" style="left:90px;top:710px"><div class="h">#c4d8…1a62 ← 7be2</div><div class="w">Devolução · km 48.390</div><div class="d">continuidade do km validada</div></div>
+ <div class="chat" id="chat" style="top:260px">
+  <div class="sm" style="margin-bottom:18px;color:var(--blue);font-weight:700;letter-spacing:3px">IA · LINGUAGEM NATURAL</div>
+  <div class="bub q" id="bq">Quem estava dirigindo o ABC-1234 na sexta?</div>
+  <div class="bub a" id="ba">Kelvin Gomes, das 08:10 às 17:40. CNH categoria B, válida. Pronto para indicar o condutor.</div></div>
+ <div class="foot" style="bottom:200px">Interface ilustrativa dos recursos do Dispatch</div>
+</div>
+
+<div class="scene" id="s8">
+ <div class="phone" id="ph"><div class="top">Dispatch · Alertas</div><div class="body">
+  <div class="wm" id="w1"><b>⚠ CNH vencendo</b><br>Carlos Eduardo Ramos · vence em 7 dias<small>08:02</small></div>
+  <div class="wm" id="w2"><b>🔧 Veículo parado</b><br>Renault Master JKL-3456 · 4 dias na oficina<small>08:03</small></div>
+  <div class="wm" id="w3"><b>📍 Km sem registro</b><br>Saveiro MNO-7890 · +38 km sem saída<small>08:03</small></div></div></div>
+ <div class="tag" id="t8" style="left:1290px;top:480px;font-size:46px;opacity:0">Alertas críticos <b>no WhatsApp</b></div>
+ <div class="foot" style="bottom:200px">Interface ilustrativa · dados de demonstração</div>
+</div>
+
+<div class="scene" id="s9">
+ <div class="cell" id="k1" style="left:150px;top:280px"><div class="num" id="v1">0</div><div class="l">colaboradores</div></div>
+ <div class="cell" id="k2" style="left:700px;top:280px"><div class="num" id="v2">0</div><div class="l">alojamentos</div></div>
+ <div class="cell" id="k3" style="left:1250px;top:280px"><div class="num" id="v3">0</div><div class="l">leitos</div></div>
+ <div class="cell" id="k4" style="left:420px;top:600px"><div class="num" id="v4">0</div><div class="l">veículos</div></div>
+ <div class="cell" id="k5" style="left:980px;top:600px"><div class="num" id="v5">0</div><div class="l">meses de histórico auditável</div></div>
+</div>
+
+<div class="scene center" id="s10">
+ <div class="logo" id="logo10" style="font-size:190px">Dispatch</div>
+ <div class="mid" id="s10a" style="margin-top:34px;opacity:0;font-size:52px">Quem está onde. Quem usa o quê. <span class="g">Tudo registrado.</span></div>
+ <div class="sm" id="s10b" style="margin-top:56px;opacity:0;letter-spacing:6px;text-transform:uppercase">Grupo DevCore · Desafio Eficaz Marketing</div>
+</div>
+
+<div id="cap"></div>
+<div class="vig"></div>
+<svg class="grain" width="2020" height="1180" id="grain"><filter id="nf"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3"/></filter><rect width="100%" height="100%" filter="url(#nf)"/></svg>
+</div>
+
+<script>
+const TL=__TL__;
+const $=id=>document.getElementById(id);
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const eo=x=>1-Math.pow(1-clamp(x),3), eio=x=>{x=clamp(x);return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2};
+const seg=(t,a,b)=>eo((t-a)/(b-a));
+const S={};TL.scenes.forEach(s=>S[s.id]=s);
+const fx=$('fx').getContext('2d');
+function rnd(i){const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)}
+
+function bg(t){
+  fx.clearRect(0,0,1920,1080);
+  const warm=t>S.s3.start-1&&t<S.s3.start+3?1:0;
+  for(let i=0;i<110;i++){
+    const sp=8+rnd(i)*28, x=(rnd(i+1)*2200+t*sp*(rnd(i+9)>.5?1:-1)+2200)%2200-140;
+    const y=(rnd(i+2)*1300-t*sp*.55+1300*50)%1300-110, r=1+rnd(i+3)*2.6;
+    const a=.12+.38*rnd(i+4)*(0.6+0.4*Math.sin(t*1.3+i));
+    fx.fillStyle=(i%4==0)?`rgba(96,149,246,${a})`:`rgba(25,210,122,${a})`;
+    fx.beginPath();fx.arc(x,y,r,0,7);fx.fill();
+  }
+  // grid floor lines
+  fx.strokeStyle='rgba(60,110,160,0.07)';fx.lineWidth=1;
+  for(let i=0;i<24;i++){const y=700+i*i*0.9+((t*30)%1)*0;fx.beginPath();fx.moveTo(0,y);fx.lineTo(1920,y);fx.stroke()}
+}
+
+function typed(el,full,p){el.textContent=full.slice(0,Math.floor(full.length*clamp(p)))}
+function showScene(id,t,fade=.5){
+  const s=S[id],el=$(id);
+  let o=clamp((t-s.start)/fade)*clamp((s.end-t)/fade);
+  if(id==='s1')o=clamp((s.end-t)/fade); if(id==='s10')o=clamp((t-s.start)/fade);
+  el.style.opacity=o;el.style.visibility=o>0?'visible':'hidden';
+  return clamp((t-s.start)/(s.end-s.start));
+}
+function place(mock,fxp,fyp,sc,rotY,rotX,dy=0){
+  const W=1500,H=972;
+  mock.style.left=(960-W/2)+'px';mock.style.top=(540-H/2-20+dy)+'px';
+  const tx=-(fxp-.5)*W*sc, ty=-(fyp-.5)*H*sc;
+  mock.style.transform=`perspective(2400px) rotateY(${rotY}deg) rotateX(${rotX}deg) translate(${tx}px,${ty}px) scale(${sc})`;
+}
+function pulse(el,t,a,b){const o=seg(t,a,a+.4)*(1-seg(t,b-.4,b));el.style.opacity=o;}
+function tag(el,t,a,b){const o=seg(t,a,a+.45)*(1-seg(t,b-.4,b));el.style.opacity=o;el.style.transform=`translateY(${(1-o)*24}px)`}
+function mockScene(id,mid,t,cfg){
+  const p=showScene(id,t);
+  const lt=t-S[id].start,du=S[id].end-S[id].start,q=lt/du;
+  const sc=cfg.s0+(cfg.s1-cfg.s0)*eio(q);
+  const fxp=cfg.f0[0]+(cfg.f1[0]-cfg.f0[0])*eio(q), fyp=cfg.f0[1]+(cfg.f1[1]-cfg.f0[1])*eio(q);
+  place($(mid),fxp,fyp,sc,-9+14*q+Math.sin(t*.6)*1.2,4-5*q);
+  cfg.hl.forEach(([e,a,b])=>pulse($(e),lt,a,b));
+  cfg.tg.forEach(([e,a,b])=>tag($(e),lt,a,b));
+}
+
+function render(t){
+  bg(t);
+  // S1
+  {const p=showScene('s1',t);const s=S.s1,lt=t-s.start;
+   const lines=[['s1a','Quem estava dirigindo?',1.3,0],['s1b','Em qual alojamento ele dormiu?',2.6,0],['s1c',null,4.2,0],['s1d','ninguém soube responder.',6.0,0]];
+   lines.forEach(([id,txt,a])=>{const e=$(id);const k=clamp((lt-a)/.6);e.style.opacity=k;e.style.transform=`translateY(${(1-eo(k))*30}px)`;
+     if(txt)typed(e,txt,(lt-a)/.8)});
+   $('s1c').style.opacity=clamp((lt-4.2)/.6);
+   const gl=(Math.sin(lt*40)>.93&&lt>6)?6:0;$('s1d').style.transform=`translateX(${gl}px)`;
+   $('s1').style.filter=lt>6?`drop-shadow(0 0 ${12+8*Math.sin(lt*6)}px rgba(255,60,60,.5))`:'none';}
+  // S2
+  {showScene('s2',t);const lt=t-S.s2.start;
+   ['c1','c2','c3'].forEach((id,i)=>{const k=seg(lt,.7+i*.9,1.3+i*.9);$(id).style.opacity=k;$(id).style.transform=`translateY(${(1-k)*60}px) scale(${.9+.1*k})`;$(id).style.color=i==2?'#ff8a8a':'#fff'});
+   $('s2a').style.opacity=1-seg(lt,5.6,6.3)*.0;
+   const k=seg(lt,4.6,5.4);$('s2b').style.opacity=k;$('s2b').style.transform=`scale(${.8+.2*k})`;
+   const k2=seg(lt,8.2,9.0);$('s2c').style.opacity=k2;$('s2c').style.transform=`scale(${.8+.2*k2})`;
+   $('s2a').style.top=(250-seg(lt,4.4,5.2)*90)+'px';}
+  // S3
+  {showScene('s3',t,.4);const lt=t-S.s3.start;
+   const k=seg(lt,.1,1.6);$('logo3').style.opacity=k;$('logo3').style.transform=`scale(${.7+.3*k})`;$('logo3').style.letterSpacing=(-6-(1-k)*30)+'px';
+   $('logo3').style.filter=`drop-shadow(0 0 ${30+60*Math.max(0,1-lt/2)}px rgba(25,210,122,.7))`;
+   $('s3a').style.opacity=seg(lt,1.4,2.2);$('s3b').style.opacity=seg(lt,3.0,3.8);}
+  mockScene('s4','m4',t,{s0:.78,s1:.9,f0:[.5,.5],f1:[.62,.28],hl:[['h4a',2.2,5],['h4b',4.2,6.9]],tg:[['t4a',2.3,5],['t4b',4.3,6.9]]});
+  mockScene('s5','m5',t,{s0:.78,s1:.95,f0:[.5,.5],f1:[.66,.36],hl:[['h5a',1.8,4],['h5b',3.2,6.5]],tg:[['t5a',1.9,4],['t5b',3.3,6.5]]});
+  mockScene('s6','m6',t,{s0:.8,s1:1.0,f0:[.45,.55],f1:[.55,.5],hl:[['h6a',1.4,6.5],['h6b',5.8,10.5]],tg:[['t6a',1.5,6.5],['t6b',5.9,10.5]]});
+  // S7
+  {showScene('s7',t);const lt=t-S.s7.start;$('s7t').style.opacity=seg(lt,.4,1);
+   [['b1',1.0],['b2',2.4],['b3',3.8]].forEach(([id,a])=>{const k=seg(lt,a,a+.6);$(id).style.opacity=k;$(id).style.transform=`translateX(${(1-k)*-60}px)`});
+   $('c71').style.opacity=seg(lt,2.0,2.6);$('c72').style.opacity=seg(lt,3.4,4.0);
+   const c=seg(lt,5.8,6.4);$('chat').style.opacity=c;$('chat').style.transform=`translateY(${(1-c)*40}px)`;
+   $('bq').style.opacity=seg(lt,6.2,6.8);$('ba').style.opacity=seg(lt,8.4,9.2);$('ba').style.transform=`translateY(${(1-seg(lt,8.4,9.2))*20}px)`;}
+  // S8
+  {showScene('s8',t);const lt=t-S.s8.start;const k=seg(lt,.2,1.0);$('ph').style.opacity=k;$('ph').style.transform=`translateY(${(1-k)*80}px) rotate(${(1-k)*-4}deg)`;
+   ['w1','w2','w3'].forEach((id,i)=>{const a=.9+i*.45,q=seg(lt,a,a+.4);$(id).style.opacity=q;$(id).style.transform=`translateY(${(1-q)*30}px)`});
+   const ph=$('ph');ph.style.left=(660-seg(lt,.6,1.6)*260)+'px';$('t8').style.opacity=seg(lt,1.2,1.9);$('t8').style.left='980px';}
+  // S9
+  {showScene('s9',t);const lt=t-S.s9.start;
+   [['k1','v1',15,'',.4],['k2','v2',3,'',.9],['k3','v3',42,'',1.4],['k4','v4',34,'',1.9],['k5','v5',6,'',2.4]].forEach(([k,v,n,_,a])=>{
+     const q=seg(lt,a,a+.7);$(k).style.opacity=q;$(k).style.transform=`translateY(${(1-q)*40}px)`;$(v).textContent=Math.round(n*eo((lt-a)/1.4))});}
+  // S10
+  {showScene('s10',t);const lt=t-S.s10.start;const k=seg(lt,.1,1.2);$('logo10').style.opacity=k;$('logo10').style.transform=`scale(${.9+.1*k})`;
+   $('s10a').style.opacity=seg(lt,1.4,2.2);$('s10b').style.opacity=seg(lt,3.8,4.6);
+   const fo=1-seg(t,TL.total-1.2,TL.total);$('stage').style.opacity=fo;}
+  // captions
+  const cur=TL.scenes.find(s=>t>=s.voice&&t<s.voice+s.dur+.2);const cap=$('cap');
+  if(cur){const parts=cur.txt.match(/[^.?!…]+[.?!…]+/g)||[cur.txt];const tot=parts.reduce((a,b)=>a+b.length,0);let acc=0,lt=t-cur.voice;
+    let txt=parts[parts.length-1];for(const p of parts){const d=cur.dur*p.length/tot;if(lt<acc+d){txt=p;break}acc+=d}
+    cap.textContent=txt.trim();cap.style.opacity=1}else cap.style.opacity=0;
+  $('grain').style.transform=`translate(${(Math.floor(t*24)*37)%50}px,${(Math.floor(t*24)*91)%50}px)`;
+}
+window.render=render;window.TOTAL=TL.total;
+render(0);
+</script></body></html>
