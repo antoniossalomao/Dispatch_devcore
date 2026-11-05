@@ -54,10 +54,18 @@ Precisa do **Node.js 22.5+** (ou **Bun**).
 cd server
 npm install
 npm run criar-banco
+npm run seed   # opcional: dados de exemplo (colaboradores, alojamentos, frota e 6 meses de histórico)
 npm start
 ```
 
-Isso cria o banco em `server/data/dispatch.db` já com o usuário administrador inicial e sobe o sistema (front + back) em `http://localhost:3001`. Para mudar o lugar do banco, copie `server/.env.example` para `server/.env` e preencha `DB_CAMINHO`.
+Isso cria o banco em `server/data/dispatch.db` já com o usuário administrador inicial (login `admin`, senha `admin123`) e sobe o sistema (front + back) em `http://localhost:3001`. Para mudar o lugar do banco, copie `server/.env.example` para `server/.env` e preencha `DB_CAMINHO`.
+
+### Configuração opcional (`server/.env`)
+
+Copie `server/.env.example` para `server/.env`:
+
+- `GROQ_API_KEY`: liga a IA (perguntas, resumo dos relatórios e chat de ajuda). Sem ela os recursos de IA avisam que estão desligados.
+- `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID`: enviam os alertas críticos pelo Telegram (crie o bot no @BotFather). Sem eles a mensagem só aparece no terminal. Depois, ative o envio em Configurações.
 
 ## Documentação
 
@@ -67,12 +75,12 @@ Isso cria o banco em `server/data/dispatch.db` já com o usuário administrador 
 
 1. ~~Pesquisa de referências e desenho das telas (Figma + protótipo navegável)~~
 2. Apresentação: telas do Figma + solução proposta.
-3. Base do `server` (banco, login, auditoria) e do `client` (layout, rotas).
-4. Cadastros (colaboradores, alojamentos/leitos, frota) com auditoria.
-5. Estadias e uso de veículo com as regras de validação (CNH, NR-24, km).
-6. Relatórios, consulta "quem estava dirigindo" e tela de auditoria.
-7. IA (Groq) e central de notificações.
-8. Integração com Telegram e ensaio da demonstração.
+3. ~~Base do `server` (banco, login, auditoria) e do `client` (layout, rotas).~~
+4. ~~Cadastros (colaboradores, alojamentos/leitos, frota) com auditoria.~~
+5. ~~Estadias e uso de veículo com as regras de validação (CNH, NR-24, km).~~
+6. ~~Relatórios, consulta "quem estava dirigindo" e tela de auditoria.~~
+7. ~~IA (Groq) e central de notificações.~~
+8. ~~Integração com Telegram~~ e ensaio da demonstração.
 
 ## Grupo DevCore
 
