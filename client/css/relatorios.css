@@ -1,0 +1,99 @@
+/* ---- estilos das telas de relatorios e auditoria ---- */
+
+.periodo-filtro {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.periodo-data {
+  width: 150px;
+}
+
+.rel-abas {
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.rel-corpo {
+  padding: 18px 20px 20px;
+}
+
+.rel-linha {
+  margin-bottom: 18px;
+}
+
+.rel-linha-topo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13.5px;
+}
+
+.rel-linha-topo span {
+  color: var(--claro-texto-fraco);
+  font-size: 12.5px;
+}
+
+.celula-barra {
+  min-width: 190px;
+}
+
+.celula-barra .aloj-barra {
+  margin: 0 0 4px;
+}
+
+.rel-pct {
+  font-size: 11.5px;
+  color: var(--claro-texto-fraco);
+}
+
+.form-linha {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin: 12px 0 16px;
+}
+
+.campo-grande {
+  flex: 1;
+  min-width: 260px;
+}
+
+.resultado-caixa {
+  border: 1px solid var(--claro-borda);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  background-color: var(--claro-cartao);
+  margin-bottom: 16px;
+}
+
+.resultado-ok {
+  border-color: #bbf7d0;
+  background-color: #f0fdf4;
+}
+
+.resultado-erro {
+  border-color: #fecaca;
+  background-color: #fef2f2;
+}
+
+.aud-tabela {
+  display: block;
+  font-size: 11.5px;
+  color: var(--claro-texto-fraco);
+}
+
+.aud-diff {
+  font-size: 11.5px;
+  color: var(--claro-texto-fraco);
+  max-width: 340px;
+}
+
+.aud-diff span {
+  display: block;
+  overflow-wrap: anywhere;
+}
