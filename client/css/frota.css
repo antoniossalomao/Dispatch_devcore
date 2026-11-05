@@ -8,7 +8,7 @@
 
 .veic-modelo {
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: 14px;
 }
 
 .veic-placa {
@@ -30,7 +30,7 @@
 }
 
 .uso-celula {
-  font-size: 12.5px;
+  font-size: 13px;
 }
 
 .uso-celula span {
@@ -50,7 +50,7 @@
 }
 
 .lista-passageiros label {
-  font-size: 12.5px;
+  font-size: 13px;
   display: flex;
   gap: 6px;
   align-items: center;
@@ -58,4 +58,17 @@
 
 .timeline-botoes {
   margin-top: 6px;
+}
+
+/* numeros alinhados a direita nas tabelas (todas as telas que carregam este css) */
+.tabela th.num,
+.tabela td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 480px) {
+  .lista-passageiros {
+    grid-template-columns: 1fr;
+  }
 }

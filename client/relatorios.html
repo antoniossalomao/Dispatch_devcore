@@ -63,7 +63,7 @@
           <span>Frota</span>
         </a>
 
-        <a href="relatorios.html#movimentacoes" class="menu-item">
+        <a href="movimentacoes.html" class="menu-item">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="17 1 21 5 17 9"/>
             <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
@@ -142,7 +142,6 @@
       <div class="filtro-abas rel-abas">
         <button type="button" class="aba-item rel-aba ativa" data-aba="ocupacao">Ocupação</button>
         <button type="button" class="aba-item rel-aba" data-aba="frota">Uso da frota</button>
-        <button type="button" class="aba-item rel-aba" data-aba="movimentacoes">Movimentações</button>
         <button type="button" class="aba-item rel-aba" data-aba="gargalos">Gargalos</button>
         <button type="button" class="aba-item rel-aba" data-aba="dirigindo">Quem estava dirigindo</button>
         <button type="button" class="aba-item rel-aba" data-aba="ia">Perguntar à IA</button>
@@ -157,18 +156,8 @@
         <div class="bloco-cabecalho"><h2 class="bloco-titulo">Uso por veículo</h2></div>
         <div class="tabela-area">
           <table class="tabela">
-            <thead><tr><th>Veículo</th><th>Viagens</th><th>Km rodados</th><th>Horas em uso</th><th>Utilização</th><th>Dias sem uso</th></tr></thead>
+            <thead><tr><th>Veículo</th><th class="num">Viagens</th><th class="num">Km rodados</th><th class="num">Horas em uso</th><th>Utilização</th><th class="num">Dias sem uso</th></tr></thead>
             <tbody id="rel-frota"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="aba-movimentacoes" class="bloco rel-secao" hidden>
-        <div class="bloco-cabecalho"><h2 class="bloco-titulo">Movimentações no período</h2><span id="rel-mov-total" class="kpi-complemento"></span></div>
-        <div class="tabela-area">
-          <table class="tabela">
-            <thead><tr><th>Quando</th><th>Tipo</th><th>Colaborador</th><th>Recurso</th></tr></thead>
-            <tbody id="rel-mov"></tbody>
           </table>
         </div>
       </section>
@@ -220,6 +209,7 @@
 
   <script src="js/api.js"></script>
   <script src="js/relatorios.js"></script>
+  <script src="js/ui.js"></script>
   <script src="js/extras.js"></script>
 </body>
 </html>

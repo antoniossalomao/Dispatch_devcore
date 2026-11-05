@@ -100,26 +100,9 @@ async function carregarFrota() {
     const tr = document.createElement('tr')
     tr.innerHTML =
       '<td><div class="veic-celula"><span class="veic-modelo">' + esc(v.modelo) + '</span><span class="veic-placa">' + esc(v.placa) + '</span></div></td>' +
-      '<td>' + v.viagens + '</td><td>' + v.km_rodados.toLocaleString('pt-BR') + ' km</td><td>' + v.horas_em_uso + ' h</td>' +
+      '<td class="num">' + v.viagens + '</td><td class="num">' + v.km_rodados.toLocaleString('pt-BR') + ' km</td><td class="num">' + v.horas_em_uso + ' h</td>' +
       '<td class="celula-barra">' + barra(v.utilizacao_pct) + '<span class="rel-pct">' + v.utilizacao_pct + '% em uso · ' + v.ociosidade_pct + '% ocioso</span></td>' +
-      '<td>' + (v.dias_sem_uso === null ? '—' : v.dias_sem_uso + ' dias') + '</td>'
-    corpo.appendChild(tr)
-  })
-}
-
-async function carregarMovimentacoes() {
-  const r = await chamarApi('/api/relatorios/movimentacoes' + consulta())
-  const corpo = document.getElementById('rel-mov')
-  corpo.innerHTML = ''
-  if (!r.ok) { corpo.innerHTML = '<tr><td colspan="4" class="texto-vazio">' + esc(r.dados.erro || 'Erro ao carregar.') + '</td></tr>'; return }
-  document.getElementById('rel-mov-total').textContent = r.dados.total + ' movimentações' + (r.dados.total > r.dados.eventos.length ? ' (mostrando as ' + r.dados.eventos.length + ' mais recentes)' : '')
-  if (r.dados.eventos.length === 0) { corpo.innerHTML = '<tr><td colspan="4" class="texto-vazio">Nenhuma movimentação no período.</td></tr>'; return }
-  r.dados.eventos.forEach(function (e) {
-    const tr = document.createElement('tr')
-    tr.innerHTML =
-      '<td>' + formatarData(e.quando) + '</td>' +
-      '<td><span class="status-tag ' + (e.categoria === 'frota' ? 'status-uso' : 'status-ativo') + '"><span class="status-ponto"></span>' + esc(e.tipo) + '</span></td>' +
-      '<td>' + esc(e.colaborador) + '</td><td>' + esc(e.recurso) + '</td>'
+      '<td class="num">' + (v.dias_sem_uso === null ? '—' : v.dias_sem_uso + ' dias') + '</td>'
     corpo.appendChild(tr)
   })
 }
@@ -145,7 +128,6 @@ function carregarTudo() {
   }
   carregarOcupacao()
   carregarFrota()
-  carregarMovimentacoes()
   carregarGargalos()
 }
 
@@ -226,7 +208,7 @@ function aoIniciar() {
   campoAte.value = paraInputData(hoje)
   campoDe.value = paraInputData(inicio)
   const aba = window.location.hash.replace('#', '')
-  if (['ocupacao', 'frota', 'movimentacoes', 'gargalos', 'dirigindo', 'ia'].indexOf(aba) !== -1) mostrarAba(aba)
+  if (['ocupacao', 'frota', 'gargalos', 'dirigindo', 'ia'].indexOf(aba) !== -1) mostrarAba(aba)
   carregarTudo()
 }
 

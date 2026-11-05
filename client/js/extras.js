@@ -22,7 +22,7 @@
     const caixa = document.createElement('div')
     caixa.className = 'sino-caixa'
     caixa.innerHTML =
-      '<button type="button" class="botao-notif" title="Avisos">' +
+      '<button type="button" class="botao-notif" title="Avisos" aria-label="Ver avisos">' +
         '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
         '<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>' +
         '<span class="sino-contador" hidden>0</span></button>' +
@@ -79,11 +79,11 @@
   chat.className = 'chat-caixa'
   chat.innerHTML =
     '<div class="chat-painel" hidden>' +
-      '<div class="chat-topo"><strong>Ajuda do Dispatch</strong><button type="button" class="chat-fechar">&times;</button></div>' +
+      '<div class="chat-topo"><strong>Ajuda do Dispatch</strong><button type="button" class="chat-fechar" aria-label="Fechar ajuda">&times;</button></div>' +
       '<div class="chat-msgs"><div class="chat-msg chat-bot">Oi! Pergunte como usar o sistema. Ex: "como registro a saída de um carro?"</div></div>' +
-      '<form class="chat-form"><input type="text" maxlength="500" placeholder="Escreva sua dúvida..." required><button type="submit">Enviar</button></form>' +
+      '<form class="chat-form"><input type="text" maxlength="500" aria-label="Sua dúvida" placeholder="Escreva sua dúvida..." required><button type="submit">Enviar</button></form>' +
     '</div>' +
-    '<button type="button" class="chat-botao" title="Ajuda">?</button>'
+    '<button type="button" class="chat-botao" title="Ajuda" aria-label="Abrir ajuda">?</button>'
   document.body.appendChild(chat)
 
   const painelChat = chat.querySelector('.chat-painel')

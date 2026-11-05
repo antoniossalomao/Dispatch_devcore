@@ -18,7 +18,7 @@
   border-radius: 999px;
   background-color: var(--vermelho);
   color: #fff;
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -68,7 +68,7 @@
   border-left: 3px solid transparent;
   padding: 10px 14px;
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--claro-texto);
   cursor: pointer;
 }
@@ -94,7 +94,7 @@
 
 .sino-vazio {
   padding: 18px 14px;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--claro-texto-fraco);
 }
 
@@ -176,7 +176,7 @@
   max-width: 85%;
   padding: 8px 11px;
   border-radius: 10px;
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.45;
   white-space: pre-wrap;
 }
@@ -194,8 +194,8 @@
 }
 
 .chat-erro {
-  border-color: #fecaca;
-  background-color: #fef2f2;
+  border-color: var(--erro-claro-borda);
+  background-color: var(--erro-claro-fundo);
 }
 
 .chat-form {
@@ -211,7 +211,7 @@
   border-radius: 8px;
   padding: 8px 10px;
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 
 .chat-form button {
@@ -221,6 +221,55 @@
   color: #fff;
   padding: 0 14px;
   font: inherit;
-  font-size: 12.5px;
+  font-size: 13px;
   cursor: pointer;
+}
+
+/* foco visivel por teclado */
+.sino-item:focus-visible,
+.sino-todas:focus-visible,
+.chat-botao:focus-visible,
+.chat-fechar:focus-visible,
+.chat-form button:focus-visible,
+.chat-form input:focus-visible {
+  outline: 2px solid var(--claro-texto-fraco);
+  outline-offset: 2px;
+}
+
+.chat-fechar:focus-visible {
+  outline-color: #fff;
+}
+
+/* o botao de ajuda nao cobre o fim do conteudo */
+.area-conteudo .conteudo {
+  padding-bottom: 84px;
+}
+
+/* gaveta ou janela aberta: o fundo nao rola (js/ui.js) */
+body.sem-rolagem {
+  overflow: hidden;
+}
+
+.modal-pequeno {
+  max-width: 440px;
+}
+
+.campo-texto-longo {
+  height: auto;
+  resize: vertical;
+  padding-top: 8px;
+}
+
+.chat-painel {
+  width: min(330px, calc(100vw - 44px));
+}
+
+@media (max-width: 560px) {
+  .sino-painel {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    top: 72px;
+    width: auto;
+  }
 }

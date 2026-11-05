@@ -91,7 +91,7 @@ async function carregarAlojamentos() {
         '<div><div class="aloj-nome">' + esc(a.nome) + '</div>' +
         '<div class="aloj-local">' + esc(a.cidade) + (a.bairro ? ' · ' + esc(a.bairro) : '') + '</div></div>' +
         (a.ocorrencias_abertas > 0
-          ? '<span class="status-tag status-atencao"><span class="status-ponto"></span>' + a.ocorrencias_abertas + ' ocorr.</span>'
+          ? '<span class="status-tag status-atencao"><span class="status-ponto"></span>' + a.ocorrencias_abertas + (a.ocorrencias_abertas === 1 ? ' ocorrência' : ' ocorrências') + '</span>'
           : '') +
       '</div>' +
       '<div class="aloj-barra"><div class="aloj-barra-preench' + (cheio ? ' cheio' : '') + '" style="width:' + a.ocupacao_pct + '%"></div></div>' +
@@ -357,7 +357,7 @@ document.getElementById('form-alojar').addEventListener('submit', async function
 })
 
 async function registrarSaida(leito) {
-  if (!window.confirm('Registrar a saída de ' + leito.pessoa_nome + ' do leito ' + leito.codigo + '?')) return
+  if (!(await confirmar('Registrar a saída de ' + leito.pessoa_nome + ' do leito ' + leito.codigo + '?', { titulo: 'Registrar saída', confirmar: 'Registrar saída' }))) return
   const r = await chamarApi('/api/alojamentos/estadias/' + leito.estadia_id + '/saida', { metodo: 'PUT', corpo: {} })
   if (!r.ok) {
     mostrarToast(r.dados.erro || 'Erro ao registrar saída.', 'erro')
@@ -403,7 +403,7 @@ document.getElementById('form-ocorrencia').addEventListener('submit', async func
 })
 
 async function resolverOcorrencia(o) {
-  const solucao = window.prompt('Como foi resolvido?')
+  const solucao = await pedirTexto('Resolver ocorrência', 'Como foi resolvido?', { confirmar: 'Resolver' })
   if (solucao === null) return
   const r = await chamarApi('/api/alojamentos/ocorrencias/' + o.id + '/resolver', { metodo: 'PUT', corpo: { solucao: solucao } })
   if (!r.ok) {

@@ -97,7 +97,7 @@ async function carregarVeiculos() {
     tr.innerHTML =
       '<td><div class="veic-celula"><span class="veic-modelo">' + esc(v.modelo) + '</span><span class="veic-placa">' + esc(v.placa) + ' · ' + v.lugares + ' lugares · CNH ' + esc(v.categoria_cnh_exigida) + '</span></div></td>' +
       '<td><span class="status-tag ' + st[0] + '"><span class="status-ponto"></span>' + st[1] + '</span></td>' +
-      '<td>' + v.km_atual.toLocaleString('pt-BR') + ' km</td>' +
+      '<td class="num">' + v.km_atual.toLocaleString('pt-BR') + ' km</td>' +
       '<td><div class="docs-celula">' + tagDoc('Licenciamento', v.licenciamento) + tagDoc('Seguro', v.seguro) + '</div></td>' +
       '<td class="uso-celula">' + (v.uso_atual
         ? esc(v.uso_atual.motorista) + '<span>' + esc(v.uso_atual.destino) + ' · desde ' + formatarData(v.uso_atual.saida) + '</span>'
@@ -357,7 +357,7 @@ document.getElementById('form-volta').addEventListener('submit', async function 
   let r = await chamarApi('/api/frota/usos/' + id + '/retorno', { metodo: 'PUT', corpo: corpo })
   // F11: viagem muito longa pede confirmacao
   if (r.status === 409 && r.dados.confirmar) {
-    if (!window.confirm(r.dados.erro)) return
+    if (!(await confirmar(r.dados.erro, { titulo: 'Confirmar viagem longa', confirmar: 'Confirmar km' }))) return
     corpo.confirmar = true
     r = await chamarApi('/api/frota/usos/' + id + '/retorno', { metodo: 'PUT', corpo: corpo })
   }

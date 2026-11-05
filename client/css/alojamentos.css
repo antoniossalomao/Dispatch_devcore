@@ -21,7 +21,7 @@
 }
 
 .aloj-cartao:hover {
-  border-color: #94a3b8;
+  border-color: var(--borda-forte);
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
 }
 
@@ -37,13 +37,13 @@
 }
 
 .aloj-nome {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .aloj-local,
 .aloj-resp {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--claro-texto-fraco);
   margin-top: 3px;
 }
@@ -69,7 +69,7 @@
 .aloj-numeros {
   display: flex;
   justify-content: space-between;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--claro-texto-fraco);
 }
 
@@ -97,7 +97,7 @@
 
 .quarto-titulo span {
   font-weight: 400;
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--claro-texto-fraco);
 }
 
@@ -141,12 +141,12 @@
 
 .leito.livre:hover {
   border-color: var(--verde);
-  background-color: #f0fdf4;
+  background-color: var(--ok-claro-fundo);
 }
 
 .leito.ocupado {
-  background-color: #fef2f2;
-  border-color: #fecaca;
+  background-color: var(--erro-claro-fundo);
+  border-color: var(--erro-claro-borda);
 }
 
 .leito.ocupado:hover {
@@ -155,4 +155,21 @@
 
 .ocor-acoes {
   margin-top: 6px;
+}
+
+.aloj-cartao:focus-visible,
+.leito:focus-visible {
+  outline: 2px solid var(--claro-texto-fraco);
+  outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  .aloj-grade {
+    grid-template-columns: 1fr;
+    padding: 14px;
+  }
+
+  .leitos-grade {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }

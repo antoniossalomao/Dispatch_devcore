@@ -77,7 +77,7 @@
   border-radius: var(--raio);
   color: #94a3b8;
   text-decoration: none;
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 500;
   transition: background-color 0.15s, color 0.15s;
 }
@@ -230,12 +230,12 @@
   padding: 0 12px;
   height: 36px;
   width: 280px;
-  color: #94a3b8;
+  color: var(--claro-texto-fraco);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .busca-caixa:focus-within {
-  border-color: #94a3b8;
+  border-color: var(--borda-forte);
   box-shadow: 0 0 0 3px var(--claro-anel);
 }
 
@@ -244,12 +244,12 @@
   background: none;
   outline: none;
   width: 100%;
-  font-size: 13.5px;
+  font-size: 14px;
   color: var(--claro-texto);
 }
 
 .busca-caixa input::placeholder {
-  color: #94a3b8;
+  color: var(--claro-texto-fraco);
 }
 
 /* botão quadrado só com icone (Button outline size icon) */
@@ -313,7 +313,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #94a3b8;
+  color: var(--claro-texto-fraco);
   margin-bottom: 10px;
 }
 
@@ -340,7 +340,7 @@
 }
 
 .kpi-complemento {
-  font-size: 12.5px;
+  font-size: 13px;
   color: var(--claro-texto-fraco);
 }
 
@@ -409,7 +409,7 @@
 }
 
 .bloco-titulo {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.2px;
   color: var(--claro-texto);
@@ -468,7 +468,7 @@
 .tabela th {
   text-align: left;
   height: 40px;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--claro-texto-fraco);
   background-color: #fafbfc;
@@ -479,7 +479,7 @@
 
 .tabela td {
   padding: 12px 20px;
-  font-size: 13.5px;
+  font-size: 14px;
   color: #334155;
   border-bottom: 1px solid var(--claro-borda);
   vertical-align: middle;
@@ -536,9 +536,9 @@
 
 /* verde = ok */
 .status-ativo {
-  background-color: #f0fdf4;
-  border-color: #bbf7d0;
-  color: #166534;
+  background-color: var(--ok-claro-fundo);
+  border-color: var(--ok-claro-borda);
+  color: var(--ok-claro-texto);
 }
 
 .status-ativo .status-ponto {
@@ -558,9 +558,9 @@
 
 /* amarelo = atenção */
 .status-atencao {
-  background-color: #fffbeb;
-  border-color: #fde68a;
-  color: #92400e;
+  background-color: var(--atencao-claro-fundo);
+  border-color: var(--atencao-claro-borda);
+  color: var(--atencao-claro-texto);
 }
 
 .status-atencao .status-ponto {
@@ -569,8 +569,8 @@
 
 /* vermelho = problema */
 .status-problema {
-  background-color: #fef2f2;
-  border-color: #fecaca;
+  background-color: var(--erro-claro-fundo);
+  border-color: var(--erro-claro-borda);
   color: #b91c1c;
 }
 
@@ -585,7 +585,7 @@
 }
 
 .status-concluido .status-ponto {
-  background-color: #94a3b8;
+  background-color: var(--borda-forte);
 }
 
 
@@ -612,7 +612,7 @@
 }
 
 .unidade-nome {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--claro-texto);
 }
@@ -645,21 +645,21 @@
 }
 
 .alerta-atencao {
-  background-color: #fffbeb;
-  border-color: #fde68a;
+  background-color: var(--atencao-claro-fundo);
+  border-color: var(--atencao-claro-borda);
 }
 
 .alerta-atencao .alerta-titulo {
-  color: #92400e;
+  color: var(--atencao-claro-texto);
 }
 
 .alerta-problema {
-  background-color: #fef2f2;
-  border-color: #fecaca;
+  background-color: var(--erro-claro-fundo);
+  border-color: var(--erro-claro-borda);
 }
 
 .alerta-problema .alerta-titulo {
-  color: #991b1b;
+  color: var(--erro-claro-texto);
 }
 
 .alerta-titulo {
@@ -669,7 +669,7 @@
 }
 
 .alerta-detalhe {
-  font-size: 12.5px;
+  font-size: 13px;
   color: #475569;
   margin-top: 2px;
 }
@@ -716,7 +716,7 @@
 
   .menu-lista {
     flex-direction: row;
-    overflow-x: auto;
+    flex-wrap: wrap;
   }
 
   .menu-item span {

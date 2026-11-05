@@ -145,7 +145,8 @@ router.get('/frota', function (req, res) {
 })
 
 // linha do tempo unica: entradas/saidas de alojamento e saidas/voltas de veiculo
-function calcularMovimentacoes(periodo) {
+function calcularMovimentacoes(periodo, filtros) {
+  const f = filtros || {}
 
   const eventos = []
 
@@ -177,13 +178,31 @@ function calcularMovimentacoes(periodo) {
   })
 
   eventos.sort(function (a, b) { return a.quando < b.quando ? 1 : -1 })
-  return { periodo: { de: periodo.de, ate: periodo.ate }, total: eventos.length, eventos: eventos.slice(0, 300) }
+
+  // filtros opcionais: categoria (alojamento/frota), tipo (Entrada, Saída, Retirada, Devolução) e busca por colaborador ou recurso
+  const busca = String(f.busca || '').trim().toLowerCase()
+  const filtrados = eventos.filter(function (e) {
+    if (f.categoria && e.categoria !== f.categoria) return false
+    if (f.tipo && e.tipo !== f.tipo) return false
+    if (busca !== '' && (e.colaborador + ' ' + e.recurso).toLowerCase().indexOf(busca) === -1) return false
+    return true
+  })
+  const porTipo = { 'Entrada': 0, 'Saída': 0, 'Retirada': 0, 'Devolução': 0 }
+  filtrados.forEach(function (e) { porTipo[e.tipo]++ })
+  const limite = Math.min(Math.max(Number(f.limite) || 300, 1), 1000)
+
+  return {
+    periodo: { de: periodo.de, ate: periodo.ate },
+    total: filtrados.length,
+    por_tipo: porTipo,
+    eventos: filtrados.slice(0, limite)
+  }
 }
 
 router.get('/movimentacoes', function (req, res) {
   const periodo = lerPeriodo(req.query)
   if (!periodo) return res.status(400).json({ erro: 'Período inválido.' })
-  res.json(calcularMovimentacoes(periodo))
+  res.json(calcularMovimentacoes(periodo, req.query))
 })
 
 // gargalos: onde o sistema esta apertado ou parado

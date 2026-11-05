@@ -55,7 +55,7 @@
 }
 
 .colab-nome {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--claro-texto);
   cursor: pointer;
@@ -68,7 +68,7 @@
 }
 
 .colab-matricula {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--claro-texto-fraco);
   font-family: Consolas, monospace;
 }
@@ -115,7 +115,7 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 
 .situacao-alojamento {
@@ -264,7 +264,7 @@
   align-items: center;
   gap: 6px;
   height: 32px;
-  font-size: 12.5px;
+  font-size: 13px;
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
   border-radius: var(--raio);
@@ -281,9 +281,9 @@
 
 /* :has deixa mudar a cor do label quando o checkbox de dentro ta marcado */
 .check-categoria:has(input:checked) {
-  background-color: #f0fdf4;
+  background-color: var(--ok-claro-fundo);
   border-color: #86efac;
-  color: #166534;
+  color: var(--ok-claro-texto);
 }
 
 .check-categoria input {
@@ -400,14 +400,14 @@
 }
 
 .status-caixa-valor {
-  font-size: 13.5px;
+  font-size: 14px;
   color: var(--claro-texto);
   margin: 4px 0 2px;
 }
 
 .status-caixa-sub {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--claro-texto-fraco);
 }
 
 .gaveta-lista-dados {
@@ -466,7 +466,7 @@
   height: 10px;
   border-radius: 50%;
   background-color: #fff;
-  border: 2px solid #94a3b8;
+  border: 2px solid var(--borda-forte);
 }
 
 .timeline-item.timeline-ativo {
@@ -479,19 +479,19 @@
 }
 
 .timeline-titulo {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--claro-texto);
 }
 
 .timeline-detalhe {
-  font-size: 12.5px;
+  font-size: 13px;
   color: #475569;
 }
 
 .timeline-data {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--claro-texto-fraco);
   margin-top: 1px;
 }
 
