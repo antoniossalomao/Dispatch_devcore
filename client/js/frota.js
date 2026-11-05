@@ -95,7 +95,7 @@ async function carregarVeiculos() {
     if (v.ativo === 0) tr.className = 'colab-inativo'
     const st = rotulosStatus[v.status]
     tr.innerHTML =
-      '<td><div class="veic-celula"><span class="veic-modelo">' + esc(v.modelo) + '</span><span class="veic-placa">' + esc(v.placa) + ' · ' + v.lugares + ' lugares · CNH ' + esc(v.categoria_cnh_exigida) + '</span></div></td>' +
+      '<td><div class="veic-celula"><span class="veic-modelo">' + esc(v.modelo) + '</span><span class="veic-placa"><span class="placa">' + esc(v.placa) + '</span> · ' + v.lugares + ' lugares · CNH ' + esc(v.categoria_cnh_exigida) + '</span></div></td>' +
       '<td><span class="status-tag ' + st[0] + '"><span class="status-ponto"></span>' + st[1] + '</span></td>' +
       '<td class="num">' + v.km_atual.toLocaleString('pt-BR') + ' km</td>' +
       '<td><div class="docs-celula">' + tagDoc('Licenciamento', v.licenciamento) + tagDoc('Seguro', v.seguro) + '</div></td>' +

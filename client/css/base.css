@@ -1,5 +1,5 @@
-/* fonte Inter, a mesma pegada dos componentes do shadcn/ui */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* IBM Plex: Sans pra interface, Sans Condensed pra titulos e numeros, Mono so pra placas e matriculas */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
 
 /* cores padrão do sistema */
 :root {
@@ -43,6 +43,9 @@
   --atencao-claro-fundo: #fffbeb;
   --atencao-claro-borda: #fde68a;
   --atencao-claro-texto: #92400e;
+  --info-claro-fundo: #eff6ff;
+  --info-claro-texto: #1e40af;
+  --superficie-2: #fafbfc; /* fundo levemente diferente do cartao (cabecalhos, rodapes) */
   --raio: 8px;
   --sombra-leve: 0 1px 2px rgba(15, 23, 42, 0.05);
 
@@ -57,7 +60,7 @@
 }
 
 body {
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  font-family: 'IBM Plex Sans', 'Segoe UI', Arial, sans-serif;
   background-color: var(--fundo);
   color: var(--texto);
   -webkit-font-smoothing: antialiased;

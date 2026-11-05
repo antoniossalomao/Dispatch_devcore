@@ -141,3 +141,7 @@
     width: 100%;
   }
 }
+
+.periodo-filtro .campo-label {
+  margin: 0;
+}

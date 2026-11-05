@@ -99,7 +99,7 @@ async function carregarFrota() {
   r.dados.veiculos.forEach(function (v) {
     const tr = document.createElement('tr')
     tr.innerHTML =
-      '<td><div class="veic-celula"><span class="veic-modelo">' + esc(v.modelo) + '</span><span class="veic-placa">' + esc(v.placa) + '</span></div></td>' +
+      '<td><div class="veic-celula"><span class="veic-modelo">' + esc(v.modelo) + '</span><span class="veic-placa"><span class="placa">' + esc(v.placa) + '</span></span></div></td>' +
       '<td class="num">' + v.viagens + '</td><td class="num">' + v.km_rodados.toLocaleString('pt-BR') + ' km</td><td class="num">' + v.horas_em_uso + ' h</td>' +
       '<td class="celula-barra">' + barra(v.utilizacao_pct) + '<span class="rel-pct">' + v.utilizacao_pct + '% em uso · ' + v.ociosidade_pct + '% ocioso</span></td>' +
       '<td class="num">' + (v.dias_sem_uso === null ? '—' : v.dias_sem_uso + ' dias') + '</td>'

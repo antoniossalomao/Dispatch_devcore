@@ -40,12 +40,12 @@
 }
 
 .config-nav-item:hover {
-  background-color: #e9edf2;
+  background-color: var(--claro-suave);
   color: var(--claro-texto);
 }
 
 .config-nav-item.ativa {
-  background-color: #e5e9ef;
+  background-color: var(--claro-suave);
   color: var(--claro-texto);
 }
 
@@ -141,7 +141,7 @@
 }
 
 .switch-linha:hover {
-  background-color: #fafbfc;
+  background-color: var(--superficie-2);
 }
 
 
@@ -257,7 +257,7 @@
 }
 
 .resumo-banco-grade .mini-kpi {
-  background-color: #fafbfc;
+  background-color: var(--superficie-2);
   box-shadow: none;
 }
 
@@ -303,12 +303,12 @@
 .perfil-operador {
   background-color: var(--claro-suave);
   border-color: var(--claro-borda);
-  color: #334155;
+  color: var(--claro-texto);
 }
 
 .redefinir-barra {
   padding: 12px 20px;
-  background-color: #fafbfc;
+  background-color: var(--superficie-2);
   border-bottom: 1px solid var(--claro-borda);
   display: flex;
   align-items: center;
