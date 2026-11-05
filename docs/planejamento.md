@@ -48,7 +48,7 @@ Quem usa o sistema tem um de dois perfis:
 5. **Relatórios:** ocupação dos alojamentos, uso de cada veículo, movimentação (quem trocou de alojamento, viagens por destino) e gargalos (horários em que todos os carros estão na rua, alojamentos sempre cheios).
 6. **Auditoria:** toda alteração fica registrada (quem fez, quando, como era antes e como ficou).
 7. **IA (Groq):** responder perguntas sobre os dados, escrever um resumo dos relatórios, ajudar a usar o sistema e escrever as notificações.
-8. **Notificações:** avisos no sistema (CNH vencendo, carro que não voltou...) e os mais importantes também por WhatsApp.
+8. **Notificações:** avisos no sistema (CNH vencendo, carro que não voltou...) e os mais importantes também por Telegram.
 
 Os itens 7 e 8 são extras que o grupo quis colocar. O sistema tem que funcionar sem eles.
 
@@ -79,7 +79,7 @@ A gente pegou cada ponto do texto do professor e ligou com uma parte do sistema.
 
 1. **Primeiro, o que o professor pediu:** cadastros, estadias, uso de veículo, ocorrências, manutenções, relatórios, auditoria e login. Isso tem que estar pronto antes de qualquer outra coisa.
 2. **Junto, os extras fáceis:** regras de CNH e NR-24, aviso de km sem registro, "quem estava dirigindo" e a proteção do log. Cada um é uma função pequena.
-3. **Por último, os extras maiores:** IA, notificações e WhatsApp.
+3. **Por último, os extras maiores:** IA, notificações e Telegram.
 
 Não vamos fazer: GPS, controle de combustível e custos, checklist de vistoria e reserva de veículo com antecedência.
 
@@ -151,16 +151,16 @@ Essas são as validações que o back-end faz antes de salvar. O front pode avis
 - **Banco:** SQLite (ver seção 7).
 - **Login:** senha salva com `bcrypt` (nunca a senha pura) e sessão com `express-session`.
 - **IA:** Groq, que tem chave grátis.
-- **WhatsApp:** WhatsApp Cloud API da Meta, que é oficial e tem número de teste grátis.
+- **Telegram:** Telegram Bot API, que é gratuita: o admin cria um bot no @BotFather e põe o token no `.env`.
 
-O front nunca fala direto com a Groq nem com o WhatsApp, quem faz isso é o back. Assim as chaves ficam só no back, no arquivo `.env`, que não vai pro git.
+O front nunca fala direto com a Groq nem com o Telegram, quem faz isso é o back. Assim as chaves ficam só no back, no arquivo `.env`, que não vai pro git.
 
 ```mermaid
 flowchart LR
     B["Navegador<br/>(client)"] --> S["Servidor<br/>(Node.js + Express)"]
     S --> DB[("SQLite")]
     S --> G["Groq (IA)"]
-    S --> W["WhatsApp"]
+    S --> W["Telegram"]
 ```
 
 
@@ -232,7 +232,7 @@ A IA vai ser usada em 4 lugares:
 Cuidados: o plano grátis tem limite de uso por minuto, então se der erro mostra uma mensagem tipo "tente de novo em alguns segundos". E se não tiver chave configurada, os botões de IA ficam desligados e o resto funciona normal.
 
 
-## 9. Notificações e WhatsApp
+## 9. Notificações e Telegram
 
 Os avisos são verificados quando o server liga e toda vez que alguém abre a tela de Resumo:
 
@@ -244,9 +244,9 @@ Os avisos são verificados quando o server liga e toda vez que alguém abre a te
 - carro na oficina há mais de 7 dias;
 - log de auditoria adulterado.
 
-Todos aparecem no sininho. Os mais graves (km sem registro, carro que não voltou, CNH vencida com o carro na rua e log adulterado) também vão por WhatsApp pro admin.
+Todos aparecem no sininho. Os mais graves (km sem registro, carro que não voltou, CNH vencida com o carro na rua e log adulterado) também vão por Telegram pro admin.
 
-Pro WhatsApp vamos usar a **WhatsApp Cloud API** da Meta, que é a oficial e tem um número de teste grátis. Enquanto ninguém configurar isso, a mensagem só aparece no terminal do server. Assim todo mundo consegue testar sem precisar de conta.
+Pro Telegram vamos usar a **Bot API**, que é gratuita: cria-se um bot no @BotFather e coloca `TELEGRAM_BOT_TOKEN` (e `TELEGRAM_CHAT_ID`, o chat padrão dos alertas) no `.env`. Cada usuário também pode ter o próprio ID de chat no cadastro. Enquanto ninguém configurar isso, a mensagem só aparece no terminal do server. Assim todo mundo consegue testar sem precisar de conta.
 
 
 ## 10. Organização do repositório
@@ -270,7 +270,7 @@ dispatch/
 │   │   ├── regras/         # as validações da seção 5: cnh.js, nr24.js, disponibilidade.js, auditoria.js
 │   │   ├── db/             # schema.sql, criar-banco.js (já feitos), conexao.js, seed.js
 │   │   ├── ia/             # chamadas pra Groq
-│   │   └── whatsapp.js
+│   │   └── telegram.js
 │   ├── .env.example
 │   └── package.json
 │
@@ -303,7 +303,7 @@ Cada um pega uma parte e faz o front e o back dela, pra ninguém ficar esperando
 | Alojamentos | Tela, cadastro, mapa de leitos, estadias, ocorrências e regras A1 a A7 |
 | Frota | Tela, cadastro, saída e volta, manutenções e regras F1 a F13 |
 | Relatórios e auditoria | Relatórios, gráficos, "quem estava dirigindo" e tela do log |
-| IA e notificações | IA, sininho e WhatsApp. Até a base ficar pronta, ajuda no seed e em Alojamentos/Frota |
+| IA e notificações | IA, sininho e Telegram. Até a base ficar pronta, ajuda no seed e em Alojamentos/Frota |
 
 Alojamentos e Frota são as partes maiores. Se alguém tiver menos tempo, vale colocar duas pessoas nelas.
 
@@ -327,9 +327,9 @@ Alojamentos e Frota são as partes maiores. Se alguém tiver menos tempo, vale c
 | 3 | Estadias, ocorrências, saída/volta de veículo, manutenções e as regras |
 | 4 | Relatórios, "quem estava dirigindo" e tela de auditoria. **Aqui tudo que o professor pediu tem que estar pronto** |
 | 5 | IA e notificações |
-| 6 | WhatsApp, ajustes visuais e ensaio da apresentação |
+| 6 | Telegram, ajustes visuais e ensaio da apresentação |
 
-Se o prazo apertar, corta do fim pro começo: primeiro o WhatsApp, depois a IA. As semanas 1 a 4 não podem ser cortadas.
+Se o prazo apertar, corta do fim pro começo: primeiro o Telegram, depois a IA. As semanas 1 a 4 não podem ser cortadas.
 
 
 ## 13. Roteiro da apresentação
@@ -340,7 +340,7 @@ Se o prazo apertar, corta do fim pro começo: primeiro o WhatsApp, depois a IA. 
 4. O que o sistema faz.
 5. **O que o professor pediu x onde o sistema atende** (tabela da seção 3). É o slide mais importante.
 6. As telas do Figma, seguindo o uso real: login, resumo, cadastrar colaborador, colocar num leito, abrir ocorrência, registrar saída de carro, manutenção, relatórios e auditoria.
-7. Os extras do grupo: IA e WhatsApp.
+7. Os extras do grupo: IA e Telegram.
 8. Como vai ser feito: tecnologias, banco e organização das pastas.
 9. Cronograma e divisão do grupo.
 
@@ -358,7 +358,7 @@ Os dados são inventados, mas a gente levou em conta:
 - os funcionários precisam saber que esses dados são registrados;
 - nem todo usuário vê tudo (admin x operador);
 - saber onde uma pessoa dormiu é informação sensível, então só quem precisa deve ver;
-- pra IA e pro WhatsApp vai só o mínimo necessário (a IA recebe números, não nomes).
+- pra IA e pro Telegram vai só o mínimo necessário (a IA recebe números, não nomes).
 
 
 ## 15. O que ainda falta decidir
@@ -384,4 +384,4 @@ Os dados são inventados, mas a gente levou em conta:
 - [Taxa de utilização da frota (Cobli)](https://www.cobli.co/blog/taxa-utilizacao-frota/)
 - [better-sqlite3](https://github.com/WiseLibs/better-sqlite3)
 - [Groq](https://console.groq.com/docs)
-- [WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api)
+- [Telegram Bot API](https://core.telegram.org/bots/api)

@@ -149,7 +149,7 @@
           </svg>
           <div>
             <span class="nav-item-titulo">Alertas e Integrações</span>
-            <span class="nav-item-sub">Prazos, Groq e WhatsApp</span>
+            <span class="nav-item-sub">Prazos, Groq e Telegram</span>
           </div>
         </button>
 
@@ -337,7 +337,7 @@
             <div class="bloco-cabecalho">
               <div>
                 <h2 class="bloco-titulo">Gatilhos de notificação</h2>
-                <p class="bloco-subtitulo">Quando o sistema deve gerar avisos preventivos na central e no WhatsApp</p>
+                <p class="bloco-subtitulo">Quando o sistema deve gerar avisos preventivos na central e no Telegram</p>
               </div>
             </div>
 
@@ -373,11 +373,11 @@
             <div class="lista-switches">
               <label class="switch-linha">
                 <div class="switch-texto">
-                  <span class="switch-titulo">Enviar alertas críticos por WhatsApp aos administradores</span>
+                  <span class="switch-titulo">Enviar alertas críticos por Telegram aos administradores</span>
                   <span class="switch-desc">Dispara mensagem quando houver uso sem registro de km, veículo não devolvido ou adulteração no log.</span>
                 </div>
                 <span class="chave">
-                  <input type="checkbox" id="cfg-whatsapp">
+                  <input type="checkbox" id="cfg-telegram">
                   <span class="chave-trilho"></span>
                 </span>
               </label>
@@ -394,7 +394,7 @@
                 <h2 class="bloco-titulo">Serviços conectados</h2>
                 <p class="bloco-subtitulo">Chaves lidas do arquivo <code>server/.env</code> (nunca expostas no navegador)</p>
               </div>
-              <button type="button" id="botao-testar-alerta" class="btn-secundario">Simular disparo WhatsApp</button>
+              <button type="button" id="botao-testar-alerta" class="btn-secundario">Testar disparo no Telegram</button>
             </div>
 
             <div class="integracoes-lista">
@@ -408,10 +408,10 @@
 
               <div class="integracao-card">
                 <div class="integracao-topo">
-                  <span class="integracao-nome">WhatsApp Cloud API</span>
-                  <span id="badge-whats" class="status-tag status-uso"><span class="status-ponto"></span>Modo terminal</span>
+                  <span class="integracao-nome">Telegram Bot API</span>
+                  <span id="badge-telegram" class="status-tag status-uso"><span class="status-ponto"></span>Modo terminal</span>
                 </div>
-                <p id="desc-whats" class="integracao-desc">Sem token oficial configurado: os alertas aparecem formatados no terminal do servidor.</p>
+                <p id="desc-telegram" class="integracao-desc">Sem TELEGRAM_BOT_TOKEN no server/.env: os alertas aparecem formatados no terminal do servidor.</p>
               </div>
             </div>
 
@@ -464,8 +464,8 @@
               </div>
 
               <div class="campo-grupo">
-                <label for="novo-telefone" class="campo-label">WhatsApp (opcional)</label>
-                <input type="text" id="novo-telefone" class="config-input" placeholder="Ex: 14999990000">
+                <label for="novo-telefone" class="campo-label">Telegram (ID do chat, opcional)</label>
+                <input type="text" id="novo-telefone" class="config-input" placeholder="Ex: 123456789">
               </div>
 
               <div class="campo-grupo">
@@ -511,7 +511,7 @@
                 <thead>
                   <tr>
                     <th>Usuário</th>
-                    <th>WhatsApp</th>
+                    <th>Telegram</th>
                     <th>Perfil</th>
                     <th>Status</th>
                     <th>Ações</th>
@@ -608,8 +608,8 @@
               </div>
 
               <div class="campo-grupo">
-                <label for="conta-telefone" class="campo-label">WhatsApp para receber alertas</label>
-                <input type="text" id="conta-telefone" class="config-input" placeholder="Ex: 14999990000">
+                <label for="conta-telefone" class="campo-label">Telegram (ID do chat) para receber alertas</label>
+                <input type="text" id="conta-telefone" class="config-input" placeholder="Ex: 123456789">
               </div>
             </div>
 

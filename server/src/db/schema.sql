@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS usuario (
     login       TEXT NOT NULL UNIQUE,
     senha_hash  TEXT NOT NULL, -- a senha nunca é salva pura, só o hash (bcrypt)
     perfil      TEXT NOT NULL CHECK (perfil IN ('admin', 'operador')), -- admin ve tudo, operador não ve auditoria nem configurações
-    telefone    TEXT, -- pro whatsapp
+    telegram_chat_id  TEXT, -- id do chat no Telegram, pra receber os alertas críticos
     ativo       INTEGER NOT NULL DEFAULT 1
 );
 
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS log_auditoria (
     hash           TEXT NOT NULL  -- se alguém mexer no banco por fora, o hash não bate mais
 );
 
--- avisos que aparecem no sininho (e alguns vão pro whatsapp)
+-- avisos que aparecem no sininho (e os críticos vão pro telegram)
 CREATE TABLE IF NOT EXISTS notificacao (
     id                INTEGER PRIMARY KEY AUTOINCREMENT,
     tipo              TEXT NOT NULL, -- ex: 'cnh_vencendo', 'km_sem_registro'
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS notificacao (
     registro_id       INTEGER,
     criada_em         TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
     lida              INTEGER NOT NULL DEFAULT 0,
-    enviada_whatsapp  INTEGER NOT NULL DEFAULT 0
+    enviada_telegram  INTEGER NOT NULL DEFAULT 0
 );
 
 

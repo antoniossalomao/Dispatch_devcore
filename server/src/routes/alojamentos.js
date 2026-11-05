@@ -2,6 +2,7 @@
 const express = require('express')
 const db = require('../db/conexao')
 const auditoria = require('../regras/auditoria')
+const { agoraLocal, normalizarData } = require('../regras/datas')
 
 const router = express.Router()
 
@@ -19,26 +20,6 @@ function exigirLogin(req, res, next) {
 }
 
 router.use(exigirLogin)
-
-function doisDigitos(n) {
-  return n < 10 ? '0' + n : String(n)
-}
-
-function agoraLocal() {
-  const d = new Date()
-  return (
-    d.getFullYear() + '-' + doisDigitos(d.getMonth() + 1) + '-' + doisDigitos(d.getDate()) + ' ' +
-    doisDigitos(d.getHours()) + ':' + doisDigitos(d.getMinutes()) + ':' + doisDigitos(d.getSeconds())
-  )
-}
-
-// aceita "2026-11-05", "2026-11-05T10:30" ou "2026-11-05 10:30" e devolve "AAAA-MM-DD HH:MM:SS"
-function normalizarData(texto) {
-  const t = String(texto || '').trim().replace('T', ' ')
-  const m = t.match(/^(\d{4}-\d{2}-\d{2})(?: (\d{2}:\d{2})(?::(\d{2}))?)?$/)
-  if (!m) return null
-  return m[1] + ' ' + (m[2] || '00:00') + ':' + (m[3] || '00')
-}
 
 // A6: o responsavel tem que ser um colaborador ativo
 function conferirResponsavel(responsavelId) {

@@ -19,7 +19,7 @@ Construtora fictícia (Construtora Aguapeí) com obras no interior de SP, equipe
 - Gera relatórios: ocupação por alojamento, uso por veículo (utilização, ociosidade, km), padrões de movimentação e gargalos.
 - Mantém log de auditoria de toda alteração (quem, quando, antes/depois), com hash encadeado para detectar edição feita fora do sistema.
 - IA via Groq: perguntas em linguagem natural sobre os dados, resumo dos relatórios, chat de suporte e redação das notificações.
-- Notificações no sistema (CNH vencendo, km sem registro, veículo não devolvido...) e envio dos alertas críticos por WhatsApp.
+- Notificações no sistema (CNH vencendo, km sem registro, veículo não devolvido...) e envio dos alertas críticos por Telegram.
 
 ## Protótipo
 
@@ -35,7 +35,7 @@ Telas: Login, Resumo Operacional, Colaboradores, Gestão de Alojamentos, Gestão
 | `server/` | Node.js (22+) + Express, express-session + bcrypt |
 | Banco | SQLite com `better-sqlite3`, SQL puro (tabelas em `server/src/db/schema.sql`) |
 | IA | Groq (`groq-sdk`), chave gratuita, usada só pelo server |
-| Avisos | WhatsApp (provedor em aberto), com modo console para desenvolvimento |
+| Avisos | Telegram (Bot API), com modo console para desenvolvimento |
 
 ## Estrutura
 
@@ -61,7 +61,7 @@ Isso cria o banco em `server/data/dispatch.db` já com o usuário administrador 
 
 ## Documentação
 
-- [docs/planejamento.md](docs/planejamento.md) — problema, solução proposta, telas, regras de negócio, arquitetura, banco de dados, IA, WhatsApp, organização do repositório, divisão de trabalho, cronograma e roteiro da apresentação.
+- [docs/planejamento.md](docs/planejamento.md) — problema, solução proposta, telas, regras de negócio, arquitetura, banco de dados, IA, Telegram, organização do repositório, divisão de trabalho, cronograma e roteiro da apresentação.
 
 ## Roadmap
 
@@ -72,7 +72,7 @@ Isso cria o banco em `server/data/dispatch.db` já com o usuário administrador 
 5. Estadias e uso de veículo com as regras de validação (CNH, NR-24, km).
 6. Relatórios, consulta "quem estava dirigindo" e tela de auditoria.
 7. IA (Groq) e central de notificações.
-8. Integração com WhatsApp e ensaio da demonstração.
+8. Integração com Telegram e ensaio da demonstração.
 
 ## Grupo DevCore
 

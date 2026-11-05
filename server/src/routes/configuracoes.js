@@ -5,6 +5,7 @@ const express = require('express')
 const bcrypt = require('bcryptjs')
 const db = require('../db/conexao')
 const auditoria = require('../regras/auditoria')
+const telegram = require('../regras/telegram')
 
 const router = express.Router()
 
@@ -26,7 +27,7 @@ const configPadrao = {
   bloquearDocVencido: true,
   avisarSeguroVencido: true,
   validarNr24: true,
-  whatsappCriticos: false
+  telegramCriticos: false
 }
 
 function lerConfig() {
@@ -97,11 +98,11 @@ router.use(exigirAdmin)
 
 router.get('/', function (req, res) {
   const usuarios = db.prepare(
-    'SELECT id, nome, login, perfil, telefone, ativo FROM usuario ORDER BY ativo DESC, id ASC'
+    'SELECT id, nome, login, perfil, telegram_chat_id, ativo FROM usuario ORDER BY ativo DESC, id ASC'
   ).all()
 
   const meuUsuario = db.prepare(
-    'SELECT id, nome, login, perfil, telefone FROM usuario WHERE id = ?'
+    'SELECT id, nome, login, perfil, telegram_chat_id FROM usuario WHERE id = ?'
   ).get(req.session.usuario.id)
 
   res.json({
@@ -111,8 +112,8 @@ router.get('/', function (req, res) {
     banco: montarDadosBanco(),
     ambiente: {
       iaConfigurada: Boolean(process.env.GROQ_API_KEY),
-      whatsappAtivo: Boolean(process.env.WHATSAPP_TOKEN),
-      whatsappModo: process.env.WHATSAPP_TOKEN ? 'Cloud API conectada' : 'Simulação no terminal'
+      telegramAtivo: telegram.configurado(),
+      telegramModo: telegram.configurado() ? 'Bot conectado' : 'Simulação no terminal'
     }
   })
 })
@@ -174,7 +175,7 @@ router.put('/parametros', function (req, res) {
     bloquearDocVencido: Boolean(b.bloquearDocVencido),
     avisarSeguroVencido: Boolean(b.avisarSeguroVencido),
     validarNr24: Boolean(b.validarNr24),
-    whatsappCriticos: Boolean(b.whatsappCriticos)
+    telegramCriticos: Boolean(b.telegramCriticos)
   }
 
   salvarConfig(novo)
@@ -210,22 +211,21 @@ router.post('/restaurar-padrao', function (req, res) {
   res.json({ mensagem: 'Valores padrão restaurados.', parametros: padrao })
 })
 
-router.post('/testar-alerta', function (req, res) {
+router.post('/testar-alerta', async function (req, res) {
   const cfg = lerConfig()
-  const admin = db.prepare('SELECT nome, telefone FROM usuario WHERE id = ?').get(req.session.usuario.id)
-  const destino = (admin && admin.telefone) ? admin.telefone : '(sem WhatsApp cadastrado na conta)'
+  const admin = db.prepare('SELECT nome, telegram_chat_id FROM usuario WHERE id = ?').get(req.session.usuario.id)
 
   const previa =
     '[DISPATCH · ' + cfg.nomeEmpresa + '] Alerta de teste: ' +
     'Veículo Saveiro MNO-7890 registrou diferença de +38 km sem saída vinculada. ' +
-    'Destinatário: ' + admin.nome + ' ' + destino
+    'Destinatário: ' + admin.nome
 
-  console.log('\n--- SIMULAÇÃO DE ALERTA WHATSAPP ---')
-  console.log(previa)
-  console.log('------------------------------------\n')
+  const r = await telegram.enviar(previa, admin.telegram_chat_id)
 
   res.json({
-    mensagem: 'Disparo simulado! A mensagem também foi registrada no terminal do servidor.',
+    mensagem: r.enviado
+      ? 'Mensagem enviada pelo Telegram!'
+      : 'Disparo simulado! A mensagem foi registrada no terminal do servidor' + (r.motivo ? ' (' + r.motivo + ')' : '') + '.',
     previa: previa
   })
 })
@@ -252,16 +252,16 @@ router.get('/backup', function (req, res) {
 
 router.put('/minha-conta', function (req, res) {
   const nome = (req.body.nome || '').trim()
-  const telefone = (req.body.telefone || '').trim()
+  const telegram_chat_id = (req.body.telegram_chat_id || '').trim()
 
   if (nome === '') {
     return res.status(400).json({ erro: 'O nome não pode ficar vazio.' })
   }
 
-  const antes = db.prepare('SELECT id, nome, telefone FROM usuario WHERE id = ?').get(req.session.usuario.id)
-  const telFinal = telefone === '' ? null : telefone
+  const antes = db.prepare('SELECT id, nome, telegram_chat_id FROM usuario WHERE id = ?').get(req.session.usuario.id)
+  const telFinal = telegram_chat_id === '' ? null : telegram_chat_id
 
-  db.prepare('UPDATE usuario SET nome = ?, telefone = ? WHERE id = ?').run(
+  db.prepare('UPDATE usuario SET nome = ?, telegram_chat_id = ? WHERE id = ?').run(
     nome,
     telFinal,
     req.session.usuario.id
@@ -276,7 +276,7 @@ router.put('/minha-conta', function (req, res) {
     registroId: req.session.usuario.id,
     resumo: 'Atualizou dados da própria conta (@' + req.session.usuario.login + ')',
     antes: antes,
-    depois: { id: req.session.usuario.id, nome: nome, telefone: telFinal }
+    depois: { id: req.session.usuario.id, nome: nome, telegram_chat_id: telFinal }
   })
 
   res.json({
@@ -321,7 +321,7 @@ router.post('/usuarios', function (req, res) {
   const login = (req.body.login || '').trim()
   const senha = req.body.senha || ''
   const perfil = req.body.perfil === 'admin' ? 'admin' : 'operador'
-  const telefone = (req.body.telefone || '').trim()
+  const telegram_chat_id = (req.body.telegram_chat_id || '').trim()
 
   if (nome === '' || login === '' || senha === '') {
     return res.status(400).json({ erro: 'Preencha nome, login e senha inicial.' })
@@ -339,9 +339,9 @@ router.post('/usuarios', function (req, res) {
   }
 
   const hash = bcrypt.hashSync(senha, 10)
-  const telFinal = telefone === '' ? null : telefone
+  const telFinal = telegram_chat_id === '' ? null : telegram_chat_id
   const resultado = db.prepare(
-    'INSERT INTO usuario (nome, login, senha_hash, perfil, telefone, ativo) VALUES (?, ?, ?, ?, ?, 1)'
+    'INSERT INTO usuario (nome, login, senha_hash, perfil, telegram_chat_id, ativo) VALUES (?, ?, ?, ?, ?, 1)'
   ).run(nome, login, hash, perfil, telFinal)
 
   const novoId = Number(resultado.lastInsertRowid)
@@ -352,7 +352,7 @@ router.post('/usuarios', function (req, res) {
     tabela: 'usuario',
     registroId: novoId,
     resumo: 'Cadastrou o usuário @' + login + ' (' + perfil + ')',
-    depois: { id: novoId, nome: nome, login: login, perfil: perfil, telefone: telFinal, ativo: 1 }
+    depois: { id: novoId, nome: nome, login: login, perfil: perfil, telegram_chat_id: telFinal, ativo: 1 }
   })
 
   res.status(201).json({ mensagem: 'Usuário @' + login + ' criado com sucesso.' })
