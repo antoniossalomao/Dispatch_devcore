@@ -80,7 +80,8 @@ Copie `server/.env.example` para `server/.env`:
 5. ~~Estadias e uso de veículo com as regras de validação (CNH, NR-24, km).~~
 6. ~~Relatórios, consulta "quem estava dirigindo" e tela de auditoria.~~
 7. ~~IA (Groq) e central de notificações.~~
-8. ~~Integração com Telegram~~ e ensaio da demonstração.
+8. ~~Integração com Telegram~~ (código pronto; falta testar o envio real com token).
+9. Ensaio da demonstração.
 
 ## Grupo DevCore
 
