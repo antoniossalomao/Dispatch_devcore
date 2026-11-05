@@ -5,7 +5,8 @@
   "description": "Back-end do Dispatch",
   "scripts": {
     "start": "node --env-file-if-exists=.env src/server.js",
-    "criar-banco": "node --env-file-if-exists=.env src/db/criar-banco.js"
+    "criar-banco": "node --env-file-if-exists=.env src/db/criar-banco.js",
+    "seed": "node --env-file-if-exists=.env src/db/seed.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
