@@ -430,3 +430,211 @@
     width: 100%;
   }
 }
+
+
+/* ---- estado do sistema (faixa no topo de Operacao e Regras) ---- */
+
+.saude-sistema {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background-color: var(--claro-cartao);
+  border: 1px solid var(--claro-borda);
+  border-radius: 14px;
+  box-shadow: var(--sombra-leve);
+  overflow: hidden;
+}
+
+.saude-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+}
+
+.saude-item + .saude-item {
+  border-left: 1px solid var(--claro-borda);
+}
+
+.saude-ponto {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background-color: var(--borda-forte);
+}
+
+.saude-ok {
+  background-color: #16a34a;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.16);
+}
+
+.saude-erro {
+  background-color: var(--vermelho);
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.18);
+}
+
+.saude-off {
+  background-color: var(--borda-forte);
+  box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.18);
+}
+
+.saude-titulo {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--claro-texto);
+}
+
+.saude-detalhe {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--claro-texto-fraco);
+}
+
+/* ---- submenu lateral: item ativo com faixa verde ---- */
+
+.config-nav-item {
+  position: relative;
+  padding: 10px 12px 10px 14px;
+}
+
+.config-nav-item.ativa {
+  background-color: var(--claro-cartao);
+  box-shadow: var(--sombra-leve), inset 0 0 0 1px var(--claro-borda);
+}
+
+.config-nav-item.ativa::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background-color: var(--verde);
+}
+
+.nav-item-titulo {
+  font-weight: 600;
+}
+
+/* ---- indicadores de usuarios e do banco: faixa unica, igual as outras telas ---- */
+
+.resumo-usuarios {
+  gap: 0;
+  background-color: var(--claro-cartao);
+  border: 1px solid var(--claro-borda);
+  border-radius: 14px;
+  box-shadow: var(--sombra-leve);
+  overflow: hidden;
+}
+
+.resumo-banco-grade {
+  gap: 0;
+  padding: 0;
+}
+
+.resumo-usuarios .mini-kpi,
+.resumo-banco-grade .mini-kpi {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 18px 22px;
+}
+
+.resumo-usuarios .mini-kpi + .mini-kpi,
+.resumo-banco-grade .mini-kpi + .mini-kpi {
+  border-left: 1px solid var(--claro-borda);
+}
+
+.resumo-banco-grade {
+  border-bottom: 1px solid var(--claro-borda);
+}
+
+.mini-rotulo {
+  font-weight: 600;
+}
+
+.mini-valor {
+  font-family: var(--fonte-num);
+  font-size: 28px;
+  letter-spacing: -0.3px;
+}
+
+/* ---- barra de salvar fixa: o botao fica sempre ao alcance ---- */
+
+.barra-salvar {
+  position: sticky;
+  bottom: 16px;
+  z-index: 5;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: color-mix(in srgb, var(--claro-cartao) 92%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--claro-borda);
+  border-radius: 12px;
+  box-shadow: var(--sombra-2);
+}
+
+@media (max-width: 1180px) {
+  .saude-sistema {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .saude-item:nth-child(3) {
+    border-left: none;
+  }
+
+  .saude-item:nth-child(n + 3) {
+    border-top: 1px solid var(--claro-borda);
+  }
+
+  .resumo-usuarios .mini-kpi:nth-child(3),
+  .resumo-banco-grade .mini-kpi:nth-child(3) {
+    border-left: none;
+  }
+
+  .resumo-usuarios .mini-kpi:nth-child(n + 3),
+  .resumo-banco-grade .mini-kpi:nth-child(n + 3) {
+    border-top: 1px solid var(--claro-borda);
+  }
+
+  .config-nav-item.ativa::before {
+    left: 6px;
+    right: 6px;
+    top: auto;
+    bottom: 0;
+    width: auto;
+    height: 3px;
+    border-radius: 3px 3px 0 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .saude-sistema {
+    grid-template-columns: 1fr;
+  }
+
+  .saude-item + .saude-item,
+  .resumo-usuarios .mini-kpi + .mini-kpi,
+  .resumo-banco-grade .mini-kpi + .mini-kpi {
+    border-left: none;
+    border-top: 1px solid var(--claro-borda);
+  }
+}
+
+/* a barra fixa nao fica por baixo do botao de ajuda (canto inferior direito) */
+.barra-salvar {
+  margin-right: 60px;
+}
+
+@media (max-width: 680px) {
+  .barra-salvar {
+    position: static;
+    margin-right: 0;
+  }
+}

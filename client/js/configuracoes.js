@@ -620,6 +620,26 @@ botaoSair.addEventListener('click', async function () {
   window.location.href = 'index.html'
 })
 
+// painel "Estado do sistema" no topo: junta o que ja veio do servidor (banco, log e integracoes)
+function marcarSaude(id, nivel, texto) {
+  const ponto = document.getElementById('saude-' + id + '-ponto')
+  ponto.className = 'saude-ponto saude-' + nivel
+  document.getElementById('saude-' + id).textContent = texto
+}
+
+function desenharSaude(dados) {
+  const b = dados.banco
+  if (b) {
+    marcarSaude('banco', 'ok', b.tamanhoKb + ' KB · ' + b.totalTabelas + ' tabelas')
+    const intg = b.integridade
+    if (intg.integro) marcarSaude('log', 'ok', 'Íntegro · ' + intg.totalLinhas + ' registros')
+    else marcarSaude('log', 'erro', 'Adulteração na linha #' + intg.linhaComProblema)
+  }
+  const amb = dados.ambiente
+  marcarSaude('ia', amb.iaConfigurada ? 'ok' : 'off', amb.iaConfigurada ? 'Conectada à Groq' : 'Desligada (sem GROQ_API_KEY)')
+  marcarSaude('telegram', amb.telegramAtivo ? 'ok' : 'off', amb.telegramAtivo ? 'Bot conectado' : 'Modo terminal (sem token)')
+}
+
 function desenharAmbiente(amb) {
   if (amb.iaConfigurada) {
     badgeIa.className = 'status-tag status-ativo'
@@ -678,6 +698,8 @@ async function carregarDados() {
     if (res.dados.banco) {
       desenharBanco(res.dados.banco)
     }
+
+    desenharSaude(res.dados)
 
     const eu = res.dados.meuUsuario
     contaNome.value = eu.nome
