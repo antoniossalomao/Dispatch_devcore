@@ -53,9 +53,7 @@ function arredondar(n, casas) {
 }
 
 // ocupacao por alojamento: leito-dias ocupados / leito-dias disponiveis
-router.get('/ocupacao', function (req, res) {
-  const periodo = lerPeriodo(req.query)
-  if (!periodo) return res.status(400).json({ erro: 'Período inválido.' })
+function calcularOcupacao(periodo) {
 
   const alojamentos = db.prepare('SELECT id, nome, cidade FROM alojamento WHERE ativo = 1 ORDER BY nome').all()
   const estadias = db.prepare(
@@ -92,13 +90,17 @@ router.get('/ocupacao', function (req, res) {
     }
   })
 
-  res.json({ periodo: { de: periodo.de, ate: periodo.ate }, alojamentos: linhas })
+  return { periodo: { de: periodo.de, ate: periodo.ate }, alojamentos: linhas }
+}
+
+router.get('/ocupacao', function (req, res) {
+  const periodo = lerPeriodo(req.query)
+  if (!periodo) return res.status(400).json({ erro: 'Período inválido.' })
+  res.json(calcularOcupacao(periodo))
 })
 
 // uso por veiculo: viagens, km, horas em uso, utilizacao e ociosidade
-router.get('/frota', function (req, res) {
-  const periodo = lerPeriodo(req.query)
-  if (!periodo) return res.status(400).json({ erro: 'Período inválido.' })
+function calcularFrota(periodo) {
 
   const veiculos = db.prepare('SELECT id, placa, modelo FROM veiculo WHERE ativo = 1 ORDER BY modelo, placa').all()
   const usos = db.prepare('SELECT veiculo_id, saida, retorno, km_saida, km_retorno FROM uso_veiculo').all()
@@ -133,13 +135,17 @@ router.get('/frota', function (req, res) {
     }
   })
 
-  res.json({ periodo: { de: periodo.de, ate: periodo.ate }, veiculos: linhas })
+  return { periodo: { de: periodo.de, ate: periodo.ate }, veiculos: linhas }
+}
+
+router.get('/frota', function (req, res) {
+  const periodo = lerPeriodo(req.query)
+  if (!periodo) return res.status(400).json({ erro: 'Período inválido.' })
+  res.json(calcularFrota(periodo))
 })
 
 // linha do tempo unica: entradas/saidas de alojamento e saidas/voltas de veiculo
-router.get('/movimentacoes', function (req, res) {
-  const periodo = lerPeriodo(req.query)
-  if (!periodo) return res.status(400).json({ erro: 'Período inválido.' })
+function calcularMovimentacoes(periodo) {
 
   const eventos = []
 
@@ -171,14 +177,18 @@ router.get('/movimentacoes', function (req, res) {
   })
 
   eventos.sort(function (a, b) { return a.quando < b.quando ? 1 : -1 })
-  res.json({ periodo: { de: periodo.de, ate: periodo.ate }, total: eventos.length, eventos: eventos.slice(0, 300) })
+  return { periodo: { de: periodo.de, ate: periodo.ate }, total: eventos.length, eventos: eventos.slice(0, 300) }
+}
+
+router.get('/movimentacoes', function (req, res) {
+  const periodo = lerPeriodo(req.query)
+  if (!periodo) return res.status(400).json({ erro: 'Período inválido.' })
+  res.json(calcularMovimentacoes(periodo))
 })
 
 // gargalos: onde o sistema esta apertado ou parado
-router.get('/gargalos', function (req, res) {
+function calcularGargalos(periodo) {
   const cfg = rotasConfig.lerConfig()
-  const periodo = lerPeriodo(req.query)
-  if (!periodo) return res.status(400).json({ erro: 'Período inválido.' })
   const agora = Date.now()
   const itens = []
 
@@ -234,7 +244,13 @@ router.get('/gargalos', function (req, res) {
     }
   })
 
-  res.json({ periodo: { de: periodo.de, ate: periodo.ate }, total: itens.length, gargalos: itens })
+  return { periodo: { de: periodo.de, ate: periodo.ate }, total: itens.length, gargalos: itens }
+}
+
+router.get('/gargalos', function (req, res) {
+  const periodo = lerPeriodo(req.query)
+  if (!periodo) return res.status(400).json({ erro: 'Período inválido.' })
+  res.json(calcularGargalos(periodo))
 })
 
 // "quem estava dirigindo o veiculo X na data Y?"
@@ -291,3 +307,8 @@ router.get('/quem-dirigia', function (req, res) {
 })
 
 module.exports = router
+module.exports.lerPeriodo = lerPeriodo
+module.exports.calcularOcupacao = calcularOcupacao
+module.exports.calcularFrota = calcularFrota
+module.exports.calcularMovimentacoes = calcularMovimentacoes
+module.exports.calcularGargalos = calcularGargalos
