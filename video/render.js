@@ -5,7 +5,7 @@ p.on('pageerror',e=>console.log('ERR',e.message));
 await p.goto('file://'+process.cwd()+'/_play.html');await p.waitForTimeout(800);
 const FPS=30,total=await p.evaluate(()=>TOTAL),N=Math.ceil(total*FPS);
 const ff=spawn('ffmpeg',['-y','-v','error','-f','image2pipe','-framerate',String(FPS),'-c:v','mjpeg','-i','-','-i','audio/mix.wav','-af','apad','-t',String(total),
- '-c:v','libx264','-preset','medium','-crf','17','-pix_fmt','yuv420p','-c:a','aac','-b:a','192k','-movflags','+faststart','dispatch_apresentacao.mp4'],{stdio:['pipe','inherit','inherit']});
+ '-c:v','libx264','-preset','medium','-crf','17','-pix_fmt','yuv420p','-c:a','aac','-b:a','192k','-movflags','+faststart','dispatch_apresentacao_v2.mp4'],{stdio:['pipe','inherit','inherit']});
 for(let i=0;i<N;i++){await p.evaluate(t=>render(t),i/FPS);
  const buf=await p.screenshot({type:'jpeg',quality:94});
  if(!ff.stdin.write(buf))await new Promise(r=>ff.stdin.once('drain',r));

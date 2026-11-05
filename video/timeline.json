@@ -1,85 +1,109 @@
 {
- "total": 93.408,
+ "total": 124.186,
  "scenes": [
+  {
+   "id": "s0",
+   "txt": "Grupo DevCore apresenta.",
+   "start": 0.0,
+   "voice": 1.5,
+   "dur": 1.515102,
+   "end": 4.015
+  },
   {
    "id": "s1",
    "txt": "Quem estava dirigindo? Em qual alojamento ele dormiu? Quando a multa chegou... ninguém soube responder.",
-   "start": 0.0,
-   "voice": 1.4,
+   "start": 4.015,
+   "voice": 5.415,
    "dur": 7.601633,
-   "end": 9.702
+   "end": 13.717
   },
   {
    "id": "s2",
    "txt": "Planilhas. Mensagens. Memória. Uma multa por não indicação do condutor custa o dobro. E um alojamento fora da NR-24 pode ser fiscalizado a qualquer momento.",
-   "start": 9.702,
-   "voice": 10.252,
+   "start": 13.717,
+   "voice": 14.267,
    "dur": 12.355918,
-   "end": 23.308
+   "end": 27.323
   },
   {
    "id": "s3",
    "txt": "Apresentamos o Dispatch. Pessoas, alojamentos e frota, com rastreabilidade total.",
-   "start": 23.308,
-   "voice": 23.858,
+   "start": 27.323,
+   "voice": 27.873,
    "dur": 5.276735,
-   "end": 29.835
+   "end": 33.85
   },
   {
    "id": "s4",
    "txt": "Em uma única visão: veículos em uso, vagas livres, e os alertas que pedem ação agora.",
-   "start": 29.835,
-   "voice": 30.385,
+   "start": 33.85,
+   "voice": 34.4,
    "dur": 6.347755,
-   "end": 37.433
+   "end": 41.448
   },
   {
    "id": "s5",
    "txt": "Cada colaborador, com a CNH monitorada. Vai vencer? O sistema avisa, antes de virar multa.",
-   "start": 37.433,
-   "voice": 37.983,
+   "start": 41.448,
+   "voice": 41.998,
    "dur": 6.217143,
-   "end": 44.9
+   "end": 48.915
   },
   {
    "id": "s6",
    "txt": "Quem está em qual leito. Quem usa qual veículo, por quanto tempo, e com quantos quilômetros. Tudo validado, respeitando a NR-24.",
-   "start": 44.9,
-   "voice": 45.45,
+   "start": 48.915,
+   "voice": 49.465,
    "dur": 10.057143,
-   "end": 56.207
+   "end": 60.222
   },
   {
    "id": "s7",
-   "txt": "Toda alteração fica registrada, com hash encadeado: quem, quando, antes e depois. E a inteligência artificial responde, em linguagem natural.",
-   "start": 56.207,
-   "voice": 56.757,
-   "dur": 12.146939,
-   "end": 69.604
+   "txt": "Toda alteração é registrada com hash encadeado. Se alguém editar o banco por fora, o Dispatch percebe na hora.",
+   "start": 60.222,
+   "voice": 61.122,
+   "dur": 7.836735,
+   "end": 70.159
+  },
+  {
+   "id": "s7b",
+   "txt": "A inteligência artificial responde perguntas em linguagem natural, sem nunca escrever SQL. E gera sozinha o relatório da semana: o sistema calcula os números, a IA escreve a análise.",
+   "start": 70.159,
+   "voice": 71.759,
+   "dur": 13.453061,
+   "end": 86.212
   },
   {
    "id": "s8",
-   "txt": "Os alertas críticos chegam direto no WhatsApp.",
-   "start": 69.604,
-   "voice": 70.154,
-   "dur": 2.925714,
-   "end": 73.78
+   "txt": "Os alertas críticos chegam direto no Telegram.",
+   "start": 86.212,
+   "voice": 87.212,
+   "dur": 2.873469,
+   "end": 93.485
+  },
+  {
+   "id": "s8b",
+   "txt": "Prazos, lotação, perfis de acesso e backup do banco: tudo configurável, sem depender de ninguém.",
+   "start": 93.485,
+   "voice": 94.285,
+   "dur": 7.523265,
+   "end": 102.808
   },
   {
    "id": "s9",
    "txt": "Três alojamentos. Quarenta e dois leitos. Trinta e quatro veículos. Seis meses de histórico, totalmente auditável.",
-   "start": 73.78,
-   "voice": 74.33,
+   "start": 102.808,
+   "voice": 103.408,
    "dur": 8.124082,
-   "end": 83.154
+   "end": 113.732
   },
   {
    "id": "s10",
    "txt": "Dispatch. Quem está onde. Quem usa o quê. Tudo registrado. Grupo DevCore.",
-   "start": 83.154,
-   "voice": 83.704,
+   "start": 113.732,
+   "voice": 114.282,
    "dur": 6.50449,
-   "end": 93.408
+   "end": 124.186
   }
  ]
 }
