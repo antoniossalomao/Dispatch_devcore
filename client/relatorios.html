@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dispatch — Relatórios</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/resumo.css">
+  <link rel="stylesheet" href="css/colaboradores.css">
+  <link rel="stylesheet" href="css/alojamentos.css">
+  <link rel="stylesheet" href="css/frota.css">
+  <link rel="stylesheet" href="css/relatorios.css">
+  <link rel="stylesheet" href="css/tema.css">
+  <script src="js/tema.js"></script>
+</head>
+<body class="painel-corpo">
+
+  <!-- menu lateral fixo -->
+  <aside class="menu-lateral">
+    <div>
+      <div class="menu-marca">
+        <span class="menu-logo">Dispatch</span>
+        <span id="nome-empresa-menu" class="menu-empresa">Construtora Aguapeí</span>
+      </div>
+
+      <p class="menu-secao">OPERAÇÃO</p>
+
+      <nav class="menu-lista">
+        <a href="resumo.html" class="menu-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          <span>Visão Geral</span>
+        </a>
+
+        <a href="colaboradores.html" class="menu-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Colaboradores</span>
+        </a>
+
+        <a href="alojamentos.html" class="menu-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18"/>
+            <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
+            <path d="M9 7h1.5M13.5 7H15M9 11h1.5M13.5 11H15M9 15h1.5M13.5 15H15"/>
+          </svg>
+          <span>Alojamentos</span>
+        </a>
+
+        <a href="frota.html" class="menu-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="6" width="14" height="10" rx="1"/>
+            <path d="M15 9h4l3 3.5V16h-7V9z"/>
+            <circle cx="5.5" cy="17.5" r="2"/>
+            <circle cx="18.5" cy="17.5" r="2"/>
+          </svg>
+          <span>Frota</span>
+        </a>
+
+        <a href="movimentacoes.html" class="menu-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"/>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+            <polyline points="7 23 3 19 7 15"/>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+          </svg>
+          <span>Movimentações</span>
+        </a>
+
+        <a href="relatorios.html" class="menu-item ativo">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <span>Relatórios</span>
+        </a>
+      </nav>
+
+      <div id="bloco-menu-admin" class="menu-admin-bloco" hidden>
+        <p class="menu-secao menu-secao-espaco">SISTEMA</p>
+        <nav class="menu-lista">
+          <a href="auditoria.html" class="menu-item">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+            <span>Auditoria</span>
+          </a>
+          <a href="configuracoes.html" class="menu-item">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.02 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span>Configurações</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <div class="menu-rodape">
+      <div id="usuario-iniciais" class="usuario-avatar">AD</div>
+      <div class="usuario-dados">
+        <p id="perfil-nome" class="usuario-nome">Administrador</p>
+        <p id="perfil-tipo" class="usuario-cargo">admin</p>
+      </div>
+      <button type="button" id="botao-sair" class="botao-sair" title="Sair do sistema">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- área de conteúdo -->
+  <div class="area-conteudo">
+
+    <header class="topo">
+      <div class="topo-esquerda">
+        <h1 class="topo-titulo">Relatórios</h1>
+        <span class="topo-data">Ocupação, uso da frota, gargalos e quem estava dirigindo</span>
+      </div>
+      <div class="topo-direita periodo-filtro">
+        <label class="campo-label" for="rel-de">De</label>
+        <input type="date" id="rel-de" class="config-input campo-data periodo-data">
+        <label class="campo-label" for="rel-ate">Até</label>
+        <input type="date" id="rel-ate" class="config-input campo-data periodo-data">
+        <button type="button" id="botao-atualizar" class="btn-secundario">Atualizar</button>
+      </div>
+    </header>
+
+    <main class="conteudo">
+
+      <div class="filtro-abas rel-abas">
+        <button type="button" class="aba-item rel-aba ativa" data-aba="ocupacao">Ocupação</button>
+        <button type="button" class="aba-item rel-aba" data-aba="frota">Uso da frota</button>
+        <button type="button" class="aba-item rel-aba" data-aba="gargalos">Gargalos</button>
+        <button type="button" class="aba-item rel-aba" data-aba="dirigindo">Quem estava dirigindo</button>
+        <button type="button" class="aba-item rel-aba" data-aba="ia">Perguntar à IA</button>
+      </div>
+
+      <section id="aba-ocupacao" class="bloco rel-secao">
+        <div class="bloco-cabecalho"><h2 class="bloco-titulo">Ocupação dos alojamentos</h2></div>
+        <div id="rel-ocupacao" class="rel-corpo"></div>
+      </section>
+
+      <section id="aba-frota" class="bloco rel-secao" hidden>
+        <div class="bloco-cabecalho"><h2 class="bloco-titulo">Uso por veículo</h2></div>
+        <div class="tabela-area">
+          <table class="tabela">
+            <thead><tr><th>Veículo</th><th class="num">Viagens</th><th class="num">Km rodados</th><th class="num">Horas em uso</th><th>Utilização</th><th class="num">Dias sem uso</th></tr></thead>
+            <tbody id="rel-frota"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="aba-gargalos" class="bloco rel-secao" hidden>
+        <div class="bloco-cabecalho"><h2 class="bloco-titulo">Gargalos e pontos de atenção</h2></div>
+        <div id="rel-gargalos" class="rel-corpo lista-alertas"></div>
+      </section>
+
+      <section id="aba-dirigindo" class="bloco rel-secao" hidden>
+        <div class="bloco-cabecalho"><h2 class="bloco-titulo">Quem estava dirigindo o veículo?</h2></div>
+        <div class="rel-corpo">
+          <p class="campo-dica">Útil para indicar o condutor em caso de multa (evita a multa por Não Indicação do Condutor).</p>
+          <form id="form-dirigindo" class="form-linha">
+            <div class="campo-grupo">
+              <label for="dir-veiculo" class="campo-label">Veículo</label>
+              <select id="dir-veiculo" class="config-select" required></select>
+            </div>
+            <div class="campo-grupo">
+              <label for="dir-quando" class="campo-label">Data e hora da infração</label>
+              <input type="datetime-local" id="dir-quando" class="config-input campo-data" required>
+            </div>
+            <button type="submit" class="btn-primario">Consultar</button>
+          </form>
+          <div id="dir-resultado" class="resultado-caixa" hidden></div>
+        </div>
+      </section>
+
+      <section id="aba-ia" class="bloco rel-secao" hidden>
+        <div class="bloco-cabecalho"><h2 class="bloco-titulo">Pergunte sobre os dados</h2></div>
+        <div class="rel-corpo">
+          <p class="campo-dica">A IA recebe só números do período selecionado (nunca nomes de colaboradores).</p>
+          <form id="form-ia" class="form-linha">
+            <div class="campo-grupo campo-grande">
+              <label for="ia-pergunta" class="campo-label">Pergunta</label>
+              <input type="text" id="ia-pergunta" class="config-input" maxlength="500" placeholder="Ex: Qual veículo ficou mais ocioso no período?" required>
+            </div>
+            <button type="submit" class="btn-primario">Perguntar</button>
+            <button type="button" id="botao-resumo-ia" class="btn-secundario">Resumir o período</button>
+          </form>
+          <div id="ia-resultado" class="resultado-caixa" hidden></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <div id="toast-rel" class="toast" hidden></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/relatorios.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/extras.js"></script>
+</body>
+</html>

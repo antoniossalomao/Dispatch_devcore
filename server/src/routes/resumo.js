@@ -2,10 +2,27 @@
 const express = require('express')
 const db = require('../db/conexao')
 const rotasConfig = require('./configuracoes')
+const notificacoes = require('../regras/notificacoes')
+
+const titulosAviso = {
+  cnh_vencendo: 'CNH próxima do vencimento',
+  cnh_vencida: 'CNH vencida',
+  cnh_vencida_na_rua: 'CNH vencida com veículo na rua',
+  licenciamento_vencendo: 'Licenciamento próximo do vencimento',
+  licenciamento_vencido: 'Licenciamento vencido',
+  seguro_vencendo: 'Seguro próximo do vencimento',
+  seguro_vencido: 'Seguro vencido',
+  km_sem_registro: 'Divergência de quilometragem',
+  nao_voltou: 'Veículo não devolvido',
+  alojamento_lotado: 'Alojamento lotado',
+  ocorrencia_antiga: 'Ocorrência aberta há muito tempo',
+  oficina_longa: 'Veículo parado na oficina',
+  log_adulterado: 'Log de auditoria adulterado'
+}
 
 const router = express.Router()
 
-router.get('/', function (req, res) {
+router.get('/', async function (req, res) {
   if (!req.session.usuario) {
     return res.status(401).json({ erro: 'Faça login para acessar.' })
   }
@@ -174,6 +191,16 @@ router.get('/', function (req, res) {
     'GROUP BY a.id'
   ).all()
 
+  // avisos reais: confere as pendencias (no maximo 1x por minuto) e mostra os nao lidos
+  if (notificacoes.precisaVerificar()) {
+    await notificacoes.verificar(rotasConfig.lerConfig())
+  }
+  const alertas = db.prepare(
+    "SELECT tipo, severidade, mensagem FROM notificacao WHERE lida = 0 ORDER BY CASE severidade WHEN 'critico' THEN 0 ELSE 1 END, id DESC LIMIT 10"
+  ).all().map(function (n) {
+    return { nivel: n.severidade === 'critico' ? 'problema' : 'atencao', titulo: titulosAviso[n.tipo] || 'Aviso', detalhe: n.mensagem }
+  })
+
   res.json({
     exemplo: false,
     nomeEmpresa: rotasConfig.lerConfig().nomeEmpresa,
@@ -187,7 +214,7 @@ router.get('/', function (req, res) {
     vagasDisponiveis: vagasDisponiveis,
     movimentacoes: ultimas,
     alojamentos: listaAlojamentos,
-    alertas: []
+    alertas: alertas
   })
 })
 

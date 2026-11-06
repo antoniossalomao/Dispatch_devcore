@@ -7,6 +7,13 @@ const rotasAuth = require('./routes/auth')
 const rotasResumo = require('./routes/resumo')
 const rotasConfiguracoes = require('./routes/configuracoes')
 const rotasPessoas = require('./routes/pessoas')
+const rotasAlojamentos = require('./routes/alojamentos')
+const rotasFrota = require('./routes/frota')
+const rotasRelatorios = require('./routes/relatorios')
+const rotasAuditoria = require('./routes/auditoria')
+const rotasIa = require('./routes/ia')
+const rotasNotificacoes = require('./routes/notificacoes')
+const notificacoes = require('./regras/notificacoes')
 
 const app = express()
 const porta = process.env.PORT || 3001
@@ -44,6 +51,12 @@ app.use('/api/resumo', rotasResumo)
 app.use('/api/configuracoes', rotasConfiguracoes)
 app.use('/api/pessoas', rotasPessoas)
 app.use('/api/colaboradores', rotasPessoas)
+app.use('/api/alojamentos', rotasAlojamentos)
+app.use('/api/frota', rotasFrota)
+app.use('/api/relatorios', rotasRelatorios)
+app.use('/api/auditoria', rotasAuditoria)
+app.use('/api/ia', rotasIa)
+app.use('/api/notificacoes', rotasNotificacoes)
 
 // entrega os arquivos html, css e js da pasta client
 const pastaClient = path.join(__dirname, '..', '..', 'client')
@@ -51,4 +64,8 @@ app.use(express.static(pastaClient))
 
 app.listen(porta, function () {
   console.log('Servidor rodando em http://localhost:' + porta)
+  // confere os avisos assim que o server liga
+  notificacoes.verificar(rotasConfiguracoes.lerConfig()).catch(function (erro) {
+    console.log('Não foi possível verificar os avisos: ' + erro.message)
+  })
 })

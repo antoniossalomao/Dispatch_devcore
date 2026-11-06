@@ -39,13 +39,13 @@ const cfgValidarNr24 = document.getElementById('cfg-validar-nr24')
 const cfgDiasVencimento = document.getElementById('cfg-dias-vencimento')
 const cfgDiasPendencia = document.getElementById('cfg-dias-pendencia')
 const cfgLotacaoPct = document.getElementById('cfg-lotacao-pct')
-const cfgWhatsapp = document.getElementById('cfg-whatsapp')
+const cfgTelegram = document.getElementById('cfg-telegram')
 
 // integrações
 const badgeIa = document.getElementById('badge-ia')
 const descIa = document.getElementById('desc-ia')
-const badgeWhats = document.getElementById('badge-whats')
-const descWhats = document.getElementById('desc-whats')
+const badgeTelegram = document.getElementById('badge-telegram')
+const descTelegram = document.getElementById('desc-telegram')
 const botaoTestarAlerta = document.getElementById('botao-testar-alerta')
 const caixaPreviaAlerta = document.getElementById('caixa-previa-alerta')
 const textoPreviaAlerta = document.getElementById('texto-previa-alerta')
@@ -160,7 +160,7 @@ botoesNav.forEach(function (botao) {
 const camposMonitorados = [
   cfgEmpresa, cfgCidade, cfgDocumento, cfgKmConfirmacao, cfgHorasRetorno,
   cfgBloquearDoc, cfgAvisarSeguro, cfgMaxLeitos, cfgAreaCama, cfgAreaBeliche,
-  cfgValidarNr24, cfgDiasVencimento, cfgDiasPendencia, cfgLotacaoPct, cfgWhatsapp
+  cfgValidarNr24, cfgDiasVencimento, cfgDiasPendencia, cfgLotacaoPct, cfgTelegram
 ]
 
 camposMonitorados.forEach(function (campo) {
@@ -188,7 +188,7 @@ function lerFormularioParametros() {
     bloquearDocVencido: cfgBloquearDoc.checked,
     avisarSeguroVencido: cfgAvisarSeguro.checked,
     validarNr24: cfgValidarNr24.checked,
-    whatsappCriticos: cfgWhatsapp.checked
+    telegramCriticos: cfgTelegram.checked
   }
 }
 
@@ -208,7 +208,7 @@ function preencherParametros(p) {
   cfgBloquearDoc.checked = Boolean(p.bloquearDocVencido)
   cfgAvisarSeguro.checked = Boolean(p.avisarSeguroVencido)
   cfgValidarNr24.checked = Boolean(p.validarNr24)
-  cfgWhatsapp.checked = Boolean(p.whatsappCriticos)
+  cfgTelegram.checked = Boolean(p.telegramCriticos)
   seloAlterado.hidden = true
 }
 
@@ -335,7 +335,7 @@ function desenharUsuarios() {
     tdPessoa.appendChild(sLogin)
 
     const tdTel = document.createElement('td')
-    tdTel.textContent = u.telefone || '—'
+    tdTel.textContent = u.telegram_chat_id || '—'
 
     const tdPerfil = document.createElement('td')
     const badge = document.createElement('span')
@@ -451,7 +451,7 @@ formNovoUsuario.addEventListener('submit', async function (e) {
     corpo: {
       nome: novoNome.value,
       login: novoLogin.value,
-      telefone: novoTelefone.value,
+      telegram_chat_id: novoTelefone.value,
       perfil: novoPerfil.value,
       senha: novoSenha.value
     }
@@ -559,7 +559,7 @@ formMinhaConta.addEventListener('submit', async function (e) {
     metodo: 'PUT',
     corpo: {
       nome: contaNome.value,
-      telefone: contaTelefone.value
+      telegram_chat_id: contaTelefone.value
     }
   })
 
@@ -620,6 +620,26 @@ botaoSair.addEventListener('click', async function () {
   window.location.href = 'index.html'
 })
 
+// painel "Estado do sistema" no topo: junta o que ja veio do servidor (banco, log e integracoes)
+function marcarSaude(id, nivel, texto) {
+  const ponto = document.getElementById('saude-' + id + '-ponto')
+  ponto.className = 'saude-ponto saude-' + nivel
+  document.getElementById('saude-' + id).textContent = texto
+}
+
+function desenharSaude(dados) {
+  const b = dados.banco
+  if (b) {
+    marcarSaude('banco', 'ok', b.tamanhoKb + ' KB · ' + b.totalTabelas + ' tabelas')
+    const intg = b.integridade
+    if (intg.integro) marcarSaude('log', 'ok', 'Íntegro · ' + intg.totalLinhas + ' registros')
+    else marcarSaude('log', 'erro', 'Adulteração na linha #' + intg.linhaComProblema)
+  }
+  const amb = dados.ambiente
+  marcarSaude('ia', amb.iaConfigurada ? 'ok' : 'off', amb.iaConfigurada ? 'Conectada à Groq' : 'Desligada (sem GROQ_API_KEY)')
+  marcarSaude('telegram', amb.telegramAtivo ? 'ok' : 'off', amb.telegramAtivo ? 'Bot conectado' : 'Modo terminal (sem token)')
+}
+
 function desenharAmbiente(amb) {
   if (amb.iaConfigurada) {
     badgeIa.className = 'status-tag status-ativo'
@@ -631,14 +651,14 @@ function desenharAmbiente(amb) {
     descIa.textContent = 'Defina GROQ_API_KEY no arquivo server/.env para ativar os recursos de IA.'
   }
 
-  if (amb.whatsappAtivo) {
-    badgeWhats.className = 'status-tag status-ativo'
-    badgeWhats.innerHTML = '<span class="status-ponto"></span>API ativa'
-    descWhats.textContent = 'Conectado à WhatsApp Cloud API para envio real de alertas.'
+  if (amb.telegramAtivo) {
+    badgeTelegram.className = 'status-tag status-ativo'
+    badgeTelegram.innerHTML = '<span class="status-ponto"></span>Bot ativo'
+    descTelegram.textContent = 'Bot do Telegram conectado: alertas críticos enviados de verdade.'
   } else {
-    badgeWhats.className = 'status-tag status-uso'
-    badgeWhats.innerHTML = '<span class="status-ponto"></span>Modo terminal'
-    descWhats.textContent = 'Sem token oficial configurado: os alertas aparecem formatados no terminal do servidor.'
+    badgeTelegram.className = 'status-tag status-uso'
+    badgeTelegram.innerHTML = '<span class="status-ponto"></span>Modo terminal'
+    descTelegram.textContent = 'Sem TELEGRAM_BOT_TOKEN no server/.env: os alertas aparecem formatados no terminal do servidor.'
   }
 }
 
@@ -679,9 +699,11 @@ async function carregarDados() {
       desenharBanco(res.dados.banco)
     }
 
+    desenharSaude(res.dados)
+
     const eu = res.dados.meuUsuario
     contaNome.value = eu.nome
-    contaTelefone.value = eu.telefone || ''
+    contaTelefone.value = eu.telegram_chat_id || ''
     contaTituloPrevia.textContent = eu.nome
     contaLoginPrevia.textContent = '@' + eu.login + ' · Perfil administrador'
     contaAvatarPrevia.textContent = pegarIniciais(eu.nome)

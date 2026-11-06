@@ -19,7 +19,7 @@ Construtora fictícia (Construtora Aguapeí) com obras no interior de SP, equipe
 - Gera relatórios: ocupação por alojamento, uso por veículo (utilização, ociosidade, km), padrões de movimentação e gargalos.
 - Mantém log de auditoria de toda alteração (quem, quando, antes/depois), com hash encadeado para detectar edição feita fora do sistema.
 - IA via Groq: perguntas em linguagem natural sobre os dados, resumo dos relatórios, chat de suporte e redação das notificações.
-- Notificações no sistema (CNH vencendo, km sem registro, veículo não devolvido...) e envio dos alertas críticos por WhatsApp.
+- Notificações no sistema (CNH vencendo, km sem registro, veículo não devolvido...) e envio dos alertas críticos por Telegram.
 
 ## Protótipo
 
@@ -35,7 +35,7 @@ Telas: Login, Resumo Operacional, Colaboradores, Gestão de Alojamentos, Gestão
 | `server/` | Node.js (22+) + Express, express-session + bcrypt |
 | Banco | SQLite com `better-sqlite3`, SQL puro (tabelas em `server/src/db/schema.sql`) |
 | IA | Groq (`groq-sdk`), chave gratuita, usada só pelo server |
-| Avisos | WhatsApp (provedor em aberto), com modo console para desenvolvimento |
+| Avisos | Telegram (Bot API), com modo console para desenvolvimento |
 
 ## Estrutura
 
@@ -54,25 +54,34 @@ Precisa do **Node.js 22.5+** (ou **Bun**).
 cd server
 npm install
 npm run criar-banco
+npm run seed   # opcional: dados de exemplo (colaboradores, alojamentos, frota e 6 meses de histórico)
 npm start
 ```
 
-Isso cria o banco em `server/data/dispatch.db` já com o usuário administrador inicial e sobe o sistema (front + back) em `http://localhost:3001`. Para mudar o lugar do banco, copie `server/.env.example` para `server/.env` e preencha `DB_CAMINHO`.
+Isso cria o banco em `server/data/dispatch.db` já com o usuário administrador inicial (login `admin`, senha `admin123`) e sobe o sistema (front + back) em `http://localhost:3001`. Para mudar o lugar do banco, copie `server/.env.example` para `server/.env` e preencha `DB_CAMINHO`.
+
+### Configuração opcional (`server/.env`)
+
+Copie `server/.env.example` para `server/.env`:
+
+- `GROQ_API_KEY`: liga a IA (perguntas, resumo dos relatórios e chat de ajuda). Sem ela os recursos de IA avisam que estão desligados.
+- `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID`: enviam os alertas críticos pelo Telegram (crie o bot no @BotFather). Sem eles a mensagem só aparece no terminal. Depois, ative o envio em Configurações.
 
 ## Documentação
 
-- [docs/planejamento.md](docs/planejamento.md) — problema, solução proposta, telas, regras de negócio, arquitetura, banco de dados, IA, WhatsApp, organização do repositório, divisão de trabalho, cronograma e roteiro da apresentação.
+- [docs/planejamento.md](docs/planejamento.md) — problema, solução proposta, telas, regras de negócio, arquitetura, banco de dados, IA, Telegram, organização do repositório, divisão de trabalho, cronograma e roteiro da apresentação.
 
 ## Roadmap
 
 1. ~~Pesquisa de referências e desenho das telas (Figma + protótipo navegável)~~
 2. Apresentação: telas do Figma + solução proposta.
-3. Base do `server` (banco, login, auditoria) e do `client` (layout, rotas).
-4. Cadastros (colaboradores, alojamentos/leitos, frota) com auditoria.
-5. Estadias e uso de veículo com as regras de validação (CNH, NR-24, km).
-6. Relatórios, consulta "quem estava dirigindo" e tela de auditoria.
-7. IA (Groq) e central de notificações.
-8. Integração com WhatsApp e ensaio da demonstração.
+3. ~~Base do `server` (banco, login, auditoria) e do `client` (layout, rotas).~~
+4. ~~Cadastros (colaboradores, alojamentos/leitos, frota) com auditoria.~~
+5. ~~Estadias e uso de veículo com as regras de validação (CNH, NR-24, km).~~
+6. ~~Relatórios, consulta "quem estava dirigindo" e tela de auditoria.~~
+7. ~~IA (Groq) e central de notificações.~~
+8. ~~Integração com Telegram~~ (código pronto; falta testar o envio real com token).
+9. Ensaio da demonstração.
 
 ## Grupo DevCore
 

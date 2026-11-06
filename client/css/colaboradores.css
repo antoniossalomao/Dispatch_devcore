@@ -46,7 +46,7 @@
 
 .colab-inativo .colab-avatar {
   background-color: #cbd5e1;
-  color: #475569;
+  color: var(--claro-texto-fraco);
 }
 
 .colab-dados-nome {
@@ -55,7 +55,7 @@
 }
 
 .colab-nome {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--claro-texto);
   cursor: pointer;
@@ -68,14 +68,14 @@
 }
 
 .colab-matricula {
-  font-size: 11.5px;
+  font-size: 12px;
   color: var(--claro-texto-fraco);
   font-family: Consolas, monospace;
 }
 
 .colab-cargo {
   font-size: 13px;
-  color: #1e293b;
+  color: var(--claro-texto);
   font-weight: 500;
 }
 
@@ -115,11 +115,11 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
-  font-size: 12.5px;
+  font-size: 13px;
 }
 
 .situacao-alojamento {
-  color: #1d4ed8;
+  color: var(--info-claro-texto);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -127,7 +127,7 @@
 }
 
 .situacao-veiculo {
-  color: #15803d;
+  color: var(--ok-claro-texto);
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -249,7 +249,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  background-color: #fafbfc;
+  background-color: var(--superficie-2);
 }
 
 .categorias-seletor {
@@ -264,14 +264,14 @@
   align-items: center;
   gap: 6px;
   height: 32px;
-  font-size: 12.5px;
+  font-size: 13px;
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
   border-radius: var(--raio);
   padding: 0 10px;
   cursor: pointer;
   font-weight: 500;
-  color: #334155;
+  color: var(--claro-texto);
   transition: background-color 0.15s, border-color 0.15s;
 }
 
@@ -281,9 +281,9 @@
 
 /* :has deixa mudar a cor do label quando o checkbox de dentro ta marcado */
 .check-categoria:has(input:checked) {
-  background-color: #f0fdf4;
+  background-color: var(--ok-claro-fundo);
   border-color: #86efac;
-  color: #166534;
+  color: var(--ok-claro-texto);
 }
 
 .check-categoria input {
@@ -389,7 +389,7 @@
   padding: 12px 14px;
   border-radius: var(--raio);
   border: 1px solid var(--claro-borda);
-  background-color: #fafbfc;
+  background-color: var(--superficie-2);
   display: flex;
   flex-direction: column;
 }
@@ -400,14 +400,14 @@
 }
 
 .status-caixa-valor {
-  font-size: 13.5px;
+  font-size: 14px;
   color: var(--claro-texto);
   margin: 4px 0 2px;
 }
 
 .status-caixa-sub {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--claro-texto-fraco);
 }
 
 .gaveta-lista-dados {
@@ -465,8 +465,8 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: #fff;
-  border: 2px solid #94a3b8;
+  background-color: var(--claro-cartao);
+  border: 2px solid var(--borda-forte);
 }
 
 .timeline-item.timeline-ativo {
@@ -479,19 +479,19 @@
 }
 
 .timeline-titulo {
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--claro-texto);
 }
 
 .timeline-detalhe {
-  font-size: 12.5px;
-  color: #475569;
+  font-size: 13px;
+  color: var(--claro-texto-fraco);
 }
 
 .timeline-data {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--claro-texto-fraco);
   margin-top: 1px;
 }
 

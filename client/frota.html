@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dispatch — Frota</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/resumo.css">
+  <link rel="stylesheet" href="css/colaboradores.css">
+  <link rel="stylesheet" href="css/alojamentos.css">
+  <link rel="stylesheet" href="css/frota.css">
+  <link rel="stylesheet" href="css/tema.css">
+  <script src="js/tema.js"></script>
+</head>
+<body class="painel-corpo">
+
+  <!-- menu lateral fixo -->
+  <aside class="menu-lateral">
+    <div>
+      <div class="menu-marca">
+        <span class="menu-logo">Dispatch</span>
+        <span id="nome-empresa-menu" class="menu-empresa">Construtora Aguapeí</span>
+      </div>
+
+      <p class="menu-secao">OPERAÇÃO</p>
+
+      <nav class="menu-lista">
+        <a href="resumo.html" class="menu-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          <span>Visão Geral</span>
+        </a>
+
+        <a href="colaboradores.html" class="menu-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Colaboradores</span>
+        </a>
+
+        <a href="alojamentos.html" class="menu-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18"/>
+            <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
+            <path d="M9 7h1.5M13.5 7H15M9 11h1.5M13.5 11H15M9 15h1.5M13.5 15H15"/>
+          </svg>
+          <span>Alojamentos</span>
+        </a>
+
+        <a href="frota.html" class="menu-item ativo">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="6" width="14" height="10" rx="1"/>
+            <path d="M15 9h4l3 3.5V16h-7V9z"/>
+            <circle cx="5.5" cy="17.5" r="2"/>
+            <circle cx="18.5" cy="17.5" r="2"/>
+          </svg>
+          <span>Frota</span>
+        </a>
+
+        <a href="movimentacoes.html" class="menu-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"/>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+            <polyline points="7 23 3 19 7 15"/>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+          </svg>
+          <span>Movimentações</span>
+        </a>
+
+        <a href="relatorios.html" class="menu-item">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <span>Relatórios</span>
+        </a>
+      </nav>
+
+      <div id="bloco-menu-admin" class="menu-admin-bloco" hidden>
+        <p class="menu-secao menu-secao-espaco">SISTEMA</p>
+        <nav class="menu-lista">
+          <a href="auditoria.html" class="menu-item">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+            <span>Auditoria</span>
+          </a>
+          <a href="configuracoes.html" class="menu-item">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.02 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span>Configurações</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+    <div class="menu-rodape">
+      <div id="usuario-iniciais" class="usuario-avatar">AD</div>
+      <div class="usuario-dados">
+        <p id="perfil-nome" class="usuario-nome">Administrador</p>
+        <p id="perfil-tipo" class="usuario-cargo">admin</p>
+      </div>
+      <button type="button" id="botao-sair" class="botao-sair" title="Sair do sistema">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- área de conteúdo -->
+  <div class="area-conteudo">
+
+    <header class="topo">
+      <div class="topo-esquerda">
+        <h1 class="topo-titulo">Frota</h1>
+        <span class="topo-data">Veículos, saídas, voltas e manutenções</span>
+      </div>
+      <div class="topo-direita">
+        <button type="button" id="botao-saida-geral" class="btn-secundario">Registrar saída</button>
+        <button type="button" id="botao-novo-veiculo" class="btn-primario">+ Novo veículo</button>
+      </div>
+    </header>
+
+    <main class="conteudo">
+
+      <section class="indicadores">
+        <div class="cartao-kpi">
+          <div class="kpi-topo"><span class="kpi-rotulo">Disponíveis</span></div>
+          <div class="kpi-valor-linha"><strong id="kpi-disponiveis" class="kpi-numero">0</strong><span id="kpi-total" class="kpi-complemento">de 0 veículos</span></div>
+          <p class="kpi-detalhe">Prontos para sair</p>
+        </div>
+        <div class="cartao-kpi">
+          <div class="kpi-topo"><span class="kpi-rotulo">Em uso</span></div>
+          <div class="kpi-valor-linha"><strong id="kpi-em-uso" class="kpi-numero">0</strong><span class="kpi-complemento">na rua agora</span></div>
+          <p class="kpi-detalhe">Aguardando registro de volta</p>
+        </div>
+        <div class="cartao-kpi">
+          <div class="kpi-topo"><span class="kpi-rotulo">Em manutenção</span></div>
+          <div class="kpi-valor-linha"><strong id="kpi-manutencao" class="kpi-numero">0</strong><span class="kpi-complemento">na oficina</span></div>
+          <p class="kpi-detalhe">Bloqueados para saída</p>
+        </div>
+        <div class="cartao-kpi">
+          <div class="kpi-topo"><span class="kpi-rotulo">Documentos</span></div>
+          <div class="kpi-valor-linha"><strong id="kpi-docs" class="kpi-numero">0</strong><span class="kpi-complemento">vencidos ou vencendo</span></div>
+          <p class="kpi-detalhe">Licenciamento e seguro</p>
+        </div>
+      </section>
+
+      <section class="bloco">
+        <div class="bloco-cabecalho">
+          <h2 class="bloco-titulo">Veículos</h2>
+          <select id="seletor-status" class="config-select select-curto">
+            <option value="ativos">Apenas ativos</option>
+            <option value="inativos">Apenas inativos</option>
+            <option value="todos">Todos</option>
+          </select>
+        </div>
+        <div class="tabela-area">
+          <table class="tabela">
+            <thead>
+              <tr>
+                <th>Veículo</th>
+                <th>Status</th>
+                <th class="num">Km atual</th>
+                <th>Documentos</th>
+                <th>Em uso</th>
+                <th class="coluna-acoes">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="lista-veiculos"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL: VEICULO -->
+  <div id="modal-veiculo" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <div class="modal-cabecalho">
+        <div>
+          <h2 id="modal-veic-titulo" class="modal-titulo">Novo veículo</h2>
+          <p class="modal-subtitulo">Licenciamento vencido bloqueia a saída; seguro vencido só avisa</p>
+        </div>
+        <button type="button" class="modal-fechar" data-fechar="modal-veiculo">&times;</button>
+      </div>
+      <form id="form-veiculo">
+        <input type="hidden" id="veic-id">
+        <div class="modal-corpo">
+          <div class="grade-campos duas-colunas">
+            <div class="campo-grupo">
+              <label for="veic-placa" class="campo-label">Placa *</label>
+              <input type="text" id="veic-placa" class="config-input" placeholder="ABC-1234" required>
+            </div>
+            <div class="campo-grupo">
+              <label for="veic-modelo" class="campo-label">Modelo *</label>
+              <input type="text" id="veic-modelo" class="config-input" placeholder="Ex: Toyota Hilux" required>
+            </div>
+          </div>
+          <div class="grade-campos duas-colunas">
+            <div class="campo-grupo">
+              <label for="veic-lugares" class="campo-label">Lugares (com o motorista) *</label>
+              <input type="number" id="veic-lugares" class="config-input" min="1" required>
+            </div>
+            <div class="campo-grupo">
+              <label for="veic-categoria" class="campo-label">Categoria de CNH exigida *</label>
+              <select id="veic-categoria" class="config-select">
+                <option value="B">B (carro)</option>
+                <option value="A">A (moto)</option>
+                <option value="C">C (caminhão)</option>
+                <option value="D">D (van/ônibus)</option>
+                <option value="E">E (articulado)</option>
+              </select>
+            </div>
+          </div>
+          <div class="grade-campos duas-colunas">
+            <div class="campo-grupo">
+              <label for="veic-km" class="campo-label">Km no cadastro</label>
+              <input type="number" id="veic-km" class="config-input" min="0" value="0">
+            </div>
+            <div class="campo-grupo"></div>
+          </div>
+          <div class="grade-campos duas-colunas">
+            <div class="campo-grupo">
+              <label for="veic-licenciamento" class="campo-label">Validade do licenciamento</label>
+              <input type="date" id="veic-licenciamento" class="config-input campo-data">
+            </div>
+            <div class="campo-grupo">
+              <label for="veic-seguro" class="campo-label">Validade do seguro</label>
+              <input type="date" id="veic-seguro" class="config-input campo-data">
+            </div>
+          </div>
+        </div>
+        <div class="modal-rodape">
+          <button type="button" class="btn-secundario" data-fechar="modal-veiculo">Cancelar</button>
+          <button type="submit" class="btn-primario">Salvar veículo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SAIDA -->
+  <div id="modal-saida" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <div class="modal-cabecalho">
+        <div>
+          <h2 class="modal-titulo">Registrar saída</h2>
+          <p class="modal-subtitulo">Valida CNH, lugares, documentos, manutenção e km</p>
+        </div>
+        <button type="button" class="modal-fechar" data-fechar="modal-saida">&times;</button>
+      </div>
+      <form id="form-saida">
+        <div class="modal-corpo">
+          <div class="grade-campos duas-colunas">
+            <div class="campo-grupo">
+              <label for="saida-veiculo" class="campo-label">Veículo *</label>
+              <select id="saida-veiculo" class="config-select" required></select>
+            </div>
+            <div class="campo-grupo">
+              <label for="saida-motorista" class="campo-label">Motorista *</label>
+              <select id="saida-motorista" class="config-select" required></select>
+            </div>
+          </div>
+          <div class="grade-campos duas-colunas">
+            <div class="campo-grupo">
+              <label for="saida-destino" class="campo-label">Destino *</label>
+              <input type="text" id="saida-destino" class="config-input" placeholder="Ex: Obra Marília Norte" required>
+            </div>
+            <div class="campo-grupo">
+              <label for="saida-km" class="campo-label">Km de saída *</label>
+              <input type="number" id="saida-km" class="config-input" min="0" required>
+            </div>
+          </div>
+          <div class="campo-grupo">
+            <span class="campo-label">Passageiros</span>
+            <div id="saida-passageiros" class="lista-passageiros"></div>
+          </div>
+        </div>
+        <div class="modal-rodape">
+          <button type="button" class="btn-secundario" data-fechar="modal-saida">Cancelar</button>
+          <button type="submit" class="btn-primario">Registrar saída</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: VOLTA -->
+  <div id="modal-volta" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <div class="modal-cabecalho">
+        <div>
+          <h2 class="modal-titulo">Registrar volta</h2>
+          <p id="volta-resumo" class="modal-subtitulo"></p>
+        </div>
+        <button type="button" class="modal-fechar" data-fechar="modal-volta">&times;</button>
+      </div>
+      <form id="form-volta">
+        <input type="hidden" id="volta-uso-id">
+        <div class="modal-corpo">
+          <div class="campo-grupo">
+            <label for="volta-km" class="campo-label">Km de volta *</label>
+            <input type="number" id="volta-km" class="config-input" min="0" required>
+          </div>
+        </div>
+        <div class="modal-rodape">
+          <button type="button" class="btn-secundario" data-fechar="modal-volta">Cancelar</button>
+          <button type="submit" class="btn-primario">Registrar volta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: MANUTENCAO -->
+  <div id="modal-manutencao" class="modal-overlay" hidden>
+    <div class="modal-card">
+      <div class="modal-cabecalho">
+        <div>
+          <h2 class="modal-titulo">Nova manutenção</h2>
+          <p class="modal-subtitulo">O veículo fica bloqueado para saída até a conclusão</p>
+        </div>
+        <button type="button" class="modal-fechar" data-fechar="modal-manutencao">&times;</button>
+      </div>
+      <form id="form-manutencao">
+        <div class="modal-corpo">
+          <div class="grade-campos duas-colunas">
+            <div class="campo-grupo">
+              <label for="manut-tipo" class="campo-label">Tipo *</label>
+              <select id="manut-tipo" class="config-select">
+                <option value="preventiva">Preventiva</option>
+                <option value="corretiva">Corretiva</option>
+              </select>
+            </div>
+            <div class="campo-grupo">
+              <label for="manut-km" class="campo-label">Km</label>
+              <input type="number" id="manut-km" class="config-input" min="0">
+            </div>
+          </div>
+          <div class="campo-grupo">
+            <label for="manut-descricao" class="campo-label">Descrição *</label>
+            <input type="text" id="manut-descricao" class="config-input" placeholder="Ex: Troca de óleo e filtros" required>
+          </div>
+        </div>
+        <div class="modal-rodape">
+          <button type="button" class="btn-secundario" data-fechar="modal-manutencao">Cancelar</button>
+          <button type="submit" class="btn-primario">Abrir manutenção</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- GAVETA: DETALHE DO VEICULO -->
+  <div id="gaveta-veiculo" class="gaveta-overlay" hidden>
+    <div class="gaveta-painel">
+      <div class="gaveta-topo">
+        <div>
+          <h2 id="gaveta-veic-nome" class="gaveta-titulo">Veículo</h2>
+          <p id="gaveta-veic-sub" class="gaveta-subtitulo"></p>
+        </div>
+        <button type="button" id="fechar-gaveta" class="modal-fechar">&times;</button>
+      </div>
+      <div class="gaveta-abas">
+        <div class="filtro-abas">
+          <button type="button" class="aba-item gaveta-aba ativa" data-gaveta="usos">Usos (<span id="cont-usos">0</span>)</button>
+          <button type="button" class="aba-item gaveta-aba" data-gaveta="manutencoes">Manutenções (<span id="cont-manut">0</span>)</button>
+        </div>
+      </div>
+      <div class="gaveta-corpo">
+        <div id="gaveta-secao-usos" class="gaveta-conteudo">
+          <div id="gaveta-lista-usos" class="timeline-lista"></div>
+        </div>
+        <div id="gaveta-secao-manutencoes" class="gaveta-conteudo" hidden>
+          <button type="button" id="botao-nova-manutencao" class="btn-secundario">+ Nova manutenção</button>
+          <div id="gaveta-lista-manut" class="timeline-lista"></div>
+        </div>
+      </div>
+      <div class="gaveta-rodape">
+        <button type="button" id="gaveta-botao-editar" class="btn-secundario">Editar dados</button>
+        <button type="button" id="gaveta-botao-status" class="btn-secundario">Desativar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-frota" class="toast" hidden></div>
+
+  <script src="js/api.js"></script>
+  <script src="js/frota.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/extras.js"></script>
+</body>
+</html>

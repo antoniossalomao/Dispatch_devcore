@@ -1,0 +1,147 @@
+/* ---- estilos das telas de relatorios e auditoria ---- */
+
+.periodo-filtro {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* cabecalho com filtro de periodo: pode quebrar em duas linhas em vez de estourar a largura */
+.topo:has(.periodo-filtro) {
+  height: auto;
+  min-height: 60px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.periodo-data {
+  width: 150px;
+}
+
+.rel-abas {
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.rel-corpo {
+  padding: 18px 20px 20px;
+}
+
+.rel-linha {
+  margin-bottom: 18px;
+}
+
+.rel-linha-topo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+.rel-linha-topo span {
+  color: var(--claro-texto-fraco);
+  font-size: 13px;
+}
+
+.celula-barra {
+  min-width: 190px;
+}
+
+.celula-barra .aloj-barra {
+  margin: 0 0 4px;
+}
+
+.rel-pct {
+  font-size: 12px;
+  color: var(--claro-texto-fraco);
+}
+
+.form-linha {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin: 12px 0 16px;
+}
+
+.campo-grande {
+  flex: 1;
+  min-width: 260px;
+}
+
+.resultado-caixa {
+  border: 1px solid var(--claro-borda);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  background-color: var(--claro-cartao);
+  margin-bottom: 16px;
+}
+
+.resultado-ok {
+  border-color: var(--ok-claro-borda);
+  background-color: var(--ok-claro-fundo);
+}
+
+.resultado-erro {
+  border-color: var(--erro-claro-borda);
+  background-color: var(--erro-claro-fundo);
+}
+
+.aud-tabela {
+  display: block;
+  font-size: 12px;
+  color: var(--claro-texto-fraco);
+}
+
+.aud-diff {
+  font-size: 12px;
+  color: var(--claro-texto-fraco);
+  max-width: 340px;
+}
+
+.aud-diff span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.mov-acoes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mov-rodape {
+  display: flex;
+  justify-content: center;
+  padding: 14px 20px;
+}
+
+.mov-rodape[hidden],
+.mov-rodape:has(button[hidden]) {
+  padding: 0;
+}
+
+@media (max-width: 780px) {
+  .periodo-filtro {
+    flex-wrap: wrap;
+  }
+
+  .periodo-data {
+    flex: 1;
+    min-width: 130px;
+    width: auto;
+  }
+
+  .form-linha .btn-primario,
+  .form-linha .btn-secundario {
+    width: 100%;
+  }
+}
+
+.periodo-filtro .campo-label {
+  margin: 0;
+}

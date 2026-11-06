@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/resumo.css">
   <link rel="stylesheet" href="css/configuracoes.css">
+  <link rel="stylesheet" href="css/tema.css">
+  <script src="js/tema.js"></script>
 </head>
 <body class="painel-corpo">
 
@@ -41,7 +43,7 @@
           <span>Colaboradores</span>
         </a>
 
-        <a href="#" class="menu-item menu-em-breve" data-tela="Alojamentos">
+        <a href="alojamentos.html" class="menu-item">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 21h18"/>
             <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
@@ -50,7 +52,7 @@
           <span>Alojamentos</span>
         </a>
 
-        <a href="#" class="menu-item menu-em-breve" data-tela="Frota">
+        <a href="frota.html" class="menu-item">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <rect x="1" y="6" width="14" height="10" rx="1"/>
             <path d="M15 9h4l3 3.5V16h-7V9z"/>
@@ -60,7 +62,7 @@
           <span>Frota</span>
         </a>
 
-        <a href="#" class="menu-item menu-em-breve" data-tela="Movimentações">
+        <a href="movimentacoes.html" class="menu-item">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="17 1 21 5 17 9"/>
             <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
@@ -70,7 +72,7 @@
           <span>Movimentações</span>
         </a>
 
-        <a href="#" class="menu-item menu-em-breve" data-tela="Relatórios">
+        <a href="relatorios.html" class="menu-item">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
             <line x1="18" y1="20" x2="18" y2="10"/>
             <line x1="12" y1="20" x2="12" y2="4"/>
@@ -83,6 +85,13 @@
       <div class="menu-admin-bloco">
         <p class="menu-secao menu-secao-espaco">SISTEMA</p>
         <nav class="menu-lista">
+          <a href="auditoria.html" class="menu-item">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+            <span>Auditoria</span>
+          </a>
           <a href="configuracoes.html" class="menu-item ativo">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"/>
@@ -149,7 +158,7 @@
           </svg>
           <div>
             <span class="nav-item-titulo">Alertas e Integrações</span>
-            <span class="nav-item-sub">Prazos, Groq e WhatsApp</span>
+            <span class="nav-item-sub">Prazos, Groq e Telegram</span>
           </div>
         </button>
 
@@ -195,6 +204,37 @@
 
         <!-- 1. OPERAÇÃO E REGRAS -->
         <form id="painel-regras" class="config-secao">
+
+          <section class="saude-sistema" aria-label="Estado do sistema">
+            <div class="saude-item">
+              <span id="saude-banco-ponto" class="saude-ponto saude-ok" aria-hidden="true"></span>
+              <div>
+                <span class="saude-titulo">Banco de dados</span>
+                <span id="saude-banco" class="saude-detalhe">Carregando...</span>
+              </div>
+            </div>
+            <div class="saude-item">
+              <span id="saude-log-ponto" class="saude-ponto saude-ok" aria-hidden="true"></span>
+              <div>
+                <span class="saude-titulo">Log de auditoria</span>
+                <span id="saude-log" class="saude-detalhe">Carregando...</span>
+              </div>
+            </div>
+            <div class="saude-item">
+              <span id="saude-ia-ponto" class="saude-ponto saude-off" aria-hidden="true"></span>
+              <div>
+                <span class="saude-titulo">Inteligência artificial</span>
+                <span id="saude-ia" class="saude-detalhe">Carregando...</span>
+              </div>
+            </div>
+            <div class="saude-item">
+              <span id="saude-telegram-ponto" class="saude-ponto saude-off" aria-hidden="true"></span>
+              <div>
+                <span class="saude-titulo">Telegram</span>
+                <span id="saude-telegram" class="saude-detalhe">Carregando...</span>
+              </div>
+            </div>
+          </section>
 
           <div class="bloco">
             <div class="bloco-cabecalho">
@@ -337,7 +377,7 @@
             <div class="bloco-cabecalho">
               <div>
                 <h2 class="bloco-titulo">Gatilhos de notificação</h2>
-                <p class="bloco-subtitulo">Quando o sistema deve gerar avisos preventivos na central e no WhatsApp</p>
+                <p class="bloco-subtitulo">Quando o sistema deve gerar avisos preventivos na central e no Telegram</p>
               </div>
             </div>
 
@@ -373,11 +413,11 @@
             <div class="lista-switches">
               <label class="switch-linha">
                 <div class="switch-texto">
-                  <span class="switch-titulo">Enviar alertas críticos por WhatsApp aos administradores</span>
+                  <span class="switch-titulo">Enviar alertas críticos por Telegram aos administradores</span>
                   <span class="switch-desc">Dispara mensagem quando houver uso sem registro de km, veículo não devolvido ou adulteração no log.</span>
                 </div>
                 <span class="chave">
-                  <input type="checkbox" id="cfg-whatsapp">
+                  <input type="checkbox" id="cfg-telegram">
                   <span class="chave-trilho"></span>
                 </span>
               </label>
@@ -394,7 +434,7 @@
                 <h2 class="bloco-titulo">Serviços conectados</h2>
                 <p class="bloco-subtitulo">Chaves lidas do arquivo <code>server/.env</code> (nunca expostas no navegador)</p>
               </div>
-              <button type="button" id="botao-testar-alerta" class="btn-secundario">Simular disparo WhatsApp</button>
+              <button type="button" id="botao-testar-alerta" class="btn-secundario">Testar disparo no Telegram</button>
             </div>
 
             <div class="integracoes-lista">
@@ -408,10 +448,10 @@
 
               <div class="integracao-card">
                 <div class="integracao-topo">
-                  <span class="integracao-nome">WhatsApp Cloud API</span>
-                  <span id="badge-whats" class="status-tag status-uso"><span class="status-ponto"></span>Modo terminal</span>
+                  <span class="integracao-nome">Telegram Bot API</span>
+                  <span id="badge-telegram" class="status-tag status-uso"><span class="status-ponto"></span>Modo terminal</span>
                 </div>
-                <p id="desc-whats" class="integracao-desc">Sem token oficial configurado: os alertas aparecem formatados no terminal do servidor.</p>
+                <p id="desc-telegram" class="integracao-desc">Sem TELEGRAM_BOT_TOKEN no server/.env: os alertas aparecem formatados no terminal do servidor.</p>
               </div>
             </div>
 
@@ -464,8 +504,8 @@
               </div>
 
               <div class="campo-grupo">
-                <label for="novo-telefone" class="campo-label">WhatsApp (opcional)</label>
-                <input type="text" id="novo-telefone" class="config-input" placeholder="Ex: 14999990000">
+                <label for="novo-telefone" class="campo-label">Telegram (ID do chat, opcional)</label>
+                <input type="text" id="novo-telefone" class="config-input" placeholder="Ex: 123456789">
               </div>
 
               <div class="campo-grupo">
@@ -511,7 +551,7 @@
                 <thead>
                   <tr>
                     <th>Usuário</th>
-                    <th>WhatsApp</th>
+                    <th>Telegram</th>
                     <th>Perfil</th>
                     <th>Status</th>
                     <th>Ações</th>
@@ -608,8 +648,8 @@
               </div>
 
               <div class="campo-grupo">
-                <label for="conta-telefone" class="campo-label">WhatsApp para receber alertas</label>
-                <input type="text" id="conta-telefone" class="config-input" placeholder="Ex: 14999990000">
+                <label for="conta-telefone" class="campo-label">Telegram (ID do chat) para receber alertas</label>
+                <input type="text" id="conta-telefone" class="config-input" placeholder="Ex: 123456789">
               </div>
             </div>
 
@@ -664,5 +704,7 @@
 
   <script src="js/api.js"></script>
   <script src="js/configuracoes.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/extras.js"></script>
 </body>
 </html>
