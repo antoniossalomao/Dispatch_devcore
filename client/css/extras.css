@@ -89,7 +89,7 @@
 }
 
 .sino-atencao {
-  border-left-color: #f59e0b;
+  border-left-color: var(--dc-ouro);
 }
 
 .sino-vazio {

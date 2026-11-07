@@ -1,16 +1,17 @@
+@import url("paleta.css");
 /* IBM Plex: Sans pra interface, Sans Condensed pra titulos e numeros, Mono so pra placas e matriculas */
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
 
 /* cores padrão do sistema */
 :root {
-  --fundo: #c4c8d0;
-  --cartao: #172133;
-  --campo: #0e1522;
-  --borda: #2a3850;
-  --texto: #e5eaf2;
-  --texto-fraco: #9aa6ba;
-  --placeholder: #6b778c;
-  --azul: #6095f6;
+  --fundo: var(--dc-noite);
+  --cartao: var(--dc-painel);
+  --campo: var(--dc-noite);
+  --borda: var(--dc-linha);
+  --texto: var(--dc-creme);
+  --texto-fraco: var(--dc-salvia);
+  --placeholder: #9f9a8f;
+  --azul: var(--dc-ouro);
   --erro-fundo: #35110f;
   --erro-texto: #ee6f68;
   --sucesso-fundo: #0d2e1e;
@@ -18,20 +19,20 @@
   --sombra: rgba(0, 0, 0, 0.4);
 
   /* topo, menu lateral e botão principal */
-  --marinho: #0b0f19;
-  --verde: #00793b;
-  --verde-hover: #168853;
+  --marinho: var(--dc-noite);
+  --verde: #806331;
+  --verde-hover: #94743d;
 
   /* cores das telas de dentro (claras), tiradas da paleta slate do shadcn */
-  --claro-fundo: #f4f6f9;
-  --claro-cartao: #fff;
-  --claro-texto: #0f172a;
-  --claro-texto-fraco: #64748b;
-  --claro-borda: #e2e8f0;
-  --claro-suave: #f1f5f9; /* fundo de aba, hover de linha etc */
+  --claro-fundo: #e6e3d9;
+  --claro-cartao: var(--dc-creme);
+  --claro-texto: var(--dc-floresta);
+  --claro-texto-fraco: #6a6457;
+  --claro-borda: #d2cfc4;
+  --claro-suave: #e0dcd0; /* fundo de aba, hover de linha etc */
   --claro-anel: rgba(100, 116, 139, 0.25); /* brilho em volta do campo com foco */
   --vermelho: #dc2626;
-  --borda-forte: #94a3b8; /* borda de hover/foco; nao usar como cor de texto (contraste 2,56:1) */
+  --borda-forte: #9a9282; /* borda de hover/foco; nao usar como cor de texto (contraste 2,56:1) */
 
   /* estados nas telas claras: fundo, borda e texto */
   --ok-claro-fundo: #f0fdf4;
@@ -43,9 +44,9 @@
   --atencao-claro-fundo: #fffbeb;
   --atencao-claro-borda: #fde68a;
   --atencao-claro-texto: #92400e;
-  --info-claro-fundo: #eff6ff;
-  --info-claro-texto: #1e40af;
-  --superficie-2: #fafbfc; /* fundo levemente diferente do cartao (cabecalhos, rodapes) */
+  --info-claro-fundo: #e6e5d7;
+  --info-claro-texto: #65501d;
+  --superficie-2: #eeebe2; /* fundo levemente diferente do cartao (cabecalhos, rodapes) */
   --raio: 8px;
   --sombra-leve: 0 1px 2px rgba(15, 23, 42, 0.05);
 
@@ -104,7 +105,7 @@ button {
 
 .btn-primario {
   background-color: var(--verde);
-  color: #fff;
+  color: var(--dc-creme);
   box-shadow: var(--sombra-leve);
 }
 
@@ -136,7 +137,7 @@ button {
 
 .btn-destrutivo {
   background-color: var(--vermelho);
-  color: #fff;
+  color: var(--dc-creme);
 }
 
 .btn-destrutivo:hover {
@@ -313,7 +314,7 @@ button {
   height: 16px;
   left: 2px;
   top: 2px;
-  background-color: #fff;
+  background-color: var(--dc-creme);
   border-radius: 50%;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   transition: transform 0.18s;
@@ -339,7 +340,7 @@ button {
   height: 44px;
   border-radius: 50%;
   background-color: var(--marinho);
-  color: #fff;
+  color: var(--dc-creme);
   font-size: 14px;
   font-weight: 600;
   display: flex;
@@ -379,7 +380,7 @@ button {
   height: 18px;
   border-radius: 50%;
   background-color: var(--verde);
-  color: #fff;
+  color: var(--dc-creme);
   font-size: 11px;
   display: flex;
   align-items: center;

@@ -4,40 +4,40 @@
 :root {
   --fonte-num: 'IBM Plex Sans Condensed', 'IBM Plex Sans', 'Segoe UI', Arial, sans-serif;
   --fonte-id: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-  --capacete: #f5b700; /* amarelo de obra: so na marca e no item ativo do menu */
+  --capacete: var(--dc-ouro); /* amarelo de obra: so na marca e no item ativo do menu */
   --sombra-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
   --sombra-2: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
-  --claro-fundo: #f3f5f8;
-  --claro-anel: rgba(0, 121, 59, 0.22);
+  --claro-fundo: #e6e3d9;
+  --claro-anel: rgba(133, 102, 34, 0.22);
   --sombra-leve: var(--sombra-1);
 }
 
 /* ===== tema escuro ===== */
 :root[data-tema='escuro'] {
-  --claro-fundo: #0c111b;
-  --claro-cartao: #141b29;
-  --claro-texto: #e6ebf3;
-  --claro-texto-fraco: #97a4b9;
-  --claro-borda: #243047;
-  --claro-suave: #1b2434;
-  --claro-anel: rgba(52, 211, 153, 0.28);
-  --borda-forte: #4c5c78;
-  --verde: #0a8f47;
-  --verde-hover: #12a355;
+  --claro-fundo: var(--dc-noite);
+  --claro-cartao: var(--dc-painel);
+  --claro-texto: var(--dc-creme);
+  --claro-texto-fraco: var(--dc-salvia);
+  --claro-borda: var(--dc-linha);
+  --claro-suave: var(--dc-elevado);
+  --claro-anel: rgba(173, 188, 170, 0.25);
+  --borda-forte: #918675;
+  --verde: #806331;
+  --verde-hover: #94743d;
   --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.4);
   --sombra-2: 0 10px 28px rgba(0, 0, 0, 0.5);
-  --ok-claro-fundo: #0f2a1d;
-  --ok-claro-borda: #1d5b3b;
-  --ok-claro-texto: #6ee7b7;
+  --ok-claro-fundo: #182e20;
+  --ok-claro-borda: #345b3e;
+  --ok-claro-texto: #b3d0a9;
   --erro-claro-fundo: #2c1517;
   --erro-claro-borda: #6a2428;
   --erro-claro-texto: #fca5a5;
-  --atencao-claro-fundo: #2b2211;
-  --atencao-claro-borda: #6a5114;
-  --atencao-claro-texto: #fcd34d;
-  --info-claro-fundo: #12233f;
-  --info-claro-texto: #93c5fd;
-  --superficie-2: #101726;
+  --atencao-claro-fundo: #302a17;
+  --atencao-claro-borda: #6c5929;
+  --atencao-claro-texto: #e1c582;
+  --info-claro-fundo: #282a1d;
+  --info-claro-texto: #cfc39c;
+  --superficie-2: #1b1a17;
   color-scheme: dark;
 }
 
@@ -54,7 +54,7 @@ body.painel-corpo {
 }
 
 ::selection {
-  background-color: rgba(0, 121, 59, 0.22);
+  background-color: rgba(133, 102, 34, 0.22);
 }
 
 :focus-visible {
@@ -69,7 +69,7 @@ body.painel-corpo {
 
 /* ===== menu lateral ===== */
 .menu-lateral {
-  background: linear-gradient(180deg, #0b0f19 0%, #0d1322 100%);
+  background: linear-gradient(180deg, var(--dc-noite) 0%, var(--dc-carvao) 100%);
   border-right: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -94,7 +94,7 @@ body.painel-corpo {
   height: 28px;
   border-radius: 8px;
   background: var(--capacete) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l6 6-6 6M12 6l6 6-6 6' fill='none' stroke='%230b0f19' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 20px no-repeat;
-  box-shadow: 0 2px 8px rgba(245, 183, 0, 0.35);
+  box-shadow: 0 2px 8px rgba(207, 173, 104, 0.18);
 }
 
 .menu-empresa {
@@ -108,7 +108,7 @@ body.painel-corpo {
   letter-spacing: 0;
   font-size: 12px;
   font-weight: 600;
-  color: #7c8aa0;
+  color: #a0ae98;
 }
 
 .menu-item {
@@ -133,7 +133,7 @@ body.painel-corpo {
 .botao-tema {
   background: none;
   border: none;
-  color: #94a3b8;
+  color: #b9b5ab;
   flex: none;
   border-radius: var(--raio);
   cursor: pointer;
@@ -145,7 +145,7 @@ body.painel-corpo {
 
 .botao-tema:hover {
   background-color: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  color: var(--dc-creme);
 }
 
 .botao-tema:focus-visible {

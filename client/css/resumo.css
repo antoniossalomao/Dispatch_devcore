@@ -16,12 +16,12 @@
   width: 236px;
   flex-shrink: 0;
   background-color: var(--marinho);
-  color: #cbd5e1;
+  color: #c3bbaa;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 20px 12px 14px;
-  border-right: 1px solid #172033;
+  border-right: 1px solid var(--dc-linha);
   position: sticky;
   top: 0;
   height: 100vh; /* o menu fica parado enquanto a pagina rola */
@@ -30,7 +30,7 @@
 
 .menu-marca {
   padding: 0 10px 20px;
-  border-bottom: 1px solid #192338;
+  border-bottom: 1px solid var(--dc-linha);
   margin-bottom: 16px;
   display: flex;
   flex-direction: column;
@@ -45,7 +45,7 @@
 
 .menu-empresa {
   font-size: 12px;
-  color: #64748b;
+  color: #b9b5ab;
   margin-top: 2px;
 }
 
@@ -53,7 +53,7 @@
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.6px;
-  color: #556274;
+  color: #9b9486;
   padding: 0 10px;
   margin-bottom: 6px;
 }
@@ -75,7 +75,7 @@
   height: 36px;
   padding: 0 10px;
   border-radius: var(--raio);
-  color: #94a3b8;
+  color: #b9b5ab;
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -83,22 +83,22 @@
 }
 
 .menu-item:hover {
-  background-color: #141d2e;
-  color: #e2e8f0;
+  background-color: var(--dc-elevado);
+  color: var(--dc-creme);
 }
 
 /* tela atual: fundo mais claro e o icone verde */
 .menu-item.ativo {
-  background-color: #1a2436;
+  background-color: #302b22;
   color: #fff;
 }
 
 .menu-item.ativo svg {
-  color: #34d399;
+  color: #d8c49a;
 }
 
 .menu-rodape {
-  border-top: 1px solid #192338;
+  border-top: 1px solid var(--dc-linha);
   padding: 12px 6px 0;
   display: flex;
   align-items: center;
@@ -109,8 +109,8 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #1e293b;
-  color: #e2e8f0;
+  background-color: #302b22;
+  color: var(--dc-creme);
   font-size: 12px;
   font-weight: 600;
   display: flex;
@@ -127,7 +127,7 @@
 .usuario-nome {
   font-size: 13px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--dc-creme);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -135,14 +135,14 @@
 
 .usuario-cargo {
   font-size: 12px;
-  color: #64748b;
+  color: #b9b5ab;
   text-transform: capitalize;
 }
 
 .botao-sair {
   background: none;
   border: none;
-  color: #94a3b8;
+  color: #b9b5ab;
   width: 32px;
   height: 32px;
   border-radius: var(--raio);
@@ -280,7 +280,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background-color: #d97706;
+  background-color: #a78339;
   border: 1.5px solid #fff;
 }
 
@@ -360,7 +360,7 @@
 }
 
 .barra-azul {
-  background-color: #2563eb;
+  background-color: var(--dc-ocre);
 }
 
 .barra-verde {
@@ -368,7 +368,7 @@
 }
 
 .barra-marinho {
-  background-color: #334155;
+  background-color: var(--dc-taupe);
 }
 
 .kpi-detalhe {
@@ -542,18 +542,18 @@
 }
 
 .status-ativo .status-ponto {
-  background-color: #16a34a;
+  background-color: #54805a;
 }
 
 /* azul = em uso */
 .status-uso {
   background-color: var(--info-claro-fundo);
-  border-color: #bfdbfe;
+  border-color: #c8bb8c;
   color: var(--info-claro-texto);
 }
 
 .status-uso .status-ponto {
-  background-color: #2563eb;
+  background-color: var(--dc-ocre);
 }
 
 /* amarelo = atenção */
@@ -564,7 +564,7 @@
 }
 
 .status-atencao .status-ponto {
-  background-color: #d97706;
+  background-color: #a78339;
 }
 
 /* vermelho = problema */
