@@ -15,7 +15,6 @@
   --vg-erro: var(--erro-claro-texto);
   --vg-erro-suave: color-mix(in srgb, var(--erro-claro-texto) 10%, transparent);
   --vg-trilho: var(--claro-suave);
-  --vg-serif: Georgia, "Times New Roman", serif;
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -94,8 +93,8 @@
 }
 
 .vg-manchete em {
-  font-family: var(--vg-serif);
-  font-style: italic;
+  font-family: var(--fonte-ui);
+  font-style: normal;
   font-weight: 400;
   color: var(--vg-acento);
 }
@@ -191,9 +190,9 @@
 }
 
 .vg-numero-sub {
-  font-family: var(--vg-serif);
+  font-family: var(--fonte-ui);
   font-size: var(--fs-16);
-  font-style: italic;
+  font-style: normal;
   color: var(--vg-fraco);
 }
 
@@ -602,9 +601,9 @@
 
 .vg-unidade-cidade {
   margin: 4px 0 0;
-  font-family: var(--vg-serif);
+  font-family: var(--fonte-ui);
   font-size: var(--fs-13);
-  font-style: italic;
+  font-style: normal;
   color: var(--vg-sutil);
 }
 
