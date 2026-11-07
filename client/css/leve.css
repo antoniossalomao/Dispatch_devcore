@@ -1,6 +1,7 @@
 /* ---- camada leve: carregada por ultimo nas telas internas ----
    segue a apresentacao da DevCore: noite/carvao, creme, ouro e ocre, fonte Inter,
-   sem verde, menos sombra, menos borda e menos texto de apoio na tela */
+   sem verde, menos sombra, menos borda e menos texto de apoio na tela.
+   os valores (fonte, espaco, raio, cor, altura de controle) vem dos tokens em base.css; aqui nao entra numero solto */
 
 :root {
   --fonte-ui: 'Inter', 'Segoe UI', Arial, sans-serif;
@@ -13,7 +14,7 @@
 body,
 body.painel-corpo {
   font-family: var(--fonte-ui);
-  letter-spacing: -0.005em;
+  letter-spacing: normal;
 }
 
 /* ===== menu lateral: noite da apresentacao, item ativo com marcador ouro ===== */
@@ -23,23 +24,23 @@ body.painel-corpo {
 }
 
 .menu-logo {
-  font-size: 20px;
+  font-size: var(--fs-20);
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.02em;
 }
 
 .menu-secao {
-  font-size: 11px;
+  font-size: var(--fs-11);
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6f6b62;
+  color: #8a857a;
 }
 
 .menu-item {
-  height: 36px;
-  font-size: 14px;
-  color: #a8a398;
+  height: var(--controle);
+  font-size: var(--fs-14);
+  color: var(--dc-salvia);
 }
 
 .menu-item svg {
@@ -57,8 +58,8 @@ body.painel-corpo {
   content: '';
   position: absolute;
   left: 0;
-  top: 9px;
-  bottom: 9px;
+  top: 8px;
+  bottom: 8px;
   width: 2px;
   border-radius: 2px;
   background-color: var(--dc-ouro);
@@ -76,29 +77,19 @@ body.painel-corpo {
 }
 
 .topo-titulo {
-  font-size: 20px;
+  font-size: var(--fs-20);
   font-weight: 600;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.02em;
 }
 
 .topo-esquerda .topo-data {
   display: none;
 }
 
-/* ===== botoes: carvao no claro, creme no escuro (como o botao da apresentacao) ===== */
+/* ===== botoes: carvao no claro, creme no escuro (como o botao da apresentacao); texto via --sobre-primario ===== */
 .btn-primario {
   box-shadow: none;
   font-weight: 500;
-}
-
-:root[data-tema='escuro'] .btn-primario,
-:root[data-tema='escuro'] .chat-eu,
-:root[data-tema='escuro'] .chat-form button {
-  color: var(--dc-noite);
-}
-
-:root[data-tema='escuro'] .toast::before {
-  color: var(--dc-noite);
 }
 
 .btn-secundario {
@@ -128,11 +119,11 @@ body.painel-corpo {
 }
 
 .indicadores .cartao-kpi {
-  padding: 18px 24px;
+  padding: 20px 24px;
 }
 
 .kpi-rotulo {
-  font-size: 11px;
+  font-size: var(--fs-11);
   font-weight: 500;
   letter-spacing: 0.08em;
   color: var(--claro-texto-fraco);
@@ -143,13 +134,13 @@ body.painel-corpo {
 }
 
 .kpi-numero {
-  font-size: 30px;
+  font-size: var(--fs-28);
   font-weight: 500;
-  letter-spacing: -0.8px;
+  letter-spacing: -0.02em;
 }
 
 .kpi-complemento {
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto-fraco);
 }
 
@@ -164,15 +155,15 @@ body.painel-corpo {
 }
 
 .bloco-titulo {
-  font-size: 15px;
+  font-size: var(--fs-16);
   font-weight: 600;
 }
 
 .tabela th {
   background-color: transparent;
-  font-size: 11px;
+  font-size: var(--fs-11);
   font-weight: 500;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -193,7 +184,7 @@ body.painel-corpo {
 }
 
 .cnh-celula {
-  gap: 6px;
+  gap: 8px;
 }
 
 .situacao-alojamento,
@@ -219,10 +210,6 @@ body.painel-corpo {
   box-shadow: none;
 }
 
-.chave input:checked + .chave-trilho {
-  background-color: var(--claro-texto);
-}
-
 /* ===== visao geral ===== */
 .vg {
   gap: 24px;
@@ -233,7 +220,7 @@ body.painel-corpo {
 }
 
 .vg-legenda {
-  font-size: 12px;
+  font-size: var(--fs-12);
 }
 
 .vg-alerta {
@@ -244,7 +231,7 @@ body.painel-corpo {
 .vg-alerta-icone {
   width: 6px;
   height: 6px;
-  margin-top: 7px;
+  margin-top: 8px;
   border-radius: 50%;
   background: var(--vg-acento);
 }
@@ -263,8 +250,8 @@ body.painel-corpo {
 }
 
 .vg-alertas-mais {
-  margin-top: 14px;
-  font-size: 13px;
+  margin-top: 16px;
+  font-size: var(--fs-13);
   padding: 0;
   background: none;
   border: 0;
@@ -284,10 +271,4 @@ body.painel-corpo {
 .vg-tipo-entra {
   color: var(--vg-livre);
   background: var(--vg-livre-suave);
-}
-
-/* ===== botao de ajuda flutuante: carvao no lugar do verde ===== */
-:root[data-tema='escuro'] .chat-botao {
-  background-color: var(--dc-creme);
-  color: var(--dc-noite);
 }
