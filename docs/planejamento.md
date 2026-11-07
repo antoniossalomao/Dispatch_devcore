@@ -100,9 +100,9 @@ Não vamos fazer: GPS, controle de combustível e custos, checklist de vistoria 
 
 Ainda falta colocar no Figma: aba de ocorrências, campo de responsável, cadastro de veículo com documentação, aba de manutenções, relatórios de movimentação e gargalos, sininho de notificações e o chat de ajuda.
 
-Visual: tema escuro, azul-marinho, conteúdo em cartões, títulos em maiúsculo, etiquetas coloridas de status (verde = ok, azul = em uso, amarelo = atenção, vermelho = problema) e botão verde pra ação principal.
+Visual: paleta de verdes de mata e tons de terra (menu musgo `#16281C`, botão principal e item ativo em verde floresta `#254226`, fundo alabastro `#EDECE6`, atenção em âmbar `#826426` e detalhes em taupe `#9D836A`), conteúdo em cartões, títulos em maiúsculo, etiquetas de status e botão verde pra ação principal. Os alertas usam âmbar em vez de vermelho; o vermelho fica só pra erro de formulário e ação destrutiva.
 
-O login é sempre claro. Dentro do sistema o escuro é o padrão, com um botão pra trocar pro claro (vai ficar no topo quando o menu existir) e a escolha fica salva no navegador. Por isso as cores ficam em variáveis no `base.css` (`var(--fundo)`, `var(--texto)`, `var(--marinho)`, `var(--verde)`...) e as telas usam elas em vez de escrever a cor direto no CSS, senão a tela não muda junto com o tema. As cores do tema claro foram tiradas do Figma.
+O login é sempre claro. Dentro do sistema o claro é o padrão, com um botão pra trocar pro escuro, e a escolha fica salva no navegador. O usuário logado (avatar, nome, troca de tema e sair) fica numa pílula no canto direito do topo, ao lado do sino. Por isso as cores ficam em variáveis no `base.css` (`var(--fundo)`, `var(--texto)`, `var(--marinho)`, `var(--verde)`...) e as telas usam elas em vez de escrever a cor direto no CSS, senão a tela não muda junto com o tema. As cores do tema claro foram tiradas do Figma.
 
 
 ## 5. Regras

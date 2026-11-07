@@ -1,13 +1,13 @@
-/* Base predominante: preto e carvão. Verde é apenas um acento secundário. */
+/* paleta do sistema: verdes de mata e tons de terra (musgo no menu, floresta nos botoes, alabastro no fundo) */
 :root {
   --dc-noite: #0a0a09;
   --dc-carvao: #1a1916;
-  --dc-floresta: #152b20;
-  --dc-musgo: #24472c;
-  --dc-creme: #eeeee6;
-  --dc-ocre: #856622;
+  --dc-floresta: #16281c;
+  --dc-musgo: #254226;
+  --dc-creme: #edece6;
+  --dc-ocre: #826426;
   --dc-ouro: #cfad68;
-  --dc-taupe: #a18a75;
+  --dc-taupe: #9d836a;
   --dc-salvia: #b9b5ab;
   --dc-painel: #151513;
   --dc-elevado: #20201d;

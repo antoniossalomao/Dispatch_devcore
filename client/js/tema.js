@@ -1,4 +1,4 @@
-// tema claro/escuro: aplica a escolha antes da tela aparecer (carregar no <head>) e coloca o botao de troca no menu
+// tema claro/escuro: aplica a escolha antes da tela aparecer (carregar no <head>) e coloca o botao de troca no perfil do topo
 (function () {
   const CHAVE = 'dispatch-tema'
 
@@ -9,7 +9,7 @@
   function temaAtual() {
     const salvo = lerSalvo()
     if (salvo === 'claro' || salvo === 'escuro') return salvo
-    return 'escuro' // A identidade DevCore usa o tema escuro por padrão; preserva a escolha salva.
+    return 'claro' // padrao é o claro (fundo alabastro); se a pessoa ja escolheu, vale a escolha dela
   }
 
   function aplicar(tema) {
@@ -19,8 +19,8 @@
   aplicar(temaAtual())
 
   document.addEventListener('DOMContentLoaded', function () {
-    const rodape = document.querySelector('.menu-rodape')
-    if (!rodape) return
+    const perfil = document.querySelector('.topo-perfil')
+    if (!perfil) return
 
     const botao = document.createElement('button')
     botao.type = 'button'
@@ -45,6 +45,6 @@
 
     desenhar()
     const sair = document.getElementById('botao-sair')
-    rodape.insertBefore(botao, sair || null)
+    perfil.insertBefore(botao, sair || null)
   })
 })()

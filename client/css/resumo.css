@@ -10,7 +10,7 @@
 }
 
 
-/* ---- menu lateral azul-marinho (no jeito do Sidebar do shadcn) ---- */
+/* ---- menu lateral verde musgo (no jeito do Sidebar do shadcn) ---- */
 
 .menu-lateral {
   width: 236px;
@@ -97,19 +97,27 @@
   color: #d8c49a;
 }
 
-.menu-rodape {
-  border-top: 1px solid var(--dc-linha);
-  padding: 12px 6px 0;
+/* ---- perfil do usuario no topo: pilula com avatar, nome, tema e sair ---- */
+/* antes ficava no rodape do menu, mas o padrao das telas web é ficar no canto de cima */
+
+.topo-perfil {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  height: 40px;
+  padding: 0 4px 0 4px;
+  margin-left: 4px;
+  border: 1px solid var(--claro-borda);
+  border-radius: 999px;
+  background-color: var(--claro-cartao);
+  box-shadow: var(--sombra-leve);
 }
 
 .usuario-avatar {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background-color: #302b22;
+  background-color: var(--dc-musgo);
   color: var(--dc-creme);
   font-size: 12px;
   font-weight: 600;
@@ -120,32 +128,34 @@
 }
 
 .usuario-dados {
-  flex: 1;
   min-width: 0;
+  max-width: 150px;
+  line-height: 1.2;
+  padding-right: 4px;
 }
 
 .usuario-nome {
   font-size: 13px;
   font-weight: 600;
-  color: var(--dc-creme);
+  color: var(--claro-texto);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .usuario-cargo {
-  font-size: 12px;
-  color: #b9b5ab;
+  font-size: 11px;
+  color: var(--claro-texto-fraco);
   text-transform: capitalize;
 }
 
 .botao-sair {
   background: none;
   border: none;
-  color: #b9b5ab;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--raio);
+  color: var(--claro-texto-fraco);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -154,8 +164,8 @@
 }
 
 .botao-sair:hover {
-  background-color: #2a1414;
-  color: #f87171;
+  background-color: var(--erro-claro-fundo);
+  color: var(--erro-claro-texto);
 }
 
 
@@ -280,7 +290,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background-color: #a78339;
+  background-color: var(--dc-ocre);
   border: 1.5px solid #fff;
 }
 
@@ -359,16 +369,22 @@
   transition: width 0.4s;
 }
 
+/* os nomes das classes ficaram do visual antigo; as cores agora sao da paleta nova */
+/* "azul" = ambar (em uso / unidade quase cheia), "verde" = floresta, "marinho" = taupe */
 .barra-azul {
   background-color: var(--dc-ocre);
 }
 
 .barra-verde {
-  background-color: var(--verde);
+  background-color: var(--dc-musgo);
 }
 
 .barra-marinho {
   background-color: var(--dc-taupe);
+}
+
+:root[data-tema='escuro'] .barra-verde {
+  background-color: #4d7a50;
 }
 
 .kpi-detalhe {
@@ -564,7 +580,7 @@
 }
 
 .status-atencao .status-ponto {
-  background-color: #a78339;
+  background-color: var(--dc-ocre);
 }
 
 /* vermelho = problema */
@@ -637,16 +653,18 @@
   gap: 10px;
 }
 
-/* caixinha de aviso (Alert do shadcn) com a cor do nivel */
+/* caixinha de aviso em ambar terroso, off-white quente e borda suave */
+/* a faixinha na esquerda mostra a gravidade: clara = atencao, cheia = problema */
 .alerta-item {
-  padding: 12px 14px;
+  padding: 12px 14px 12px 16px;
   border-radius: var(--raio);
-  border: 1px solid var(--claro-borda);
+  border: 1px solid var(--atencao-claro-borda);
+  border-left-width: 3px;
+  background-color: var(--atencao-claro-fundo);
 }
 
 .alerta-atencao {
-  background-color: var(--atencao-claro-fundo);
-  border-color: var(--atencao-claro-borda);
+  border-left-color: var(--dc-taupe);
 }
 
 .alerta-atencao .alerta-titulo {
@@ -654,12 +672,23 @@
 }
 
 .alerta-problema {
-  background-color: var(--erro-claro-fundo);
-  border-color: var(--erro-claro-borda);
+  border-left-color: var(--dc-ocre);
 }
 
 .alerta-problema .alerta-titulo {
-  color: var(--erro-claro-texto);
+  color: var(--atencao-claro-texto);
+}
+
+/* bolinha antes do titulo so no problema, pra diferenciar sem usar vermelho */
+.alerta-problema .alerta-titulo::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--dc-ocre);
+  margin-right: 7px;
+  vertical-align: 1px;
 }
 
 .alerta-titulo {

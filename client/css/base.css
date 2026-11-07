@@ -19,17 +19,17 @@
   --sombra: rgba(0, 0, 0, 0.4);
 
   /* topo, menu lateral e botão principal */
-  --marinho: var(--dc-noite);
-  --verde: #806331;
-  --verde-hover: #94743d;
+  --marinho: var(--dc-floresta);
+  --verde: var(--dc-musgo);
+  --verde-hover: #2f5532;
 
-  /* cores das telas de dentro (claras), tiradas da paleta slate do shadcn */
-  --claro-fundo: #e6e3d9;
-  --claro-cartao: var(--dc-creme);
+  /* cores das telas de dentro (claras): fundo alabastro e cartao um pouco mais claro pra destacar */
+  --claro-fundo: var(--dc-creme);
+  --claro-cartao: #f8f7f3;
   --claro-texto: var(--dc-floresta);
-  --claro-texto-fraco: #6a6457;
-  --claro-borda: #d2cfc4;
-  --claro-suave: #e0dcd0; /* fundo de aba, hover de linha etc */
+  --claro-texto-fraco: #67604f;
+  --claro-borda: #dcd8cc;
+  --claro-suave: #e8e5dc; /* fundo de aba, hover de linha etc */
   --claro-anel: rgba(100, 116, 139, 0.25); /* brilho em volta do campo com foco */
   --vermelho: #dc2626;
   --borda-forte: #9a9282; /* borda de hover/foco; nao usar como cor de texto (contraste 2,56:1) */
@@ -41,9 +41,10 @@
   --erro-claro-fundo: #fef2f2;
   --erro-claro-borda: #fecaca;
   --erro-claro-texto: #991b1b;
-  --atencao-claro-fundo: #fffbeb;
-  --atencao-claro-borda: #fde68a;
-  --atencao-claro-texto: #92400e;
+  /* atencao em ambar terroso, no lugar do amarelo/vermelho generico */
+  --atencao-claro-fundo: #f6f1e5;
+  --atencao-claro-borda: #dccdab;
+  --atencao-claro-texto: var(--dc-ocre);
   --info-claro-fundo: #e6e5d7;
   --info-claro-texto: #65501d;
   --superficie-2: #eeebe2; /* fundo levemente diferente do cartao (cabecalhos, rodapes) */

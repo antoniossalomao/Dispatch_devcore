@@ -7,8 +7,8 @@
   --capacete: var(--dc-ouro); /* amarelo de obra: so na marca e no item ativo do menu */
   --sombra-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
   --sombra-2: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
-  --claro-fundo: #e6e3d9;
-  --claro-anel: rgba(133, 102, 34, 0.22);
+  --claro-fundo: var(--dc-creme);
+  --claro-anel: rgba(37, 66, 38, 0.22);
   --sombra-leve: var(--sombra-1);
 }
 
@@ -22,8 +22,8 @@
   --claro-suave: var(--dc-elevado);
   --claro-anel: rgba(173, 188, 170, 0.25);
   --borda-forte: #918675;
-  --verde: #806331;
-  --verde-hover: #94743d;
+  --verde: #2f5532;
+  --verde-hover: #3a663e;
   --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.4);
   --sombra-2: 0 10px 28px rgba(0, 0, 0, 0.5);
   --ok-claro-fundo: #182e20;
@@ -32,9 +32,9 @@
   --erro-claro-fundo: #2c1517;
   --erro-claro-borda: #6a2428;
   --erro-claro-texto: #fca5a5;
-  --atencao-claro-fundo: #302a17;
-  --atencao-claro-borda: #6c5929;
-  --atencao-claro-texto: #e1c582;
+  --atencao-claro-fundo: #241f14;
+  --atencao-claro-borda: #5c4a26;
+  --atencao-claro-texto: #d6b874;
   --info-claro-fundo: #282a1d;
   --info-claro-texto: #cfc39c;
   --superficie-2: #1b1a17;
@@ -68,13 +68,16 @@ body.painel-corpo {
 }
 
 /* ===== menu lateral ===== */
+/* fundo musgo liso, com mais respiro entre os itens */
 .menu-lateral {
-  background: linear-gradient(180deg, var(--dc-noite) 0%, var(--dc-carvao) 100%);
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--dc-floresta);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 22px 14px 18px;
 }
 
 .menu-marca {
-  border-bottom-color: rgba(255, 255, 255, 0.07);
+  border-bottom-color: rgba(237, 236, 230, 0.1);
+  margin-bottom: 20px;
 }
 
 .menu-logo {
@@ -108,34 +111,58 @@ body.painel-corpo {
   letter-spacing: 0;
   font-size: 12px;
   font-weight: 600;
-  color: #a0ae98;
+  color: #8fa58c;
+  margin-bottom: 8px;
+}
+
+.menu-secao-espaco {
+  margin-top: 28px;
+}
+
+.menu-lista {
+  gap: 4px;
 }
 
 .menu-item {
+  height: 38px;
+  padding: 0 12px;
+  gap: 12px;
+  color: #bcc8b8;
+  font-weight: 400;
   transition: background-color 0.15s, color 0.15s;
 }
 
+.menu-item svg {
+  opacity: 0.85;
+}
+
+.menu-item:hover {
+  background-color: rgba(237, 236, 230, 0.07);
+  color: var(--dc-creme);
+}
+
+/* tela atual: fundo verde floresta, sem faixa forte do lado */
 .menu-item.ativo {
-  background-color: rgba(255, 255, 255, 0.07);
-  box-shadow: inset 3px 0 0 var(--capacete);
+  background-color: var(--dc-musgo);
+  color: #fff;
+  font-weight: 500;
+  box-shadow: inset 0 0 0 1px rgba(237, 236, 230, 0.06);
 }
 
-.menu-rodape {
-  gap: 6px;
+.menu-item.ativo svg {
+  color: #cfe0c8;
+  opacity: 1;
 }
 
-.botao-tema,
-.botao-sair {
-  width: 28px;
-  height: 28px;
-}
-
+/* botao de tema dentro da pilula do perfil, mesmo tamanho do sair */
 .botao-tema {
+  width: 30px;
+  height: 30px;
   background: none;
   border: none;
-  color: #b9b5ab;
+  color: var(--claro-texto-fraco);
   flex: none;
-  border-radius: var(--raio);
+  border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -144,12 +171,8 @@ body.painel-corpo {
 }
 
 .botao-tema:hover {
-  background-color: rgba(255, 255, 255, 0.08);
-  color: var(--dc-creme);
-}
-
-.botao-tema:focus-visible {
-  outline-color: var(--capacete);
+  background-color: var(--claro-suave);
+  color: var(--claro-texto);
 }
 
 /* ===== topo ===== */
@@ -204,8 +227,16 @@ body.painel-corpo {
   border-left: 1px solid var(--claro-borda);
 }
 
+/* rotulo pequeno em maiusculo, mais integrado ao numero */
 .kpi-rotulo {
+  font-size: 12px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.kpi-topo svg {
+  color: var(--dc-taupe);
 }
 
 .kpi-numero {
@@ -229,10 +260,34 @@ body.painel-corpo {
   }
 }
 
+@media (max-width: 780px) {
+  .menu-lateral {
+    padding: 14px 16px;
+  }
+
+  .menu-marca {
+    margin-bottom: 8px;
+  }
+
+  /* no celular a busca, o sino e o perfil quebram linha se nao couberem */
+  .topo-direita {
+    flex-wrap: wrap;
+  }
+
+  .topo-perfil {
+    margin-left: auto;
+  }
+}
+
 @media (max-width: 560px) {
   .indicadores .cartao-kpi + .cartao-kpi {
     border-left: none;
     border-top: 1px solid var(--claro-borda);
+  }
+
+  /* tela bem estreita: some o nome e fica so o avatar, o tema e o sair */
+  .usuario-dados {
+    display: none;
   }
 }
 
