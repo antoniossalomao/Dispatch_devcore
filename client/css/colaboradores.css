@@ -282,7 +282,7 @@
 /* :has deixa mudar a cor do label quando o checkbox de dentro ta marcado */
 .check-categoria:has(input:checked) {
   background-color: var(--ok-claro-fundo);
-  border-color: #a9c39b;
+  border-color: var(--borda-forte);
   color: var(--ok-claro-texto);
 }
 

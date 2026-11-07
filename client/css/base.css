@@ -1,6 +1,6 @@
 @import url("paleta.css");
-/* IBM Plex: Sans pra interface, Sans Condensed pra titulos e numeros, Mono so pra placas e matriculas */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+/* Inter, a mesma fonte da apresentacao da DevCore */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* cores padrão do sistema */
 :root {
@@ -14,19 +14,19 @@
   --azul: var(--dc-ouro);
   --erro-fundo: #35110f;
   --erro-texto: #ee6f68;
-  --sucesso-fundo: #0d2e1e;
-  --sucesso-texto: #6ee7b7;
+  --sucesso-fundo: #23221e;
+  --sucesso-texto: #e3dccb;
   --sombra: rgba(0, 0, 0, 0.4);
 
-  /* topo, menu lateral e botão principal */
-  --marinho: var(--dc-floresta);
-  --verde: var(--dc-musgo);
-  --verde-hover: #2f5532;
+  /* topo, menu lateral e botão principal: carvao da apresentacao (nomes antigos mantidos pra nao quebrar os css) */
+  --marinho: var(--dc-carvao);
+  --verde: var(--dc-carvao);
+  --verde-hover: #36332c;
 
   /* cores das telas de dentro (claras): fundo alabastro e cartao um pouco mais claro pra destacar */
   --claro-fundo: var(--dc-creme);
   --claro-cartao: #f8f7f3;
-  --claro-texto: var(--dc-floresta);
+  --claro-texto: var(--dc-carvao);
   --claro-texto-fraco: #67604f;
   --claro-borda: #dcd8cc;
   --claro-suave: #e8e5dc; /* fundo de aba, hover de linha etc */
@@ -35,9 +35,9 @@
   --borda-forte: #9a9282; /* borda de hover/foco; nao usar como cor de texto (contraste 2,56:1) */
 
   /* estados nas telas claras: fundo, borda e texto */
-  --ok-claro-fundo: #f0fdf4;
-  --ok-claro-borda: #bbf7d0;
-  --ok-claro-texto: #166534;
+  --ok-claro-fundo: #edeae1;
+  --ok-claro-borda: #d9d4c7;
+  --ok-claro-texto: #4f4a3f;
   --erro-claro-fundo: #fef2f2;
   --erro-claro-borda: #fecaca;
   --erro-claro-texto: #991b1b;
@@ -62,7 +62,7 @@
 }
 
 body {
-  font-family: 'IBM Plex Sans', 'Segoe UI', Arial, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
   background-color: var(--fundo);
   color: var(--texto);
   -webkit-font-smoothing: antialiased;

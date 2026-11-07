@@ -117,7 +117,7 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background-color: var(--dc-musgo);
+  background-color: var(--dc-carvao);
   color: var(--dc-creme);
   font-size: 12px;
   font-weight: 600;
@@ -376,7 +376,7 @@
 }
 
 .barra-verde {
-  background-color: var(--dc-musgo);
+  background-color: var(--dc-carvao);
 }
 
 .barra-marinho {
@@ -384,7 +384,7 @@
 }
 
 :root[data-tema='escuro'] .barra-verde {
-  background-color: #4d7a50;
+  background-color: var(--dc-salvia);
 }
 
 .kpi-detalhe {
@@ -558,7 +558,7 @@
 }
 
 .status-ativo .status-ponto {
-  background-color: #54805a;
+  background-color: var(--dc-taupe);
 }
 
 /* azul = em uso */

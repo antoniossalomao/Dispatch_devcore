@@ -465,8 +465,8 @@
 }
 
 .saude-ok {
-  background-color: #54805a;
-  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.16);
+  background-color: var(--dc-ouro);
+  box-shadow: 0 0 0 4px rgba(207, 173, 104, 0.2);
 }
 
 .saude-erro {

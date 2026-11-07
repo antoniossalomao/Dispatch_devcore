@@ -1,0 +1,293 @@
+/* ---- camada leve: carregada por ultimo nas telas internas ----
+   segue a apresentacao da DevCore: noite/carvao, creme, ouro e ocre, fonte Inter,
+   sem verde, menos sombra, menos borda e menos texto de apoio na tela */
+
+:root {
+  --fonte-ui: 'Inter', 'Segoe UI', Arial, sans-serif;
+  --fonte-num: var(--fonte-ui);
+  --fonte-id: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --sombra-1: none;
+  --sombra-leve: none;
+}
+
+body,
+body.painel-corpo {
+  font-family: var(--fonte-ui);
+  letter-spacing: -0.005em;
+}
+
+/* ===== menu lateral: noite da apresentacao, item ativo com marcador ouro ===== */
+.menu-lateral {
+  background: var(--dc-noite);
+  border-right-color: rgba(237, 236, 230, 0.06);
+}
+
+.menu-logo {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+.menu-secao {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6f6b62;
+}
+
+.menu-item {
+  height: 36px;
+  font-size: 14px;
+  color: #a8a398;
+}
+
+.menu-item svg {
+  opacity: 0.7;
+}
+
+.menu-item.ativo {
+  position: relative;
+  background-color: rgba(237, 236, 230, 0.06);
+  color: var(--dc-creme);
+  box-shadow: none;
+}
+
+.menu-item.ativo::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  bottom: 9px;
+  width: 2px;
+  border-radius: 2px;
+  background-color: var(--dc-ouro);
+}
+
+.menu-item.ativo svg {
+  color: var(--dc-ouro);
+}
+
+/* ===== topo: so o titulo; o subtitulo descritivo sai ===== */
+.topo {
+  background-color: var(--claro-fundo);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.topo-titulo {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.topo-esquerda .topo-data {
+  display: none;
+}
+
+/* ===== botoes: carvao no claro, creme no escuro (como o botao da apresentacao) ===== */
+.btn-primario {
+  box-shadow: none;
+  font-weight: 500;
+}
+
+:root[data-tema='escuro'] .btn-primario,
+:root[data-tema='escuro'] .chat-eu,
+:root[data-tema='escuro'] .chat-form button {
+  color: var(--dc-noite);
+}
+
+:root[data-tema='escuro'] .toast::before {
+  color: var(--dc-noite);
+}
+
+.btn-secundario {
+  box-shadow: none;
+}
+
+/* acoes das linhas da tabela viram texto, sem caixa: menos peso visual por linha */
+.botoes-acoes {
+  gap: 2px;
+}
+
+.botoes-acoes .btn-secundario {
+  background: transparent;
+  border-color: transparent;
+  color: var(--claro-texto-fraco);
+  font-weight: 500;
+}
+
+.botoes-acoes .btn-secundario:hover {
+  background-color: var(--claro-suave);
+  color: var(--claro-texto);
+}
+
+/* ===== indicadores: so rotulo e numero ===== */
+.indicadores {
+  box-shadow: none;
+}
+
+.indicadores .cartao-kpi {
+  padding: 18px 24px;
+}
+
+.kpi-rotulo {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--claro-texto-fraco);
+}
+
+.kpi-topo svg {
+  display: none;
+}
+
+.kpi-numero {
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.8px;
+}
+
+.kpi-complemento {
+  font-size: 13px;
+  color: var(--claro-texto-fraco);
+}
+
+/* a linha de explicacao embaixo do numero sai: o rotulo e o complemento ja dizem o que e */
+.kpi-detalhe {
+  display: none;
+}
+
+/* ===== blocos e tabelas: borda fina, sem sombra, linhas mais baixas ===== */
+.bloco {
+  box-shadow: none;
+}
+
+.bloco-titulo {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.tabela th {
+  background-color: transparent;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tabela td {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.colab-avatar {
+  background-color: var(--claro-suave);
+  color: var(--claro-texto);
+  font-weight: 600;
+}
+
+.situacao-livre,
+.cnh-texto {
+  color: var(--claro-texto-fraco);
+}
+
+.cnh-celula {
+  gap: 6px;
+}
+
+.situacao-alojamento,
+.situacao-veiculo {
+  color: var(--claro-texto);
+}
+
+/* etiqueta "ok" fica neutra: so o que pede atencao ganha cor */
+.status-ativo {
+  background-color: transparent;
+  border-color: var(--claro-borda);
+  color: var(--claro-texto-fraco);
+}
+
+.status-ativo .status-ponto {
+  background-color: var(--dc-salvia);
+}
+
+/* ===== janelas, cartoes e paineis ===== */
+.quarto-card,
+.aloj-card,
+.cartao-saude {
+  box-shadow: none;
+}
+
+.chave input:checked + .chave-trilho {
+  background-color: var(--claro-texto);
+}
+
+/* ===== visao geral ===== */
+.vg {
+  gap: 24px;
+}
+
+.vg-manchete {
+  font-weight: 400;
+}
+
+.vg-legenda {
+  font-size: 12px;
+}
+
+.vg-alerta {
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  gap: 12px;
+}
+
+.vg-alerta-icone {
+  width: 6px;
+  height: 6px;
+  margin-top: 7px;
+  border-radius: 50%;
+  background: var(--vg-acento);
+}
+
+.vg-alerta-problema .vg-alerta-icone {
+  background: var(--vg-erro);
+}
+
+/* descricao do alerta em uma linha so */
+.vg-alerta-detalhe {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.vg-alertas-mais {
+  margin-top: 14px;
+  font-size: 13px;
+  padding: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.vg-recurso .vg-tipo-seta {
+  flex: none;
+}
+
+.vg-tipo-sai {
+  color: var(--vg-acento);
+  background: var(--vg-acento-suave);
+}
+
+.vg-tipo-entra {
+  color: var(--vg-livre);
+  background: var(--vg-livre-suave);
+}
+
+/* ===== botao de ajuda flutuante: carvao no lugar do verde ===== */
+:root[data-tema='escuro'] .chat-botao {
+  background-color: var(--dc-creme);
+  color: var(--dc-noite);
+}

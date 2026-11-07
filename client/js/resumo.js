@@ -20,7 +20,6 @@ const pendLegenda = document.getElementById('pend-legenda')
 const pendContagem = document.getElementById('pend-contagem')
 
 const listaMov = document.getElementById('lista-movimentacoes')
-const listaAloj = document.getElementById('lista-alojamentos')
 const listaAlertas = document.getElementById('lista-alertas')
 const pontoAlerta = document.getElementById('ponto-alerta')
 
@@ -38,7 +37,12 @@ const avisoTela = document.getElementById('aviso-tela')
 const dataHoje = document.getElementById('data-hoje')
 const abasFiltro = document.querySelectorAll('.vg-aba')
 
+// a visao geral mostra so o essencial: o resto fica nas telas de cada area
+const LIMITE_MOV = 5
+const LIMITE_ALERTAS = 4
+
 let movimentacoesAtuais = []
+let alertasAbertos = false
 let filtroCategoria = 'todos'
 
 dataHoje.textContent = new Date().toLocaleDateString('pt-BR', {
@@ -166,13 +170,13 @@ function desenharTabela(lista) {
   if (lista.length === 0) {
     const tr = document.createElement('tr')
     const td = criar('td', 'vg-vazio', 'Nenhuma movimentação encontrada para esse filtro.')
-    td.colSpan = 5
+    td.colSpan = 4
     tr.appendChild(td)
     listaMov.appendChild(tr)
     return
   }
 
-  lista.forEach(function (item) {
+  lista.slice(0, LIMITE_MOV).forEach(function (item) {
     const tr = document.createElement('tr')
 
     const tdPessoa = document.createElement('td')
@@ -180,23 +184,16 @@ function desenharTabela(lista) {
     pessoa.appendChild(criar('span', 'vg-avatar', pegarIniciais(item.colaborador)))
     const nomes = document.createElement('div')
     nomes.appendChild(criar('span', 'vg-pessoa-nome', item.colaborador))
-    if (item.cargo) {
-      nomes.appendChild(criar('span', 'vg-pessoa-cargo', item.cargo))
-    }
     pessoa.appendChild(nomes)
     tdPessoa.appendChild(pessoa)
 
+    // o tipo do movimento vira so a seta antes do recurso (saida ↗, volta ↙)
     const sai = item.tipo === 'Retirada' || item.tipo === 'Saída'
-    const tdTipo = document.createElement('td')
-    const tipo = criar('span', 'vg-tipo ' + (sai ? 'vg-tipo-sai' : 'vg-tipo-entra'))
-    tipo.appendChild(criar('span', 'vg-tipo-seta', sai ? '↗' : '↙'))
-    const tipoTexto = criar('span', null, item.tipo)
-    tipoTexto.appendChild(criar('small', null, item.categoria === 'frota' ? 'Frota' : 'Alojamento'))
-    tipo.appendChild(tipoTexto)
-    tdTipo.appendChild(tipo)
-
     const tdRecurso = document.createElement('td')
     const recurso = criar('div', 'vg-recurso')
+    const seta = criar('span', 'vg-tipo-seta ' + (sai ? 'vg-tipo-sai' : 'vg-tipo-entra'), sai ? '↗' : '↙')
+    seta.title = item.tipo
+    recurso.appendChild(seta)
     const pedacos = item.recurso.split(' · ')
     recurso.appendChild(criar('span', 'vg-recurso-nome', pedacos[0]))
     if (pedacos[1]) {
@@ -213,60 +210,10 @@ function desenharTabela(lista) {
     tdStatus.appendChild(criar('span', classeStatus(item.status), item.status))
 
     tr.appendChild(tdPessoa)
-    tr.appendChild(tdTipo)
     tr.appendChild(tdRecurso)
     tr.appendChild(tdQuando)
     tr.appendChild(tdStatus)
     listaMov.appendChild(tr)
-  })
-}
-
-function desenharAlojamentos(lista) {
-  listaAloj.innerHTML = ''
-
-  if (!lista || lista.length === 0) {
-    listaAloj.appendChild(criar('p', 'vg-vazio', 'Nenhum alojamento cadastrado ainda.'))
-    return
-  }
-
-  lista.forEach(function (aloj) {
-    const pct = porcentagem(aloj.ocupados, aloj.total)
-    const card = criar('article', 'vg-unidade')
-
-    const topo = criar('div', 'vg-unidade-topo')
-    const nomes = document.createElement('div')
-    nomes.appendChild(criar('h4', 'vg-unidade-nome', aloj.nome))
-    if (aloj.cidade) {
-      nomes.appendChild(criar('p', 'vg-unidade-cidade', aloj.cidade))
-    }
-    topo.appendChild(nomes)
-
-    let situacao = 'Com vagas'
-    let classe = 'vg-chip vg-chip-acento'
-    if (pct >= 90) {
-      situacao = 'Lotado'
-      classe = 'vg-chip vg-chip-erro'
-    } else if (pct >= 75) {
-      situacao = 'Quase cheio'
-    }
-    topo.appendChild(criar('span', classe, situacao))
-
-    const leitos = criar('div', 'vg-leitos')
-    for (let i = 0; i < aloj.total; i++) {
-      leitos.appendChild(criar('i', i < aloj.ocupados ? 'ocupado' : ''))
-    }
-
-    const pe = criar('div', 'vg-unidade-pe')
-    const conta = document.createElement('span')
-    conta.appendChild(criar('b', null, aloj.ocupados))
-    conta.appendChild(document.createTextNode(' de ' + aloj.total + ' leitos'))
-    pe.appendChild(conta)
-    pe.appendChild(criar('span', null, pct + '% ocupado'))
-
-    card.appendChild(topo)
-    card.appendChild(leitos)
-    card.appendChild(pe)
-    listaAloj.appendChild(card)
   })
 }
 
@@ -305,10 +252,15 @@ function desenharAlertas(lista) {
     pendContagem.appendChild(criar('span', 'vg-chip vg-chip-acento', atencao + ' atenção'))
   }
 
-  lista.forEach(function (a) {
+  // criticas primeiro; a lista completa fica no sino
+  const ordenada = lista.slice().sort(function (a, b) {
+    return (b.nivel === 'problema') - (a.nivel === 'problema')
+  })
+
+  ordenada.slice(0, alertasAbertos ? ordenada.length : LIMITE_ALERTAS).forEach(function (a) {
     const problema = a.nivel === 'problema'
     const item = criar('div', 'vg-alerta ' + (problema ? 'vg-alerta-problema' : 'vg-alerta-atencao'))
-    item.appendChild(criar('span', 'vg-alerta-icone', problema ? '!' : '•'))
+    item.appendChild(criar('span', 'vg-alerta-icone'))
 
     const corpo = document.createElement('div')
     corpo.appendChild(criar('p', 'vg-alerta-titulo', a.titulo))
@@ -320,6 +272,17 @@ function desenharAlertas(lista) {
     item.appendChild(link)
     listaAlertas.appendChild(item)
   })
+
+  if (!alertasAbertos && lista.length > LIMITE_ALERTAS) {
+    const resto = lista.length - LIMITE_ALERTAS
+    const mais = criar('button', 'vg-link vg-alertas-mais', 'Ver mais ' + resto + ' ' + plural(resto, 'pendência', 'pendências'))
+    mais.type = 'button'
+    mais.addEventListener('click', function () {
+      alertasAbertos = true
+      desenharAlertas(lista)
+    })
+    listaAlertas.appendChild(mais)
+  }
 }
 
 function desenharManchete(d, pendencias, criticos) {
@@ -440,7 +403,6 @@ async function carregarPainel() {
 
     movimentacoesAtuais = d.movimentacoes || []
     aplicarFiltros()
-    desenharAlojamentos(d.alojamentos)
     desenharAlertas(alertas)
   } catch (erro) {
     mostrarAviso('Sem conexão com o servidor.')
