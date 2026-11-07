@@ -1,9 +1,29 @@
 @import url("paleta.css");
-/* IBM Plex: Sans pra interface, Sans Condensed pra titulos e numeros, Mono so pra placas e matriculas */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@500&display=swap');
+/* Inter, a mesma fonte da apresentacao da DevCore */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* cores padrão do sistema */
+/* ===== tokens do sistema =====
+   referencia: design systems publicos de produtos profissionais (Shopify Polaris, GitHub Primer, Stripe, Linear)
+   - grade de 4px: espacamentos so em 4, 8, 12, 16, 20, 24, 32, 40
+   - texto: 14px no corpo, 13 secundario, 12 legenda, 11 rotulo em caixa alta; titulos 16/20/28; numeros grandes 40
+   - pesos: 400 texto, 500 rotulo/acao, 600 titulo
+   - raios: 6 (etiqueta, botao pequeno), 8 (campo, botao), 12 (cartao, painel, janela)
+   - controles: 32px pequeno, 36px padrao
+   cores seguem a apresentacao da DevCore (paleta.css) */
 :root {
+  --fs-11: 11px;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-14: 14px;
+  --fs-16: 16px;
+  --fs-20: 20px;
+  --fs-28: 28px;
+  --fs-40: 40px;
+  --raio-p: 6px;
+  --raio-g: 12px;
+  --controle: 36px;
+  --controle-p: 32px;
+
   --fundo: var(--dc-noite);
   --cartao: var(--dc-painel);
   --campo: var(--dc-noite);
@@ -13,34 +33,37 @@
   --placeholder: #9f9a8f;
   --azul: var(--dc-ouro);
   --erro-fundo: #35110f;
-  --erro-texto: #ee6f68;
-  --sucesso-fundo: #0d2e1e;
-  --sucesso-texto: #6ee7b7;
+  --erro-texto: #e08a7e;
+  --sucesso-fundo: #23221e;
+  --sucesso-texto: #e3dccb;
   --sombra: rgba(0, 0, 0, 0.4);
 
-  /* topo, menu lateral e botão principal */
-  --marinho: var(--dc-floresta);
-  --verde: var(--dc-musgo);
-  --verde-hover: #2f5532;
+  /* topo, menu lateral e botão principal: carvao da apresentacao (nomes antigos mantidos pra nao quebrar os css) */
+  --marinho: var(--dc-carvao);
+  --verde: var(--dc-carvao);
+  --verde-hover: #36332c;
+  --sobre-primario: var(--dc-creme); /* texto em cima do botao principal */
+  --acento: var(--dc-ocre); /* destaque: ocre no claro, ouro no escuro */
 
   /* cores das telas de dentro (claras): fundo alabastro e cartao um pouco mais claro pra destacar */
   --claro-fundo: var(--dc-creme);
   --claro-cartao: #f8f7f3;
-  --claro-texto: var(--dc-floresta);
+  --claro-texto: var(--dc-carvao);
   --claro-texto-fraco: #67604f;
   --claro-borda: #dcd8cc;
   --claro-suave: #e8e5dc; /* fundo de aba, hover de linha etc */
-  --claro-anel: rgba(100, 116, 139, 0.25); /* brilho em volta do campo com foco */
-  --vermelho: #dc2626;
+  --claro-anel: rgba(130, 100, 38, 0.2); /* brilho em volta do campo com foco */
+  --vermelho: #a3352b; /* tijolo, no tom da paleta */
+  --vermelho-hover: #8a2c24;
   --borda-forte: #9a9282; /* borda de hover/foco; nao usar como cor de texto (contraste 2,56:1) */
 
   /* estados nas telas claras: fundo, borda e texto */
-  --ok-claro-fundo: #f0fdf4;
-  --ok-claro-borda: #bbf7d0;
-  --ok-claro-texto: #166534;
-  --erro-claro-fundo: #fef2f2;
-  --erro-claro-borda: #fecaca;
-  --erro-claro-texto: #991b1b;
+  --ok-claro-fundo: #edeae1;
+  --ok-claro-borda: #d9d4c7;
+  --ok-claro-texto: #4f4a3f;
+  --erro-claro-fundo: #f6e9e6;
+  --erro-claro-borda: #e6c3bd;
+  --erro-claro-texto: #a3352b;
   /* atencao em ambar terroso, no lugar do amarelo/vermelho generico */
   --atencao-claro-fundo: #f6f1e5;
   --atencao-claro-borda: #dccdab;
@@ -49,7 +72,7 @@
   --info-claro-texto: #65501d;
   --superficie-2: #eeebe2; /* fundo levemente diferente do cartao (cabecalhos, rodapes) */
   --raio: 8px;
-  --sombra-leve: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --sombra-leve: none;
 
   color-scheme: dark;
 }
@@ -62,7 +85,7 @@
 }
 
 body {
-  font-family: 'IBM Plex Sans', 'Segoe UI', Arial, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
   background-color: var(--fundo);
   color: var(--texto);
   -webkit-font-smoothing: antialiased;
@@ -91,12 +114,12 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 36px;
+  gap: 8px;
+  height: var(--controle);
   padding: 0 16px;
   border-radius: var(--raio);
   border: 1px solid transparent;
-  font-size: 14px;
+  font-size: var(--fs-14);
   font-weight: 500;
   white-space: nowrap;
   text-decoration: none;
@@ -106,7 +129,7 @@ button {
 
 .btn-primario {
   background-color: var(--verde);
-  color: var(--dc-creme);
+  color: var(--sobre-primario);
   box-shadow: var(--sombra-leve);
 }
 
@@ -142,13 +165,13 @@ button {
 }
 
 .btn-destrutivo:hover {
-  background-color: #b91c1c;
+  background-color: var(--vermelho-hover);
 }
 
 .btn-pequeno {
-  height: 32px;
+  height: var(--controle-p);
   padding: 0 12px;
-  font-size: 13px;
+  font-size: var(--fs-13);
 }
 
 /* anel em volta quando chega no botão pelo tab do teclado */
@@ -190,25 +213,25 @@ button {
 }
 
 .campo-label {
-  font-size: 13px;
+  font-size: var(--fs-13);
   font-weight: 500;
   color: var(--claro-texto);
   margin-bottom: 8px;
 }
 
 .campo-dica {
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--claro-texto-fraco);
-  margin-top: 6px;
+  margin-top: 8px;
   line-height: 1.4;
 }
 
 .config-input,
 .config-select {
   width: 100%;
-  height: 36px;
+  height: var(--controle);
   padding: 0 12px;
-  font-size: 14px;
+  font-size: var(--fs-14);
   color: var(--claro-texto);
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
@@ -273,13 +296,13 @@ button {
 }
 
 .switch-titulo {
-  font-size: 14px;
+  font-size: var(--fs-14);
   font-weight: 500;
   color: var(--claro-texto);
 }
 
 .switch-desc {
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto-fraco);
   line-height: 1.45;
 }
@@ -302,7 +325,7 @@ button {
 .chave-trilho {
   position: absolute;
   inset: 0;
-  background-color: #cbd5e1;
+  background-color: var(--borda-forte);
   border-radius: 999px;
   transition: background-color 0.18s;
 }
@@ -315,14 +338,14 @@ button {
   height: 16px;
   left: 2px;
   top: 2px;
-  background-color: var(--dc-creme);
+  background-color: var(--claro-cartao);
   border-radius: 50%;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   transition: transform 0.18s;
 }
 
 .chave input:checked + .chave-trilho {
-  background-color: var(--verde);
+  background-color: var(--claro-texto);
 }
 
 .chave input:checked + .chave-trilho::before {
@@ -342,7 +365,7 @@ button {
   border-radius: 50%;
   background-color: var(--marinho);
   color: var(--dc-creme);
-  font-size: 14px;
+  font-size: var(--fs-14);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -358,14 +381,14 @@ button {
   right: 24px;
   bottom: 24px;
   max-width: 380px;
-  padding: 14px 16px 14px 40px;
+  padding: 16px 16px 16px 40px;
   border-radius: var(--raio);
   background-color: var(--claro-cartao);
   color: var(--claro-texto);
   border: 1px solid var(--claro-borda);
-  font-size: 14px;
+  font-size: var(--fs-14);
   font-weight: 500;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  box-shadow: var(--sombra-2);
   z-index: 200;
   animation: toastSubir 0.25s ease-out;
 }
@@ -381,23 +404,23 @@ button {
   height: 18px;
   border-radius: 50%;
   background-color: var(--verde);
-  color: var(--dc-creme);
-  font-size: 11px;
+  color: var(--sobre-primario);
+  font-size: var(--fs-11);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .toast.toast-erro {
-  color: #991b1b;
-  border-color: #fecaca;
-  background-color: #fef2f2;
+  color: var(--erro-claro-texto);
+  border-color: var(--erro-claro-borda);
+  background-color: var(--erro-claro-fundo);
 }
 
 .toast.toast-erro::before {
   content: '!';
   background-color: var(--vermelho);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 @keyframes toastSubir {

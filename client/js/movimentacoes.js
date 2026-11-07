@@ -53,7 +53,7 @@ const seletorCategoria = document.getElementById('mov-categoria')
 const seletorTipo = document.getElementById('mov-tipo')
 const corpo = document.getElementById('mov-lista')
 const botaoMais = document.getElementById('botao-mais')
-const PASSO = 300
+const PASSO = 30 // poucas linhas por vez pra tela nao pesar; 'mostrar mais' traz o resto
 
 let limite = PASSO
 let eventosAtuais = []
@@ -70,15 +70,18 @@ function ajustarTipos() {
   if (seletorTipo.value !== '' && area !== '' && tiposPorArea[area].indexOf(seletorTipo.value) === -1) seletorTipo.value = ''
 }
 
+function filtrosQuery(qtd) {
+  return '?de=' + encodeURIComponent(campoDe.value) + '&ate=' + encodeURIComponent(campoAte.value) +
+    '&categoria=' + encodeURIComponent(seletorCategoria.value) + '&tipo=' + encodeURIComponent(seletorTipo.value) +
+    '&busca=' + encodeURIComponent(campoBusca.value) + '&limite=' + qtd
+}
+
 async function carregar() {
   if (!campoDe.value || !campoAte.value || campoDe.value > campoAte.value) {
     mostrarToast('Informe um período válido (a data inicial não pode ser depois da final).', 'erro')
     return
   }
-  const q = '?de=' + encodeURIComponent(campoDe.value) + '&ate=' + encodeURIComponent(campoAte.value) +
-    '&categoria=' + encodeURIComponent(seletorCategoria.value) + '&tipo=' + encodeURIComponent(seletorTipo.value) +
-    '&busca=' + encodeURIComponent(campoBusca.value) + '&limite=' + limite
-  const r = await chamarApi('/api/relatorios/movimentacoes' + q)
+  const r = await chamarApi('/api/relatorios/movimentacoes' + filtrosQuery(limite))
   corpo.innerHTML = ''
   if (!r.ok) {
     corpo.innerHTML = '<tr><td colspan="4" class="texto-vazio">' + esc(r.dados.erro || 'Erro ao carregar.') + '</td></tr>'
@@ -125,9 +128,11 @@ botaoMais.addEventListener('click', function () {
   carregar()
 })
 
-// exporta o que esta na tela (respeita os filtros) em CSV com ; e BOM pro Excel abrir os acentos
-document.getElementById('botao-exportar').addEventListener('click', function () {
-  if (eventosAtuais.length === 0) {
+// exporta tudo que bate com os filtros (nao so a pagina na tela) em CSV com ; e BOM pro Excel abrir os acentos
+document.getElementById('botao-exportar').addEventListener('click', async function () {
+  const r = await chamarApi('/api/relatorios/movimentacoes' + filtrosQuery(1000))
+  const todos = r.ok ? r.dados.eventos : eventosAtuais
+  if (todos.length === 0) {
     mostrarToast('Não há movimentações para exportar.', 'erro')
     return
   }
@@ -135,7 +140,7 @@ document.getElementById('botao-exportar').addEventListener('click', function () 
     const v = String(t === null || t === undefined ? '' : t)
     return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v
   }
-  const linhas = [['Quando', 'Área', 'Tipo', 'Colaborador', 'Recurso']].concat(eventosAtuais.map(function (e) {
+  const linhas = [['Quando', 'Área', 'Tipo', 'Colaborador', 'Recurso']].concat(todos.map(function (e) {
     return [e.quando, e.categoria === 'frota' ? 'Frota' : 'Alojamento', e.tipo, e.colaborador, e.recurso]
   }))
   const csv = '\ufeff' + linhas.map(function (l) { return l.map(celula).join(';') }).join('\r\n')

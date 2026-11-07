@@ -8,13 +8,13 @@
 
 .veic-modelo {
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--fs-14);
 }
 
 .veic-placa {
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--claro-texto-fraco);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
 }
 
 .docs-celula {
@@ -25,12 +25,12 @@
 }
 
 .doc-linha {
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--claro-texto-fraco);
 }
 
 .uso-celula {
-  font-size: 13px;
+  font-size: var(--fs-13);
 }
 
 .uso-celula span {
@@ -41,23 +41,23 @@
 .lista-passageiros {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
+  gap: 8px;
   max-height: 160px;
   overflow-y: auto;
   border: 1px solid var(--claro-borda);
-  border-radius: 8px;
+  border-radius: var(--raio);
   padding: 8px;
 }
 
 .lista-passageiros label {
-  font-size: 13px;
+  font-size: var(--fs-13);
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
 }
 
 .timeline-botoes {
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 /* numeros alinhados a direita nas tabelas (todas as telas que carregam este css) */
