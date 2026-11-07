@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/resumo.css">
   <link rel="stylesheet" href="css/tema.css">
+  <link rel="stylesheet" href="css/visao-geral.css">
   <script src="js/tema.js"></script>
 </head>
 <body class="painel-corpo">
@@ -148,139 +149,117 @@
       </div>
     </header>
 
-    <main class="conteudo">
+    <main class="conteudo vg">
 
-      <!-- linha de indicadores -->
-      <section class="indicadores">
-
-        <div class="cartao-kpi">
-          <div class="kpi-topo">
-            <span class="kpi-rotulo">Veículos em uso</span>
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M5 17H3v-5l2-5h12l2 5v5h-2"/>
-              <circle cx="7.5" cy="17.5" r="2"/>
-              <circle cx="16.5" cy="17.5" r="2"/>
-            </svg>
-          </div>
-          <div class="kpi-valor-linha">
-            <strong id="num-veiculos-uso" class="kpi-numero">25</strong>
-            <span id="sub-veiculos-uso" class="kpi-complemento">de 34 na frota</span>
-          </div>
-          <div class="barra-fundo">
-            <div id="barra-frota" class="barra-preenchimento barra-azul" style="width: 74%"></div>
-          </div>
-          <p id="detalhe-veiculos-uso" class="kpi-detalhe">2 veículos em manutenção no momento</p>
+      <section class="vg-cabeca">
+        <div>
+          <p class="vg-sobre"><span class="vg-rotulo">Visão geral</span><span id="vg-atualizado">carregando</span></p>
+          <h2 id="vg-manchete" class="vg-manchete">Carregando a operação...</h2>
         </div>
-
-        <div class="cartao-kpi">
-          <div class="kpi-topo">
-            <span class="kpi-rotulo">Veículos disponíveis</span>
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-          </div>
-          <div class="kpi-valor-linha">
-            <strong id="num-veiculos-disp" class="kpi-numero">7</strong>
-            <span class="kpi-complemento">prontos para saída</span>
-          </div>
-          <div class="barra-fundo">
-            <div id="barra-disp" class="barra-preenchimento barra-verde" style="width: 21%"></div>
-          </div>
-          <p id="detalhe-veiculos-disp" class="kpi-detalhe">Documentação e CNH validadas na saída</p>
+        <div class="vg-acoes">
+          <a href="relatorios.html" class="vg-botao">Relatórios</a>
+          <a href="movimentacoes.html" class="vg-botao vg-botao-principal">Registrar movimentação <span aria-hidden="true">&#8599;</span></a>
         </div>
-
-        <div class="cartao-kpi">
-          <div class="kpi-topo">
-            <span class="kpi-rotulo">Alojamentos ativos</span>
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M3 21h18"/>
-              <path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>
-            </svg>
-          </div>
-          <div class="kpi-valor-linha">
-            <strong id="num-alojamentos" class="kpi-numero">3</strong>
-            <span id="sub-alojamentos" class="kpi-complemento">42 leitos no total</span>
-          </div>
-          <div class="barra-fundo">
-            <div id="barra-ocupacao" class="barra-preenchimento barra-marinho" style="width: 55%"></div>
-          </div>
-          <p id="detalhe-alojamentos" class="kpi-detalhe">23 leitos ocupados hoje (55%)</p>
-        </div>
-
-        <div class="cartao-kpi">
-          <div class="kpi-topo">
-            <span class="kpi-rotulo">Vagas disponíveis</span>
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M2 4v16"/>
-              <path d="M2 8h18a2 2 0 0 1 2 2v10"/>
-              <path d="M2 17h20"/>
-              <path d="M6 8v9"/>
-            </svg>
-          </div>
-          <div class="kpi-valor-linha">
-            <strong id="num-vagas" class="kpi-numero">19</strong>
-            <span class="kpi-complemento">leitos livres</span>
-          </div>
-          <div class="barra-fundo">
-            <div id="barra-vagas" class="barra-preenchimento barra-verde" style="width: 45%"></div>
-          </div>
-          <p class="kpi-detalhe">Capacidade dentro do limite da NR-24</p>
-        </div>
-
       </section>
 
-      <!-- grade principal: movimentações à esquerda e lateral de acompanhamento à direita -->
-      <div class="grade-operacional">
+      <section class="vg-indicadores">
+        <article class="vg-cartao">
+          <div class="vg-cartao-topo">
+            <span class="vg-rotulo">01 / Frota</span>
+            <a href="frota.html" class="vg-link">Ver frota</a>
+          </div>
+          <div class="vg-numero-linha">
+            <strong id="frota-uso" class="vg-numero">0</strong>
+            <span id="frota-sub" class="vg-numero-sub">veículos na rua</span>
+          </div>
+          <div id="frota-barra" class="vg-segmentos"></div>
+          <ul id="frota-legenda" class="vg-legenda"></ul>
+        </article>
 
-        <section class="bloco">
-          <div class="bloco-cabecalho">
+        <article class="vg-cartao">
+          <div class="vg-cartao-topo">
+            <span class="vg-rotulo">02 / Hospedagem</span>
+            <a href="alojamentos.html" class="vg-link">Ver unidades</a>
+          </div>
+          <div class="vg-numero-linha">
+            <strong id="leitos-ocupados" class="vg-numero">0</strong>
+            <span id="leitos-sub" class="vg-numero-sub">leitos ocupados</span>
+          </div>
+          <div id="leitos-barra" class="vg-segmentos"></div>
+          <ul id="leitos-legenda" class="vg-legenda"></ul>
+        </article>
+
+        <article class="vg-cartao">
+          <div class="vg-cartao-topo">
+            <span class="vg-rotulo">03 / Pendências</span>
+            <a href="#secao-alertas" class="vg-link">Ver lista</a>
+          </div>
+          <div class="vg-numero-linha">
+            <strong id="pend-total" class="vg-numero">0</strong>
+            <span id="pend-sub" class="vg-numero-sub">em aberto</span>
+          </div>
+          <div id="pend-barra" class="vg-segmentos"></div>
+          <ul id="pend-legenda" class="vg-legenda"></ul>
+        </article>
+      </section>
+
+      <div class="vg-grade">
+        <section class="vg-painel">
+          <div class="vg-painel-topo">
             <div>
-              <h2 class="bloco-titulo">Movimentações recentes</h2>
-              <p class="bloco-subtitulo">Últimas entradas, retiradas e devoluções registradas</p>
+              <span class="vg-rotulo">04 / Movimentações</span>
+              <h3 class="vg-titulo">Últimos registros</h3>
             </div>
-
-            <div class="filtro-abas">
-              <button type="button" class="aba-item ativa" data-filtro="todos">Todas</button>
-              <button type="button" class="aba-item" data-filtro="frota">Frota</button>
-              <button type="button" class="aba-item" data-filtro="alojamento">Alojamentos</button>
+            <div class="vg-abas">
+              <button type="button" class="vg-aba ativa" data-filtro="todos">Todas</button>
+              <button type="button" class="vg-aba" data-filtro="frota">Frota</button>
+              <button type="button" class="vg-aba" data-filtro="alojamento">Alojamentos</button>
             </div>
           </div>
-
-          <div class="tabela-area">
-            <table class="tabela">
+          <div class="vg-tabela-area">
+            <table class="vg-tabela">
               <thead>
                 <tr>
                   <th>Colaborador</th>
-                  <th>Tipo</th>
+                  <th>Movimento</th>
                   <th>Recurso</th>
-                  <th>Horário</th>
+                  <th>Quando</th>
                   <th>Status</th>
                 </tr>
               </thead>
               <tbody id="lista-movimentacoes"></tbody>
             </table>
           </div>
+          <div class="vg-painel-pe">
+            <a href="movimentacoes.html" class="vg-link">Ver histórico completo</a>
+          </div>
         </section>
 
-        <div class="coluna-lateral">
-
-          <section class="bloco">
-            <div class="bloco-cabecalho bloco-cabecalho-simples">
-              <h2 class="bloco-titulo">Ocupação por unidade</h2>
+        <section id="secao-alertas" class="vg-painel">
+          <div class="vg-painel-topo">
+            <div>
+              <span class="vg-rotulo">05 / Atenção</span>
+              <h3 class="vg-titulo">O que precisa ser resolvido</h3>
             </div>
-            <div id="lista-alojamentos" class="lista-unidades"></div>
-          </section>
-
-          <section id="secao-alertas" class="bloco">
-            <div class="bloco-cabecalho bloco-cabecalho-simples">
-              <h2 class="bloco-titulo">Atenção operacional</h2>
-            </div>
-            <div id="lista-alertas" class="lista-alertas"></div>
-          </section>
-
-        </div>
-
+            <div id="pend-contagem" class="vg-contagem"></div>
+          </div>
+          <div id="lista-alertas" class="vg-alertas"></div>
+        </section>
       </div>
+
+      <section class="vg-painel">
+        <div class="vg-painel-topo">
+          <div>
+            <span class="vg-rotulo">06 / Alojamentos</span>
+            <h3 class="vg-titulo">Ocupação por unidade</h3>
+          </div>
+          <ul class="vg-legenda">
+            <li><i class="cor-acento"></i>Ocupado</li>
+            <li><i class="cor-trilho"></i>Livre</li>
+          </ul>
+        </div>
+        <div id="lista-alojamentos" class="vg-unidades"></div>
+      </section>
 
     </main>
   </div>

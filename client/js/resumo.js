@@ -1,20 +1,23 @@
 // tela de Resumo Operacional
 
-const numVeiculosUso = document.getElementById('num-veiculos-uso')
-const subVeiculosUso = document.getElementById('sub-veiculos-uso')
-const detalheVeiculosUso = document.getElementById('detalhe-veiculos-uso')
-const barraFrota = document.getElementById('barra-frota')
+const manchete = document.getElementById('vg-manchete')
+const atualizado = document.getElementById('vg-atualizado')
 
-const numVeiculosDisp = document.getElementById('num-veiculos-disp')
-const barraDisp = document.getElementById('barra-disp')
+const frotaUso = document.getElementById('frota-uso')
+const frotaSub = document.getElementById('frota-sub')
+const frotaBarra = document.getElementById('frota-barra')
+const frotaLegenda = document.getElementById('frota-legenda')
 
-const numAlojamentos = document.getElementById('num-alojamentos')
-const subAlojamentos = document.getElementById('sub-alojamentos')
-const detalheAlojamentos = document.getElementById('detalhe-alojamentos')
-const barraOcupacao = document.getElementById('barra-ocupacao')
+const leitosOcupados = document.getElementById('leitos-ocupados')
+const leitosSub = document.getElementById('leitos-sub')
+const leitosBarra = document.getElementById('leitos-barra')
+const leitosLegenda = document.getElementById('leitos-legenda')
 
-const numVagas = document.getElementById('num-vagas')
-const barraVagas = document.getElementById('barra-vagas')
+const pendTotal = document.getElementById('pend-total')
+const pendSub = document.getElementById('pend-sub')
+const pendBarra = document.getElementById('pend-barra')
+const pendLegenda = document.getElementById('pend-legenda')
+const pendContagem = document.getElementById('pend-contagem')
 
 const listaMov = document.getElementById('lista-movimentacoes')
 const listaAloj = document.getElementById('lista-alojamentos')
@@ -33,12 +36,11 @@ const botaoNotif = document.getElementById('botao-notificacoes')
 const secaoAlertas = document.getElementById('secao-alertas')
 const avisoTela = document.getElementById('aviso-tela')
 const dataHoje = document.getElementById('data-hoje')
-const abasFiltro = document.querySelectorAll('.aba-item')
+const abasFiltro = document.querySelectorAll('.vg-aba')
 
 let movimentacoesAtuais = []
 let filtroCategoria = 'todos'
 
-// mostra a data atual no cabeçalho
 dataHoje.textContent = new Date().toLocaleDateString('pt-BR', {
   weekday: 'long',
   day: '2-digit',
@@ -61,21 +63,80 @@ function pegarIniciais(nome) {
   return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase()
 }
 
-function classeStatus(status) {
-  if (status === 'Ativo') {
-    return 'status-tag status-ativo'
-  }
-  if (status === 'Em uso') {
-    return 'status-tag status-uso'
-  }
-  return 'status-tag status-concluido'
-}
-
 function porcentagem(parte, total) {
   if (!total || total <= 0) {
     return 0
   }
   return Math.round((parte / total) * 100)
+}
+
+function plural(n, um, varios) {
+  return n === 1 ? um : varios
+}
+
+function criar(tag, classe, texto) {
+  const el = document.createElement(tag)
+  if (classe) {
+    el.className = classe
+  }
+  if (texto !== undefined) {
+    el.textContent = texto
+  }
+  return el
+}
+
+function desenharSegmentos(barra, legenda, partes) {
+  barra.innerHTML = ''
+  legenda.innerHTML = ''
+
+  partes.forEach(function (p) {
+    if (p.valor > 0 && !p.soLegenda) {
+      const seg = criar('span', p.cor)
+      seg.style.flexGrow = p.valor
+      barra.appendChild(seg)
+    }
+
+    const li = document.createElement('li')
+    li.appendChild(criar('i', p.cor))
+    li.appendChild(criar('b', null, p.valor))
+    li.appendChild(document.createTextNode(p.nome))
+    legenda.appendChild(li)
+  })
+}
+
+function textoQuando(dataOrdem, horario) {
+  if (!dataOrdem) {
+    return { dia: '', hora: horario || '' }
+  }
+
+  const dia = dataOrdem.slice(0, 10)
+  const hoje = new Date()
+  const ontem = new Date()
+  ontem.setDate(hoje.getDate() - 1)
+
+  function formatar(d) {
+    const mes = String(d.getMonth() + 1).padStart(2, '0')
+    const dd = String(d.getDate()).padStart(2, '0')
+    return d.getFullYear() + '-' + mes + '-' + dd
+  }
+
+  if (dia === formatar(hoje)) {
+    return { dia: 'Hoje', hora: horario }
+  }
+  if (dia === formatar(ontem)) {
+    return { dia: 'Ontem', hora: horario }
+  }
+  return { dia: dia.slice(8, 10) + '/' + dia.slice(5, 7), hora: horario }
+}
+
+function classeStatus(status) {
+  if (status === 'Em uso') {
+    return 'vg-status vg-status-uso'
+  }
+  if (status === 'Ativo') {
+    return 'vg-status vg-status-ativo'
+  }
+  return 'vg-status'
 }
 
 function aplicarFiltros() {
@@ -104,10 +165,8 @@ function desenharTabela(lista) {
 
   if (lista.length === 0) {
     const tr = document.createElement('tr')
-    const td = document.createElement('td')
+    const td = criar('td', 'vg-vazio', 'Nenhuma movimentação encontrada para esse filtro.')
     td.colSpan = 5
-    td.className = 'texto-vazio'
-    td.textContent = 'Nenhuma movimentação encontrada para esse filtro.'
     tr.appendChild(td)
     listaMov.appendChild(tr)
     return
@@ -117,43 +176,47 @@ function desenharTabela(lista) {
     const tr = document.createElement('tr')
 
     const tdPessoa = document.createElement('td')
-    const spanNome = document.createElement('span')
-    spanNome.className = 'pessoa-nome'
-    spanNome.textContent = item.colaborador
-    tdPessoa.appendChild(spanNome)
-
+    const pessoa = criar('div', 'vg-pessoa')
+    pessoa.appendChild(criar('span', 'vg-avatar', pegarIniciais(item.colaborador)))
+    const nomes = document.createElement('div')
+    nomes.appendChild(criar('span', 'vg-pessoa-nome', item.colaborador))
     if (item.cargo) {
-      const spanCargo = document.createElement('span')
-      spanCargo.className = 'pessoa-cargo'
-      spanCargo.textContent = item.cargo
-      tdPessoa.appendChild(spanCargo)
+      nomes.appendChild(criar('span', 'vg-pessoa-cargo', item.cargo))
     }
+    pessoa.appendChild(nomes)
+    tdPessoa.appendChild(pessoa)
 
+    const sai = item.tipo === 'Retirada' || item.tipo === 'Saída'
     const tdTipo = document.createElement('td')
-    tdTipo.textContent = item.tipo
+    const tipo = criar('span', 'vg-tipo ' + (sai ? 'vg-tipo-sai' : 'vg-tipo-entra'))
+    tipo.appendChild(criar('span', 'vg-tipo-seta', sai ? '↗' : '↙'))
+    const tipoTexto = criar('span', null, item.tipo)
+    tipoTexto.appendChild(criar('small', null, item.categoria === 'frota' ? 'Frota' : 'Alojamento'))
+    tipo.appendChild(tipoTexto)
+    tdTipo.appendChild(tipo)
 
     const tdRecurso = document.createElement('td')
-    tdRecurso.textContent = item.recurso
+    const recurso = criar('div', 'vg-recurso')
+    const pedacos = item.recurso.split(' · ')
+    recurso.appendChild(criar('span', 'vg-recurso-nome', pedacos[0]))
+    if (pedacos[1]) {
+      recurso.appendChild(criar('span', 'vg-placa', pedacos[1]))
+    }
+    tdRecurso.appendChild(recurso)
 
-    const tdHorario = document.createElement('td')
-    tdHorario.className = 'celula-horario'
-    tdHorario.textContent = item.horario
+    const quando = textoQuando(item.data_ordem, item.horario)
+    const tdQuando = criar('td', 'vg-quando')
+    tdQuando.appendChild(criar('b', null, quando.dia))
+    tdQuando.appendChild(document.createTextNode(quando.dia ? ', ' + quando.hora : quando.hora))
 
     const tdStatus = document.createElement('td')
-    const tag = document.createElement('span')
-    tag.className = classeStatus(item.status)
-    const ponto = document.createElement('span')
-    ponto.className = 'status-ponto'
-    tag.appendChild(ponto)
-    tag.appendChild(document.createTextNode(item.status))
-    tdStatus.appendChild(tag)
+    tdStatus.appendChild(criar('span', classeStatus(item.status), item.status))
 
     tr.appendChild(tdPessoa)
     tr.appendChild(tdTipo)
     tr.appendChild(tdRecurso)
-    tr.appendChild(tdHorario)
+    tr.appendChild(tdQuando)
     tr.appendChild(tdStatus)
-
     listaMov.appendChild(tr)
   })
 }
@@ -162,83 +225,131 @@ function desenharAlojamentos(lista) {
   listaAloj.innerHTML = ''
 
   if (!lista || lista.length === 0) {
-    const p = document.createElement('p')
-    p.className = 'texto-vazio'
-    p.textContent = 'Nenhum alojamento cadastrado ainda.'
-    listaAloj.appendChild(p)
+    listaAloj.appendChild(criar('p', 'vg-vazio', 'Nenhum alojamento cadastrado ainda.'))
     return
   }
 
   lista.forEach(function (aloj) {
     const pct = porcentagem(aloj.ocupados, aloj.total)
-    const div = document.createElement('div')
+    const card = criar('article', 'vg-unidade')
 
-    const topo = document.createElement('div')
-    topo.className = 'unidade-topo'
-
-    const nome = document.createElement('span')
-    nome.className = 'unidade-nome'
-    nome.textContent = aloj.nome
+    const topo = criar('div', 'vg-unidade-topo')
+    const nomes = document.createElement('div')
+    nomes.appendChild(criar('h4', 'vg-unidade-nome', aloj.nome))
     if (aloj.cidade) {
-      const cid = document.createElement('span')
-      cid.className = 'unidade-cidade'
-      cid.textContent = '· ' + aloj.cidade
-      nome.appendChild(cid)
+      nomes.appendChild(criar('p', 'vg-unidade-cidade', aloj.cidade))
+    }
+    topo.appendChild(nomes)
+
+    let situacao = 'Com vagas'
+    let classe = 'vg-chip vg-chip-acento'
+    if (pct >= 90) {
+      situacao = 'Lotado'
+      classe = 'vg-chip vg-chip-erro'
+    } else if (pct >= 75) {
+      situacao = 'Quase cheio'
+    }
+    topo.appendChild(criar('span', classe, situacao))
+
+    const leitos = criar('div', 'vg-leitos')
+    for (let i = 0; i < aloj.total; i++) {
+      leitos.appendChild(criar('i', i < aloj.ocupados ? 'ocupado' : ''))
     }
 
-    const numeros = document.createElement('span')
-    numeros.className = 'unidade-numeros'
-    numeros.textContent = aloj.ocupados + '/' + aloj.total + ' leitos'
+    const pe = criar('div', 'vg-unidade-pe')
+    const conta = document.createElement('span')
+    conta.appendChild(criar('b', null, aloj.ocupados))
+    conta.appendChild(document.createTextNode(' de ' + aloj.total + ' leitos'))
+    pe.appendChild(conta)
+    pe.appendChild(criar('span', null, pct + '% ocupado'))
 
-    topo.appendChild(nome)
-    topo.appendChild(numeros)
-
-    const fundo = document.createElement('div')
-    fundo.className = 'barra-fundo'
-    const barra = document.createElement('div')
-    barra.className = 'barra-preenchimento ' + (pct >= 80 ? 'barra-azul' : 'barra-verde')
-    barra.style.width = pct + '%'
-    fundo.appendChild(barra)
-
-    div.appendChild(topo)
-    div.appendChild(fundo)
-    listaAloj.appendChild(div)
+    card.appendChild(topo)
+    card.appendChild(leitos)
+    card.appendChild(pe)
+    listaAloj.appendChild(card)
   })
+}
+
+function linkDoAlerta(a) {
+  const texto = (a.titulo + ' ' + a.detalhe).toLowerCase()
+  if (texto.indexOf('cnh') !== -1) {
+    return { href: 'colaboradores.html', nome: 'Ver colaborador' }
+  }
+  if (texto.indexOf('leito') !== -1 || texto.indexOf('alojamento') !== -1) {
+    return { href: 'alojamentos.html', nome: 'Ver alojamento' }
+  }
+  return { href: 'frota.html', nome: 'Ver veículo' }
 }
 
 function desenharAlertas(lista) {
   listaAlertas.innerHTML = ''
+  pendContagem.innerHTML = ''
 
   if (!lista || lista.length === 0) {
     pontoAlerta.hidden = true
-    const p = document.createElement('p')
-    p.className = 'texto-vazio'
-    p.textContent = 'Nenhuma pendência operacional aberta.'
-    listaAlertas.appendChild(p)
+    listaAlertas.appendChild(criar('p', 'vg-vazio', 'Nenhuma pendência em aberto. Tudo em dia.'))
     return
   }
 
   pontoAlerta.hidden = false
 
+  const criticos = lista.filter(function (a) {
+    return a.nivel === 'problema'
+  }).length
+  const atencao = lista.length - criticos
+
+  if (criticos > 0) {
+    pendContagem.appendChild(criar('span', 'vg-chip vg-chip-erro', criticos + ' ' + plural(criticos, 'crítica', 'críticas')))
+  }
+  if (atencao > 0) {
+    pendContagem.appendChild(criar('span', 'vg-chip vg-chip-acento', atencao + ' atenção'))
+  }
+
   lista.forEach(function (a) {
-    const div = document.createElement('div')
-    div.className = 'alerta-item ' + (a.nivel === 'problema' ? 'alerta-problema' : 'alerta-atencao')
+    const problema = a.nivel === 'problema'
+    const item = criar('div', 'vg-alerta ' + (problema ? 'vg-alerta-problema' : 'vg-alerta-atencao'))
+    item.appendChild(criar('span', 'vg-alerta-icone', problema ? '!' : '•'))
 
-    const titulo = document.createElement('p')
-    titulo.className = 'alerta-titulo'
-    titulo.textContent = a.titulo
-
-    const detalhe = document.createElement('p')
-    detalhe.className = 'alerta-detalhe'
-    detalhe.textContent = a.detalhe
-
-    div.appendChild(titulo)
-    div.appendChild(detalhe)
-    listaAlertas.appendChild(div)
+    const corpo = document.createElement('div')
+    corpo.appendChild(criar('p', 'vg-alerta-titulo', a.titulo))
+    corpo.appendChild(criar('p', 'vg-alerta-detalhe', a.detalhe))
+    const destino = linkDoAlerta(a)
+    const link = criar('a', 'vg-link', destino.nome)
+    link.href = destino.href
+    item.appendChild(corpo)
+    item.appendChild(link)
+    listaAlertas.appendChild(item)
   })
 }
 
-// filtro por abas (Todas / Frota / Alojamentos)
+function desenharManchete(d, pendencias, criticos) {
+  manchete.innerHTML = ''
+
+  function numero(valor, classe) {
+    const em = document.createElement('em')
+    em.textContent = valor
+    if (classe) {
+      em.className = classe
+    }
+    manchete.appendChild(em)
+  }
+
+  function texto(t) {
+    manchete.appendChild(document.createTextNode(t))
+  }
+
+  numero(d.veiculosEmUso)
+  texto(' ' + plural(d.veiculosEmUso, 'veículo na rua', 'veículos na rua') + ', ')
+  numero(d.leitosOcupados)
+  texto(' ' + plural(d.leitosOcupados, 'pessoa alojada', 'pessoas alojadas') + ' e ')
+  if (pendencias === 0) {
+    texto('nenhuma pendência em aberto.')
+    return
+  }
+  numero(pendencias, criticos > 0 ? 'vg-critico' : '')
+  texto(' ' + plural(pendencias, 'pendência', 'pendências') + ' para resolver.')
+}
+
 abasFiltro.forEach(function (aba) {
   aba.addEventListener('click', function () {
     abasFiltro.forEach(function (outra) {
@@ -256,7 +367,6 @@ botaoNotif.addEventListener('click', function () {
   secaoAlertas.scrollIntoView({ behavior: 'smooth' })
 })
 
-// aviso pra telas que serão implementadas nas próximas tarefas
 const linksEmBreve = document.querySelectorAll('.menu-em-breve')
 linksEmBreve.forEach(function (link) {
   link.addEventListener('click', function (e) {
@@ -296,33 +406,42 @@ async function carregarPainel() {
     if (d.nomeEmpresa) {
       nomeEmpresaMenu.textContent = d.nomeEmpresa
     }
-    const pctFrota = porcentagem(d.veiculosEmUso, d.totalVeiculos)
-    const pctDisp = porcentagem(d.veiculosDisponiveis, d.totalVeiculos)
-    const pctOcup = porcentagem(d.leitosOcupados, d.totalLeitos)
-    const pctVagas = porcentagem(d.vagasDisponiveis, d.totalLeitos)
 
-    numVeiculosUso.textContent = d.veiculosEmUso
-    subVeiculosUso.textContent = 'de ' + d.totalVeiculos + ' na frota'
-    barraFrota.style.width = pctFrota + '%'
-    detalheVeiculosUso.textContent = d.veiculosManutencao > 0
-      ? d.veiculosManutencao + ' em manutenção no momento'
-      : 'Nenhum veículo na oficina'
+    const alertas = d.alertas || []
+    const criticos = alertas.filter(function (a) {
+      return a.nivel === 'problema'
+    }).length
 
-    numVeiculosDisp.textContent = d.veiculosDisponiveis
-    barraDisp.style.width = pctDisp + '%'
+    atualizado.textContent = 'atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+    desenharManchete(d, alertas.length, criticos)
 
-    numAlojamentos.textContent = d.totalAlojamentos
-    subAlojamentos.textContent = d.totalLeitos + ' leitos no total'
-    barraOcupacao.style.width = pctOcup + '%'
-    detalheAlojamentos.textContent = d.leitosOcupados + ' leitos ocupados hoje (' + pctOcup + '%)'
+    frotaUso.textContent = d.veiculosEmUso
+    frotaSub.textContent = 'de ' + d.totalVeiculos + ' ' + plural(d.totalVeiculos, 'veículo', 'veículos') + ' na rua'
+    desenharSegmentos(frotaBarra, frotaLegenda, [
+      { nome: 'em uso', valor: d.veiculosEmUso, cor: 'cor-acento' },
+      { nome: plural(d.veiculosDisponiveis, 'disponível', 'disponíveis'), valor: d.veiculosDisponiveis, cor: 'cor-livre' },
+      { nome: 'na oficina', valor: d.veiculosManutencao, cor: 'cor-taupe' }
+    ])
 
-    numVagas.textContent = d.vagasDisponiveis
-    barraVagas.style.width = pctVagas + '%'
+    leitosOcupados.textContent = d.leitosOcupados
+    leitosSub.textContent = 'de ' + d.totalLeitos + ' leitos · ' + porcentagem(d.leitosOcupados, d.totalLeitos) + '%'
+    desenharSegmentos(leitosBarra, leitosLegenda, [
+      { nome: plural(d.leitosOcupados, 'ocupado', 'ocupados'), valor: d.leitosOcupados, cor: 'cor-acento' },
+      { nome: plural(d.vagasDisponiveis, 'livre', 'livres'), valor: d.vagasDisponiveis, cor: 'cor-livre' },
+      { nome: plural(d.totalAlojamentos, 'unidade', 'unidades'), valor: d.totalAlojamentos, cor: 'cor-trilho', soLegenda: true }
+    ])
+
+    pendTotal.textContent = alertas.length
+    pendSub.textContent = alertas.length === 0 ? 'tudo em dia' : 'em aberto'
+    desenharSegmentos(pendBarra, pendLegenda, [
+      { nome: plural(criticos, 'crítica', 'críticas'), valor: criticos, cor: 'cor-erro' },
+      { nome: 'de atenção', valor: alertas.length - criticos, cor: 'cor-acento' }
+    ])
 
     movimentacoesAtuais = d.movimentacoes || []
     aplicarFiltros()
     desenharAlojamentos(d.alojamentos)
-    desenharAlertas(d.alertas)
+    desenharAlertas(alertas)
   } catch (erro) {
     mostrarAviso('Sem conexão com o servidor.')
   }
