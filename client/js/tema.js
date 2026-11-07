@@ -9,7 +9,7 @@
   function temaAtual() {
     const salvo = lerSalvo()
     if (salvo === 'claro' || salvo === 'escuro') return salvo
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'escuro' : 'claro'
+    return 'escuro' // A identidade DevCore usa o tema escuro por padrão; preserva a escolha salva.
   }
 
   function aplicar(tema) {

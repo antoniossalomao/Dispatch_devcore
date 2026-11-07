@@ -45,7 +45,7 @@
 }
 
 .colab-inativo .colab-avatar {
-  background-color: #cbd5e1;
+  background-color: var(--claro-suave);
   color: var(--claro-texto-fraco);
 }
 
@@ -282,7 +282,7 @@
 /* :has deixa mudar a cor do label quando o checkbox de dentro ta marcado */
 .check-categoria:has(input:checked) {
   background-color: var(--ok-claro-fundo);
-  border-color: #86efac;
+  border-color: #a9c39b;
   color: var(--ok-claro-texto);
 }
 

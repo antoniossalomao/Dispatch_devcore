@@ -1,0 +1,15 @@
+/* Base predominante: preto e carvão. Verde é apenas um acento secundário. */
+:root {
+  --dc-noite: #0a0a09;
+  --dc-carvao: #1a1916;
+  --dc-floresta: #152b20;
+  --dc-musgo: #24472c;
+  --dc-creme: #eeeee6;
+  --dc-ocre: #856622;
+  --dc-ouro: #cfad68;
+  --dc-taupe: #a18a75;
+  --dc-salvia: #b9b5ab;
+  --dc-painel: #151513;
+  --dc-elevado: #20201d;
+  --dc-linha: #34342f;
+}
