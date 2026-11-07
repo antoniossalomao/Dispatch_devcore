@@ -4,14 +4,14 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
-  padding: 18px 20px 20px;
+  padding: 20px 20px 20px;
 }
 
 .aloj-cartao {
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: 12px;
-  padding: 18px;
+  border-radius: var(--raio-g);
+  padding: 20px;
   box-shadow: var(--sombra-leve);
   cursor: pointer;
   text-align: left;
@@ -22,7 +22,7 @@
 
 .aloj-cartao:hover {
   border-color: var(--borda-forte);
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  box-shadow: none;
 }
 
 .aloj-cartao.aloj-inativo {
@@ -37,15 +37,15 @@
 }
 
 .aloj-nome {
-  font-size: 14px;
+  font-size: var(--fs-14);
   font-weight: 600;
 }
 
 .aloj-local,
 .aloj-resp {
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto-fraco);
-  margin-top: 3px;
+  margin-top: 4px;
 }
 
 .aloj-barra {
@@ -69,7 +69,7 @@
 .aloj-numeros {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto-fraco);
 }
 
@@ -81,23 +81,23 @@
 
 .quarto-card {
   border: 1px solid var(--claro-borda);
-  border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 14px;
+  border-radius: var(--raio);
+  padding: 16px;
+  margin-bottom: 16px;
   background-color: var(--claro-cartao);
 }
 
 .quarto-titulo {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: var(--fs-14);
   font-weight: 600;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .quarto-titulo span {
   font-weight: 400;
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto-fraco);
 }
 
@@ -109,8 +109,8 @@
 
 .leito {
   border: 1px solid var(--claro-borda);
-  border-radius: 8px;
-  padding: 8px 10px;
+  border-radius: var(--raio);
+  padding: 8px 12px;
   text-align: left;
   font: inherit;
   cursor: pointer;
@@ -122,17 +122,17 @@
 }
 
 .leito-codigo {
-  font-size: 12px;
+  font-size: var(--fs-12);
   font-weight: 600;
 }
 
 .leito-tipo {
-  font-size: 11px;
+  font-size: var(--fs-11);
   color: var(--claro-texto-fraco);
 }
 
 .leito-pessoa {
-  font-size: 12px;
+  font-size: var(--fs-12);
 }
 
 .leito.livre {
@@ -154,7 +154,7 @@
 }
 
 .ocor-acoes {
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .aloj-cartao:focus-visible,
@@ -166,7 +166,7 @@
 @media (max-width: 560px) {
   .aloj-grade {
     grid-template-columns: 1fr;
-    padding: 14px;
+    padding: 16px;
   }
 
   .leitos-grade {

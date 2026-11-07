@@ -58,7 +58,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  font-family: 'IBM Plex Sans Condensed', 'IBM Plex Sans', sans-serif;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.3px;
@@ -76,7 +76,7 @@
 }
 
 .login-chamada {
-  font-family: 'IBM Plex Sans Condensed', 'IBM Plex Sans', sans-serif;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   font-size: 34px;
   font-weight: 600;
   line-height: 1.15;
@@ -102,7 +102,7 @@
 }
 
 .login-titulo {
-  font-family: 'IBM Plex Sans Condensed', 'IBM Plex Sans', sans-serif;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
   font-size: 26px;
   font-weight: 600;
   letter-spacing: -0.2px;
@@ -185,7 +185,7 @@
 }
 
 .login-sucesso {
-  border: 1px solid #14532d;
+  border: 1px solid #3b3a34;
   background-color: var(--sucesso-fundo);
   color: var(--sucesso-texto);
   font-size: 14px;
@@ -195,8 +195,8 @@
 }
 
 .login-botao {
-  background-color: var(--verde);
-  color: #fff;
+  background-color: var(--dc-creme); /* botao claro sobre o fundo noite, como na apresentacao */
+  color: var(--dc-noite);
   border: none;
   border-radius: 8px;
   height: 40px;
@@ -207,14 +207,14 @@
   transition: background-color 0.2s, box-shadow 0.2s;
 }
 
-/* anel verde quando chega no botão pelo tab */
+/* anel dourado quando chega no botão pelo tab */
 .login-botao:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(22, 136, 83, 0.4);
+  box-shadow: 0 0 0 3px rgba(207, 173, 104, 0.4);
 }
 
 .login-botao:hover {
-  background-color: var(--verde-hover);
+  background-color: #ffffff;
 }
 
 .login-botao:disabled {

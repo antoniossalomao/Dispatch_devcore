@@ -19,7 +19,7 @@
 
 .select-curto {
   width: 170px;
-  font-size: 13px;
+  font-size: var(--fs-13);
 }
 
 /* coluna do colaborador na tabela com avatar */
@@ -31,12 +31,12 @@
 
 /* bolinha com as iniciais (Avatar do shadcn) */
 .colab-avatar {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background-color: var(--marinho);
-  color: #fff;
-  font-size: 12px;
+  color: var(--dc-creme);
+  font-size: var(--fs-12);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -55,7 +55,7 @@
 }
 
 .colab-nome {
-  font-size: 14px;
+  font-size: var(--fs-14);
   font-weight: 500;
   color: var(--claro-texto);
   cursor: pointer;
@@ -68,19 +68,19 @@
 }
 
 .colab-matricula {
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--claro-texto-fraco);
-  font-family: Consolas, monospace;
+  font-family: var(--fonte-id);
 }
 
 .colab-cargo {
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto);
   font-weight: 500;
 }
 
 .colab-obra {
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--claro-texto-fraco);
   margin-top: 1px;
 }
@@ -94,19 +94,19 @@
 
 .cnh-categorias-badge {
   display: inline-block;
-  font-size: 11px;
+  font-size: var(--fs-11);
   font-weight: 600;
   color: var(--claro-texto);
   background-color: var(--claro-suave);
   border: 1px solid var(--claro-borda);
-  padding: 1px 7px;
-  border-radius: 6px;
+  padding: 1px 8px;
+  border-radius: var(--raio-p);
   width: fit-content;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
 }
 
 .cnh-validade-txt {
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--claro-texto-fraco);
 }
 
@@ -114,8 +114,8 @@
 .situacao-celula {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  font-size: 13px;
+  gap: 4px;
+  font-size: var(--fs-13);
 }
 
 .situacao-alojamento {
@@ -146,7 +146,7 @@
 .botoes-acoes {
   display: flex;
   justify-content: flex-end;
-  gap: 6px;
+  gap: 8px;
 }
 
 
@@ -155,7 +155,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(10, 10, 9, 0.5);
   z-index: 100;
   display: flex;
   align-items: center;
@@ -167,13 +167,13 @@
 .modal-card {
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: 12px;
+  border-radius: var(--raio-g);
   width: 100%;
   max-width: 640px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
+  box-shadow: var(--sombra-2);
   overflow: hidden;
   animation: crescer 0.18s ease-out; /* abre crescendo um pouquinho, igual o do shadcn */
 }
@@ -189,7 +189,7 @@
 }
 
 .modal-cabecalho {
-  padding: 22px 24px 16px;
+  padding: 24px 24px 16px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -197,14 +197,14 @@
 }
 
 .modal-titulo {
-  font-size: 17px;
+  font-size: var(--fs-16);
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.02em;
   color: var(--claro-texto);
 }
 
 .modal-subtitulo {
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto-fraco);
   margin-top: 4px;
 }
@@ -215,8 +215,8 @@
   border: none;
   width: 28px;
   height: 28px;
-  border-radius: 6px;
-  font-size: 20px;
+  border-radius: var(--raio-p);
+  font-size: var(--fs-20);
   line-height: 1;
   color: var(--claro-texto-fraco);
   cursor: pointer;
@@ -254,7 +254,7 @@
 
 .categorias-seletor {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -262,13 +262,13 @@
 .check-categoria {
   display: flex;
   align-items: center;
-  gap: 6px;
-  height: 32px;
-  font-size: 13px;
+  gap: 8px;
+  height: var(--controle-p);
+  font-size: var(--fs-13);
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
   border-radius: var(--raio);
-  padding: 0 10px;
+  padding: 0 12px;
   cursor: pointer;
   font-weight: 500;
   color: var(--claro-texto);
@@ -282,7 +282,7 @@
 /* :has deixa mudar a cor do label quando o checkbox de dentro ta marcado */
 .check-categoria:has(input:checked) {
   background-color: var(--ok-claro-fundo);
-  border-color: #a9c39b;
+  border-color: var(--borda-forte);
   color: var(--ok-claro-texto);
 }
 
@@ -291,7 +291,7 @@
 }
 
 .modal-rodape {
-  padding: 14px 24px;
+  padding: 16px 24px;
   border-top: 1px solid var(--claro-borda);
   display: flex;
   justify-content: flex-end;
@@ -304,7 +304,7 @@
 .gaveta-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(10, 10, 9, 0.5);
   z-index: 90;
   display: flex;
   justify-content: flex-end;
@@ -317,7 +317,7 @@
   background-color: var(--claro-fundo);
   height: 100%;
   border-left: 1px solid var(--claro-borda);
-  box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15);
+  box-shadow: var(--sombra-2);
   display: flex;
   flex-direction: column;
   animation: deslizarGaveta 0.25s ease-out;
@@ -339,18 +339,18 @@
 .gaveta-perfil {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .gaveta-titulo {
-  font-size: 17px;
+  font-size: var(--fs-16);
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.02em;
   color: var(--claro-texto);
 }
 
 .gaveta-subtitulo {
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto-fraco);
   margin-top: 2px;
 }
@@ -359,7 +359,7 @@
 .gaveta-abas {
   background-color: var(--claro-cartao);
   border-bottom: 1px solid var(--claro-borda);
-  padding: 0 24px 14px;
+  padding: 0 24px 16px;
 }
 
 .gaveta-corpo {
@@ -382,11 +382,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-top: 14px;
+  margin-top: 16px;
 }
 
 .status-caixa {
-  padding: 12px 14px;
+  padding: 12px 16px;
   border-radius: var(--raio);
   border: 1px solid var(--claro-borda);
   background-color: var(--superficie-2);
@@ -395,34 +395,34 @@
 }
 
 .status-caixa-rotulo {
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--claro-texto-fraco);
 }
 
 .status-caixa-valor {
-  font-size: 14px;
+  font-size: var(--fs-14);
   color: var(--claro-texto);
   margin: 4px 0 2px;
 }
 
 .status-caixa-sub {
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--claro-texto-fraco);
 }
 
 .gaveta-lista-dados {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .dado-linha {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
-  padding-bottom: 10px;
+  font-size: var(--fs-13);
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--claro-borda);
 }
 
@@ -444,8 +444,8 @@
 .timeline-lista {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 14px;
+  gap: 16px;
+  margin-top: 16px;
 }
 
 .timeline-item {
@@ -479,24 +479,24 @@
 }
 
 .timeline-titulo {
-  font-size: 14px;
+  font-size: var(--fs-14);
   font-weight: 500;
   color: var(--claro-texto);
 }
 
 .timeline-detalhe {
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto-fraco);
 }
 
 .timeline-data {
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--claro-texto-fraco);
   margin-top: 1px;
 }
 
 .gaveta-rodape {
-  padding: 14px 24px;
+  padding: 16px 24px;
   background-color: var(--claro-cartao);
   border-top: 1px solid var(--claro-borda);
   display: flex;

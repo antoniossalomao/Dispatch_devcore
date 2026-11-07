@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="css/resumo.css">
   <link rel="stylesheet" href="css/tema.css">
   <link rel="stylesheet" href="css/visao-geral.css">
+  <link rel="stylesheet" href="css/leve.css">
   <script src="js/tema.js"></script>
 </head>
 <body class="painel-corpo">
@@ -157,7 +158,6 @@
           <h2 id="vg-manchete" class="vg-manchete">Carregando a operação...</h2>
         </div>
         <div class="vg-acoes">
-          <a href="relatorios.html" class="vg-botao">Relatórios</a>
           <a href="movimentacoes.html" class="vg-botao vg-botao-principal">Registrar movimentação <span aria-hidden="true">&#8599;</span></a>
         </div>
       </section>
@@ -165,7 +165,7 @@
       <section class="vg-indicadores">
         <article class="vg-cartao">
           <div class="vg-cartao-topo">
-            <span class="vg-rotulo">01 / Frota</span>
+            <span class="vg-rotulo">Frota</span>
             <a href="frota.html" class="vg-link">Ver frota</a>
           </div>
           <div class="vg-numero-linha">
@@ -178,7 +178,7 @@
 
         <article class="vg-cartao">
           <div class="vg-cartao-topo">
-            <span class="vg-rotulo">02 / Hospedagem</span>
+            <span class="vg-rotulo">Hospedagem</span>
             <a href="alojamentos.html" class="vg-link">Ver unidades</a>
           </div>
           <div class="vg-numero-linha">
@@ -191,7 +191,7 @@
 
         <article class="vg-cartao">
           <div class="vg-cartao-topo">
-            <span class="vg-rotulo">03 / Pendências</span>
+            <span class="vg-rotulo">Pendências</span>
             <a href="#secao-alertas" class="vg-link">Ver lista</a>
           </div>
           <div class="vg-numero-linha">
@@ -207,7 +207,6 @@
         <section class="vg-painel">
           <div class="vg-painel-topo">
             <div>
-              <span class="vg-rotulo">04 / Movimentações</span>
               <h3 class="vg-titulo">Últimos registros</h3>
             </div>
             <div class="vg-abas">
@@ -221,7 +220,6 @@
               <thead>
                 <tr>
                   <th>Colaborador</th>
-                  <th>Movimento</th>
                   <th>Recurso</th>
                   <th>Quando</th>
                   <th>Status</th>
@@ -238,7 +236,6 @@
         <section id="secao-alertas" class="vg-painel">
           <div class="vg-painel-topo">
             <div>
-              <span class="vg-rotulo">05 / Atenção</span>
               <h3 class="vg-titulo">O que precisa ser resolvido</h3>
             </div>
             <div id="pend-contagem" class="vg-contagem"></div>
@@ -247,19 +244,6 @@
         </section>
       </div>
 
-      <section class="vg-painel">
-        <div class="vg-painel-topo">
-          <div>
-            <span class="vg-rotulo">06 / Alojamentos</span>
-            <h3 class="vg-titulo">Ocupação por unidade</h3>
-          </div>
-          <ul class="vg-legenda">
-            <li><i class="cor-acento"></i>Ocupado</li>
-            <li><i class="cor-trilho"></i>Livre</li>
-          </ul>
-        </div>
-        <div id="lista-alojamentos" class="vg-unidades"></div>
-      </section>
 
     </main>
   </div>

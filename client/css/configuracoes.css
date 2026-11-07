@@ -5,7 +5,7 @@
 .config-layout {
   display: grid;
   grid-template-columns: 224px 1fr;
-  gap: 28px;
+  gap: 32px;
   align-items: start;
   max-width: 1260px;
 }
@@ -24,10 +24,10 @@
   background: none;
   border: none;
   border-radius: var(--raio);
-  padding: 9px 12px;
+  padding: 8px 12px;
   display: flex;
   align-items: flex-start;
-  gap: 11px;
+  gap: 12px;
   text-align: left;
   color: var(--claro-texto-fraco);
   cursor: pointer;
@@ -55,14 +55,14 @@
 
 .nav-item-titulo {
   display: block;
-  font-size: 14px;
+  font-size: var(--fs-14);
   font-weight: 500;
   line-height: 1.3;
 }
 
 .nav-item-sub {
   display: block;
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--claro-texto-fraco);
   margin-top: 2px;
 }
@@ -74,18 +74,18 @@
 .config-secao {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
 /* etiqueta amarela de "atenção" (Badge) */
 .selo-pendente {
-  font-size: 12px;
+  font-size: var(--fs-12);
   font-weight: 500;
   color: var(--atencao-claro-texto);
   background-color: var(--atencao-claro-fundo);
   border: 1px solid var(--atencao-claro-borda);
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: var(--raio-p);
 }
 
 
@@ -103,7 +103,7 @@
 .campo-sufixo {
   display: flex;
   align-items: stretch;
-  height: 36px;
+  height: var(--controle);
   border: 1px solid var(--claro-borda);
   border-radius: var(--raio);
   overflow: hidden;
@@ -123,7 +123,7 @@
   border: none;
   outline: none;
   padding: 0 12px;
-  font-size: 14px;
+  font-size: var(--fs-14);
   color: var(--claro-texto);
   background: none;
   font-variant-numeric: tabular-nums;
@@ -135,7 +135,7 @@
   padding: 0 12px;
   background-color: var(--claro-suave);
   border-left: 1px solid var(--claro-borda);
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto-fraco);
   user-select: none;
 }
@@ -150,17 +150,17 @@
 .barra-salvar {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
   padding-top: 2px;
 }
 
 .config-rodape-form {
-  padding: 14px 20px;
+  padding: 16px 20px;
   border-top: 1px solid var(--claro-borda);
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .rodape-entre {
@@ -179,7 +179,7 @@
   padding: 20px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 16px;
 }
 
 .integracao-card {
@@ -193,17 +193,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .integracao-nome {
-  font-size: 14px;
+  font-size: var(--fs-14);
   font-weight: 600;
   color: var(--claro-texto);
 }
 
 .integracao-desc {
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto-fraco);
   line-height: 1.45;
 }
@@ -211,25 +211,25 @@
 /* bloco escuro tipo terminal, mostra como a mensagem vai sair */
 .previa-alerta {
   margin: 0 20px 20px;
-  padding: 14px 16px;
+  padding: 16px 16px;
   background-color: var(--marinho);
   color: var(--dc-creme);
   border-radius: var(--raio);
-  font-size: 13px;
+  font-size: var(--fs-13);
 }
 
 .previa-titulo {
   display: block;
-  font-size: 11px;
+  font-size: var(--fs-11);
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
   color: var(--claro-texto-fraco);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .previa-alerta code {
-  font-family: Consolas, monospace;
+  font-family: var(--fonte-id);
   line-height: 1.5;
   word-break: break-word;
 }
@@ -251,8 +251,8 @@
 .mini-kpi {
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: 12px;
-  padding: 14px 16px;
+  border-radius: var(--raio-g);
+  padding: 16px 16px;
   box-shadow: var(--sombra-leve);
 }
 
@@ -263,15 +263,15 @@
 
 .mini-rotulo {
   display: block;
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto-fraco);
   margin-bottom: 4px;
 }
 
 .mini-valor {
-  font-size: 22px;
+  font-size: var(--fs-20);
   font-weight: 600;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.02em;
   color: var(--claro-texto);
   font-variant-numeric: tabular-nums;
 }
@@ -282,22 +282,22 @@
 
 .acoes-linha {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .perfil-badge {
   display: inline-block;
   padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 12px;
+  border-radius: var(--raio-p);
+  font-size: var(--fs-12);
   font-weight: 500;
   border: 1px solid transparent;
 }
 
 .perfil-admin {
   background-color: var(--claro-texto);
-  color: #fff;
+  color: var(--claro-cartao);
 }
 
 .perfil-operador {
@@ -312,19 +312,19 @@
   border-bottom: 1px solid var(--claro-borda);
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .redefinir-texto {
-  font-size: 13px;
+  font-size: var(--fs-13);
   font-weight: 500;
   color: var(--claro-texto);
 }
 
 .redefinir-campo {
   width: 200px;
-  height: 32px;
+  height: var(--controle-p);
 }
 
 
@@ -339,12 +339,12 @@
 
 .integridade-status strong {
   display: block;
-  font-size: 14px;
+  font-size: var(--fs-14);
   font-weight: 600;
 }
 
 .integridade-status p {
-  font-size: 13px;
+  font-size: var(--fs-13);
   margin-top: 2px;
   opacity: 0.9;
 }
@@ -367,14 +367,14 @@
 .conta-topo-perfil {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .mostrar-senha-conta {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 13px;
+  font-size: var(--fs-13);
   color: var(--claro-texto-fraco);
   cursor: pointer;
 }
@@ -439,7 +439,7 @@
   grid-template-columns: repeat(4, 1fr);
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: 14px;
+  border-radius: var(--raio-g);
   box-shadow: var(--sombra-leve);
   overflow: hidden;
 }
@@ -459,29 +459,29 @@
   flex: none;
   width: 10px;
   height: 10px;
-  margin-top: 5px;
+  margin-top: 4px;
   border-radius: 50%;
   background-color: var(--borda-forte);
 }
 
 .saude-ok {
-  background-color: #54805a;
-  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.16);
+  background-color: var(--dc-ouro);
+  box-shadow: 0 0 0 4px rgba(207, 173, 104, 0.2);
 }
 
 .saude-erro {
   background-color: var(--vermelho);
-  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.18);
+  box-shadow: 0 0 0 4px rgba(163, 53, 43, 0.18);
 }
 
 .saude-off {
   background-color: var(--borda-forte);
-  box-shadow: 0 0 0 4px rgba(148, 163, 184, 0.18);
+  box-shadow: 0 0 0 4px rgba(157, 131, 106, 0.18);
 }
 
 .saude-titulo {
   display: block;
-  font-size: 13px;
+  font-size: var(--fs-13);
   font-weight: 600;
   color: var(--claro-texto);
 }
@@ -489,7 +489,7 @@
 .saude-detalhe {
   display: block;
   margin-top: 2px;
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: var(--claro-texto-fraco);
 }
 
@@ -497,7 +497,7 @@
 
 .config-nav-item {
   position: relative;
-  padding: 10px 12px 10px 14px;
+  padding: 12px 12px 12px 16px;
 }
 
 .config-nav-item.ativa {
@@ -526,7 +526,7 @@
   gap: 0;
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: 14px;
+  border-radius: var(--raio-g);
   box-shadow: var(--sombra-leve);
   overflow: hidden;
 }
@@ -542,7 +542,7 @@
   border: none;
   border-radius: 0;
   box-shadow: none;
-  padding: 18px 22px;
+  padding: 20px 24px;
 }
 
 .resumo-usuarios .mini-kpi + .mini-kpi,
@@ -560,8 +560,8 @@
 
 .mini-valor {
   font-family: var(--fonte-num);
-  font-size: 28px;
-  letter-spacing: -0.3px;
+  font-size: var(--fs-28);
+  letter-spacing: -0.02em;
 }
 
 /* ---- barra de salvar fixa: o botao fica sempre ao alcance ---- */
@@ -576,7 +576,7 @@
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   border: 1px solid var(--claro-borda);
-  border-radius: 12px;
+  border-radius: var(--raio-g);
   box-shadow: var(--sombra-2);
 }
 

@@ -2,13 +2,13 @@
    carregada depois dos css de cada tela, so nas telas internas (o login tem o proprio css) */
 
 :root {
-  --fonte-num: 'IBM Plex Sans Condensed', 'IBM Plex Sans', 'Segoe UI', Arial, sans-serif;
-  --fonte-id: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  --fonte-num: 'Inter', 'Segoe UI', Arial, sans-serif;
+  --fonte-id: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --capacete: var(--dc-ouro); /* amarelo de obra: so na marca e no item ativo do menu */
-  --sombra-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
-  --sombra-2: 0 8px 24px rgba(15, 23, 42, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --sombra-1: none;
+  --sombra-2: 0 12px 32px rgba(26, 25, 22, 0.14), 0 2px 6px rgba(26, 25, 22, 0.06);
   --claro-fundo: var(--dc-creme);
-  --claro-anel: rgba(37, 66, 38, 0.22);
+  --claro-anel: rgba(130, 100, 38, 0.2);
   --sombra-leve: var(--sombra-1);
 }
 
@@ -20,18 +20,22 @@
   --claro-texto-fraco: var(--dc-salvia);
   --claro-borda: var(--dc-linha);
   --claro-suave: var(--dc-elevado);
-  --claro-anel: rgba(173, 188, 170, 0.25);
+  --claro-anel: rgba(207, 173, 104, 0.22);
   --borda-forte: #918675;
-  --verde: #2f5532;
-  --verde-hover: #3a663e;
-  --sombra-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --verde: #e9e4d6;
+  --verde-hover: #ffffff;
+  --sobre-primario: var(--dc-noite);
+  --acento: var(--dc-ouro);
+  --vermelho: #c2493d;
+  --vermelho-hover: #a83d33;
+  --sombra-1: none;
   --sombra-2: 0 10px 28px rgba(0, 0, 0, 0.5);
-  --ok-claro-fundo: #182e20;
-  --ok-claro-borda: #345b3e;
-  --ok-claro-texto: #b3d0a9;
+  --ok-claro-fundo: #23221e;
+  --ok-claro-borda: #3b3a34;
+  --ok-claro-texto: #cfc9bb;
   --erro-claro-fundo: #2c1517;
   --erro-claro-borda: #6a2428;
-  --erro-claro-texto: #fca5a5;
+  --erro-claro-texto: #e08a7e;
   --atencao-claro-fundo: #241f14;
   --atencao-claro-borda: #5c4a26;
   --atencao-claro-texto: #d6b874;
@@ -70,9 +74,9 @@ body.painel-corpo {
 /* ===== menu lateral ===== */
 /* fundo musgo liso, com mais respiro entre os itens */
 .menu-lateral {
-  background: var(--dc-floresta);
+  background: var(--dc-noite);
   border-right: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 22px 14px 18px;
+  padding: 24px 16px 20px;
 }
 
 .menu-marca {
@@ -83,11 +87,11 @@ body.painel-corpo {
 .menu-logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-family: var(--fonte-num);
-  font-size: 23px;
-  font-weight: 700;
-  letter-spacing: -0.3px;
+  font-size: var(--fs-20);
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .menu-logo::before {
@@ -95,28 +99,28 @@ body.painel-corpo {
   flex: none;
   width: 28px;
   height: 28px;
-  border-radius: 8px;
+  border-radius: var(--raio);
   background: var(--capacete) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l6 6-6 6M12 6l6 6-6 6' fill='none' stroke='%230b0f19' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 20px no-repeat;
   box-shadow: 0 2px 8px rgba(207, 173, 104, 0.18);
 }
 
 .menu-empresa {
   margin-top: 2px;
-  margin-left: 38px;
+  margin-left: 40px;
 }
 
 /* nomes das secoes em texto normal, sem caixa alta */
 .menu-secao {
   text-transform: none;
   letter-spacing: 0;
-  font-size: 12px;
+  font-size: var(--fs-12);
   font-weight: 600;
-  color: #8fa58c;
+  color: #8a857a;
   margin-bottom: 8px;
 }
 
 .menu-secao-espaco {
-  margin-top: 28px;
+  margin-top: 32px;
 }
 
 .menu-lista {
@@ -127,7 +131,7 @@ body.painel-corpo {
   height: 38px;
   padding: 0 12px;
   gap: 12px;
-  color: #bcc8b8;
+  color: var(--dc-salvia);
   font-weight: 400;
   transition: background-color 0.15s, color 0.15s;
 }
@@ -143,21 +147,21 @@ body.painel-corpo {
 
 /* tela atual: fundo verde floresta, sem faixa forte do lado */
 .menu-item.ativo {
-  background-color: var(--dc-musgo);
-  color: #fff;
+  background-color: rgba(237, 236, 230, 0.08);
+  color: var(--dc-creme);
   font-weight: 500;
   box-shadow: inset 0 0 0 1px rgba(237, 236, 230, 0.06);
 }
 
 .menu-item.ativo svg {
-  color: #cfe0c8;
+  color: var(--dc-ouro);
   opacity: 1;
 }
 
 /* botao de tema dentro da pilula do perfil, mesmo tamanho do sair */
 .botao-tema {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   background: none;
   border: none;
   color: var(--claro-texto-fraco);
@@ -185,9 +189,9 @@ body.painel-corpo {
 
 .topo-titulo {
   font-family: var(--fonte-num);
-  font-size: 21px;
+  font-size: var(--fs-20);
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.02em;
   color: var(--claro-texto);
 }
 
@@ -210,7 +214,7 @@ body.painel-corpo {
   gap: 0;
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: 14px;
+  border-radius: var(--raio-g);
   box-shadow: var(--sombra-1);
   overflow: hidden;
 }
@@ -220,7 +224,7 @@ body.painel-corpo {
   border: none;
   border-radius: 0;
   box-shadow: none;
-  padding: 22px 26px;
+  padding: 24px 24px;
 }
 
 .indicadores .cartao-kpi + .cartao-kpi {
@@ -229,10 +233,10 @@ body.painel-corpo {
 
 /* rotulo pequeno em maiusculo, mais integrado ao numero */
 .kpi-rotulo {
-  font-size: 12px;
+  font-size: var(--fs-12);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .kpi-topo svg {
@@ -241,13 +245,13 @@ body.painel-corpo {
 
 .kpi-numero {
   font-family: var(--fonte-num);
-  font-size: 40px;
+  font-size: var(--fs-40);
   font-weight: 600;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.02em;
 }
 
 .kpi-complemento {
-  font-size: 13px;
+  font-size: var(--fs-13);
 }
 
 @media (max-width: 1140px) {
@@ -262,7 +266,7 @@ body.painel-corpo {
 
 @media (max-width: 780px) {
   .menu-lateral {
-    padding: 14px 16px;
+    padding: 16px 16px;
   }
 
   .menu-marca {
@@ -293,20 +297,20 @@ body.painel-corpo {
 
 /* ===== blocos e tabelas ===== */
 .bloco {
-  border-radius: 12px;
+  border-radius: var(--raio-g);
   box-shadow: var(--sombra-1);
 }
 
 .bloco-titulo {
   font-family: var(--fonte-num);
-  font-size: 16px;
+  font-size: var(--fs-16);
   font-weight: 600;
-  letter-spacing: -0.1px;
+  letter-spacing: -0.02em;
 }
 
 .tabela th {
   background-color: var(--claro-suave);
-  font-size: 12px;
+  font-size: var(--fs-12);
   font-weight: 600;
   color: var(--claro-texto-fraco);
 }
@@ -331,19 +335,19 @@ body.painel-corpo {
 .placa,
 .colab-matricula {
   font-family: var(--fonte-id);
-  font-size: 12px;
+  font-size: var(--fs-12);
   letter-spacing: 0.02em;
 }
 
 .texto-vazio {
-  padding: 28px 16px;
+  padding: 32px 16px;
   text-align: center;
   color: var(--claro-texto-fraco);
 }
 
 /* ===== botoes e campos ===== */
 .btn-primario {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 1px 2px rgba(0, 90, 44, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .btn-secundario {
@@ -410,7 +414,7 @@ body.painel-corpo {
 .modal-titulo,
 .gaveta-titulo {
   font-family: var(--fonte-num);
-  letter-spacing: -0.1px;
+  letter-spacing: -0.02em;
 }
 
 /* ===== tema escuro: ajustes pontuais ===== */
