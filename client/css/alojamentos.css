@@ -4,13 +4,13 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
-  padding: 20px 20px 20px;
+  padding: 24px;
 }
 
 .aloj-cartao {
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: var(--raio-g);
+  border-radius: 12px;
   padding: 20px;
   box-shadow: var(--sombra-leve);
   cursor: pointer;
@@ -22,7 +22,8 @@
 
 .aloj-cartao:hover {
   border-color: var(--borda-forte);
-  box-shadow: none;
+  box-shadow: var(--sombra-leve);
+  background-color: var(--superficie-2);
 }
 
 .aloj-cartao.aloj-inativo {
@@ -37,21 +38,21 @@
 }
 
 .aloj-nome {
-  font-size: var(--fs-14);
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .aloj-local,
 .aloj-resp {
-  font-size: var(--fs-13);
+  font-size: 13px;
   color: var(--claro-texto-fraco);
   margin-top: 4px;
 }
 
 .aloj-barra {
-  height: 8px;
+  height: 4px;
   background-color: var(--claro-suave);
-  border-radius: 999px;
+  border-radius: 2px;
   overflow: hidden;
   margin: 16px 0 8px;
 }
@@ -59,7 +60,7 @@
 .aloj-barra-preench {
   height: 100%;
   background-color: var(--verde);
-  border-radius: 999px;
+  border-radius: 2px;
 }
 
 .aloj-barra-preench.cheio {
@@ -69,7 +70,7 @@
 .aloj-numeros {
   display: flex;
   justify-content: space-between;
-  font-size: var(--fs-13);
+  font-size: 13px;
   color: var(--claro-texto-fraco);
 }
 
@@ -81,7 +82,7 @@
 
 .quarto-card {
   border: 1px solid var(--claro-borda);
-  border-radius: var(--raio);
+  border-radius: 10px;
   padding: 16px;
   margin-bottom: 16px;
   background-color: var(--claro-cartao);
@@ -90,14 +91,14 @@
 .quarto-titulo {
   display: flex;
   justify-content: space-between;
-  font-size: var(--fs-14);
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
   margin-bottom: 12px;
 }
 
 .quarto-titulo span {
   font-weight: 400;
-  font-size: var(--fs-13);
+  font-size: 13px;
   color: var(--claro-texto-fraco);
 }
 
@@ -109,8 +110,8 @@
 
 .leito {
   border: 1px solid var(--claro-borda);
-  border-radius: var(--raio);
-  padding: 8px 12px;
+  border-radius: 8px;
+  padding: 12px;
   text-align: left;
   font: inherit;
   cursor: pointer;
@@ -118,21 +119,21 @@
   color: var(--claro-texto);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .leito-codigo {
-  font-size: var(--fs-12);
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .leito-tipo {
-  font-size: var(--fs-11);
+  font-size: 11px;
   color: var(--claro-texto-fraco);
 }
 
 .leito-pessoa {
-  font-size: var(--fs-12);
+  font-size: 12px;
 }
 
 .leito.livre {
@@ -140,17 +141,17 @@
 }
 
 .leito.livre:hover {
-  border-color: var(--verde);
-  background-color: var(--ok-claro-fundo);
+  border-color: var(--borda-forte);
+  background-color: var(--claro-suave);
 }
 
 .leito.ocupado {
-  background-color: var(--erro-claro-fundo);
-  border-color: var(--erro-claro-borda);
+  background-color: var(--claro-suave);
+  border-color: var(--borda-forte);
 }
 
 .leito.ocupado:hover {
-  border-color: var(--vermelho);
+  border-color: var(--claro-texto-fraco);
 }
 
 .ocor-acoes {

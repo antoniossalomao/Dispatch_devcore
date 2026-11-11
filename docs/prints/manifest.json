@@ -1,0 +1,338 @@
+[
+  {
+    "group": "desktop",
+    "key": "01-login",
+    "label": "Login",
+    "file": "desktop/01-login.png"
+  },
+  {
+    "group": "desktop",
+    "key": "36-login-validacao",
+    "label": "Login — validação",
+    "file": "desktop/36-login-validacao.png"
+  },
+  {
+    "group": "desktop",
+    "key": "02-cadastro",
+    "label": "Cadastro de acesso",
+    "file": "desktop/02-cadastro.png"
+  },
+  {
+    "group": "desktop",
+    "key": "03-resumo",
+    "label": "Resumo operacional",
+    "file": "desktop/03-resumo.png"
+  },
+  {
+    "group": "desktop",
+    "key": "34-notificacoes",
+    "label": "Notificações",
+    "file": "desktop/34-notificacoes.png"
+  },
+  {
+    "group": "desktop",
+    "key": "35-ajuda",
+    "label": "Ajuda",
+    "file": "desktop/35-ajuda.png"
+  },
+  {
+    "group": "desktop",
+    "key": "04-colaboradores",
+    "label": "Colaboradores",
+    "file": "desktop/04-colaboradores.png"
+  },
+  {
+    "group": "desktop",
+    "key": "11-novo-colaborador",
+    "label": "Novo colaborador",
+    "file": "desktop/11-novo-colaborador.png"
+  },
+  {
+    "group": "desktop",
+    "key": "12-colaborador-historico",
+    "label": "Colaborador — visão geral",
+    "file": "desktop/12-colaborador-historico.png"
+  },
+  {
+    "group": "desktop",
+    "key": "13-colaborador-alojamentos",
+    "label": "Colaborador — alojamentos",
+    "file": "desktop/13-colaborador-alojamentos.png"
+  },
+  {
+    "group": "desktop",
+    "key": "14-colaborador-frota",
+    "label": "Colaborador — frota",
+    "file": "desktop/14-colaborador-frota.png"
+  },
+  {
+    "group": "desktop",
+    "key": "05-alojamentos",
+    "label": "Alojamentos",
+    "file": "desktop/05-alojamentos.png"
+  },
+  {
+    "group": "desktop",
+    "key": "15-novo-alojamento",
+    "label": "Novo alojamento",
+    "file": "desktop/15-novo-alojamento.png"
+  },
+  {
+    "group": "desktop",
+    "key": "16-alojamento-leitos",
+    "label": "Alojamento — mapa de leitos",
+    "file": "desktop/16-alojamento-leitos.png"
+  },
+  {
+    "group": "desktop",
+    "key": "17-novo-quarto",
+    "label": "Novo quarto",
+    "file": "desktop/17-novo-quarto.png"
+  },
+  {
+    "group": "desktop",
+    "key": "18-alojar-colaborador",
+    "label": "Alojar colaborador",
+    "file": "desktop/18-alojar-colaborador.png"
+  },
+  {
+    "group": "desktop",
+    "key": "19-alojamento-ocorrencias",
+    "label": "Alojamento — ocorrências",
+    "file": "desktop/19-alojamento-ocorrencias.png"
+  },
+  {
+    "group": "desktop",
+    "key": "20-nova-ocorrencia",
+    "label": "Nova ocorrência",
+    "file": "desktop/20-nova-ocorrencia.png"
+  },
+  {
+    "group": "desktop",
+    "key": "06-frota",
+    "label": "Frota",
+    "file": "desktop/06-frota.png"
+  },
+  {
+    "group": "desktop",
+    "key": "21-novo-veiculo",
+    "label": "Novo veículo",
+    "file": "desktop/21-novo-veiculo.png"
+  },
+  {
+    "group": "desktop",
+    "key": "22-saida-veiculo",
+    "label": "Registrar saída",
+    "file": "desktop/22-saida-veiculo.png"
+  },
+  {
+    "group": "desktop",
+    "key": "39-retorno-veiculo",
+    "label": "Registrar retorno",
+    "file": "desktop/39-retorno-veiculo.png"
+  },
+  {
+    "group": "desktop",
+    "key": "23-veiculo-historico",
+    "label": "Veículo — histórico de usos",
+    "file": "desktop/23-veiculo-historico.png"
+  },
+  {
+    "group": "desktop",
+    "key": "24-veiculo-manutencoes",
+    "label": "Veículo — manutenções",
+    "file": "desktop/24-veiculo-manutencoes.png"
+  },
+  {
+    "group": "desktop",
+    "key": "25-nova-manutencao",
+    "label": "Nova manutenção",
+    "file": "desktop/25-nova-manutencao.png"
+  },
+  {
+    "group": "desktop",
+    "key": "07-movimentacoes",
+    "label": "Movimentações",
+    "file": "desktop/07-movimentacoes.png"
+  },
+  {
+    "group": "desktop",
+    "key": "08-relatorios",
+    "label": "Relatórios — ocupação",
+    "file": "desktop/08-relatorios.png"
+  },
+  {
+    "group": "desktop",
+    "key": "26-relatorios-frota",
+    "label": "Relatórios — uso da frota",
+    "file": "desktop/26-relatorios-frota.png"
+  },
+  {
+    "group": "desktop",
+    "key": "27-relatorios-gargalos",
+    "label": "Relatórios — gargalos",
+    "file": "desktop/27-relatorios-gargalos.png"
+  },
+  {
+    "group": "desktop",
+    "key": "28-consulta-condutor",
+    "label": "Consulta de condutor",
+    "file": "desktop/28-consulta-condutor.png"
+  },
+  {
+    "group": "desktop",
+    "key": "29-relatorios-perguntas",
+    "label": "Perguntas sobre os dados",
+    "file": "desktop/29-relatorios-perguntas.png"
+  },
+  {
+    "group": "desktop",
+    "key": "09-configuracoes",
+    "label": "Configurações — operação e regras",
+    "file": "desktop/09-configuracoes.png"
+  },
+  {
+    "group": "desktop",
+    "key": "30-config-alertas",
+    "label": "Configurações — alertas e integrações",
+    "file": "desktop/30-config-alertas.png"
+  },
+  {
+    "group": "desktop",
+    "key": "31-config-usuarios",
+    "label": "Configurações — usuários e acessos",
+    "file": "desktop/31-config-usuarios.png"
+  },
+  {
+    "group": "desktop",
+    "key": "32-config-banco",
+    "label": "Configurações — banco e backup",
+    "file": "desktop/32-config-banco.png"
+  },
+  {
+    "group": "desktop",
+    "key": "10-auditoria",
+    "label": "Configurações — auditoria",
+    "file": "desktop/10-auditoria.png"
+  },
+  {
+    "group": "desktop",
+    "key": "33-config-conta",
+    "label": "Configurações — minha conta",
+    "file": "desktop/33-config-conta.png"
+  },
+  {
+    "group": "desktop",
+    "key": "37-tema-claro",
+    "label": "Resumo — tema claro",
+    "file": "desktop/37-tema-claro.png"
+  },
+  {
+    "group": "desktop",
+    "key": "38-cadastro-claro",
+    "label": "Cadastro de veículo — tema claro",
+    "file": "desktop/38-cadastro-claro.png"
+  },
+  {
+    "group": "celular",
+    "key": "01-login",
+    "label": "Login",
+    "file": "celular/01-login.png"
+  },
+  {
+    "group": "celular",
+    "key": "02-cadastro",
+    "label": "Cadastro de acesso",
+    "file": "celular/02-cadastro.png"
+  },
+  {
+    "group": "celular",
+    "key": "03-resumo",
+    "label": "Resumo operacional",
+    "file": "celular/03-resumo.png"
+  },
+  {
+    "group": "celular",
+    "key": "04-colaboradores",
+    "label": "Colaboradores",
+    "file": "celular/04-colaboradores.png"
+  },
+  {
+    "group": "celular",
+    "key": "11-novo-colaborador",
+    "label": "Novo colaborador",
+    "file": "celular/11-novo-colaborador.png"
+  },
+  {
+    "group": "celular",
+    "key": "05-alojamentos",
+    "label": "Alojamentos",
+    "file": "celular/05-alojamentos.png"
+  },
+  {
+    "group": "celular",
+    "key": "06-frota",
+    "label": "Frota",
+    "file": "celular/06-frota.png"
+  },
+  {
+    "group": "celular",
+    "key": "21-novo-veiculo",
+    "label": "Novo veículo",
+    "file": "celular/21-novo-veiculo.png"
+  },
+  {
+    "group": "celular",
+    "key": "07-movimentacoes",
+    "label": "Movimentações",
+    "file": "celular/07-movimentacoes.png"
+  },
+  {
+    "group": "celular",
+    "key": "08-relatorios",
+    "label": "Relatórios",
+    "file": "celular/08-relatorios.png"
+  },
+  {
+    "group": "celular",
+    "key": "09-configuracoes",
+    "label": "Configurações",
+    "file": "celular/09-configuracoes.png"
+  },
+  {
+    "group": "celular",
+    "key": "30-config-alertas",
+    "label": "Alertas e integrações",
+    "file": "celular/30-config-alertas.png"
+  },
+  {
+    "group": "celular",
+    "key": "31-config-usuarios",
+    "label": "Usuários e acessos",
+    "file": "celular/31-config-usuarios.png"
+  },
+  {
+    "group": "celular",
+    "key": "32-config-banco",
+    "label": "Banco e backup",
+    "file": "celular/32-config-banco.png"
+  },
+  {
+    "group": "celular",
+    "key": "10-auditoria",
+    "label": "Auditoria",
+    "file": "celular/10-auditoria.png"
+  },
+  {
+    "group": "celular",
+    "key": "33-config-conta",
+    "label": "Minha conta",
+    "file": "celular/33-config-conta.png"
+  },
+  {
+    "group": "celular",
+    "key": "34-notificacoes",
+    "label": "Notificações",
+    "file": "celular/34-notificacoes.png"
+  }
+]

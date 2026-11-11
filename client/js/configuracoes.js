@@ -16,6 +16,7 @@ const paineis = {
   alertas: document.getElementById('painel-alertas'),
   usuarios: document.getElementById('painel-usuarios'),
   banco: document.getElementById('painel-banco'),
+  auditoria: document.getElementById('painel-auditoria'),
   conta: document.getElementById('painel-conta')
 }
 
@@ -141,19 +142,31 @@ function mostrarAvisoTopo(texto) {
   }, 2600)
 }
 
-// troca entre os 5 painéis do submenu
+// Cada seção tem um endereço próprio, inclusive o acesso antigo à Auditoria.
+function abrirAbaConfig(alvo) {
+  if (!Object.prototype.hasOwnProperty.call(paineis, alvo)) alvo = 'regras'
+  botoesNav.forEach(function (botao) {
+    const ativa = botao.dataset.aba === alvo
+    botao.classList.toggle('ativa', ativa)
+    if (ativa) botao.setAttribute('aria-current', 'true')
+    else botao.removeAttribute('aria-current')
+  })
+  Object.keys(paineis).forEach(function (chave) {
+    paineis[chave].hidden = chave !== alvo
+  })
+  document.dispatchEvent(new CustomEvent('dispatch:config-aba', { detail: alvo }))
+}
+
 botoesNav.forEach(function (botao) {
   botao.addEventListener('click', function () {
-    botoesNav.forEach(function (b) {
-      b.classList.remove('ativa')
-    })
-    botao.classList.add('ativa')
-
     const alvo = botao.dataset.aba
-    Object.keys(paineis).forEach(function (chave) {
-      paineis[chave].hidden = chave !== alvo
-    })
+    if (window.location.hash !== '#' + alvo) history.pushState(null, '', '#' + alvo)
+    abrirAbaConfig(alvo)
   })
+})
+
+window.addEventListener('hashchange', function () {
+  abrirAbaConfig(window.location.hash.slice(1))
 })
 
 // avisa no topo quando algum parâmetro foi editado e ainda não salvo
@@ -163,14 +176,31 @@ const camposMonitorados = [
   cfgValidarNr24, cfgDiasVencimento, cfgDiasPendencia, cfgLotacaoPct, cfgTelegram
 ]
 
+let parametrosSalvos = null
+
+function atualizarEstadoParametros() {
+  const alterados = parametrosSalvos !== null && parametrosSalvos !== JSON.stringify(lerFormularioParametros())
+  seloAlterado.hidden = !alterados
+  const formularios = [formRegras, formAlertas]
+  formularios.forEach(function (formulario) {
+    formulario.querySelector('button[type="submit"]').disabled = !alterados || formulario.getAttribute('aria-busy') === 'true'
+  })
+  return alterados
+}
+
 camposMonitorados.forEach(function (campo) {
-  campo.addEventListener('input', function () {
-    seloAlterado.hidden = false
-  })
-  campo.addEventListener('change', function () {
-    seloAlterado.hidden = false
-  })
+  campo.addEventListener('input', atualizarEstadoParametros)
+  campo.addEventListener('change', atualizarEstadoParametros)
 })
+
+window.addEventListener('beforeunload', function (evento) {
+  if (atualizarEstadoParametros()) {
+    evento.preventDefault()
+    evento.returnValue = ''
+  }
+})
+
+atualizarEstadoParametros()
 
 function lerFormularioParametros() {
   return {
@@ -209,7 +239,8 @@ function preencherParametros(p) {
   cfgAvisarSeguro.checked = Boolean(p.avisarSeguroVencido)
   cfgValidarNr24.checked = Boolean(p.validarNr24)
   cfgTelegram.checked = Boolean(p.telegramCriticos)
-  seloAlterado.hidden = true
+  parametrosSalvos = JSON.stringify(lerFormularioParametros())
+  atualizarEstadoParametros()
 }
 
 async function salvarParametros(e) {
@@ -234,6 +265,7 @@ formRegras.addEventListener('submit', salvarParametros)
 formAlertas.addEventListener('submit', salvarParametros)
 
 botaoRestaurar.addEventListener('click', async function () {
+  if (!(await confirmar('As regras atuais e as alterações não salvas serão substituídas pelos parâmetros padrão.', { titulo: 'Restaurar parâmetros padrão', confirmar: 'Restaurar padrões' }))) return
   const r = await chamarApi('/api/configuracoes/restaurar-padrao', { metodo: 'POST' })
   if (!r.ok) {
     mostrarToast(r.dados.erro || 'Não foi possível restaurar.', 'erro')
@@ -707,6 +739,7 @@ async function carregarDados() {
     contaTituloPrevia.textContent = eu.nome
     contaLoginPrevia.textContent = '@' + eu.login + ' · Perfil administrador'
     contaAvatarPrevia.textContent = pegarIniciais(eu.nome)
+    abrirAbaConfig(window.location.hash.slice(1))
   } catch (erro) {
     mostrarToast('Sem conexão com o servidor.', 'erro')
   }

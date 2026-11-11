@@ -12,4 +12,13 @@
   --dc-painel: #151513;
   --dc-elevado: #20201d;
   --dc-linha: #34342f;
+
+  /* Superfícies neutras da aplicação; a apresentação usa os tokens --dc-*. */
+  --op-fundo: #111315;
+  --op-painel: #191c20;
+  --op-elevado: #24282d;
+  --op-borda: #30353b;
+  --op-texto: #eceef0;
+  --op-secundario: #a8afb8;
+  --op-mudo: #939ba5;
 }

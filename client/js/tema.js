@@ -1,4 +1,4 @@
-// tema claro/escuro: aplica a escolha antes da tela aparecer (carregar no <head>) e coloca o botao de troca no perfil do topo
+// tema claro/escuro: aplica a escolha antes da tela aparecer (carregar no <head>) e coloca o botão de troca junto ao perfil no topo
 (function () {
   const CHAVE = 'dispatch-tema'
 
@@ -9,7 +9,7 @@
   function temaAtual() {
     const salvo = lerSalvo()
     if (salvo === 'claro' || salvo === 'escuro') return salvo
-    return 'claro' // padrao é o claro (fundo alabastro); se a pessoa ja escolheu, vale a escolha dela
+    return 'escuro' // A identidade DevCore usa o tema escuro por padrão; preserva a escolha salva.
   }
 
   function aplicar(tema) {

@@ -100,9 +100,9 @@ Não vamos fazer: GPS, controle de combustível e custos, checklist de vistoria 
 
 Ainda falta colocar no Figma: aba de ocorrências, campo de responsável, cadastro de veículo com documentação, aba de manutenções, relatórios de movimentação e gargalos, sininho de notificações e o chat de ajuda.
 
-Visual: paleta de verdes de mata e tons de terra (menu musgo `#16281C`, botão principal e item ativo em verde floresta `#254226`, fundo alabastro `#EDECE6`, atenção em âmbar `#826426` e detalhes em taupe `#9D836A`), conteúdo em cartões, títulos em maiúsculo, etiquetas de status e botão verde pra ação principal. Os alertas usam âmbar em vez de vermelho; o vermelho fica só pra erro de formulário e ação destrutiva.
+Visual: superfícies operacionais em grafite e cinza, texto claro, ações principais discretas e cores semânticas para status. Os tokens da marca e a apresentação DevCore permanecem em `paleta.css`; a interface usa os tokens neutros `--op-*`. A documentação atual está em `docs/identidade-visual.md` e `docs/ui-ux.md`.
 
-O login é sempre claro. Dentro do sistema o claro é o padrão, com um botão pra trocar pro escuro, e a escolha fica salva no navegador. O usuário logado (avatar, nome, troca de tema e sair) fica numa pílula no canto direito do topo, ao lado do sino. Por isso as cores ficam em variáveis no `base.css` (`var(--fundo)`, `var(--texto)`, `var(--marinho)`, `var(--verde)`...) e as telas usam elas em vez de escrever a cor direto no CSS, senão a tela não muda junto com o tema. As cores do tema claro foram tiradas do Figma.
+O sistema inicia no tema escuro, preserva a escolha em `dispatch-tema` e permite alternar para o claro. O perfil, a troca de tema e a saída ficam no topo, ao lado do sino. Configurações fica no rodapé do menu e contém a Auditoria. No celular, o menu é recolhível. As cores das telas usam variáveis compartilhadas para manter os dois temas consistentes.
 
 
 ## 5. Regras

@@ -8,16 +8,25 @@ Os tokens estão em `client/css/paleta.css`, importados pelo sistema e pelo port
 
 | Token | Cor | Uso |
 |---|---|---|
-| `--dc-noite` | `#0A0A09` | Fundo principal preto |
-| `--dc-carvao` | `#1A1916` | Superfícies neutras e profundidade |
-| `--dc-floresta` / `--dc-musgo` | `#152B20` / `#24472C` | Verde apenas como acento secundário |
-| `--dc-creme` | `#EEEEE6` | Texto e botões de destaque |
-| `--dc-ocre` | `#856622` | Acentos e indicadores |
+| `--dc-noite` | `#0A0A09` | Fundo principal |
+| `--dc-carvao` | `#1A1916` | Superfícies da apresentação |
+| `--dc-floresta` | `#16281C` | Superfícies e profundidade |
+| `--dc-musgo` | `#254226` | Variações de verde |
+| `--dc-creme` | `#EDECE6` | Texto e botões de destaque |
+| `--dc-ocre` | `#826426` | Acentos e indicadores |
 | `--dc-ouro` | `#CFAD68` | Detalhes e foco visual |
-| `--dc-taupe` | `#A18A75` | Acento secundário |
-| `--dc-salvia` | `#B9B5AB` | Texto secundário neutro |
+| `--dc-taupe` | `#9D836A` | Acento secundário |
+| `--dc-salvia` | `#B9B5AB` | Texto secundário |
 
 O Dispatch inicia em tema escuro quando não existe preferência salva. A alternância claro/escuro continua disponível e preserva a escolha em `dispatch-tema`. Cores semânticas de erro e alertas críticos continuam distintas da identidade da marca.
+
+### Superfícies operacionais
+
+No sistema, a direção visual é mais sóbria: grafite e cinza nos fundos, cartões, campos, navegação e tabelas. O verde fica restrito a estados positivos; ouro e creme mantêm a ligação com a marca em detalhes e ações. A apresentação conserva sua paleta original.
+
+Os tokens `--op-*`, no mesmo `paleta.css`, definem o tema escuro: fundo `#111315`, painel `#191C20`, superfície elevada `#24282D`, borda `#30353B`, texto `#ECEEF0` e texto secundário `#A8AFB8`. O tema claro usa fundo `#F4F5F6`, cartões brancos e texto `#202328`. Os nomes legados `--verde` e `--marinho` continuam disponíveis para os módulos, mas apontam para controles e superfícies neutros.
+
+O refinamento de espaçamento, tipografia e componentes está documentado em [Unslop no Dispatch](unslop-dispatch.md).
 
 ## Logo vetorial
 
@@ -34,6 +43,14 @@ A cena do produto também fica presa: a interface começa inclinada e menor, ocu
 `prefers-reduced-motion: reduce` desativa os movimentos e a rolagem suave e remove os percursos extras, inclusive quando a preferência muda durante a navegação. Sem JavaScript, o conteúdo segue no fluxo normal. Não há rolagem artificial nem dependência de biblioteca de animação.
 
 As abas do produto aceitam clique, setas, Home e End. Os detalhes de planos usam `dialog` nativo, com foco modal e fechamento por Escape, botão ou clique fora. FAQ usa `details` e `summary`, funcionando sem JavaScript.
+
+## Navegação do sistema
+
+Configurações fica no rodapé do menu lateral para administradores. A seção Auditoria está dentro de Configurações, com filtros do histórico e verificação de integridade; o endereço antigo `auditoria.html` redireciona para `configuracoes.html#auditoria`.
+
+O perfil, a troca de tema e a saída ficam no cabeçalho de todas as telas operacionais. Os alertas de Atenção operacional ficam no sino ao lado do perfil, com contagem de pendências, leitura individual e leitura em lote. O resumo concentra os indicadores, as movimentações e a ocupação por unidade.
+
+No celular, o menu operacional é recolhível para priorizar o conteúdo. As abas de relatórios, configurações e históricos aceitam teclado; buscas têm limpeza direta e tabelas indicam quando há mais colunas fora da área visível. Feedback de envio e proteção de alterações seguem os [princípios de UI/UX aplicados](ui-ux.md).
 
 ## Planos e conteúdo
 

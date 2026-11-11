@@ -138,7 +138,8 @@ function desenharTabela(lista) {
     const dadosNome = document.createElement('div')
     dadosNome.className = 'colab-dados-nome'
 
-    const spanNome = document.createElement('span')
+    const spanNome = document.createElement('button')
+    spanNome.type = 'button'
     spanNome.className = 'colab-nome'
     spanNome.textContent = c.nome
     spanNome.addEventListener('click', function () {

@@ -4,8 +4,8 @@
 
 .config-layout {
   display: grid;
-  grid-template-columns: 224px 1fr;
-  gap: 32px;
+  grid-template-columns: 224px minmax(0, 1fr);
+  gap: 24px;
   align-items: start;
   max-width: 1260px;
 }
@@ -24,7 +24,7 @@
   background: none;
   border: none;
   border-radius: var(--raio);
-  padding: 8px 12px;
+  padding: 12px;
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -55,14 +55,14 @@
 
 .nav-item-titulo {
   display: block;
-  font-size: var(--fs-14);
+  font-size: 14px;
   font-weight: 500;
   line-height: 1.3;
 }
 
 .nav-item-sub {
   display: block;
-  font-size: var(--fs-12);
+  font-size: 12px;
   color: var(--claro-texto-fraco);
   margin-top: 2px;
 }
@@ -74,18 +74,28 @@
 .config-secao {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
+}
+
+.auditoria-cabecalho {
+  padding: 0;
+  border-bottom: none;
+}
+
+#painel-auditoria .busca-larga {
+  flex: 1 1 240px;
+  max-width: 100%;
 }
 
 /* etiqueta amarela de "atenção" (Badge) */
 .selo-pendente {
-  font-size: var(--fs-12);
+  font-size: 12px;
   font-weight: 500;
   color: var(--atencao-claro-texto);
   background-color: var(--atencao-claro-fundo);
   border: 1px solid var(--atencao-claro-borda);
   padding: 2px 8px;
-  border-radius: var(--raio-p);
+  border-radius: 6px;
 }
 
 
@@ -103,7 +113,7 @@
 .campo-sufixo {
   display: flex;
   align-items: stretch;
-  height: var(--controle);
+  height: 36px;
   border: 1px solid var(--claro-borda);
   border-radius: var(--raio);
   overflow: hidden;
@@ -123,7 +133,7 @@
   border: none;
   outline: none;
   padding: 0 12px;
-  font-size: var(--fs-14);
+  font-size: 14px;
   color: var(--claro-texto);
   background: none;
   font-variant-numeric: tabular-nums;
@@ -135,7 +145,7 @@
   padding: 0 12px;
   background-color: var(--claro-suave);
   border-left: 1px solid var(--claro-borda);
-  font-size: var(--fs-13);
+  font-size: 13px;
   color: var(--claro-texto-fraco);
   user-select: none;
 }
@@ -193,17 +203,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .integracao-nome {
-  font-size: var(--fs-14);
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--claro-texto);
 }
 
 .integracao-desc {
-  font-size: var(--fs-13);
+  font-size: 13px;
   color: var(--claro-texto-fraco);
   line-height: 1.45;
 }
@@ -211,21 +221,21 @@
 /* bloco escuro tipo terminal, mostra como a mensagem vai sair */
 .previa-alerta {
   margin: 0 20px 20px;
-  padding: 16px 16px;
+  padding: 16px;
   background-color: var(--marinho);
   color: var(--dc-creme);
   border-radius: var(--raio);
-  font-size: var(--fs-13);
+  font-size: 13px;
 }
 
 .previa-titulo {
   display: block;
-  font-size: var(--fs-11);
+  font-size: 11px;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  text-transform: none;
+  letter-spacing: 0;
   color: var(--claro-texto-fraco);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .previa-alerta code {
@@ -251,8 +261,8 @@
 .mini-kpi {
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: var(--raio-g);
-  padding: 16px 16px;
+  border-radius: 12px;
+  padding: 16px;
   box-shadow: var(--sombra-leve);
 }
 
@@ -263,15 +273,15 @@
 
 .mini-rotulo {
   display: block;
-  font-size: var(--fs-13);
+  font-size: 13px;
   color: var(--claro-texto-fraco);
   margin-bottom: 4px;
 }
 
 .mini-valor {
-  font-size: var(--fs-20);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0;
   color: var(--claro-texto);
   font-variant-numeric: tabular-nums;
 }
@@ -289,15 +299,15 @@
 .perfil-badge {
   display: inline-block;
   padding: 2px 8px;
-  border-radius: var(--raio-p);
-  font-size: var(--fs-12);
+  border-radius: 6px;
+  font-size: 12px;
   font-weight: 500;
   border: 1px solid transparent;
 }
 
 .perfil-admin {
   background-color: var(--claro-texto);
-  color: var(--claro-cartao);
+  color: #fff;
 }
 
 .perfil-operador {
@@ -317,14 +327,14 @@
 }
 
 .redefinir-texto {
-  font-size: var(--fs-13);
+  font-size: 13px;
   font-weight: 500;
   color: var(--claro-texto);
 }
 
 .redefinir-campo {
   width: 200px;
-  height: var(--controle-p);
+  height: 32px;
 }
 
 
@@ -339,12 +349,12 @@
 
 .integridade-status strong {
   display: block;
-  font-size: var(--fs-14);
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .integridade-status p {
-  font-size: var(--fs-13);
+  font-size: 13px;
   margin-top: 2px;
   opacity: 0.9;
 }
@@ -374,7 +384,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--fs-13);
+  font-size: 13px;
   color: var(--claro-texto-fraco);
   cursor: pointer;
 }
@@ -439,7 +449,7 @@
   grid-template-columns: repeat(4, 1fr);
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: var(--raio-g);
+  border-radius: 16px;
   box-shadow: var(--sombra-leve);
   overflow: hidden;
 }
@@ -459,37 +469,34 @@
   flex: none;
   width: 10px;
   height: 10px;
-  margin-top: 4px;
+  margin-top: 5px;
   border-radius: 50%;
   background-color: var(--borda-forte);
 }
 
 .saude-ok {
-  background-color: var(--dc-ouro);
-  box-shadow: 0 0 0 4px rgba(207, 173, 104, 0.2);
+  background-color: #54805a;
 }
 
 .saude-erro {
   background-color: var(--vermelho);
-  box-shadow: 0 0 0 4px rgba(163, 53, 43, 0.18);
 }
 
 .saude-off {
   background-color: var(--borda-forte);
-  box-shadow: 0 0 0 4px rgba(157, 131, 106, 0.18);
 }
 
 .saude-titulo {
   display: block;
-  font-size: var(--fs-13);
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 500;
   color: var(--claro-texto);
 }
 
 .saude-detalhe {
   display: block;
   margin-top: 2px;
-  font-size: var(--fs-12);
+  font-size: 12px;
   color: var(--claro-texto-fraco);
 }
 
@@ -497,7 +504,7 @@
 
 .config-nav-item {
   position: relative;
-  padding: 12px 12px 12px 16px;
+  padding: 12px 16px;
 }
 
 .config-nav-item.ativa {
@@ -517,7 +524,7 @@
 }
 
 .nav-item-titulo {
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* ---- indicadores de usuarios e do banco: faixa unica, igual as outras telas ---- */
@@ -526,7 +533,7 @@
   gap: 0;
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: var(--raio-g);
+  border-radius: 16px;
   box-shadow: var(--sombra-leve);
   overflow: hidden;
 }
@@ -555,13 +562,13 @@
 }
 
 .mini-rotulo {
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .mini-valor {
   font-family: var(--fonte-num);
-  font-size: var(--fs-28);
-  letter-spacing: -0.02em;
+  font-size: 28px;
+  letter-spacing: 0;
 }
 
 /* ---- barra de salvar fixa: o botao fica sempre ao alcance ---- */
@@ -572,11 +579,9 @@
   z-index: 5;
   align-items: center;
   padding: 12px 16px;
-  background-color: color-mix(in srgb, var(--claro-cartao) 92%, transparent);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: var(--raio-g);
+  border-radius: 12px;
   box-shadow: var(--sombra-2);
 }
 

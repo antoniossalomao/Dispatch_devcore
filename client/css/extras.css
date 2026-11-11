@@ -4,6 +4,11 @@
   position: relative;
 }
 
+/* O painel fica acima da ajuda flutuante também nas telas pequenas. */
+.topo:has(.sino-painel:not([hidden])) {
+  z-index: 60;
+}
+
 .sino-caixa .botao-notif {
   position: relative;
 }
@@ -12,13 +17,13 @@
   position: absolute;
   top: -4px;
   right: -4px;
-  min-width: 17px;
-  height: 17px;
+  min-width: 20px;
+  height: 20px;
   padding: 0 4px;
   border-radius: 999px;
   background-color: var(--vermelho);
-  color: var(--dc-creme);
-  font-size: var(--fs-11);
+  color: #fff;
+  font-size: 11px;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -29,12 +34,12 @@
   position: absolute;
   right: 0;
   top: calc(100% + 8px);
-  width: 360px;
-  max-height: 440px;
+  width: 400px;
+  max-height: min(480px, calc(100dvh - 88px));
   overflow-y: auto;
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: var(--raio-g);
+  border-radius: 12px;
   box-shadow: var(--sombra-2);
   z-index: 60;
 }
@@ -43,9 +48,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px;
+  position: sticky;
+  top: 0;
+  background-color: var(--claro-cartao);
   border-bottom: 1px solid var(--claro-borda);
-  font-size: var(--fs-13);
+  font-size: 13px;
 }
 
 .sino-todas {
@@ -53,7 +63,7 @@
   border: none;
   color: var(--claro-texto-fraco);
   font: inherit;
-  font-size: var(--fs-12);
+  font-size: 12px;
   cursor: pointer;
   text-decoration: underline;
 }
@@ -66,11 +76,12 @@
   border: none;
   border-bottom: 1px solid var(--claro-borda);
   border-left: 3px solid transparent;
-  padding: 12px 16px;
+  padding: 16px;
   font: inherit;
-  font-size: var(--fs-13);
+  font-size: 13px;
   color: var(--claro-texto);
   cursor: pointer;
+  line-height: 20px;
 }
 
 .sino-item:hover {
@@ -79,22 +90,43 @@
 
 .sino-item small {
   display: block;
-  margin-top: 2px;
+  margin-top: 8px;
   color: var(--claro-texto-fraco);
-  font-size: var(--fs-11);
+  font-size: 12px;
+}
+
+.sino-nivel {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sino-critico .sino-nivel {
+  color: var(--erro-claro-texto);
+}
+
+.sino-atencao .sino-nivel {
+  color: var(--atencao-claro-texto);
+}
+
+.sino-item:focus-visible,
+.sino-todas:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: -3px;
 }
 
 .sino-critico {
-  border-left-color: var(--vermelho);
+  border-left-color: var(--erro-claro-texto);
 }
 
 .sino-atencao {
-  border-left-color: var(--dc-ouro);
+  border-left-color: var(--atencao-claro-texto);
 }
 
 .sino-vazio {
   padding: 20px 16px;
-  font-size: var(--fs-13);
+  font-size: 13px;
   color: var(--claro-texto-fraco);
 }
 
@@ -102,30 +134,30 @@
 
 .chat-caixa {
   position: fixed;
-  right: 22px;
-  bottom: 22px;
+  right: 24px;
+  bottom: 24px;
   z-index: 55;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 12px;
+  gap: 8px;
 }
 
 .chat-botao {
   width: 44px;
   height: 44px;
-  border-radius: 50%;
-  border: none;
-  background-color: var(--verde);
-  color: var(--sobre-primario);
-  font-size: var(--fs-20);
+  border-radius: 12px;
+  border: 1px solid var(--claro-borda);
+  background-color: var(--claro-cartao);
+  color: var(--claro-texto-fraco);
+  font-size: 20px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: var(--sombra-2);
+  transition: background-color 0.16s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .chat-botao:hover {
-  background-color: var(--verde-hover);
+  background-color: var(--claro-suave);
 }
 
 .chat-painel {
@@ -135,7 +167,7 @@
   flex-direction: column;
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: var(--raio-g);
+  border-radius: 16px;
   box-shadow: var(--sombra-2);
   overflow: hidden;
 }
@@ -148,17 +180,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: 12px 14px;
   background-color: var(--marinho);
-  color: var(--dc-creme);
-  font-size: var(--fs-13);
+  color: #fff;
+  font-size: 13px;
 }
 
 .chat-fechar {
   background: none;
   border: none;
-  color: var(--dc-creme);
-  font-size: var(--fs-20);
+  color: #fff;
+  font-size: 20px;
   cursor: pointer;
 }
 
@@ -175,8 +207,8 @@
 .chat-msg {
   max-width: 85%;
   padding: 8px 12px;
-  border-radius: var(--raio);
-  font-size: var(--fs-13);
+  border-radius: 10px;
+  font-size: 13px;
   line-height: 1.45;
   white-space: pre-wrap;
 }
@@ -190,7 +222,7 @@
 .chat-eu {
   align-self: flex-end;
   background-color: var(--verde);
-  color: var(--sobre-primario);
+  color: #fff;
 }
 
 .chat-erro {
@@ -208,20 +240,20 @@
 .chat-form input {
   flex: 1;
   border: 1px solid var(--claro-borda);
-  border-radius: var(--raio);
-  padding: 8px 12px;
+  border-radius: 8px;
+  padding: 8px 10px;
   font: inherit;
-  font-size: var(--fs-13);
+  font-size: 13px;
 }
 
 .chat-form button {
   border: none;
-  border-radius: var(--raio);
+  border-radius: 8px;
   background-color: var(--verde);
-  color: var(--sobre-primario);
-  padding: 0 16px;
+  color: #fff;
+  padding: 0 14px;
   font: inherit;
-  font-size: var(--fs-13);
+  font-size: 13px;
   cursor: pointer;
 }
 
@@ -237,7 +269,7 @@
 }
 
 .chat-fechar:focus-visible {
-  outline-color: var(--dc-creme);
+  outline-color: #fff;
 }
 
 /* o botao de ajuda nao cobre o fim do conteudo */
@@ -264,12 +296,15 @@ body.sem-rolagem {
   width: min(330px, calc(100vw - 44px));
 }
 
-@media (max-width: 560px) {
+@media (max-width: 780px) {
   .sino-painel {
     position: fixed;
-    left: 12px;
-    right: 12px;
-    top: 72px;
+    left: 16px;
+    right: 16px;
     width: auto;
+  }
+
+  .sino-todas {
+    min-height: 44px;
   }
 }
