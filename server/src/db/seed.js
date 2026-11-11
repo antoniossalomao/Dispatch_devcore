@@ -1,7 +1,7 @@
 // carrega dados de exemplo da Construtora Aguapei: 15 colaboradores, 3 alojamentos, 6 veiculos e 6 meses de historico
 // uso: npm run seed (depois do criar-banco). so roda se o banco ainda nao tem colaboradores
 const db = require('./conexao')
-const auditoria = require('../regras/auditoria')
+const auditoria = require('../services/Auditoria')
 
 if (db.prepare('SELECT COUNT(*) AS n FROM pessoa').get().n > 0) {
   console.log('O banco já tem colaboradores. Apague o arquivo do banco e rode "npm run criar-banco" antes do seed.')

@@ -1,6 +1,6 @@
 /* os botões, campos, chaves e o toast ficam no base.css pq outras telas tbm usam */
 
-/* ---- estrutura em duas colunas (submenu + conteúdo) ---- */
+/* estrutura em duas colunas (submenu + conteúdo) */
 
 .config-layout {
   display: grid;
@@ -10,7 +10,7 @@
   max-width: 1260px;
 }
 
-/* submenu igual o da pagina de settings do shadcn: botões sem borda, o ativo com fundo cinza */
+/* Navegação das configurações */
 .config-nav {
   position: sticky;
   top: 80px; /* desconta a altura do topo, que tbm fica parado */
@@ -99,7 +99,7 @@
 }
 
 
-/* ---- campos dentro dos cartões ---- */
+/* campos dentro dos cartões */
 
 .grade-campos {
   padding: 20px;
@@ -155,7 +155,7 @@
 }
 
 
-/* ---- rodapés ---- */
+/* rodapés */
 
 .barra-salvar {
   display: flex;
@@ -183,7 +183,7 @@
 }
 
 
-/* ---- integrações e prévia ---- */
+/* integrações e prévia */
 
 .integracoes-lista {
   padding: 20px;
@@ -245,7 +245,7 @@
 }
 
 
-/* ---- usuários e mini indicadores ---- */
+/* usuários e mini indicadores */
 
 .resumo-usuarios,
 .resumo-banco-grade {
@@ -338,7 +338,7 @@
 }
 
 
-/* ---- banco e integridade (parecido com o Alert do shadcn) ---- */
+/* Banco e integridade */
 
 .integridade-status {
   margin: 16px 20px;
@@ -372,7 +372,7 @@
 }
 
 
-/* ---- minha conta ---- */
+/* minha conta */
 
 .conta-topo-perfil {
   display: flex;
@@ -395,7 +395,7 @@
 }
 
 
-/* ---- responsivo ---- */
+/* responsivo */
 
 @media (max-width: 1180px) {
   .config-layout {
@@ -442,7 +442,7 @@
 }
 
 
-/* ---- estado do sistema (faixa no topo de Operacao e Regras) ---- */
+/* estado do sistema (faixa no topo de Operacao e Regras) */
 
 .saude-sistema {
   display: grid;
@@ -500,7 +500,7 @@
   color: var(--claro-texto-fraco);
 }
 
-/* ---- submenu lateral: item ativo com faixa verde ---- */
+/* submenu lateral: item ativo com faixa verde */
 
 .config-nav-item {
   position: relative;
@@ -527,7 +527,7 @@
   font-weight: 500;
 }
 
-/* ---- indicadores de usuarios e do banco: faixa unica, igual as outras telas ---- */
+/* indicadores de usuarios e do banco: faixa unica, igual as outras telas */
 
 .resumo-usuarios {
   gap: 0;
@@ -571,7 +571,7 @@
   letter-spacing: 0;
 }
 
-/* ---- barra de salvar fixa: o botao fica sempre ao alcance ---- */
+/* barra de salvar fixa: o botao fica sempre ao alcance */
 
 .barra-salvar {
   position: sticky;

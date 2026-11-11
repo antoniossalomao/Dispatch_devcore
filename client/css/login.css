@@ -1,4 +1,4 @@
-/* ---- pagina e cartão ---- */
+/* pagina e cartão */
 
 /* flex com center nos dois = cartão bem no meio da tela */
 .login-pagina {
@@ -23,7 +23,7 @@
 }
 
 
-/* ---- lado azul (esquerda) ---- */
+/* lado azul (esquerda) */
 
 /* space-between joga o nome pra cima e o texto pra baixo */
 .login-lado {
@@ -84,7 +84,7 @@
 }
 
 
-/* ---- lado do formulario (direita) ---- */
+/* lado do formulario (direita) */
 
 .login-entrar {
   flex: 1;
@@ -237,7 +237,7 @@
 }
 
 
-/* ---- celular ---- */
+/* celular */
 
 @media (max-width: 700px) {
   .login-lado::after {

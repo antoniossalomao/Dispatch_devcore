@@ -146,10 +146,10 @@ Essas são as validações que o back-end faz antes de salvar. O front pode avis
 
 ## 6. Tecnologias
 
-- **Front (`client/`):** HTML, CSS e JavaScript puro, uma página pra cada tela. Os gráficos com Chart.js.
+- **Front (`client/`):** HTML, CSS e JavaScript puro, uma página pra cada tela. As telas usam classes para organizar os eventos e os dados.
 - **Back (`server/`):** Node.js com Express.
 - **Banco:** SQLite (ver seção 7).
-- **Login:** senha salva com `bcrypt` (nunca a senha pura) e sessão com `express-session`.
+- **Login:** senha salva com `bcryptjs` (nunca a senha pura) e sessão com `express-session`.
 - **IA:** Groq, que tem chave grátis.
 - **Telegram:** Telegram Bot API, que é gratuita: o admin cria um bot no @BotFather e põe o token no `.env`.
 
@@ -166,11 +166,11 @@ flowchart LR
 
 ## 7. Banco de dados
 
-Vamos usar **SQLite** com o pacote `better-sqlite3`, escrevendo o SQL na mão, igual a gente vê na aula. O banco é só um arquivo, então ninguém precisa instalar nada.
+Usamos **SQLite** pelo módulo nativo `node:sqlite`, com consultas SQL. O banco é só um arquivo, então ninguém precisa instalar nada.
 
-As tabelas estão em [server/src/db/schema.sql](../server/src/db/schema.sql), e o banco é criado com `npm run criar-banco` (dentro da pasta `server`). Cada um do grupo tem o próprio banco no seu computador. Pra todo mundo ter os mesmos dados de teste tem o `seed.js` (ainda a fazer).
+As tabelas estão em [server/src/db/schema.sql](../server/src/db/schema.sql), e o banco é criado com `npm run criar-banco` (dentro da pasta `server`). Cada um do grupo tem o próprio banco no seu computador. Pra todo mundo ter os mesmos dados de teste tem o comando `npm run seed`.
 
-O banco fica numa pasta fora do projeto (`C:\Users\<seu usuário>\dispatch-dados\`), porque o projeto está no OneDrive e ele pode estragar o arquivo do banco enquanto sincroniza.
+Por padrão, o banco fica em `server/data/dispatch.db`. Se a pasta do projeto estiver sincronizada pelo OneDrive, use `DB_CAMINHO` no `.env` para guardar o banco fora dela.
 
 Algumas decisões:
 
@@ -265,7 +265,10 @@ dispatch/
 │   │   ├── server.js       # liga o servidor, confere os avisos e entrega a pasta client
 │   │   ├── routes/         # uma rota por assunto: auth, pessoas, alojamentos, frota, relatorios,
 │   │   │                   # auditoria, notificacoes, ia, resumo, configuracoes
-│   │   ├── regras/         # cnh.js, auditoria.js (hash encadeado), datas.js, notificacoes.js, ia.js (Groq), telegram.js
+│   │   ├── controllers/    # ações da API
+│   │   ├── models/         # Cnh, Quarto e Veiculo
+│   │   ├── services/       # configurações, relatórios, auditoria, notificações, IA e Telegram
+│   │   ├── regras/         # funções de data compartilhadas
 │   │   └── db/             # schema.sql, criar-banco.js, conexao.js, seed.js
 │   ├── .env.example
 │   └── package.json
@@ -274,9 +277,9 @@ dispatch/
 └── README.md
 ```
 
-As regras ficam separadas das rotas pra ficar mais fácil de achar e de testar cada uma.
+As responsabilidades das classes e o caminho de uma requisição estão em [estrutura-codigo.md](estrutura-codigo.md).
 
-Pra rodar o projeto precisa do **Node.js 22 ou mais novo**:
+Pra rodar o projeto precisa do **Node.js 22.13 ou mais novo**:
 
 ```bash
 cd server
@@ -380,6 +383,6 @@ Os dados são inventados, mas a gente levou em conta:
 - [LGPD nas relações de trabalho](https://www.barbieriadvogados.com/barbieri-advogados-lgpd-nas-relacoes-de-trabalho/)
 - [Planilha de controle diário de veículos (Cobli)](https://www.cobli.co/conteudo/planilha-controle-diario-de-veiculos/)
 - [Taxa de utilização da frota (Cobli)](https://www.cobli.co/blog/taxa-utilizacao-frota/)
-- [better-sqlite3](https://github.com/WiseLibs/better-sqlite3)
+- [SQLite no Node.js](https://nodejs.org/api/sqlite.html)
 - [Groq](https://console.groq.com/docs)
 - [Telegram Bot API](https://core.telegram.org/bots/api)

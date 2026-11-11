@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node --env-file-if-exists=.env src/server.js",
     "criar-banco": "node --env-file-if-exists=.env src/db/criar-banco.js",
-    "seed": "node --env-file-if-exists=.env src/db/seed.js"
+    "seed": "node --env-file-if-exists=.env src/db/seed.js",
+    "test": "node --test"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

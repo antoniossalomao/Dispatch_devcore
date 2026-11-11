@@ -1,280 +1,248 @@
-// tela de Resumo Operacional
-
-const numVeiculosUso = document.getElementById('num-veiculos-uso')
-const subVeiculosUso = document.getElementById('sub-veiculos-uso')
-const detalheVeiculosUso = document.getElementById('detalhe-veiculos-uso')
-
-const numVeiculosDisp = document.getElementById('num-veiculos-disp')
-
-const numAlojamentos = document.getElementById('num-alojamentos')
-const subAlojamentos = document.getElementById('sub-alojamentos')
-const detalheAlojamentos = document.getElementById('detalhe-alojamentos')
-
-const numVagas = document.getElementById('num-vagas')
-
-const listaMov = document.getElementById('lista-movimentacoes')
-const listaAloj = document.getElementById('lista-alojamentos')
-
-const usuarioIniciais = document.getElementById('usuario-iniciais')
-const perfilNome = document.getElementById('perfil-nome')
-const perfilTipo = document.getElementById('perfil-tipo')
-const botaoSair = document.getElementById('botao-sair')
-const blocoMenuAdmin = document.getElementById('bloco-menu-admin')
-const nomeEmpresaMenu = document.getElementById('nome-empresa-menu')
-
-const campoBusca = document.getElementById('campo-busca')
-const avisoTela = document.getElementById('aviso-tela')
-const dataHoje = document.getElementById('data-hoje')
-const abasFiltro = document.querySelectorAll('.aba-item')
-
-let movimentacoesAtuais = []
-let filtroCategoria = 'todos'
-
-// mostra a data atual no cabeçalho
-dataHoje.textContent = new Date().toLocaleDateString('pt-BR', {
-  weekday: 'long',
-  day: '2-digit',
-  month: 'short'
-})
-
-function mostrarAviso(texto) {
-  avisoTela.textContent = texto
-  avisoTela.hidden = false
-  setTimeout(function () {
-    avisoTela.hidden = true
-  }, 2800)
-}
-
-function pegarIniciais(nome) {
-  const partes = nome.trim().split(' ')
-  if (partes.length === 1) {
-    return partes[0].slice(0, 2).toUpperCase()
-  }
-  return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase()
-}
-
-function classeStatus(status) {
-  if (status === 'Ativo') {
-    return 'status-tag status-ativo'
-  }
-  if (status === 'Em uso') {
-    return 'status-tag status-uso'
-  }
-  return 'status-tag status-concluido'
-}
-
-function porcentagem(parte, total) {
-  if (!total || total <= 0) {
-    return 0
-  }
-  return Math.round((parte / total) * 100)
-}
-
-function aplicarFiltros() {
-  const termo = campoBusca.value.trim().toLowerCase()
-
-  const filtradas = movimentacoesAtuais.filter(function (item) {
-    if (filtroCategoria !== 'todos' && item.categoria !== filtroCategoria) {
-      return false
-    }
-    if (termo === '') {
-      return true
-    }
-    return (
-      item.colaborador.toLowerCase().indexOf(termo) !== -1 ||
-      item.tipo.toLowerCase().indexOf(termo) !== -1 ||
-      item.recurso.toLowerCase().indexOf(termo) !== -1 ||
-      item.status.toLowerCase().indexOf(termo) !== -1
-    )
-  })
-
-  desenharTabela(filtradas)
-}
-
-function desenharTabela(lista) {
-  listaMov.innerHTML = ''
-
-  if (lista.length === 0) {
-    const tr = document.createElement('tr')
-    const td = document.createElement('td')
-    td.colSpan = 5
-    td.className = 'texto-vazio'
-    td.textContent = 'Nenhuma movimentação encontrada para esse filtro.'
-    tr.appendChild(td)
-    listaMov.appendChild(tr)
-    return
+// Controla a tela de resumo.
+class TelaResumo {
+  constructor() {
+    this.numVeiculosUso = document.getElementById('num-veiculos-uso');
+    this.subVeiculosUso = document.getElementById('sub-veiculos-uso');
+    this.detalheVeiculosUso = document.getElementById('detalhe-veiculos-uso');
+    this.numVeiculosDisp = document.getElementById('num-veiculos-disp');
+    this.numAlojamentos = document.getElementById('num-alojamentos');
+    this.subAlojamentos = document.getElementById('sub-alojamentos');
+    this.detalheAlojamentos = document.getElementById('detalhe-alojamentos');
+    this.numVagas = document.getElementById('num-vagas');
+    this.listaMov = document.getElementById('lista-movimentacoes');
+    this.listaAloj = document.getElementById('lista-alojamentos');
+    this.usuarioIniciais = document.getElementById('usuario-iniciais');
+    this.perfilNome = document.getElementById('perfil-nome');
+    this.perfilTipo = document.getElementById('perfil-tipo');
+    this.botaoSair = document.getElementById('botao-sair');
+    this.blocoMenuAdmin = document.getElementById('bloco-menu-admin');
+    this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
+    this.campoBusca = document.getElementById('campo-busca');
+    this.avisoTela = document.getElementById('aviso-tela');
+    this.dataHoje = document.getElementById('data-hoje');
+    this.abasFiltro = document.querySelectorAll('.aba-item');
+    this.movimentacoesAtuais = [];
+    this.filtroCategoria = 'todos';
+    this.dataHoje.textContent = new Date().toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'short'
+    });
+    this.linksEmBreve = document.querySelectorAll('.menu-em-breve');
+    this.configurarEventos();
+    this.carregarPainel();
   }
 
-  lista.forEach(function (item) {
-    const tr = document.createElement('tr')
-
-    const tdPessoa = document.createElement('td')
-    const spanNome = document.createElement('span')
-    spanNome.className = 'pessoa-nome'
-    spanNome.textContent = item.colaborador
-    tdPessoa.appendChild(spanNome)
-
-    if (item.cargo) {
-      const spanCargo = document.createElement('span')
-      spanCargo.className = 'pessoa-cargo'
-      spanCargo.textContent = item.cargo
-      tdPessoa.appendChild(spanCargo)
-    }
-
-    const tdTipo = document.createElement('td')
-    tdTipo.textContent = item.tipo
-
-    const tdRecurso = document.createElement('td')
-    tdRecurso.textContent = item.recurso
-
-    const tdHorario = document.createElement('td')
-    tdHorario.className = 'celula-horario'
-    tdHorario.textContent = item.horario
-
-    const tdStatus = document.createElement('td')
-    const tag = document.createElement('span')
-    tag.className = classeStatus(item.status)
-    const ponto = document.createElement('span')
-    ponto.className = 'status-ponto'
-    tag.appendChild(ponto)
-    tag.appendChild(document.createTextNode(item.status))
-    tdStatus.appendChild(tag)
-
-    tr.appendChild(tdPessoa)
-    tr.appendChild(tdTipo)
-    tr.appendChild(tdRecurso)
-    tr.appendChild(tdHorario)
-    tr.appendChild(tdStatus)
-
-    listaMov.appendChild(tr)
-  })
-}
-
-function desenharAlojamentos(lista) {
-  listaAloj.innerHTML = ''
-
-  if (!lista || lista.length === 0) {
-    const p = document.createElement('p')
-    p.className = 'texto-vazio'
-    p.textContent = 'Nenhum alojamento cadastrado ainda.'
-    listaAloj.appendChild(p)
-    return
+  configurarEventos() {
+    this.abasFiltro.forEach((aba) => {
+      aba.addEventListener('click', () => {
+        this.abasFiltro.forEach((outra) => {
+          outra.classList.remove('ativa');
+        });
+        aba.classList.add('ativa');
+        this.filtroCategoria = aba.dataset.filtro;
+        this.aplicarFiltros();
+      });
+    });
+    this.campoBusca.addEventListener('input', this.aplicarFiltros.bind(this));
+    this.linksEmBreve.forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.mostrarAviso('Módulo "' + link.dataset.tela + '" em construção.');
+      });
+    });
+    this.botaoSair.addEventListener('click', async () => {
+      await chamarApi('/api/auth/sair', {
+        metodo: 'POST'
+      });
+      window.location.href = 'index.html';
+    });
   }
 
-  lista.forEach(function (aloj) {
-    const pct = porcentagem(aloj.ocupados, aloj.total)
-    const div = document.createElement('div')
+  mostrarAviso(texto) {
+    this.avisoTela.textContent = texto;
+    this.avisoTela.hidden = false;
+    setTimeout(() => {
+      this.avisoTela.hidden = true;
+    }, 2800);
+  }
 
-    const topo = document.createElement('div')
-    topo.className = 'unidade-topo'
-
-    const nome = document.createElement('span')
-    nome.className = 'unidade-nome'
-    nome.textContent = aloj.nome
-    if (aloj.cidade) {
-      const cid = document.createElement('span')
-      cid.className = 'unidade-cidade'
-      cid.textContent = '· ' + aloj.cidade
-      nome.appendChild(cid)
+  pegarIniciais(nome) {
+    const partes = nome.trim().split(' ');
+    if (partes.length === 1) {
+      return partes[0].slice(0, 2).toUpperCase();
     }
+    return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+  }
 
-    const numeros = document.createElement('span')
-    numeros.className = 'unidade-numeros'
-    numeros.textContent = aloj.ocupados + '/' + aloj.total + ' leitos'
-
-    topo.appendChild(nome)
-    topo.appendChild(numeros)
-
-    const fundo = document.createElement('div')
-    fundo.className = 'barra-fundo'
-    const barra = document.createElement('div')
-    barra.className = 'barra-preenchimento ' + (pct >= 80 ? 'barra-azul' : 'barra-verde')
-    barra.style.width = pct + '%'
-    fundo.appendChild(barra)
-
-    div.appendChild(topo)
-    div.appendChild(fundo)
-    listaAloj.appendChild(div)
-  })
-}
-
-// filtro por abas (Todas / Frota / Alojamentos)
-abasFiltro.forEach(function (aba) {
-  aba.addEventListener('click', function () {
-    abasFiltro.forEach(function (outra) {
-      outra.classList.remove('ativa')
-    })
-    aba.classList.add('ativa')
-    filtroCategoria = aba.dataset.filtro
-    aplicarFiltros()
-  })
-})
-
-campoBusca.addEventListener('input', aplicarFiltros)
-
-// aviso pra telas que serão implementadas nas próximas tarefas
-const linksEmBreve = document.querySelectorAll('.menu-em-breve')
-linksEmBreve.forEach(function (link) {
-  link.addEventListener('click', function (e) {
-    e.preventDefault()
-    mostrarAviso('Módulo "' + link.dataset.tela + '" em construção.')
-  })
-})
-
-botaoSair.addEventListener('click', async function () {
-  await chamarApi('/api/auth/sair', { metodo: 'POST' })
-  window.location.href = 'index.html'
-})
-
-async function carregarPainel() {
-  try {
-    const sessao = await chamarApi('/api/auth/eu')
-    if (!sessao.ok) {
-      window.location.href = 'index.html'
-      return
+  classeStatus(status) {
+    if (status === 'Ativo') {
+      return 'status-tag status-ativo';
     }
-
-    const user = sessao.dados.usuario
-    perfilNome.textContent = user.nome
-    perfilTipo.textContent = user.perfil
-    usuarioIniciais.textContent = pegarIniciais(user.nome)
-
-    if (user.perfil === 'admin') {
-      blocoMenuAdmin.hidden = false
+    if (status === 'Em uso') {
+      return 'status-tag status-uso';
     }
+    return 'status-tag status-concluido';
+  }
 
-    const res = await chamarApi('/api/resumo')
-    if (!res.ok) {
-      return
+  porcentagem(parte, total) {
+    if (!total || total <= 0) {
+      return 0;
     }
+    return Math.round((parte / total) * 100);
+  }
 
-    const d = res.dados
-    if (d.nomeEmpresa) {
-      nomeEmpresaMenu.textContent = d.nomeEmpresa
+  aplicarFiltros() {
+    const termo = this.campoBusca.value.trim().toLowerCase();
+    const filtradas = this.movimentacoesAtuais.filter((item) => {
+      if (this.filtroCategoria !== 'todos' && item.categoria !== this.filtroCategoria) {
+        return false;
+      }
+      if (termo === '') {
+        return true;
+      }
+      return (
+        item.colaborador.toLowerCase().indexOf(termo) !== -1 ||
+        item.tipo.toLowerCase().indexOf(termo) !== -1 ||
+        item.recurso.toLowerCase().indexOf(termo) !== -1 ||
+        item.status.toLowerCase().indexOf(termo) !== -1
+      );
+    });
+    this.desenharTabela(filtradas);
+  }
+
+  desenharTabela(lista) {
+    this.listaMov.innerHTML = '';
+    if (lista.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 5;
+      td.className = 'texto-vazio';
+      td.textContent = 'Nenhuma movimentação encontrada para esse filtro.';
+      tr.appendChild(td);
+      this.listaMov.appendChild(tr);
+      return;
     }
-    const pctOcup = porcentagem(d.leitosOcupados, d.totalLeitos)
+    lista.forEach((item) => {
+      const tr = document.createElement('tr');
+      const tdPessoa = document.createElement('td');
+      const spanNome = document.createElement('span');
+      spanNome.className = 'pessoa-nome';
+      spanNome.textContent = item.colaborador;
+      tdPessoa.appendChild(spanNome);
+      if (item.cargo) {
+        const spanCargo = document.createElement('span');
+        spanCargo.className = 'pessoa-cargo';
+        spanCargo.textContent = item.cargo;
+        tdPessoa.appendChild(spanCargo);
+      }
+      const tdTipo = document.createElement('td');
+      tdTipo.textContent = item.tipo;
+      const tdRecurso = document.createElement('td');
+      tdRecurso.textContent = item.recurso;
+      const tdHorario = document.createElement('td');
+      tdHorario.className = 'celula-horario';
+      tdHorario.textContent = item.horario;
+      const tdStatus = document.createElement('td');
+      const tag = document.createElement('span');
+      tag.className = this.classeStatus(item.status);
+      const ponto = document.createElement('span');
+      ponto.className = 'status-ponto';
+      tag.appendChild(ponto);
+      tag.appendChild(document.createTextNode(item.status));
+      tdStatus.appendChild(tag);
+      tr.appendChild(tdPessoa);
+      tr.appendChild(tdTipo);
+      tr.appendChild(tdRecurso);
+      tr.appendChild(tdHorario);
+      tr.appendChild(tdStatus);
+      this.listaMov.appendChild(tr);
+    });
+  }
 
-    numVeiculosUso.textContent = d.veiculosEmUso
-    subVeiculosUso.textContent = 'de ' + d.totalVeiculos + ' na frota'
-    detalheVeiculosUso.textContent = d.veiculosManutencao > 0
-      ? d.veiculosManutencao + ' em manutenção no momento'
-      : 'Nenhum veículo na oficina'
+  desenharAlojamentos(lista) {
+    this.listaAloj.innerHTML = '';
+    if (!lista || lista.length === 0) {
+      const p = document.createElement('p');
+      p.className = 'texto-vazio';
+      p.textContent = 'Nenhum alojamento cadastrado ainda.';
+      this.listaAloj.appendChild(p);
+      return;
+    }
+    lista.forEach((aloj) => {
+      const pct = this.porcentagem(aloj.ocupados, aloj.total);
+      const div = document.createElement('div');
+      const topo = document.createElement('div');
+      topo.className = 'unidade-topo';
+      const nome = document.createElement('span');
+      nome.className = 'unidade-nome';
+      nome.textContent = aloj.nome;
+      if (aloj.cidade) {
+        const cid = document.createElement('span');
+        cid.className = 'unidade-cidade';
+        cid.textContent = '· ' + aloj.cidade;
+        nome.appendChild(cid);
+      }
+      const numeros = document.createElement('span');
+      numeros.className = 'unidade-numeros';
+      numeros.textContent = aloj.ocupados + '/' + aloj.total + ' leitos';
+      topo.appendChild(nome);
+      topo.appendChild(numeros);
+      const fundo = document.createElement('div');
+      fundo.className = 'barra-fundo';
+      const barra = document.createElement('div');
+      barra.className = 'barra-preenchimento ' + (pct >= 80 ? 'barra-azul' : 'barra-verde');
+      barra.style.width = pct + '%';
+      fundo.appendChild(barra);
+      div.appendChild(topo);
+      div.appendChild(fundo);
+      this.listaAloj.appendChild(div);
+    });
+  }
 
-    numVeiculosDisp.textContent = d.veiculosDisponiveis
-    document.getElementById('detalhe-veiculos-disp').textContent = 'Documentação e CNH validadas na saída'
-
-    numAlojamentos.textContent = d.totalAlojamentos
-    subAlojamentos.textContent = d.totalLeitos + ' leitos no total'
-    detalheAlojamentos.textContent = d.leitosOcupados + ' leitos ocupados hoje (' + pctOcup + '%)'
-
-    numVagas.textContent = d.vagasDisponiveis
-
-    movimentacoesAtuais = d.movimentacoes || []
-    aplicarFiltros()
-    desenharAlojamentos(d.alojamentos)
-  } catch (erro) {
-    mostrarAviso('Sem conexão com o servidor.')
+  async carregarPainel() {
+    try {
+      const sessao = await chamarApi('/api/auth/eu');
+      if (!sessao.ok) {
+        window.location.href = 'index.html';
+        return;
+      }
+      const user = sessao.dados.usuario;
+      this.perfilNome.textContent = user.nome;
+      this.perfilTipo.textContent = user.perfil;
+      this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
+      if (user.perfil === 'admin') {
+        this.blocoMenuAdmin.hidden = false;
+      }
+      const res = await chamarApi('/api/resumo');
+      if (!res.ok) {
+        return;
+      }
+      const d = res.dados;
+      if (d.nomeEmpresa) {
+        this.nomeEmpresaMenu.textContent = d.nomeEmpresa;
+      }
+      const pctOcup = this.porcentagem(d.leitosOcupados, d.totalLeitos);
+      this.numVeiculosUso.textContent = d.veiculosEmUso;
+      this.subVeiculosUso.textContent = 'de ' + d.totalVeiculos + ' na frota';
+      this.detalheVeiculosUso.textContent =
+        d.veiculosManutencao > 0
+          ? d.veiculosManutencao + ' em manutenção no momento'
+          : 'Nenhum veículo na oficina';
+      this.numVeiculosDisp.textContent = d.veiculosDisponiveis;
+      document.getElementById('detalhe-veiculos-disp').textContent =
+        'Documentação e CNH validadas na saída';
+      this.numAlojamentos.textContent = d.totalAlojamentos;
+      this.subAlojamentos.textContent = d.totalLeitos + ' leitos no total';
+      this.detalheAlojamentos.textContent =
+        d.leitosOcupados + ' leitos ocupados hoje (' + pctOcup + '%)';
+      this.numVagas.textContent = d.vagasDisponiveis;
+      this.movimentacoesAtuais = d.movimentacoes || [];
+      this.aplicarFiltros();
+      this.desenharAlojamentos(d.alojamentos);
+    } catch (erro) {
+      this.mostrarAviso('Sem conexão com o servidor.');
+    }
   }
 }
-
-carregarPainel()
+new TelaResumo();

@@ -1,4 +1,4 @@
-/* ---- layout base do painel ---- */
+/* layout base do painel */
 /* esse css tbm é usado por colaboradores e configuracoes (menu, topo, cartão e tabela) */
 
 .painel-corpo {
@@ -10,7 +10,7 @@
 }
 
 
-/* ---- menu lateral azul-marinho (no jeito do Sidebar do shadcn) ---- */
+/* Menu lateral */
 
 .menu-lateral {
   width: 256px;
@@ -159,7 +159,7 @@
 }
 
 
-/* ---- barra do topo ---- */
+/* barra do topo */
 
 .area-conteudo {
   flex: 1;
@@ -202,7 +202,7 @@
   color: var(--claro-texto-fraco);
 }
 
-/* Badge cinza do shadcn (variante secondary) */
+/* Etiqueta de status */
 .topo-aviso {
   font-size: 12px;
   font-weight: 500;
@@ -286,7 +286,7 @@
 }
 
 
-/* ---- conteúdo e indicadores ---- */
+/* conteúdo e indicadores */
 
 .conteudo {
   padding: 32px;
@@ -301,7 +301,7 @@
   margin-bottom: 24px;
 }
 
-/* cartão de numero (Card do shadcn) */
+/* Indicadores */
 .cartao-kpi {
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
@@ -377,7 +377,7 @@
 }
 
 
-/* ---- grade principal (tabela + coluna lateral) ---- */
+/* grade principal (tabela + coluna lateral) */
 
 .grade-operacional {
   display: grid;
@@ -421,7 +421,7 @@
   margin-top: 4px;
 }
 
-/* abas (Tabs do shadcn): fundo cinza e a aba ativa branca */
+/* Abas */
 .filtro-abas {
   display: inline-flex;
   background-color: var(--claro-suave);
@@ -454,7 +454,7 @@
 }
 
 
-/* ---- tabela (Table do shadcn) ---- */
+/* Tabela */
 
 .tabela-area {
   overflow-x: auto;
@@ -589,7 +589,7 @@
 }
 
 
-/* ---- coluna lateral: ocupação e alertas ---- */
+/* coluna lateral: ocupação e alertas */
 
 .coluna-lateral {
   display: flex;
@@ -637,7 +637,7 @@
   gap: 8px;
 }
 
-/* caixinha de aviso (Alert do shadcn) com a cor do nivel */
+/* Avisos por gravidade */
 .alerta-item {
   padding: 12px;
   border-radius: var(--raio);
@@ -680,7 +680,7 @@
 }
 
 
-/* ---- responsivo ---- */
+/* responsivo */
 
 @media (max-width: 1140px) {
   .indicadores {

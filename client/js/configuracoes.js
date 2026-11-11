@@ -1,748 +1,725 @@
-// tela de Configurações do sistema
-
-const nomeEmpresaMenu = document.getElementById('nome-empresa-menu')
-const usuarioIniciais = document.getElementById('usuario-iniciais')
-const perfilNome = document.getElementById('perfil-nome')
-const perfilTipo = document.getElementById('perfil-tipo')
-const botaoSair = document.getElementById('botao-sair')
-const avisoTela = document.getElementById('aviso-tela')
-const seloAlterado = document.getElementById('selo-alterado')
-const toast = document.getElementById('toast-retorno')
-
-// navegação lateral das seções
-const botoesNav = document.querySelectorAll('.config-nav-item')
-const paineis = {
-  regras: document.getElementById('painel-regras'),
-  alertas: document.getElementById('painel-alertas'),
-  usuarios: document.getElementById('painel-usuarios'),
-  banco: document.getElementById('painel-banco'),
-  auditoria: document.getElementById('painel-auditoria'),
-  conta: document.getElementById('painel-conta')
-}
-
-// campos de operação, frota, alojamento e alertas
-const formRegras = document.getElementById('painel-regras')
-const formAlertas = document.getElementById('form-alertas')
-const botaoRestaurar = document.getElementById('botao-restaurar')
-
-const cfgEmpresa = document.getElementById('cfg-empresa')
-const cfgCidade = document.getElementById('cfg-cidade')
-const cfgDocumento = document.getElementById('cfg-documento')
-const cfgKmConfirmacao = document.getElementById('cfg-km-confirmacao')
-const cfgHorasRetorno = document.getElementById('cfg-horas-retorno')
-const cfgBloquearDoc = document.getElementById('cfg-bloquear-doc')
-const cfgAvisarSeguro = document.getElementById('cfg-avisar-seguro')
-const cfgMaxLeitos = document.getElementById('cfg-max-leitos')
-const cfgAreaCama = document.getElementById('cfg-area-cama')
-const cfgAreaBeliche = document.getElementById('cfg-area-beliche')
-const cfgValidarNr24 = document.getElementById('cfg-validar-nr24')
-
-const cfgDiasVencimento = document.getElementById('cfg-dias-vencimento')
-const cfgDiasPendencia = document.getElementById('cfg-dias-pendencia')
-const cfgLotacaoPct = document.getElementById('cfg-lotacao-pct')
-const cfgTelegram = document.getElementById('cfg-telegram')
-
-// integrações
-const badgeIa = document.getElementById('badge-ia')
-const descIa = document.getElementById('desc-ia')
-const badgeTelegram = document.getElementById('badge-telegram')
-const descTelegram = document.getElementById('desc-telegram')
-const botaoTestarAlerta = document.getElementById('botao-testar-alerta')
-const caixaPreviaAlerta = document.getElementById('caixa-previa-alerta')
-const textoPreviaAlerta = document.getElementById('texto-previa-alerta')
-
-// usuários
-const contAtivos = document.getElementById('cont-ativos')
-const contAdmins = document.getElementById('cont-admins')
-const contOperadores = document.getElementById('cont-operadores')
-const contInativos = document.getElementById('cont-inativos')
-const abrirNovoUsuario = document.getElementById('abrir-novo-usuario')
-const fecharNovoUsuario = document.getElementById('fechar-novo-usuario')
-const formNovoUsuario = document.getElementById('form-novo-usuario')
-const buscaUsuario = document.getElementById('busca-usuario')
-const tabelaUsuarios = document.getElementById('tabela-usuarios')
-
-const novoNome = document.getElementById('novo-nome')
-const novoLogin = document.getElementById('novo-login')
-const novoTelefone = document.getElementById('novo-telefone')
-const novoPerfil = document.getElementById('novo-perfil')
-const novoSenha = document.getElementById('novo-senha')
-
-const caixaRedefinir = document.getElementById('caixa-redefinir')
-const redefinirRotulo = document.getElementById('redefinir-rotulo')
-const redefinirInput = document.getElementById('redefinir-input')
-const redefinirSalvar = document.getElementById('redefinir-salvar')
-const redefinirCancelar = document.getElementById('redefinir-cancelar')
-
-// banco e auditoria
-const linkBackup = document.getElementById('link-backup')
-const dbTamanho = document.getElementById('db-tamanho')
-const dbTabelas = document.getElementById('db-tabelas')
-const dbPessoas = document.getElementById('db-pessoas')
-const dbLogs = document.getElementById('db-logs')
-const botaoVerificarLog = document.getElementById('botao-verificar-log')
-const caixaIntegridade = document.getElementById('caixa-integridade')
-const integridadeTitulo = document.getElementById('integridade-titulo')
-const integridadeMotivo = document.getElementById('integridade-motivo')
-const tabelaLogsRecentes = document.getElementById('tabela-logs-recentes')
-
-// minha conta
-const formMinhaConta = document.getElementById('form-minha-conta')
-const contaAvatarPrevia = document.getElementById('conta-avatar-previa')
-const contaTituloPrevia = document.getElementById('conta-titulo-previa')
-const contaLoginPrevia = document.getElementById('conta-login-previa')
-const contaNome = document.getElementById('conta-nome')
-const contaTelefone = document.getElementById('conta-telefone')
-
-const formMinhaSenha = document.getElementById('form-minha-senha')
-const senhaAtual = document.getElementById('senha-atual')
-const senhaNova = document.getElementById('senha-nova')
-const senhaConfirmar = document.getElementById('senha-confirmar')
-const mostrarSenhasConta = document.getElementById('mostrar-senhas-conta')
-
-let meuId = null
-let meuLogin = ''
-let todosUsuarios = []
-let usuarioRedefinindoId = null
-let timerToast = null
-
-// ajusta o link de download do backup caso esteja no Live Server
-linkBackup.href = baseApi + '/api/configuracoes/backup'
-
-function pegarIniciais(nome) {
-  const texto = (nome || '').trim()
-  if (texto === '') {
-    return '--'
-  }
-  const partes = texto.split(' ')
-  if (partes.length === 1) {
-    return partes[0].slice(0, 2).toUpperCase()
-  }
-  return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase()
-}
-
-function mostrarToast(texto, tipo) {
-  toast.textContent = texto
-  toast.className = tipo === 'erro' ? 'toast toast-erro' : 'toast'
-  toast.hidden = false
-
-  if (timerToast) {
-    clearTimeout(timerToast)
-  }
-  timerToast = setTimeout(function () {
-    toast.hidden = true
-  }, 3200)
-}
-
-function mostrarAvisoTopo(texto) {
-  avisoTela.textContent = texto
-  avisoTela.hidden = false
-  setTimeout(function () {
-    avisoTela.hidden = true
-  }, 2600)
-}
-
-// Cada seção tem um endereço próprio, inclusive o acesso antigo à Auditoria.
-function abrirAbaConfig(alvo) {
-  if (!Object.prototype.hasOwnProperty.call(paineis, alvo)) alvo = 'regras'
-  botoesNav.forEach(function (botao) {
-    const ativa = botao.dataset.aba === alvo
-    botao.classList.toggle('ativa', ativa)
-    if (ativa) botao.setAttribute('aria-current', 'true')
-    else botao.removeAttribute('aria-current')
-  })
-  Object.keys(paineis).forEach(function (chave) {
-    paineis[chave].hidden = chave !== alvo
-  })
-  document.dispatchEvent(new CustomEvent('dispatch:config-aba', { detail: alvo }))
-}
-
-botoesNav.forEach(function (botao) {
-  botao.addEventListener('click', function () {
-    const alvo = botao.dataset.aba
-    if (window.location.hash !== '#' + alvo) history.pushState(null, '', '#' + alvo)
-    abrirAbaConfig(alvo)
-  })
-})
-
-window.addEventListener('hashchange', function () {
-  abrirAbaConfig(window.location.hash.slice(1))
-})
-
-// avisa no topo quando algum parâmetro foi editado e ainda não salvo
-const camposMonitorados = [
-  cfgEmpresa, cfgCidade, cfgDocumento, cfgKmConfirmacao, cfgHorasRetorno,
-  cfgBloquearDoc, cfgAvisarSeguro, cfgMaxLeitos, cfgAreaCama, cfgAreaBeliche,
-  cfgValidarNr24, cfgDiasVencimento, cfgDiasPendencia, cfgLotacaoPct, cfgTelegram
-]
-
-let parametrosSalvos = null
-
-function atualizarEstadoParametros() {
-  const alterados = parametrosSalvos !== null && parametrosSalvos !== JSON.stringify(lerFormularioParametros())
-  seloAlterado.hidden = !alterados
-  const formularios = [formRegras, formAlertas]
-  formularios.forEach(function (formulario) {
-    formulario.querySelector('button[type="submit"]').disabled = !alterados || formulario.getAttribute('aria-busy') === 'true'
-  })
-  return alterados
-}
-
-camposMonitorados.forEach(function (campo) {
-  campo.addEventListener('input', atualizarEstadoParametros)
-  campo.addEventListener('change', atualizarEstadoParametros)
-})
-
-window.addEventListener('beforeunload', function (evento) {
-  if (atualizarEstadoParametros()) {
-    evento.preventDefault()
-    evento.returnValue = ''
-  }
-})
-
-atualizarEstadoParametros()
-
-function lerFormularioParametros() {
-  return {
-    nomeEmpresa: cfgEmpresa.value,
-    cidadeBase: cfgCidade.value,
-    documentoEmpresa: cfgDocumento.value,
-    diasAvisoVencimento: cfgDiasVencimento.value,
-    horasAlertaRetorno: cfgHorasRetorno.value,
-    kmConfirmacaoViagem: cfgKmConfirmacao.value,
-    diasAlertaPendencia: cfgDiasPendencia.value,
-    maxLeitosQuarto: cfgMaxLeitos.value,
-    areaMinimaCama: cfgAreaCama.value,
-    areaMinimaBeliche: cfgAreaBeliche.value,
-    lotacaoAlertaPct: cfgLotacaoPct.value,
-    bloquearDocVencido: cfgBloquearDoc.checked,
-    avisarSeguroVencido: cfgAvisarSeguro.checked,
-    validarNr24: cfgValidarNr24.checked,
-    telegramCriticos: cfgTelegram.checked
-  }
-}
-
-function preencherParametros(p) {
-  nomeEmpresaMenu.textContent = p.nomeEmpresa
-  cfgEmpresa.value = p.nomeEmpresa || ''
-  cfgCidade.value = p.cidadeBase || ''
-  cfgDocumento.value = p.documentoEmpresa || ''
-  cfgDiasVencimento.value = p.diasAvisoVencimento
-  cfgHorasRetorno.value = p.horasAlertaRetorno
-  cfgKmConfirmacao.value = p.kmConfirmacaoViagem
-  cfgDiasPendencia.value = p.diasAlertaPendencia
-  cfgMaxLeitos.value = p.maxLeitosQuarto
-  cfgAreaCama.value = p.areaMinimaCama
-  cfgAreaBeliche.value = p.areaMinimaBeliche
-  cfgLotacaoPct.value = p.lotacaoAlertaPct
-  cfgBloquearDoc.checked = Boolean(p.bloquearDocVencido)
-  cfgAvisarSeguro.checked = Boolean(p.avisarSeguroVencido)
-  cfgValidarNr24.checked = Boolean(p.validarNr24)
-  cfgTelegram.checked = Boolean(p.telegramCriticos)
-  parametrosSalvos = JSON.stringify(lerFormularioParametros())
-  atualizarEstadoParametros()
-}
-
-async function salvarParametros(e) {
-  e.preventDefault()
-
-  const r = await chamarApi('/api/configuracoes/parametros', {
-    metodo: 'PUT',
-    corpo: lerFormularioParametros()
-  })
-
-  if (!r.ok) {
-    mostrarToast(r.dados.erro || 'Erro ao salvar configurações.', 'erro')
-    return
+// Controla a tela de configuracoes.
+class TelaConfiguracoes {
+  constructor() {
+    this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
+    this.usuarioIniciais = document.getElementById('usuario-iniciais');
+    this.perfilNome = document.getElementById('perfil-nome');
+    this.perfilTipo = document.getElementById('perfil-tipo');
+    this.botaoSair = document.getElementById('botao-sair');
+    this.avisoTela = document.getElementById('aviso-tela');
+    this.seloAlterado = document.getElementById('selo-alterado');
+    this.toast = document.getElementById('toast-retorno');
+    this.botoesNav = document.querySelectorAll('.config-nav-item');
+    this.paineis = {
+      regras: document.getElementById('painel-regras'),
+      alertas: document.getElementById('painel-alertas'),
+      usuarios: document.getElementById('painel-usuarios'),
+      banco: document.getElementById('painel-banco'),
+      auditoria: document.getElementById('painel-auditoria'),
+      conta: document.getElementById('painel-conta')
+    };
+    this.formRegras = document.getElementById('painel-regras');
+    this.formAlertas = document.getElementById('form-alertas');
+    this.botaoRestaurar = document.getElementById('botao-restaurar');
+    this.cfgEmpresa = document.getElementById('cfg-empresa');
+    this.cfgCidade = document.getElementById('cfg-cidade');
+    this.cfgDocumento = document.getElementById('cfg-documento');
+    this.cfgKmConfirmacao = document.getElementById('cfg-km-confirmacao');
+    this.cfgHorasRetorno = document.getElementById('cfg-horas-retorno');
+    this.cfgBloquearDoc = document.getElementById('cfg-bloquear-doc');
+    this.cfgAvisarSeguro = document.getElementById('cfg-avisar-seguro');
+    this.cfgMaxLeitos = document.getElementById('cfg-max-leitos');
+    this.cfgAreaCama = document.getElementById('cfg-area-cama');
+    this.cfgAreaBeliche = document.getElementById('cfg-area-beliche');
+    this.cfgValidarNr24 = document.getElementById('cfg-validar-nr24');
+    this.cfgDiasVencimento = document.getElementById('cfg-dias-vencimento');
+    this.cfgDiasPendencia = document.getElementById('cfg-dias-pendencia');
+    this.cfgLotacaoPct = document.getElementById('cfg-lotacao-pct');
+    this.cfgTelegram = document.getElementById('cfg-telegram');
+    this.badgeIa = document.getElementById('badge-ia');
+    this.descIa = document.getElementById('desc-ia');
+    this.badgeTelegram = document.getElementById('badge-telegram');
+    this.descTelegram = document.getElementById('desc-telegram');
+    this.botaoTestarAlerta = document.getElementById('botao-testar-alerta');
+    this.caixaPreviaAlerta = document.getElementById('caixa-previa-alerta');
+    this.textoPreviaAlerta = document.getElementById('texto-previa-alerta');
+    this.contAtivos = document.getElementById('cont-ativos');
+    this.contAdmins = document.getElementById('cont-admins');
+    this.contOperadores = document.getElementById('cont-operadores');
+    this.contInativos = document.getElementById('cont-inativos');
+    this.abrirNovoUsuario = document.getElementById('abrir-novo-usuario');
+    this.fecharNovoUsuario = document.getElementById('fechar-novo-usuario');
+    this.formNovoUsuario = document.getElementById('form-novo-usuario');
+    this.buscaUsuario = document.getElementById('busca-usuario');
+    this.tabelaUsuarios = document.getElementById('tabela-usuarios');
+    this.novoNome = document.getElementById('novo-nome');
+    this.novoLogin = document.getElementById('novo-login');
+    this.novoTelefone = document.getElementById('novo-telefone');
+    this.novoPerfil = document.getElementById('novo-perfil');
+    this.novoSenha = document.getElementById('novo-senha');
+    this.caixaRedefinir = document.getElementById('caixa-redefinir');
+    this.redefinirRotulo = document.getElementById('redefinir-rotulo');
+    this.redefinirInput = document.getElementById('redefinir-input');
+    this.redefinirSalvar = document.getElementById('redefinir-salvar');
+    this.redefinirCancelar = document.getElementById('redefinir-cancelar');
+    this.linkBackup = document.getElementById('link-backup');
+    this.dbTamanho = document.getElementById('db-tamanho');
+    this.dbTabelas = document.getElementById('db-tabelas');
+    this.dbPessoas = document.getElementById('db-pessoas');
+    this.dbLogs = document.getElementById('db-logs');
+    this.botaoVerificarLog = document.getElementById('botao-verificar-log');
+    this.caixaIntegridade = document.getElementById('caixa-integridade');
+    this.integridadeTitulo = document.getElementById('integridade-titulo');
+    this.integridadeMotivo = document.getElementById('integridade-motivo');
+    this.tabelaLogsRecentes = document.getElementById('tabela-logs-recentes');
+    this.formMinhaConta = document.getElementById('form-minha-conta');
+    this.contaAvatarPrevia = document.getElementById('conta-avatar-previa');
+    this.contaTituloPrevia = document.getElementById('conta-titulo-previa');
+    this.contaLoginPrevia = document.getElementById('conta-login-previa');
+    this.contaNome = document.getElementById('conta-nome');
+    this.contaTelefone = document.getElementById('conta-telefone');
+    this.formMinhaSenha = document.getElementById('form-minha-senha');
+    this.senhaAtual = document.getElementById('senha-atual');
+    this.senhaNova = document.getElementById('senha-nova');
+    this.senhaConfirmar = document.getElementById('senha-confirmar');
+    this.mostrarSenhasConta = document.getElementById('mostrar-senhas-conta');
+    this.meuId = null;
+    this.meuLogin = '';
+    this.todosUsuarios = [];
+    this.usuarioRedefinindoId = null;
+    this.timerToast = null;
+    this.linkBackup.href = baseApi + '/api/configuracoes/backup';
+    this.camposMonitorados = [
+      this.cfgEmpresa,
+      this.cfgCidade,
+      this.cfgDocumento,
+      this.cfgKmConfirmacao,
+      this.cfgHorasRetorno,
+      this.cfgBloquearDoc,
+      this.cfgAvisarSeguro,
+      this.cfgMaxLeitos,
+      this.cfgAreaCama,
+      this.cfgAreaBeliche,
+      this.cfgValidarNr24,
+      this.cfgDiasVencimento,
+      this.cfgDiasPendencia,
+      this.cfgLotacaoPct,
+      this.cfgTelegram
+    ];
+    this.parametrosSalvos = null;
+    this.linksEmBreve = document.querySelectorAll('.menu-em-breve');
+    this.configurarEventos();
+    this.carregarDados();
   }
 
-  preencherParametros(r.dados.parametros)
-  mostrarToast(r.dados.mensagem, 'ok')
-  carregarDados()
-}
-
-formRegras.addEventListener('submit', salvarParametros)
-formAlertas.addEventListener('submit', salvarParametros)
-
-botaoRestaurar.addEventListener('click', async function () {
-  if (!(await confirmar('As regras atuais e as alterações não salvas serão substituídas pelos parâmetros padrão.', { titulo: 'Restaurar parâmetros padrão', confirmar: 'Restaurar padrões' }))) return
-  const r = await chamarApi('/api/configuracoes/restaurar-padrao', { metodo: 'POST' })
-  if (!r.ok) {
-    mostrarToast(r.dados.erro || 'Não foi possível restaurar.', 'erro')
-    return
-  }
-  preencherParametros(r.dados.parametros)
-  mostrarToast(r.dados.mensagem, 'ok')
-  carregarDados()
-})
-
-botaoTestarAlerta.addEventListener('click', async function () {
-  const r = await chamarApi('/api/configuracoes/testar-alerta', { metodo: 'POST' })
-  if (!r.ok) {
-    mostrarToast(r.dados.erro || 'Erro ao simular alerta.', 'erro')
-    return
-  }
-  textoPreviaAlerta.textContent = r.dados.previa
-  caixaPreviaAlerta.hidden = false
-  mostrarToast(r.dados.mensagem, 'ok')
-})
-
-// ---- usuários ----
-
-abrirNovoUsuario.addEventListener('click', function () {
-  formNovoUsuario.hidden = false
-  novoNome.focus()
-})
-
-fecharNovoUsuario.addEventListener('click', function () {
-  formNovoUsuario.hidden = true
-})
-
-buscaUsuario.addEventListener('input', function () {
-  desenharUsuarios()
-})
-
-function atualizarResumoUsuarios(lista) {
-  let ativos = 0
-  let admins = 0
-  let operadores = 0
-  let inativos = 0
-
-  lista.forEach(function (u) {
-    if (u.ativo === 1) {
-      ativos++
-      if (u.perfil === 'admin') {
-        admins++
-      } else {
-        operadores++
+  configurarEventos() {
+    this.botoesNav.forEach((botao) => {
+      botao.addEventListener('click', () => {
+        const alvo = botao.dataset.aba;
+        if (window.location.hash !== '#' + alvo) history.pushState(null, '', '#' + alvo);
+        this.abrirAbaConfig(alvo);
+      });
+    });
+    window.addEventListener('hashchange', () => {
+      this.abrirAbaConfig(window.location.hash.slice(1));
+    });
+    this.camposMonitorados.forEach((campo) => {
+      campo.addEventListener('input', this.atualizarEstadoParametros.bind(this));
+      campo.addEventListener('change', this.atualizarEstadoParametros.bind(this));
+    });
+    window.addEventListener('beforeunload', (evento) => {
+      if (this.atualizarEstadoParametros()) {
+        evento.preventDefault();
+        evento.returnValue = '';
       }
-    } else {
-      inativos++
-    }
-  })
+    });
+    this.atualizarEstadoParametros();
+    this.formRegras.addEventListener('submit', this.salvarParametros.bind(this));
+    this.formAlertas.addEventListener('submit', this.salvarParametros.bind(this));
+    this.botaoRestaurar.addEventListener('click', this.restaurarParametros.bind(this));
+    this.botaoTestarAlerta.addEventListener('click', this.testarAlerta.bind(this));
+    this.abrirNovoUsuario.addEventListener('click', () => {
+      this.formNovoUsuario.hidden = false;
+      this.novoNome.focus();
+    });
+    this.fecharNovoUsuario.addEventListener('click', () => {
+      this.formNovoUsuario.hidden = true;
+    });
+    this.buscaUsuario.addEventListener('input', () => {
+      this.desenharUsuarios();
+    });
+    this.redefinirCancelar.addEventListener('click', () => {
+      this.caixaRedefinir.hidden = true;
+      this.usuarioRedefinindoId = null;
+    });
+    this.redefinirSalvar.addEventListener('click', this.salvarSenhaUsuario.bind(this));
+    this.formNovoUsuario.addEventListener('submit', this.cadastrarUsuario.bind(this));
+    this.botaoVerificarLog.addEventListener('click', this.verificarIntegridade.bind(this));
+    this.contaNome.addEventListener('input', () => {
+      const nome = this.contaNome.value.trim() || 'Administrador';
+      this.contaTituloPrevia.textContent = nome;
+      this.contaAvatarPrevia.textContent = this.pegarIniciais(nome);
+    });
+    this.mostrarSenhasConta.addEventListener('change', () => {
+      const tipo = this.mostrarSenhasConta.checked ? 'text' : 'password';
+      this.senhaAtual.type = tipo;
+      this.senhaNova.type = tipo;
+      this.senhaConfirmar.type = tipo;
+    });
+    this.formMinhaConta.addEventListener('submit', this.salvarMinhaConta.bind(this));
+    this.formMinhaSenha.addEventListener('submit', this.salvarMinhaSenha.bind(this));
+    this.linksEmBreve.forEach((link) => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.mostrarAvisoTopo('Módulo "' + link.dataset.tela + '" em construção.');
+      });
+    });
+    this.botaoSair.addEventListener('click', async () => {
+      await chamarApi('/api/auth/sair', {
+        metodo: 'POST'
+      });
+      window.location.href = 'index.html';
+    });
+  }
 
-  contAtivos.textContent = ativos
-  contAdmins.textContent = admins
-  contOperadores.textContent = operadores
-  contInativos.textContent = inativos
-}
-
-function desenharUsuarios() {
-  tabelaUsuarios.innerHTML = ''
-  const termo = buscaUsuario.value.trim().toLowerCase()
-
-  const filtrados = todosUsuarios.filter(function (u) {
-    if (termo === '') {
-      return true
-    }
-    return (
-      u.nome.toLowerCase().indexOf(termo) !== -1 ||
-      u.login.toLowerCase().indexOf(termo) !== -1
+  async restaurarParametros() {
+    if (
+      !(await confirmar(
+        'As regras atuais e as alterações não salvas serão substituídas pelos parâmetros padrão.',
+        {
+          titulo: 'Restaurar parâmetros padrão',
+          confirmar: 'Restaurar padrões'
+        }
+      ))
     )
-  })
-
-  if (filtrados.length === 0) {
-    const tr = document.createElement('tr')
-    const td = document.createElement('td')
-    td.colSpan = 5
-    td.className = 'texto-vazio'
-    td.textContent = 'Nenhum usuário encontrado.'
-    tr.appendChild(td)
-    tabelaUsuarios.appendChild(tr)
-    return
+      return;
+    const r = await chamarApi('/api/configuracoes/restaurar-padrao', {
+      metodo: 'POST'
+    });
+    if (!r.ok) {
+      this.mostrarToast(r.dados.erro || 'Não foi possível restaurar.', 'erro');
+      return;
+    }
+    this.preencherParametros(r.dados.parametros);
+    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.carregarDados();
   }
 
-  filtrados.forEach(function (u) {
-    const tr = document.createElement('tr')
-    const ehEu = u.id === meuId
+  async testarAlerta() {
+    const r = await chamarApi('/api/configuracoes/testar-alerta', {
+      metodo: 'POST'
+    });
+    if (!r.ok) {
+      this.mostrarToast(r.dados.erro || 'Erro ao simular alerta.', 'erro');
+      return;
+    }
+    this.textoPreviaAlerta.textContent = r.dados.previa;
+    this.caixaPreviaAlerta.hidden = false;
+    this.mostrarToast(r.dados.mensagem, 'ok');
+  }
 
-    const tdPessoa = document.createElement('td')
-    const sNome = document.createElement('span')
-    sNome.className = 'pessoa-nome'
-    sNome.textContent = u.nome + (ehEu ? ' (você)' : '')
-    const sLogin = document.createElement('span')
-    sLogin.className = 'pessoa-cargo'
-    sLogin.textContent = '@' + u.login
-    tdPessoa.appendChild(sNome)
-    tdPessoa.appendChild(sLogin)
-
-    const tdTel = document.createElement('td')
-    tdTel.textContent = u.telegram_chat_id || '—'
-
-    const tdPerfil = document.createElement('td')
-    const badge = document.createElement('span')
-    badge.className = 'perfil-badge ' + (u.perfil === 'admin' ? 'perfil-admin' : 'perfil-operador')
-    badge.textContent = u.perfil === 'admin' ? 'Admin' : 'Operador'
-    tdPerfil.appendChild(badge)
-
-    const tdStatus = document.createElement('td')
-    const tag = document.createElement('span')
-    tag.className = u.ativo === 1 ? 'status-tag status-ativo' : 'status-tag status-concluido'
-    const ponto = document.createElement('span')
-    ponto.className = 'status-ponto'
-    tag.appendChild(ponto)
-    tag.appendChild(document.createTextNode(u.ativo === 1 ? 'Ativo' : 'Inativo'))
-    tdStatus.appendChild(tag)
-
-    const tdAcoes = document.createElement('td')
-    const box = document.createElement('div')
-    box.className = 'acoes-linha'
-
-    const btnSenha = document.createElement('button')
-    btnSenha.type = 'button'
-    btnSenha.className = 'btn-secundario btn-pequeno'
-    btnSenha.textContent = 'Nova senha'
-    btnSenha.addEventListener('click', function () {
-      usuarioRedefinindoId = u.id
-      redefinirRotulo.textContent = 'Nova senha para @' + u.login + ':'
-      redefinirInput.value = ''
-      caixaRedefinir.hidden = false
-      redefinirInput.focus()
-    })
-    box.appendChild(btnSenha)
-
-    if (!ehEu) {
-      const btnPerfil = document.createElement('button')
-      btnPerfil.type = 'button'
-      btnPerfil.className = 'btn-secundario btn-pequeno'
-      const outroPerfil = u.perfil === 'admin' ? 'operador' : 'admin'
-      btnPerfil.textContent = u.perfil === 'admin' ? 'Tornar operador' : 'Tornar admin'
-      btnPerfil.addEventListener('click', async function () {
-        const r = await chamarApi('/api/configuracoes/usuarios/' + u.id + '/perfil', {
-          metodo: 'PUT',
-          corpo: { perfil: outroPerfil }
-        })
-        if (!r.ok) {
-          mostrarToast(r.dados.erro || 'Erro ao alterar perfil.', 'erro')
-          return
+  async salvarSenhaUsuario() {
+    if (!this.usuarioRedefinindoId) {
+      return;
+    }
+    const r = await chamarApi(
+      '/api/configuracoes/usuarios/' + this.usuarioRedefinindoId + '/senha',
+      {
+        metodo: 'PUT',
+        corpo: {
+          novaSenha: this.redefinirInput.value
         }
-        mostrarToast(r.dados.mensagem, 'ok')
-        carregarDados()
-      })
-      box.appendChild(btnPerfil)
+      }
+    );
+    if (!r.ok) {
+      this.mostrarToast(r.dados.erro || 'Erro ao redefinir a senha.', 'erro');
+      return;
+    }
+    this.caixaRedefinir.hidden = true;
+    this.usuarioRedefinindoId = null;
+    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.carregarDados();
+  }
 
-      const btnAtivo = document.createElement('button')
-      btnAtivo.type = 'button'
-      btnAtivo.className = 'btn-secundario btn-pequeno'
-      btnAtivo.textContent = u.ativo === 1 ? 'Desativar' : 'Reativar'
-      btnAtivo.addEventListener('click', async function () {
-        const r = await chamarApi('/api/configuracoes/usuarios/' + u.id + '/ativo', {
-          metodo: 'PUT',
-          corpo: { ativo: u.ativo === 1 ? 0 : 1 }
-        })
-        if (!r.ok) {
-          mostrarToast(r.dados.erro || 'Erro ao alterar acesso.', 'erro')
-          return
+  async cadastrarUsuario(e) {
+    e.preventDefault();
+    const r = await chamarApi('/api/configuracoes/usuarios', {
+      metodo: 'POST',
+      corpo: {
+        nome: this.novoNome.value,
+        login: this.novoLogin.value,
+        telegram_chat_id: this.novoTelefone.value,
+        perfil: this.novoPerfil.value,
+        senha: this.novoSenha.value
+      }
+    });
+    if (!r.ok) {
+      this.mostrarToast(r.dados.erro || 'Erro ao cadastrar usuário.', 'erro');
+      return;
+    }
+    this.formNovoUsuario.reset();
+    this.formNovoUsuario.hidden = true;
+    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.carregarDados();
+  }
+
+  async verificarIntegridade() {
+    const r = await chamarApi('/api/configuracoes/verificar-log');
+    if (!r.ok) {
+      this.mostrarToast('Não foi possível verificar o log.', 'erro');
+      return;
+    }
+    this.desenharBanco(r.dados.banco);
+    this.mostrarToast('Verificação de integridade concluída.', 'ok');
+  }
+
+  async salvarMinhaConta(e) {
+    e.preventDefault();
+    const r = await chamarApi('/api/configuracoes/minha-conta', {
+      metodo: 'PUT',
+      corpo: {
+        nome: this.contaNome.value,
+        telegram_chat_id: this.contaTelefone.value
+      }
+    });
+    if (!r.ok) {
+      this.mostrarToast(r.dados.erro || 'Erro ao atualizar dados.', 'erro');
+      return;
+    }
+    const novoNome = r.dados.usuario.nome;
+    this.perfilNome.textContent = novoNome;
+    this.usuarioIniciais.textContent = this.pegarIniciais(novoNome);
+    this.contaTituloPrevia.textContent = novoNome;
+    this.contaAvatarPrevia.textContent = this.pegarIniciais(novoNome);
+    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.carregarDados();
+  }
+
+  async salvarMinhaSenha(e) {
+    e.preventDefault();
+    if (this.senhaNova.value !== this.senhaConfirmar.value) {
+      this.mostrarToast('A confirmação da nova senha não confere.', 'erro');
+      return;
+    }
+    const r = await chamarApi('/api/configuracoes/minha-senha', {
+      metodo: 'PUT',
+      corpo: {
+        senhaAtual: this.senhaAtual.value,
+        novaSenha: this.senhaNova.value
+      }
+    });
+    if (!r.ok) {
+      this.mostrarToast(r.dados.erro || 'Erro ao alterar a senha.', 'erro');
+      return;
+    }
+    this.formMinhaSenha.reset();
+    this.senhaAtual.type = 'password';
+    this.senhaNova.type = 'password';
+    this.senhaConfirmar.type = 'password';
+    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.carregarDados();
+  }
+
+  pegarIniciais(nome) {
+    const texto = (nome || '').trim();
+    if (texto === '') {
+      return '--';
+    }
+    const partes = texto.split(' ');
+    if (partes.length === 1) {
+      return partes[0].slice(0, 2).toUpperCase();
+    }
+    return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
+  }
+
+  mostrarToast(texto, tipo) {
+    this.toast.textContent = texto;
+    this.toast.className = tipo === 'erro' ? 'toast toast-erro' : 'toast';
+    this.toast.hidden = false;
+    if (this.timerToast) {
+      clearTimeout(this.timerToast);
+    }
+    this.timerToast = setTimeout(() => {
+      this.toast.hidden = true;
+    }, 3200);
+  }
+
+  mostrarAvisoTopo(texto) {
+    this.avisoTela.textContent = texto;
+    this.avisoTela.hidden = false;
+    setTimeout(() => {
+      this.avisoTela.hidden = true;
+    }, 2600);
+  }
+
+  abrirAbaConfig(alvo) {
+    if (!Object.prototype.hasOwnProperty.call(this.paineis, alvo)) alvo = 'regras';
+    this.botoesNav.forEach((botao) => {
+      const ativa = botao.dataset.aba === alvo;
+      botao.classList.toggle('ativa', ativa);
+      if (ativa) botao.setAttribute('aria-current', 'true');
+      else botao.removeAttribute('aria-current');
+    });
+    Object.keys(this.paineis).forEach((chave) => {
+      this.paineis[chave].hidden = chave !== alvo;
+    });
+    document.dispatchEvent(
+      new CustomEvent('dispatch:config-aba', {
+        detail: alvo
+      })
+    );
+  }
+
+  atualizarEstadoParametros() {
+    const alterados =
+      this.parametrosSalvos !== null &&
+      this.parametrosSalvos !== JSON.stringify(this.lerFormularioParametros());
+    this.seloAlterado.hidden = !alterados;
+    const formularios = [this.formRegras, this.formAlertas];
+    formularios.forEach((formulario) => {
+      formulario.querySelector('button[type="submit"]').disabled =
+        !alterados || formulario.getAttribute('aria-busy') === 'true';
+    });
+    return alterados;
+  }
+
+  lerFormularioParametros() {
+    return {
+      nomeEmpresa: this.cfgEmpresa.value,
+      cidadeBase: this.cfgCidade.value,
+      documentoEmpresa: this.cfgDocumento.value,
+      diasAvisoVencimento: this.cfgDiasVencimento.value,
+      horasAlertaRetorno: this.cfgHorasRetorno.value,
+      kmConfirmacaoViagem: this.cfgKmConfirmacao.value,
+      diasAlertaPendencia: this.cfgDiasPendencia.value,
+      maxLeitosQuarto: this.cfgMaxLeitos.value,
+      areaMinimaCama: this.cfgAreaCama.value,
+      areaMinimaBeliche: this.cfgAreaBeliche.value,
+      lotacaoAlertaPct: this.cfgLotacaoPct.value,
+      bloquearDocVencido: this.cfgBloquearDoc.checked,
+      avisarSeguroVencido: this.cfgAvisarSeguro.checked,
+      validarNr24: this.cfgValidarNr24.checked,
+      telegramCriticos: this.cfgTelegram.checked
+    };
+  }
+
+  preencherParametros(p) {
+    this.nomeEmpresaMenu.textContent = p.nomeEmpresa;
+    this.cfgEmpresa.value = p.nomeEmpresa || '';
+    this.cfgCidade.value = p.cidadeBase || '';
+    this.cfgDocumento.value = p.documentoEmpresa || '';
+    this.cfgDiasVencimento.value = p.diasAvisoVencimento;
+    this.cfgHorasRetorno.value = p.horasAlertaRetorno;
+    this.cfgKmConfirmacao.value = p.kmConfirmacaoViagem;
+    this.cfgDiasPendencia.value = p.diasAlertaPendencia;
+    this.cfgMaxLeitos.value = p.maxLeitosQuarto;
+    this.cfgAreaCama.value = p.areaMinimaCama;
+    this.cfgAreaBeliche.value = p.areaMinimaBeliche;
+    this.cfgLotacaoPct.value = p.lotacaoAlertaPct;
+    this.cfgBloquearDoc.checked = Boolean(p.bloquearDocVencido);
+    this.cfgAvisarSeguro.checked = Boolean(p.avisarSeguroVencido);
+    this.cfgValidarNr24.checked = Boolean(p.validarNr24);
+    this.cfgTelegram.checked = Boolean(p.telegramCriticos);
+    this.parametrosSalvos = JSON.stringify(this.lerFormularioParametros());
+    this.atualizarEstadoParametros();
+  }
+
+  async salvarParametros(e) {
+    e.preventDefault();
+    const r = await chamarApi('/api/configuracoes/parametros', {
+      metodo: 'PUT',
+      corpo: this.lerFormularioParametros()
+    });
+    if (!r.ok) {
+      this.mostrarToast(r.dados.erro || 'Erro ao salvar configurações.', 'erro');
+      return;
+    }
+    this.preencherParametros(r.dados.parametros);
+    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.carregarDados();
+  }
+
+  atualizarResumoUsuarios(lista) {
+    let ativos = 0;
+    let admins = 0;
+    let operadores = 0;
+    let inativos = 0;
+    lista.forEach((u) => {
+      if (u.ativo === 1) {
+        ativos++;
+        if (u.perfil === 'admin') {
+          admins++;
+        } else {
+          operadores++;
         }
-        mostrarToast(r.dados.mensagem, 'ok')
-        carregarDados()
-      })
-      box.appendChild(btnAtivo)
+      } else {
+        inativos++;
+      }
+    });
+    this.contAtivos.textContent = ativos;
+    this.contAdmins.textContent = admins;
+    this.contOperadores.textContent = operadores;
+    this.contInativos.textContent = inativos;
+  }
+
+  desenharUsuarios() {
+    this.tabelaUsuarios.innerHTML = '';
+    const termo = this.buscaUsuario.value.trim().toLowerCase();
+    const filtrados = this.todosUsuarios.filter((u) => {
+      if (termo === '') {
+        return true;
+      }
+      return (
+        u.nome.toLowerCase().indexOf(termo) !== -1 || u.login.toLowerCase().indexOf(termo) !== -1
+      );
+    });
+    if (filtrados.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 5;
+      td.className = 'texto-vazio';
+      td.textContent = 'Nenhum usuário encontrado.';
+      tr.appendChild(td);
+      this.tabelaUsuarios.appendChild(tr);
+      return;
     }
-
-    tdAcoes.appendChild(box)
-
-    tr.appendChild(tdPessoa)
-    tr.appendChild(tdTel)
-    tr.appendChild(tdPerfil)
-    tr.appendChild(tdStatus)
-    tr.appendChild(tdAcoes)
-
-    tabelaUsuarios.appendChild(tr)
-  })
-}
-
-redefinirCancelar.addEventListener('click', function () {
-  caixaRedefinir.hidden = true
-  usuarioRedefinindoId = null
-})
-
-redefinirSalvar.addEventListener('click', async function () {
-  if (!usuarioRedefinindoId) {
-    return
+    filtrados.forEach((u) => {
+      const tr = document.createElement('tr');
+      const ehEu = u.id === this.meuId;
+      const tdPessoa = document.createElement('td');
+      const sNome = document.createElement('span');
+      sNome.className = 'pessoa-nome';
+      sNome.textContent = u.nome + (ehEu ? ' (você)' : '');
+      const sLogin = document.createElement('span');
+      sLogin.className = 'pessoa-cargo';
+      sLogin.textContent = '@' + u.login;
+      tdPessoa.appendChild(sNome);
+      tdPessoa.appendChild(sLogin);
+      const tdTel = document.createElement('td');
+      tdTel.textContent = u.telegram_chat_id || '—';
+      const tdPerfil = document.createElement('td');
+      const badge = document.createElement('span');
+      badge.className =
+        'perfil-badge ' + (u.perfil === 'admin' ? 'perfil-admin' : 'perfil-operador');
+      badge.textContent = u.perfil === 'admin' ? 'Admin' : 'Operador';
+      tdPerfil.appendChild(badge);
+      const tdStatus = document.createElement('td');
+      const tag = document.createElement('span');
+      tag.className = u.ativo === 1 ? 'status-tag status-ativo' : 'status-tag status-concluido';
+      const ponto = document.createElement('span');
+      ponto.className = 'status-ponto';
+      tag.appendChild(ponto);
+      tag.appendChild(document.createTextNode(u.ativo === 1 ? 'Ativo' : 'Inativo'));
+      tdStatus.appendChild(tag);
+      const tdAcoes = document.createElement('td');
+      const box = document.createElement('div');
+      box.className = 'acoes-linha';
+      const btnSenha = document.createElement('button');
+      btnSenha.type = 'button';
+      btnSenha.className = 'btn-secundario btn-pequeno';
+      btnSenha.textContent = 'Nova senha';
+      btnSenha.addEventListener('click', () => {
+        this.usuarioRedefinindoId = u.id;
+        this.redefinirRotulo.textContent = 'Nova senha para @' + u.login + ':';
+        this.redefinirInput.value = '';
+        this.caixaRedefinir.hidden = false;
+        this.redefinirInput.focus();
+      });
+      box.appendChild(btnSenha);
+      if (!ehEu) {
+        const btnPerfil = document.createElement('button');
+        btnPerfil.type = 'button';
+        btnPerfil.className = 'btn-secundario btn-pequeno';
+        const outroPerfil = u.perfil === 'admin' ? 'operador' : 'admin';
+        btnPerfil.textContent = u.perfil === 'admin' ? 'Tornar operador' : 'Tornar admin';
+        btnPerfil.addEventListener('click', async () => {
+          const r = await chamarApi('/api/configuracoes/usuarios/' + u.id + '/perfil', {
+            metodo: 'PUT',
+            corpo: {
+              perfil: outroPerfil
+            }
+          });
+          if (!r.ok) {
+            this.mostrarToast(r.dados.erro || 'Erro ao alterar perfil.', 'erro');
+            return;
+          }
+          this.mostrarToast(r.dados.mensagem, 'ok');
+          this.carregarDados();
+        });
+        box.appendChild(btnPerfil);
+        const btnAtivo = document.createElement('button');
+        btnAtivo.type = 'button';
+        btnAtivo.className = 'btn-secundario btn-pequeno';
+        btnAtivo.textContent = u.ativo === 1 ? 'Desativar' : 'Reativar';
+        btnAtivo.addEventListener('click', async () => {
+          const r = await chamarApi('/api/configuracoes/usuarios/' + u.id + '/ativo', {
+            metodo: 'PUT',
+            corpo: {
+              ativo: u.ativo === 1 ? 0 : 1
+            }
+          });
+          if (!r.ok) {
+            this.mostrarToast(r.dados.erro || 'Erro ao alterar acesso.', 'erro');
+            return;
+          }
+          this.mostrarToast(r.dados.mensagem, 'ok');
+          this.carregarDados();
+        });
+        box.appendChild(btnAtivo);
+      }
+      tdAcoes.appendChild(box);
+      tr.appendChild(tdPessoa);
+      tr.appendChild(tdTel);
+      tr.appendChild(tdPerfil);
+      tr.appendChild(tdStatus);
+      tr.appendChild(tdAcoes);
+      this.tabelaUsuarios.appendChild(tr);
+    });
   }
-  const r = await chamarApi('/api/configuracoes/usuarios/' + usuarioRedefinindoId + '/senha', {
-    metodo: 'PUT',
-    corpo: { novaSenha: redefinirInput.value }
-  })
-  if (!r.ok) {
-    mostrarToast(r.dados.erro || 'Erro ao redefinir a senha.', 'erro')
-    return
-  }
-  caixaRedefinir.hidden = true
-  usuarioRedefinindoId = null
-  mostrarToast(r.dados.mensagem, 'ok')
-  carregarDados()
-})
 
-formNovoUsuario.addEventListener('submit', async function (e) {
-  e.preventDefault()
-
-  const r = await chamarApi('/api/configuracoes/usuarios', {
-    metodo: 'POST',
-    corpo: {
-      nome: novoNome.value,
-      login: novoLogin.value,
-      telegram_chat_id: novoTelefone.value,
-      perfil: novoPerfil.value,
-      senha: novoSenha.value
+  desenharBanco(b) {
+    this.dbTamanho.textContent = b.tamanhoKb + ' KB';
+    this.dbTabelas.textContent = b.totalTabelas;
+    this.dbPessoas.textContent = b.contagens.colaboradores;
+    this.dbLogs.textContent = b.contagens.logs;
+    const intg = b.integridade;
+    if (intg.integro) {
+      this.caixaIntegridade.className = 'integridade-status integridade-ok';
+      this.integridadeTitulo.textContent =
+        'Cadeia íntegra (' + intg.totalLinhas + ' registros verificados)';
+      this.integridadeMotivo.textContent = intg.motivo;
+    } else {
+      this.caixaIntegridade.className = 'integridade-status integridade-erro';
+      this.integridadeTitulo.textContent =
+        'Adulteração detectada na linha #' + intg.linhaComProblema;
+      this.integridadeMotivo.textContent = intg.motivo;
     }
-  })
-
-  if (!r.ok) {
-    mostrarToast(r.dados.erro || 'Erro ao cadastrar usuário.', 'erro')
-    return
-  }
-
-  formNovoUsuario.reset()
-  formNovoUsuario.hidden = true
-  mostrarToast(r.dados.mensagem, 'ok')
-  carregarDados()
-})
-
-// ---- banco e auditoria ----
-
-function desenharBanco(b) {
-  dbTamanho.textContent = b.tamanhoKb + ' KB'
-  dbTabelas.textContent = b.totalTabelas
-  dbPessoas.textContent = b.contagens.colaboradores
-  dbLogs.textContent = b.contagens.logs
-
-  const intg = b.integridade
-  if (intg.integro) {
-    caixaIntegridade.className = 'integridade-status integridade-ok'
-    integridadeTitulo.textContent = 'Cadeia íntegra (' + intg.totalLinhas + ' registros verificados)'
-    integridadeMotivo.textContent = intg.motivo
-  } else {
-    caixaIntegridade.className = 'integridade-status integridade-erro'
-    integridadeTitulo.textContent = 'Adulteração detectada na linha #' + intg.linhaComProblema
-    integridadeMotivo.textContent = intg.motivo
-  }
-
-  tabelaLogsRecentes.innerHTML = ''
-  const logs = b.ultimosLogs || []
-
-  if (logs.length === 0) {
-    const tr = document.createElement('tr')
-    const td = document.createElement('td')
-    td.colSpan = 4
-    td.className = 'texto-vazio'
-    td.textContent = 'Nenhuma alteração registrada ainda no log.'
-    tr.appendChild(td)
-    tabelaLogsRecentes.appendChild(tr)
-    return
-  }
-
-  logs.forEach(function (l) {
-    const tr = document.createElement('tr')
-
-    const tdId = document.createElement('td')
-    tdId.className = 'celula-horario'
-    tdId.textContent = '#' + l.id
-
-    const tdQuando = document.createElement('td')
-    tdQuando.className = 'celula-horario'
-    tdQuando.textContent = l.quando.slice(0, 16)
-
-    const tdAutor = document.createElement('td')
-    tdAutor.textContent = '@' + l.autor
-
-    const tdResumo = document.createElement('td')
-    tdResumo.textContent = l.resumo
-
-    tr.appendChild(tdId)
-    tr.appendChild(tdQuando)
-    tr.appendChild(tdAutor)
-    tr.appendChild(tdResumo)
-
-    tabelaLogsRecentes.appendChild(tr)
-  })
-}
-
-botaoVerificarLog.addEventListener('click', async function () {
-  const r = await chamarApi('/api/configuracoes/verificar-log')
-  if (!r.ok) {
-    mostrarToast('Não foi possível verificar o log.', 'erro')
-    return
-  }
-  desenharBanco(r.dados.banco)
-  mostrarToast('Verificação de integridade concluída.', 'ok')
-})
-
-// ---- minha conta ----
-
-contaNome.addEventListener('input', function () {
-  const nome = contaNome.value.trim() || 'Administrador'
-  contaTituloPrevia.textContent = nome
-  contaAvatarPrevia.textContent = pegarIniciais(nome)
-})
-
-mostrarSenhasConta.addEventListener('change', function () {
-  const tipo = mostrarSenhasConta.checked ? 'text' : 'password'
-  senhaAtual.type = tipo
-  senhaNova.type = tipo
-  senhaConfirmar.type = tipo
-})
-
-formMinhaConta.addEventListener('submit', async function (e) {
-  e.preventDefault()
-
-  const r = await chamarApi('/api/configuracoes/minha-conta', {
-    metodo: 'PUT',
-    corpo: {
-      nome: contaNome.value,
-      telegram_chat_id: contaTelefone.value
+    this.tabelaLogsRecentes.innerHTML = '';
+    const logs = b.ultimosLogs || [];
+    if (logs.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 4;
+      td.className = 'texto-vazio';
+      td.textContent = 'Nenhuma alteração registrada ainda no log.';
+      tr.appendChild(td);
+      this.tabelaLogsRecentes.appendChild(tr);
+      return;
     }
-  })
-
-  if (!r.ok) {
-    mostrarToast(r.dados.erro || 'Erro ao atualizar dados.', 'erro')
-    return
+    logs.forEach((l) => {
+      const tr = document.createElement('tr');
+      const tdId = document.createElement('td');
+      tdId.className = 'celula-horario';
+      tdId.textContent = '#' + l.id;
+      const tdQuando = document.createElement('td');
+      tdQuando.className = 'celula-horario';
+      tdQuando.textContent = l.quando.slice(0, 16);
+      const tdAutor = document.createElement('td');
+      tdAutor.textContent = '@' + l.autor;
+      const tdResumo = document.createElement('td');
+      tdResumo.textContent = l.resumo;
+      tr.appendChild(tdId);
+      tr.appendChild(tdQuando);
+      tr.appendChild(tdAutor);
+      tr.appendChild(tdResumo);
+      this.tabelaLogsRecentes.appendChild(tr);
+    });
   }
 
-  const novoNome = r.dados.usuario.nome
-  perfilNome.textContent = novoNome
-  usuarioIniciais.textContent = pegarIniciais(novoNome)
-  contaTituloPrevia.textContent = novoNome
-  contaAvatarPrevia.textContent = pegarIniciais(novoNome)
-
-  mostrarToast(r.dados.mensagem, 'ok')
-  carregarDados()
-})
-
-formMinhaSenha.addEventListener('submit', async function (e) {
-  e.preventDefault()
-
-  if (senhaNova.value !== senhaConfirmar.value) {
-    mostrarToast('A confirmação da nova senha não confere.', 'erro')
-    return
+  marcarSaude(id, nivel, texto) {
+    const ponto = document.getElementById('saude-' + id + '-ponto');
+    ponto.className = 'saude-ponto saude-' + nivel;
+    document.getElementById('saude-' + id).textContent = texto;
   }
 
-  const r = await chamarApi('/api/configuracoes/minha-senha', {
-    metodo: 'PUT',
-    corpo: {
-      senhaAtual: senhaAtual.value,
-      novaSenha: senhaNova.value
+  desenharSaude(dados) {
+    const b = dados.banco;
+    if (b) {
+      this.marcarSaude('banco', 'ok', b.tamanhoKb + ' KB · ' + b.totalTabelas + ' tabelas');
+      const intg = b.integridade;
+      if (intg.integro)
+        this.marcarSaude('log', 'ok', 'Íntegro · ' + intg.totalLinhas + ' registros');
+      else this.marcarSaude('log', 'erro', 'Adulteração na linha #' + intg.linhaComProblema);
     }
-  })
-
-  if (!r.ok) {
-    mostrarToast(r.dados.erro || 'Erro ao alterar a senha.', 'erro')
-    return
+    const amb = dados.ambiente;
+    this.marcarSaude(
+      'ia',
+      amb.iaConfigurada ? 'ok' : 'off',
+      amb.iaConfigurada ? 'Conectada à Groq' : 'Desligada (sem GROQ_API_KEY)'
+    );
+    this.marcarSaude(
+      'telegram',
+      amb.telegramAtivo ? 'ok' : 'off',
+      amb.telegramAtivo ? 'Bot conectado' : 'Modo terminal (sem token)'
+    );
   }
 
-  formMinhaSenha.reset()
-  senhaAtual.type = 'password'
-  senhaNova.type = 'password'
-  senhaConfirmar.type = 'password'
-  mostrarToast(r.dados.mensagem, 'ok')
-  carregarDados()
-})
-
-const linksEmBreve = document.querySelectorAll('.menu-em-breve')
-linksEmBreve.forEach(function (link) {
-  link.addEventListener('click', function (e) {
-    e.preventDefault()
-    mostrarAvisoTopo('Módulo "' + link.dataset.tela + '" em construção.')
-  })
-})
-
-botaoSair.addEventListener('click', async function () {
-  await chamarApi('/api/auth/sair', { metodo: 'POST' })
-  window.location.href = 'index.html'
-})
-
-// painel "Estado do sistema" no topo: junta o que ja veio do servidor (banco, log e integracoes)
-function marcarSaude(id, nivel, texto) {
-  const ponto = document.getElementById('saude-' + id + '-ponto')
-  ponto.className = 'saude-ponto saude-' + nivel
-  document.getElementById('saude-' + id).textContent = texto
-}
-
-function desenharSaude(dados) {
-  const b = dados.banco
-  if (b) {
-    marcarSaude('banco', 'ok', b.tamanhoKb + ' KB · ' + b.totalTabelas + ' tabelas')
-    const intg = b.integridade
-    if (intg.integro) marcarSaude('log', 'ok', 'Íntegro · ' + intg.totalLinhas + ' registros')
-    else marcarSaude('log', 'erro', 'Adulteração na linha #' + intg.linhaComProblema)
-  }
-  const amb = dados.ambiente
-  marcarSaude('ia', amb.iaConfigurada ? 'ok' : 'off', amb.iaConfigurada ? 'Conectada à Groq' : 'Desligada (sem GROQ_API_KEY)')
-  marcarSaude('telegram', amb.telegramAtivo ? 'ok' : 'off', amb.telegramAtivo ? 'Bot conectado' : 'Modo terminal (sem token)')
-}
-
-function desenharAmbiente(amb) {
-  if (amb.iaConfigurada) {
-    badgeIa.className = 'status-tag status-ativo'
-    badgeIa.innerHTML = '<span class="status-ponto"></span>Conectada'
-    descIa.textContent = 'Chave GROQ_API_KEY presente no servidor. Consultas e resumos prontos para uso.'
-  } else {
-    badgeIa.className = 'status-tag status-concluido'
-    badgeIa.innerHTML = '<span class="status-ponto"></span>Desligada'
-    descIa.textContent = 'Defina GROQ_API_KEY no arquivo server/.env para ativar os recursos de IA.'
+  desenharAmbiente(amb) {
+    if (amb.iaConfigurada) {
+      this.badgeIa.className = 'status-tag status-ativo';
+      this.badgeIa.innerHTML = '<span class="status-ponto"></span>Conectada';
+      this.descIa.textContent =
+        'Chave GROQ_API_KEY presente no servidor. Consultas e resumos prontos para uso.';
+    } else {
+      this.badgeIa.className = 'status-tag status-concluido';
+      this.badgeIa.innerHTML = '<span class="status-ponto"></span>Desligada';
+      this.descIa.textContent =
+        'Defina GROQ_API_KEY no arquivo server/.env para ativar os recursos de IA.';
+    }
+    if (amb.telegramAtivo) {
+      this.badgeTelegram.className = 'status-tag status-ativo';
+      this.badgeTelegram.innerHTML = '<span class="status-ponto"></span>Bot ativo';
+      this.descTelegram.textContent =
+        'Bot do Telegram conectado: alertas críticos enviados de verdade.';
+    } else {
+      this.badgeTelegram.className = 'status-tag status-uso';
+      this.badgeTelegram.innerHTML = '<span class="status-ponto"></span>Modo terminal';
+      this.descTelegram.textContent =
+        'Sem TELEGRAM_BOT_TOKEN no server/.env: os alertas aparecem formatados no terminal do servidor.';
+    }
   }
 
-  if (amb.telegramAtivo) {
-    badgeTelegram.className = 'status-tag status-ativo'
-    badgeTelegram.innerHTML = '<span class="status-ponto"></span>Bot ativo'
-    descTelegram.textContent = 'Bot do Telegram conectado: alertas críticos enviados de verdade.'
-  } else {
-    badgeTelegram.className = 'status-tag status-uso'
-    badgeTelegram.innerHTML = '<span class="status-ponto"></span>Modo terminal'
-    descTelegram.textContent = 'Sem TELEGRAM_BOT_TOKEN no server/.env: os alertas aparecem formatados no terminal do servidor.'
-  }
-}
-
-async function carregarDados() {
-  try {
-    const sessao = await chamarApi('/api/auth/eu')
-    if (!sessao.ok) {
-      window.location.href = 'index.html'
-      return
+  async carregarDados() {
+    try {
+      const sessao = await chamarApi('/api/auth/eu');
+      if (!sessao.ok) {
+        window.location.href = 'index.html';
+        return;
+      }
+      const user = sessao.dados.usuario;
+      if (user.perfil !== 'admin') {
+        window.location.href = 'resumo.html';
+        return;
+      }
+      this.meuId = user.id;
+      this.meuLogin = user.login;
+      this.perfilNome.textContent = user.nome;
+      this.perfilTipo.textContent = user.perfil;
+      this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
+      const res = await chamarApi('/api/configuracoes');
+      if (!res.ok) {
+        this.mostrarToast(res.dados.erro || 'Erro ao carregar configurações.', 'erro');
+        return;
+      }
+      this.preencherParametros(res.dados.parametros);
+      this.desenharAmbiente(res.dados.ambiente);
+      this.todosUsuarios = res.dados.usuarios || [];
+      this.atualizarResumoUsuarios(this.todosUsuarios);
+      this.desenharUsuarios();
+      if (res.dados.banco) {
+        this.desenharBanco(res.dados.banco);
+      }
+      this.desenharSaude(res.dados);
+      const eu = res.dados.meuUsuario;
+      this.contaNome.value = eu.nome;
+      this.contaTelefone.value = eu.telegram_chat_id || '';
+      this.contaTituloPrevia.textContent = eu.nome;
+      this.contaLoginPrevia.textContent = '@' + eu.login + ' · Perfil administrador';
+      this.contaAvatarPrevia.textContent = this.pegarIniciais(eu.nome);
+      this.abrirAbaConfig(window.location.hash.slice(1));
+    } catch (erro) {
+      this.mostrarToast('Sem conexão com o servidor.', 'erro');
     }
-
-    const user = sessao.dados.usuario
-    if (user.perfil !== 'admin') {
-      window.location.href = 'resumo.html'
-      return
-    }
-
-    meuId = user.id
-    meuLogin = user.login
-    perfilNome.textContent = user.nome
-    perfilTipo.textContent = user.perfil
-    usuarioIniciais.textContent = pegarIniciais(user.nome)
-
-    const res = await chamarApi('/api/configuracoes')
-    if (!res.ok) {
-      mostrarToast(res.dados.erro || 'Erro ao carregar configurações.', 'erro')
-      return
-    }
-
-    preencherParametros(res.dados.parametros)
-    desenharAmbiente(res.dados.ambiente)
-
-    todosUsuarios = res.dados.usuarios || []
-    atualizarResumoUsuarios(todosUsuarios)
-    desenharUsuarios()
-
-    if (res.dados.banco) {
-      desenharBanco(res.dados.banco)
-    }
-
-    desenharSaude(res.dados)
-
-    const eu = res.dados.meuUsuario
-    contaNome.value = eu.nome
-    contaTelefone.value = eu.telegram_chat_id || ''
-    contaTituloPrevia.textContent = eu.nome
-    contaLoginPrevia.textContent = '@' + eu.login + ' · Perfil administrador'
-    contaAvatarPrevia.textContent = pegarIniciais(eu.nome)
-    abrirAbaConfig(window.location.hash.slice(1))
-  } catch (erro) {
-    mostrarToast('Sem conexão com o servidor.', 'erro')
   }
 }
-
-carregarDados()
+new TelaConfiguracoes();

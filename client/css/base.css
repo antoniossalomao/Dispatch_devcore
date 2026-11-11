@@ -98,7 +98,7 @@ button {
 }
 
 
-/* ---- botões (iguais ao Button do shadcn) ---- */
+/* Botões */
 
 .btn-primario,
 .btn-secundario,
@@ -130,7 +130,7 @@ button {
   background-color: var(--verde-hover);
 }
 
-/* o "outline" do shadcn: fundo branco com borda */
+/* Botão com borda */
 .btn-secundario {
   background-color: var(--claro-cartao);
   color: var(--claro-texto);
@@ -185,7 +185,7 @@ button {
 }
 
 
-/* ---- campos de formulário (Input, Select e Label) ---- */
+/* campos de formulário (Input, Select e Label) */
 
 .grade-campos {
   display: grid;
@@ -237,7 +237,7 @@ button {
   color: var(--claro-texto-fraco);
 }
 
-/* tira a setinha padrão do select e coloca uma igual a do shadcn */
+/* Seta dos campos de seleção */
 .config-select {
   appearance: none;
   padding-right: 36px;
@@ -261,7 +261,7 @@ button {
 }
 
 
-/* ---- chave liga/desliga (Switch) ---- */
+/* chave liga/desliga (Switch) */
 
 .lista-switches {
   display: flex;
@@ -350,7 +350,7 @@ button {
 }
 
 
-/* ---- avatar com as iniciais ---- */
+/* avatar com as iniciais */
 
 .conta-avatar-grande {
   width: 44px;
@@ -367,7 +367,7 @@ button {
 }
 
 
-/* ---- aviso que aparece no canto (parecido com o Sonner do shadcn) ---- */
+/* Mensagem de retorno */
 
 .toast {
   position: fixed;
