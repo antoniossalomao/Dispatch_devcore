@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#090f0c" />
+    <meta name="theme-color" content="#0a0a09" />
     <meta
       name="description"
       content="DevCore. Tecnologia com propósito, do primeiro conceito ao produto. Conheça o Dispatch, nossa solução de gestão de pessoas, alojamentos e frota."
@@ -49,13 +49,10 @@
     </svg>
     <main id="conteudo">
       <section class="hero" id="inicio" aria-labelledby="titulo">
-        <div
-          class="hero-atmosfera"
-          aria-hidden="true"
-          data-parallax="0.12"
-        ></div>
+        <div class="hero-atmosfera" aria-hidden="true"></div>
         <div class="hero-trama" aria-hidden="true"></div>
         <div class="hero-conteudo">
+          <div class="hero-luz" aria-hidden="true"></div>
           <div class="hero-topo">
             <span class="sobretitulo"
               ><i></i> ESTÚDIO DE IDEIAS & TECNOLOGIA</span
@@ -84,8 +81,11 @@
               </div>
             </div>
             <div class="universo" aria-hidden="true">
-              <div class="orbita orbita-a" data-parallax="-0.08"></div>
-              <div class="orbita orbita-b" data-parallax="0.06"></div>
+              <div class="anel-profundidade anel-um"></div>
+              <div class="anel-profundidade anel-dois"></div>
+              <span class="nucleo-legenda">DEVCORE / O PONTO DE PARTIDA</span>
+              <div class="orbita orbita-a"></div>
+              <div class="orbita orbita-b"></div>
               <div class="orbita orbita-c"></div>
               <span class="ponto-orbita ponto-a"></span
               ><span class="ponto-orbita ponto-b"></span
@@ -95,13 +95,16 @@
                 width="500"
                 height="330"
                 alt=""
-                data-parallax="-0.12"
               /><span class="coordenada coordenada-a"
                 >IDEIA / FORMA / CÓDIGO</span
               ><span class="coordenada coordenada-b"
                 >UM NÚCLEO. INFINITAS POSSIBILIDADES.</span
               >
             </div>
+          </div>
+          <div class="hero-desfecho" aria-hidden="true">
+            <span class="sobretitulo">DO NÚCLEO À OPERAÇÃO</span>
+            <p>Uma ideia.<br /><em>Novas dimensões.</em></p>
           </div>
           <div class="hero-rodape">
             <span>TECNOLOGIA COM RAÍZES HUMANAS.</span>
@@ -188,63 +191,81 @@
             ></a>
           </div>
         </div>
-        <div class="vitrine" data-parallax="0.025">
-          <div class="vitrine-barra">
-            <span class="janela-pontos" aria-hidden="true">● ● ●</span
-            ><span>DISPATCH / VISÃO DO PRODUTO</span
-            ><span class="vitrine-status"><i></i> INTERFACE REAL</span>
+        <div class="produto-cena">
+          <div class="produto-pin">
+            <div class="produto-luz" aria-hidden="true"></div>
+            <div class="produto-palavra" aria-hidden="true">Dispatch.</div>
+            <div class="vitrine">
+              <div class="vitrine-barra">
+                <span class="janela-pontos" aria-hidden="true">● ● ●</span
+                ><span>DISPATCH / VISÃO DO PRODUTO</span
+                ><span class="vitrine-status"><i></i> INTERFACE REAL</span>
+              </div>
+              <div class="abas" role="tablist" aria-label="Telas do Dispatch">
+                <button
+                  id="aba-resumo"
+                  type="button"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="painel-tela"
+                  data-tela="resumo"
+                >
+                  Visão geral <span>01</span></button
+                ><button
+                  id="aba-colaboradores"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="painel-tela"
+                  tabindex="-1"
+                  data-tela="colaboradores"
+                >
+                  Colaboradores <span>02</span></button
+                ><button
+                  id="aba-configuracoes"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="painel-tela"
+                  tabindex="-1"
+                  data-tela="configuracoes"
+                >
+                  Configurações <span>03</span>
+                </button>
+              </div>
+              <figure
+                id="painel-tela"
+                role="tabpanel"
+                aria-labelledby="aba-resumo"
+                tabindex="0"
+              >
+                <img
+                  id="tela-dispatch"
+                  src="assets/apresentacao/resumo.png"
+                  width="1440"
+                  height="1000"
+                  alt="Resumo operacional do Dispatch com indicadores e movimentações"
+                  loading="lazy"
+                />
+                <figcaption id="legenda-tela">
+                  Clareza para acompanhar a operação. Tela demonstrativa com
+                  dados fictícios.
+                </figcaption>
+              </figure>
+            </div>
+            <div class="produto-cartao produto-cartao-a" aria-hidden="true">
+              <span>01 / PESSOAS</span
+              ><strong>Cada pessoa.<br />Seu lugar.</strong><i></i>
+            </div>
+            <div class="produto-cartao produto-cartao-b" aria-hidden="true">
+              <span>02 / OPERAÇÃO</span><strong>Tudo se conecta.</strong>
+              <div class="mini-barras"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="produto-trilha" aria-hidden="true">
+              <span>UMA VISÃO MAIS AMPLA</span><i></i
+              ><span class="produto-contador">01 — 03</span>
+            </div>
           </div>
-          <div class="abas" role="tablist" aria-label="Telas do Dispatch">
-            <button
-              id="aba-resumo"
-              type="button"
-              role="tab"
-              aria-selected="true"
-              aria-controls="painel-tela"
-              data-tela="resumo"
-            >
-              Visão geral <span>01</span></button
-            ><button
-              id="aba-colaboradores"
-              type="button"
-              role="tab"
-              aria-selected="false"
-              aria-controls="painel-tela"
-              tabindex="-1"
-              data-tela="colaboradores"
-            >
-              Colaboradores <span>02</span></button
-            ><button
-              id="aba-configuracoes"
-              type="button"
-              role="tab"
-              aria-selected="false"
-              aria-controls="painel-tela"
-              tabindex="-1"
-              data-tela="configuracoes"
-            >
-              Configurações <span>03</span>
-            </button>
-          </div>
-          <figure
-            id="painel-tela"
-            role="tabpanel"
-            aria-labelledby="aba-resumo"
-            tabindex="0"
-          >
-            <img
-              id="tela-dispatch"
-              src="assets/apresentacao/resumo.png"
-              width="1440"
-              height="1000"
-              alt="Resumo operacional do Dispatch com indicadores e movimentações"
-              loading="lazy"
-            />
-            <figcaption id="legenda-tela">
-              Clareza para acompanhar a operação. Tela demonstrativa com dados
-              fictícios.
-            </figcaption>
-          </figure>
         </div>
         <div class="recursos">
           <article>
@@ -286,7 +307,7 @@
         </p>
       </section>
       <section class="manifesto" aria-label="Nossa visão">
-        <div class="manifesto-fundo" data-parallax="0.1" aria-hidden="true">
+        <div class="manifesto-fundo" aria-hidden="true">
           <img
             src="assets/apresentacao/devcore-simbolo.svg"
             width="550"
@@ -480,7 +501,7 @@
         </div>
       </section>
       <section class="convite">
-        <div class="convite-marca" data-parallax="0.06" aria-hidden="true">
+        <div class="convite-marca" aria-hidden="true">
           <img
             src="assets/apresentacao/devcore-simbolo.svg"
             width="280"

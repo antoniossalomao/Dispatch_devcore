@@ -114,7 +114,7 @@ function desenharTabela(lista) {
   if (lista.length === 0) {
     const tr = document.createElement('tr')
     const td = document.createElement('td')
-    td.colSpan = 6
+    td.colSpan = 5
     td.className = 'texto-vazio'
     td.textContent = 'Nenhum colaborador encontrado para os filtros selecionados.'
     tr.appendChild(td)
@@ -161,31 +161,23 @@ function desenharTabela(lista) {
     const pCargo = document.createElement('div')
     pCargo.className = 'colab-cargo'
     pCargo.textContent = c.cargo
-    const pObra = document.createElement('div')
-    pObra.className = 'colab-obra'
-    pObra.textContent = c.obra
     tdCargo.appendChild(pCargo)
-    tdCargo.appendChild(pObra)
-
-    // Contato
-    const tdContato = document.createElement('td')
-    tdContato.textContent = c.telefone || '—'
 
     // CNH
     const tdCnh = document.createElement('td')
     const boxCnh = document.createElement('div')
     boxCnh.className = 'cnh-celula'
 
-    if (c.cnh_categorias) {
-      const badgeCat = document.createElement('span')
-      badgeCat.className = 'cnh-categorias-badge'
-      badgeCat.textContent = 'Cat. ' + c.cnh_categorias
-      boxCnh.appendChild(badgeCat)
+    // na lista so aparece a categoria; a etiqueta colorida fica pra CNH vencendo ou vencida
+    const cat = document.createElement('span')
+    cat.className = 'cnh-texto'
+    cat.textContent = c.cnh_categorias ? 'Cat. ' + c.cnh_categorias : '—'
+    boxCnh.appendChild(cat)
+    if (c.cnh_info.status === 'vencendo' || c.cnh_info.status === 'vencida') {
+      const spanTag = document.createElement('div')
+      spanTag.innerHTML = tagCnh(c.cnh_info)
+      boxCnh.appendChild(spanTag)
     }
-
-    const spanTag = document.createElement('div')
-    spanTag.innerHTML = tagCnh(c.cnh_info)
-    boxCnh.appendChild(spanTag)
     tdCnh.appendChild(boxCnh)
 
     // Situacao operacional
@@ -196,21 +188,21 @@ function desenharTabela(lista) {
     if (c.alojamento_atual) {
       const divAloj = document.createElement('div')
       divAloj.className = 'situacao-alojamento'
-      divAloj.textContent = 'Alojamento: ' + c.alojamento_atual.alojamento + ' (' + c.alojamento_atual.leito + ')'
+      divAloj.textContent = c.alojamento_atual.alojamento + ' · ' + c.alojamento_atual.leito
       boxSit.appendChild(divAloj)
     }
 
     if (c.veiculo_atual) {
       const divVeic = document.createElement('div')
       divVeic.className = 'situacao-veiculo'
-      divVeic.textContent = 'Veículo: ' + c.veiculo_atual.modelo + ' · ' + c.veiculo_atual.placa
+      divVeic.textContent = c.veiculo_atual.modelo + ' · ' + c.veiculo_atual.placa
       boxSit.appendChild(divVeic)
     }
 
     if (!c.alojamento_atual && !c.veiculo_atual) {
       const divLivre = document.createElement('div')
       divLivre.className = 'situacao-livre'
-      divLivre.textContent = 'Sem alocação ativa'
+      divLivre.textContent = '—'
       boxSit.appendChild(divLivre)
     }
     tdSituacao.appendChild(boxSit)
@@ -243,7 +235,6 @@ function desenharTabela(lista) {
 
     tr.appendChild(tdColab)
     tr.appendChild(tdCargo)
-    tr.appendChild(tdContato)
     tr.appendChild(tdCnh)
     tr.appendChild(tdSituacao)
     tr.appendChild(tdAcoes)

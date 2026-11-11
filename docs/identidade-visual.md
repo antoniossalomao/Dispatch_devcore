@@ -8,14 +8,15 @@ Os tokens estão em `client/css/paleta.css`, importados pelo sistema e pelo port
 
 | Token | Cor | Uso |
 |---|---|---|
-| `--dc-noite` | `#090F0C` | Fundo principal |
-| `--dc-floresta` | `#152B20` | Superfícies e profundidade |
-| `--dc-musgo` | `#24472C` | Variações de verde |
-| `--dc-creme` | `#EEEEE6` | Texto e botões de destaque |
-| `--dc-ocre` | `#856622` | Acentos e indicadores |
+| `--dc-noite` | `#0A0A09` | Fundo principal |
+| `--dc-carvao` | `#1A1916` | Superfícies da apresentação |
+| `--dc-floresta` | `#16281C` | Superfícies e profundidade |
+| `--dc-musgo` | `#254226` | Variações de verde |
+| `--dc-creme` | `#EDECE6` | Texto e botões de destaque |
+| `--dc-ocre` | `#826426` | Acentos e indicadores |
 | `--dc-ouro` | `#CFAD68` | Detalhes e foco visual |
-| `--dc-taupe` | `#A18A75` | Acento secundário |
-| `--dc-salvia` | `#ADBCAA` | Texto secundário |
+| `--dc-taupe` | `#9D836A` | Acento secundário |
+| `--dc-salvia` | `#B9B5AB` | Texto secundário |
 
 O Dispatch inicia em tema escuro quando não existe preferência salva. A alternância claro/escuro continua disponível e preserva a escolha em `dispatch-tema`. Cores semânticas de erro e alertas críticos continuam distintas da identidade da marca.
 
@@ -33,7 +34,13 @@ O refinamento de espaçamento, tipografia e componentes está documentado em [Un
 
 ## Movimento e navegação
 
-O parallax usa um único `requestAnimationFrame` por evento, com limites de deslocamento, menor intensidade em telas pequenas e atualização apenas das camadas próximas à área visível. `prefers-reduced-motion: reduce` desativa os deslocamentos e a rolagem suave, inclusive quando a preferência muda durante a navegação.
+A predominância visual é de preto e carvão, com creme, ocre e taupe; o verde fica restrito a detalhes e estados semânticos.
+
+O parallax acompanha a rolagem nativa sem capturar eventos de wheel ou touch. Em desktops com altura suficiente, a abertura fica presa durante parte do percurso: a logo muda de escala e perspectiva, os anéis giram em planos distintos e o texto passa para uma segunda composição. O mouse acrescenta profundidade, apenas com ponteiro preciso.
+
+A cena do produto também fica presa: a interface começa inclinada e menor, ocupa progressivamente o quadro e os cartões decorativos se afastam. Manifesto e encerramento têm camadas independentes. O motor interpola as mudanças em `requestAnimationFrame` apenas até estabilizar, agrupando leituras antes de escritas. Em celular a abertura segue o fluxo normal e a cena do produto tem percurso e inclinação menores.
+
+`prefers-reduced-motion: reduce` desativa os movimentos e a rolagem suave e remove os percursos extras, inclusive quando a preferência muda durante a navegação. Sem JavaScript, o conteúdo segue no fluxo normal. Não há rolagem artificial nem dependência de biblioteca de animação.
 
 As abas do produto aceitam clique, setas, Home e End. Os detalhes de planos usam `dialog` nativo, com foco modal e fechamento por Escape, botão ou clique fora. FAQ usa `details` e `summary`, funcionando sem JavaScript.
 

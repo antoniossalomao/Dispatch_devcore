@@ -61,7 +61,12 @@ function tagDoc(rotulo, doc) {
   if (doc.status === 'vencido') return '<span class="status-tag status-problema"><span class="status-ponto"></span>' + rotulo + ' vencido</span>'
   if (doc.status === 'vencendo') return '<span class="status-tag status-atencao"><span class="status-ponto"></span>' + rotulo + ' em ' + doc.dias + 'd</span>'
   if (doc.status === 'sem_data') return '<span class="doc-linha">' + rotulo + ': sem data</span>'
-  return '<span class="doc-linha">' + rotulo + ' ok</span>'
+  return '' // documento em dia nao precisa aparecer na lista, so o que pede atencao
+}
+
+function celulaDocs(v) {
+  const tags = tagDoc('Licenciamento', v.licenciamento) + tagDoc('Seguro', v.seguro)
+  return tags || '<span class="doc-linha">Em dia</span>'
 }
 
 function formatarData(texto) {
@@ -95,12 +100,12 @@ async function carregarVeiculos() {
     if (v.ativo === 0) tr.className = 'colab-inativo'
     const st = rotulosStatus[v.status]
     tr.innerHTML =
-      '<td><div class="veic-celula"><span class="veic-modelo">' + esc(v.modelo) + '</span><span class="veic-placa"><span class="placa">' + esc(v.placa) + '</span> · ' + v.lugares + ' lugares · CNH ' + esc(v.categoria_cnh_exigida) + '</span></div></td>' +
+      '<td><div class="veic-celula"><span class="veic-modelo">' + esc(v.modelo) + '</span><span class="veic-placa"><span class="placa">' + esc(v.placa) + '</span></span></div></td>' +
       '<td><span class="status-tag ' + st[0] + '"><span class="status-ponto"></span>' + st[1] + '</span></td>' +
       '<td class="num">' + v.km_atual.toLocaleString('pt-BR') + ' km</td>' +
-      '<td><div class="docs-celula">' + tagDoc('Licenciamento', v.licenciamento) + tagDoc('Seguro', v.seguro) + '</div></td>' +
+      '<td><div class="docs-celula">' + celulaDocs(v) + '</div></td>' +
       '<td class="uso-celula">' + (v.uso_atual
-        ? esc(v.uso_atual.motorista) + '<span>' + esc(v.uso_atual.destino) + ' · desde ' + formatarData(v.uso_atual.saida) + '</span>'
+        ? esc(v.uso_atual.motorista) + '<span>' + esc(v.uso_atual.destino) + '</span>'
         : '<span>—</span>') + '</td>'
 
     const tdAcoes = document.createElement('td')
