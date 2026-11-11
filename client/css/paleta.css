@@ -1,0 +1,24 @@
+/* Identidade DevCore — referência: floresta, musgo, porcelana, ocre e taupe. */
+:root {
+  --dc-noite: #090f0c;
+  --dc-floresta: #152b20;
+  --dc-musgo: #24472c;
+  --dc-creme: #eeeee6;
+  --dc-ocre: #856622;
+  --dc-ouro: #cfad68;
+  --dc-taupe: #a18a75;
+  --dc-salvia: #adbcaa;
+  --dc-painel: #111d16;
+  --dc-elevado: #1a2a20;
+  --dc-linha: #304335;
+
+  /* Superfícies do sistema: neutras para leitura prolongada.
+     A apresentação conserva a paleta DevCore acima. */
+  --op-fundo: #111315;
+  --op-painel: #191c20;
+  --op-elevado: #24282d;
+  --op-borda: #30353b;
+  --op-texto: #eceef0;
+  --op-secundario: #a8afb8;
+  --op-mudo: #939ba5;
+}

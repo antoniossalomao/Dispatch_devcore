@@ -31,13 +31,13 @@
 
 /* bolinha com as iniciais (Avatar do shadcn) */
 .colab-avatar {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background-color: var(--marinho);
   color: #fff;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,7 +45,7 @@
 }
 
 .colab-inativo .colab-avatar {
-  background-color: #cbd5e1;
+  background-color: var(--claro-suave);
   color: var(--claro-texto-fraco);
 }
 
@@ -95,14 +95,14 @@
 .cnh-categorias-badge {
   display: inline-block;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--claro-texto);
   background-color: var(--claro-suave);
   border: 1px solid var(--claro-borda);
-  padding: 1px 7px;
+  padding: 2px 8px;
   border-radius: 6px;
   width: fit-content;
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
 }
 
 .cnh-validade-txt {
@@ -114,7 +114,7 @@
 .situacao-celula {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   font-size: 13px;
 }
 
@@ -146,7 +146,7 @@
 .botoes-acoes {
   display: flex;
   justify-content: flex-end;
-  gap: 6px;
+  gap: 8px;
 }
 
 
@@ -161,21 +161,21 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
-  animation: aparecer 0.15s ease-out;
+  animation: aparecer 0.15s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .modal-card {
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: 12px;
+  border-radius: 16px;
   width: 100%;
   max-width: 640px;
-  max-height: 90vh;
+  max-height: calc(100dvh - 32px);
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
   overflow: hidden;
-  animation: crescer 0.18s ease-out; /* abre crescendo um pouquinho, igual o do shadcn */
+  animation: crescer 0.18s cubic-bezier(0.22, 1, 0.36, 1); /* abre crescendo um pouquinho, igual o do shadcn */
 }
 
 @keyframes aparecer {
@@ -189,7 +189,7 @@
 }
 
 .modal-cabecalho {
-  padding: 22px 24px 16px;
+  padding: 24px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -197,9 +197,9 @@
 }
 
 .modal-titulo {
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0;
   color: var(--claro-texto);
 }
 
@@ -213,8 +213,8 @@
 .modal-fechar {
   background: none;
   border: none;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 6px;
   font-size: 20px;
   line-height: 1;
@@ -230,7 +230,7 @@
 }
 
 .modal-corpo {
-  padding: 4px 24px 20px;
+  padding: 24px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -254,7 +254,7 @@
 
 .categorias-seletor {
   display: flex;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -262,13 +262,13 @@
 .check-categoria {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   height: 32px;
   font-size: 13px;
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
   border-radius: var(--raio);
-  padding: 0 10px;
+  padding: 0 12px;
   cursor: pointer;
   font-weight: 500;
   color: var(--claro-texto);
@@ -281,9 +281,9 @@
 
 /* :has deixa mudar a cor do label quando o checkbox de dentro ta marcado */
 .check-categoria:has(input:checked) {
-  background-color: var(--ok-claro-fundo);
-  border-color: #86efac;
-  color: var(--ok-claro-texto);
+  background-color: var(--claro-suave);
+  border-color: var(--borda-forte);
+  color: var(--claro-texto);
 }
 
 .check-categoria input {
@@ -291,7 +291,7 @@
 }
 
 .modal-rodape {
-  padding: 14px 24px;
+  padding: 16px 24px;
   border-top: 1px solid var(--claro-borda);
   display: flex;
   justify-content: flex-end;
@@ -308,7 +308,7 @@
   z-index: 90;
   display: flex;
   justify-content: flex-end;
-  animation: aparecer 0.15s ease-out;
+  animation: aparecer 0.15s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .gaveta-painel {
@@ -320,7 +320,7 @@
   box-shadow: -10px 0 30px rgba(15, 23, 42, 0.15);
   display: flex;
   flex-direction: column;
-  animation: deslizarGaveta 0.25s ease-out;
+  animation: deslizarGaveta 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes deslizarGaveta {
@@ -329,7 +329,7 @@
 }
 
 .gaveta-topo {
-  padding: 20px 24px;
+  padding: 24px;
   background-color: var(--claro-cartao);
   display: flex;
   justify-content: space-between;
@@ -339,31 +339,31 @@
 .gaveta-perfil {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .gaveta-titulo {
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0;
   color: var(--claro-texto);
 }
 
 .gaveta-subtitulo {
   font-size: 13px;
   color: var(--claro-texto-fraco);
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 /* as abas em si vem do resumo.css (filtro-abas), aqui é só a faixa branca em volta */
 .gaveta-abas {
   background-color: var(--claro-cartao);
   border-bottom: 1px solid var(--claro-borda);
-  padding: 0 24px 14px;
+  padding: 0 24px 16px;
 }
 
 .gaveta-corpo {
-  padding: 20px 24px;
+  padding: 24px;
   overflow-y: auto;
   flex: 1;
 }
@@ -382,11 +382,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  margin-top: 14px;
+  margin-top: 16px;
 }
 
 .status-caixa {
-  padding: 12px 14px;
+  padding: 12px 16px;
   border-radius: var(--raio);
   border: 1px solid var(--claro-borda);
   background-color: var(--superficie-2);
@@ -413,8 +413,8 @@
 .gaveta-lista-dados {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .dado-linha {
@@ -422,7 +422,7 @@
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--claro-borda);
 }
 
@@ -444,8 +444,8 @@
 .timeline-lista {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 14px;
+  gap: 16px;
+  margin-top: 16px;
 }
 
 .timeline-item {
@@ -454,7 +454,7 @@
   border-left: 2px solid var(--claro-borda);
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .timeline-item::before {
@@ -496,7 +496,7 @@
 }
 
 .gaveta-rodape {
-  padding: 14px 24px;
+  padding: 16px 24px;
   background-color: var(--claro-cartao);
   border-top: 1px solid var(--claro-borda);
   display: flex;

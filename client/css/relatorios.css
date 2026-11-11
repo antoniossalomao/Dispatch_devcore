@@ -10,10 +10,10 @@
 /* cabecalho com filtro de periodo: pode quebrar em duas linhas em vez de estourar a largura */
 .topo:has(.periodo-filtro) {
   height: auto;
-  min-height: 60px;
+  min-height: 64px;
   flex-wrap: wrap;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 12px;
+  padding-bottom: 12px;
 }
 
 .periodo-data {
@@ -21,16 +21,16 @@
 }
 
 .rel-abas {
-  margin-bottom: 18px;
+  margin-bottom: 24px;
   flex-wrap: wrap;
 }
 
 .rel-corpo {
-  padding: 18px 20px 20px;
+  padding: 24px;
 }
 
 .rel-linha {
-  margin-bottom: 18px;
+  margin-bottom: 24px;
 }
 
 .rel-linha-topo {
@@ -73,7 +73,7 @@
 .resultado-caixa {
   border: 1px solid var(--claro-borda);
   border-radius: 10px;
-  padding: 14px 16px;
+  padding: 16px;
   font-size: 14px;
   line-height: 1.55;
   white-space: pre-wrap;
@@ -117,7 +117,7 @@
 .mov-rodape {
   display: flex;
   justify-content: center;
-  padding: 14px 20px;
+  padding: 16px 20px;
 }
 
 .mov-rodape[hidden],

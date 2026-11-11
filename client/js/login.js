@@ -23,25 +23,32 @@ checkMostrar.addEventListener('change', function () {
   }
 })
 
-function mostrarErro(texto) {
+function mostrarErro(texto, campo) {
   msgErro.textContent = texto
   msgErro.hidden = false
+  if (campo) {
+    campo.setAttribute('aria-invalid', 'true')
+    campo.focus()
+  } else msgErro.focus()
 }
 
 function esconderErro() {
   msgErro.textContent = ''
   msgErro.hidden = true
+  const campos = [inputUsuario, inputSenha]
+  campos.forEach(function (campo) { campo.removeAttribute('aria-invalid') })
 }
 
 // roda quando clica em Entrar (ou aperta enter)
 form.addEventListener('submit', async function (e) {
   e.preventDefault()
+  esconderErro()
 
   const usuario = inputUsuario.value.trim()
   const senha = inputSenha.value
 
   if (usuario === '' || senha === '') {
-    mostrarErro('Preencha o usuário e a senha.')
+    mostrarErro('Preencha o usuário e a senha.', usuario === '' ? inputUsuario : inputSenha)
     return
   }
 

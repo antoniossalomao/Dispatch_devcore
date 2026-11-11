@@ -13,15 +13,15 @@
 /* ---- menu lateral azul-marinho (no jeito do Sidebar do shadcn) ---- */
 
 .menu-lateral {
-  width: 236px;
+  width: 256px;
   flex-shrink: 0;
   background-color: var(--marinho);
-  color: #cbd5e1;
+  color: var(--op-secundario);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 20px 12px 14px;
-  border-right: 1px solid #172033;
+  padding: 24px 16px 16px;
+  border-right: 1px solid var(--dc-linha);
   position: sticky;
   top: 0;
   height: 100vh; /* o menu fica parado enquanto a pagina rola */
@@ -29,8 +29,8 @@
 }
 
 .menu-marca {
-  padding: 0 10px 20px;
-  border-bottom: 1px solid #192338;
+  padding: 0 8px 24px;
+  border-bottom: 1px solid var(--dc-linha);
   margin-bottom: 16px;
   display: flex;
   flex-direction: column;
@@ -38,28 +38,28 @@
 
 .menu-logo {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 600;
   color: #fff;
-  letter-spacing: -0.4px;
+  letter-spacing: 0;
 }
 
 .menu-empresa {
   font-size: 12px;
-  color: #64748b;
-  margin-top: 2px;
+  color: var(--op-secundario);
+  margin-top: 4px;
 }
 
 .menu-secao {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.6px;
-  color: #556274;
-  padding: 0 10px;
-  margin-bottom: 6px;
+  color: var(--op-mudo);
+  padding: 0 8px;
+  margin-bottom: 8px;
 }
 
 .menu-secao-espaco {
-  margin-top: 22px;
+  margin-top: 24px;
 }
 
 .menu-lista {
@@ -71,11 +71,11 @@
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   height: 36px;
-  padding: 0 10px;
+  padding: 0 8px;
   border-radius: var(--raio);
-  color: #94a3b8;
+  color: var(--op-secundario);
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
@@ -83,34 +83,34 @@
 }
 
 .menu-item:hover {
-  background-color: #141d2e;
-  color: #e2e8f0;
+  background-color: var(--op-elevado);
+  color: var(--dc-creme);
 }
 
 /* tela atual: fundo mais claro e o icone verde */
 .menu-item.ativo {
-  background-color: #1a2436;
+  background-color: var(--op-elevado);
   color: #fff;
 }
 
 .menu-item.ativo svg {
-  color: #34d399;
+  color: inherit;
 }
 
 .menu-rodape {
-  border-top: 1px solid #192338;
-  padding: 12px 6px 0;
+  border-top: 1px solid var(--dc-linha);
+  padding: 16px 0 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .usuario-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: #1e293b;
-  color: #e2e8f0;
+  background-color: var(--op-elevado);
+  color: var(--dc-creme);
   font-size: 12px;
   font-weight: 600;
   display: flex;
@@ -127,7 +127,7 @@
 .usuario-nome {
   font-size: 13px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: var(--dc-creme);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -135,14 +135,14 @@
 
 .usuario-cargo {
   font-size: 12px;
-  color: #64748b;
+  color: var(--op-secundario);
   text-transform: capitalize;
 }
 
 .botao-sair {
   background: none;
   border: none;
-  color: #94a3b8;
+  color: var(--op-secundario);
   width: 32px;
   height: 32px;
   border-radius: var(--raio);
@@ -169,7 +169,8 @@
 }
 
 .topo {
-  height: 60px;
+  min-height: 64px;
+  height: auto;
   background-color: var(--claro-cartao);
   border-bottom: 1px solid var(--claro-borda);
   padding: 0 32px;
@@ -192,7 +193,7 @@
 .topo-titulo {
   font-size: 17px;
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: 0;
   color: var(--claro-texto);
 }
 
@@ -280,7 +281,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background-color: #d97706;
+  background-color: #a78339;
   border: 1.5px solid #fff;
 }
 
@@ -288,8 +289,8 @@
 /* ---- conteúdo e indicadores ---- */
 
 .conteudo {
-  padding: 28px 32px 40px;
-  max-width: 1360px;
+  padding: 32px;
+  max-width: 1600px;
   width: 100%;
 }
 
@@ -297,7 +298,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  margin-bottom: 22px;
+  margin-bottom: 24px;
 }
 
 /* cartão de numero (Card do shadcn) */
@@ -314,7 +315,7 @@
   justify-content: space-between;
   align-items: center;
   color: var(--claro-texto-fraco);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .kpi-rotulo {
@@ -327,13 +328,13 @@
   display: flex;
   align-items: baseline;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .kpi-numero {
   font-size: 30px;
   font-weight: 600;
-  letter-spacing: -0.8px;
+  letter-spacing: 0;
   color: var(--claro-texto);
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -346,21 +347,20 @@
 
 /* barrinha de progresso (Progress), redonda nas pontas */
 .barra-fundo {
-  height: 6px;
+  height: 4px;
   background-color: var(--claro-suave);
   border-radius: 999px;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .barra-preenchimento {
   height: 100%;
   border-radius: 999px;
-  transition: width 0.4s;
 }
 
 .barra-azul {
-  background-color: #2563eb;
+  background-color: var(--dc-ocre);
 }
 
 .barra-verde {
@@ -368,7 +368,7 @@
 }
 
 .barra-marinho {
-  background-color: #334155;
+  background-color: var(--dc-taupe);
 }
 
 .kpi-detalhe {
@@ -381,8 +381,8 @@
 
 .grade-operacional {
   display: grid;
-  grid-template-columns: 1fr 330px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
   align-items: start;
 }
 
@@ -395,7 +395,7 @@
 }
 
 .bloco-cabecalho {
-  padding: 18px 20px;
+  padding: 20px;
   border-bottom: 1px solid var(--claro-borda);
   display: flex;
   justify-content: space-between;
@@ -411,21 +411,21 @@
 .bloco-titulo {
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: -0.2px;
+  letter-spacing: 0;
   color: var(--claro-texto);
 }
 
 .bloco-subtitulo {
   font-size: 13px;
   color: var(--claro-texto-fraco);
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 /* abas (Tabs do shadcn): fundo cinza e a aba ativa branca */
 .filtro-abas {
   display: inline-flex;
   background-color: var(--claro-suave);
-  padding: 3px;
+  padding: 4px;
   border-radius: 10px;
   gap: 2px;
 }
@@ -433,12 +433,12 @@
 .aba-item {
   border: none;
   background: none;
-  height: 30px;
+  height: 32px;
   padding: 0 12px;
   font-size: 13px;
   font-weight: 500;
   color: var(--claro-texto-fraco);
-  border-radius: 7px;
+  border-radius: 6px;
   cursor: pointer;
   transition: color 0.15s, background-color 0.15s;
 }
@@ -519,7 +519,7 @@
 .status-tag {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 2px 8px;
   border-radius: 6px;
   border: 1px solid transparent;
@@ -529,8 +529,8 @@
 }
 
 .status-ponto {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
   border-radius: 50%;
 }
 
@@ -542,18 +542,18 @@
 }
 
 .status-ativo .status-ponto {
-  background-color: #16a34a;
+  background-color: #54805a;
 }
 
 /* azul = em uso */
 .status-uso {
   background-color: var(--info-claro-fundo);
-  border-color: #bfdbfe;
+  border-color: #c8bb8c;
   color: var(--info-claro-texto);
 }
 
 .status-uso .status-ponto {
-  background-color: #2563eb;
+  background-color: var(--dc-ocre);
 }
 
 /* amarelo = atenção */
@@ -564,7 +564,7 @@
 }
 
 .status-atencao .status-ponto {
-  background-color: #d97706;
+  background-color: #a78339;
 }
 
 /* vermelho = problema */
@@ -594,11 +594,11 @@
 .coluna-lateral {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
 }
 
 .lista-unidades {
-  padding: 18px 20px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -634,12 +634,12 @@
   padding: 16px 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 /* caixinha de aviso (Alert do shadcn) com a cor do nivel */
 .alerta-item {
-  padding: 12px 14px;
+  padding: 12px;
   border-radius: var(--raio);
   border: 1px solid var(--claro-borda);
 }
@@ -671,7 +671,7 @@
 .alerta-detalhe {
   font-size: 13px;
   color: var(--claro-texto-fraco);
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .texto-vazio {
@@ -701,7 +701,7 @@
     width: 100%;
     height: auto;
     position: static;
-    padding: 14px 16px;
+    padding: 16px;
     gap: 12px;
   }
 
@@ -726,7 +726,7 @@
   .topo {
     height: auto;
     position: static;
-    padding: 14px 18px;
+    padding: 16px;
     flex-direction: column;
     align-items: stretch;
   }
@@ -736,7 +736,7 @@
   }
 
   .conteudo {
-    padding: 18px;
+    padding: 16px;
   }
 
   .indicadores {

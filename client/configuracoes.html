@@ -6,8 +6,11 @@
   <title>Dispatch — Configurações</title>
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/resumo.css">
+  <link rel="stylesheet" href="css/colaboradores.css">
+  <link rel="stylesheet" href="css/relatorios.css">
   <link rel="stylesheet" href="css/configuracoes.css">
   <link rel="stylesheet" href="css/tema.css">
+  <link rel="stylesheet" href="css/usabilidade.css">
   <script src="js/tema.js"></script>
 </head>
 <body class="painel-corpo">
@@ -20,7 +23,7 @@
         <span id="nome-empresa-menu" class="menu-empresa">Construtora Aguapeí</span>
       </div>
 
-      <p class="menu-secao">OPERAÇÃO</p>
+      <p class="menu-secao">Operação</p>
 
       <nav class="menu-lista">
         <a href="resumo.html" class="menu-item">
@@ -30,7 +33,7 @@
             <rect x="3" y="14" width="7" height="7" rx="1"/>
             <rect x="14" y="14" width="7" height="7" rx="1"/>
           </svg>
-          <span>Visão Geral</span>
+          <span>Visão geral</span>
         </a>
 
         <a href="colaboradores.html" class="menu-item">
@@ -81,41 +84,18 @@
           <span>Relatórios</span>
         </a>
       </nav>
+    </div>
 
-      <div class="menu-admin-bloco">
-        <p class="menu-secao menu-secao-espaco">SISTEMA</p>
-        <nav class="menu-lista">
-          <a href="auditoria.html" class="menu-item">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              <polyline points="9 12 11 14 15 10"/>
-            </svg>
-            <span>Auditoria</span>
-          </a>
-          <a href="configuracoes.html" class="menu-item ativo">
+    <div id="bloco-menu-admin" class="menu-admin-bloco menu-rodape">
+      <nav class="menu-lista" aria-label="Sistema">
+        <a href="configuracoes.html" class="menu-item ativo">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"/>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.02 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
             </svg>
             <span>Configurações</span>
           </a>
-        </nav>
-      </div>
-    </div>
-
-    <div class="menu-rodape">
-      <div id="usuario-iniciais" class="usuario-avatar">AD</div>
-      <div class="usuario-dados">
-        <p id="perfil-nome" class="usuario-nome">Administrador</p>
-        <p id="perfil-tipo" class="usuario-cargo">admin</p>
-      </div>
-      <button type="button" id="botao-sair" class="botao-sair" title="Sair do sistema">
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-          <polyline points="16 17 21 12 16 7"/>
-          <line x1="21" y1="12" x2="9" y2="12"/>
-        </svg>
-      </button>
+      </nav>
     </div>
   </aside>
 
@@ -130,7 +110,21 @@
       </div>
 
       <div class="topo-direita">
-        <span id="selo-alterado" class="selo-pendente" hidden>Alterações não salvas</span>
+        <span id="selo-alterado" class="selo-pendente" role="status" aria-live="polite" hidden>Alterações não salvas</span>
+        <div class="topo-perfil" role="group" aria-label="Usuário e preferências">
+          <div id="usuario-iniciais" class="usuario-avatar">AD</div>
+          <div class="usuario-dados">
+            <p id="perfil-nome" class="usuario-nome">Administrador</p>
+            <p id="perfil-tipo" class="usuario-cargo">admin</p>
+          </div>
+          <button type="button" id="botao-sair" class="botao-sair" title="Sair do sistema">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -146,7 +140,7 @@
             <line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>
           </svg>
           <div>
-            <span class="nav-item-titulo">Operação e Regras</span>
+            <span class="nav-item-titulo">Operação e regras</span>
             <span class="nav-item-sub">Empresa, frota e NR-24</span>
           </div>
         </button>
@@ -157,7 +151,7 @@
             <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
           <div>
-            <span class="nav-item-titulo">Alertas e Integrações</span>
+            <span class="nav-item-titulo">Alertas e integrações</span>
             <span class="nav-item-sub">Prazos, Groq e Telegram</span>
           </div>
         </button>
@@ -170,7 +164,7 @@
             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
           <div>
-            <span class="nav-item-titulo">Usuários e Acessos</span>
+            <span class="nav-item-titulo">Usuários e acessos</span>
             <span class="nav-item-sub">Perfis admin e operador</span>
           </div>
         </button>
@@ -182,8 +176,19 @@
             <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
           </svg>
           <div>
-            <span class="nav-item-titulo">Banco e Auditoria</span>
-            <span class="nav-item-sub">Backup e hash do log</span>
+            <span class="nav-item-titulo">Banco e backup</span>
+            <span class="nav-item-sub">Armazenamento e cópia de segurança</span>
+          </div>
+        </button>
+
+        <button type="button" class="config-nav-item" data-aba="auditoria">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+          <div>
+            <span class="nav-item-titulo">Auditoria</span>
+            <span class="nav-item-sub">Histórico, filtros e integridade</span>
           </div>
         </button>
 
@@ -193,7 +198,7 @@
             <circle cx="12" cy="7" r="4"/>
           </svg>
           <div>
-            <span class="nav-item-titulo">Minha Conta</span>
+            <span class="nav-item-titulo">Minha conta</span>
             <span class="nav-item-sub">Perfil pessoal e senha</span>
           </div>
         </button>
@@ -533,7 +538,7 @@
                 <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                   <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>
                 </svg>
-                <input type="text" id="busca-usuario" placeholder="Filtrar por nome ou @login...">
+                <input type="text" id="busca-usuario" placeholder="Buscar usuários" aria-label="Buscar por nome ou login">
               </div>
 
               <button type="button" id="abrir-novo-usuario" class="btn-primario">+ Novo usuário</button>
@@ -627,6 +632,45 @@
 
         </div>
 
+        <section id="painel-auditoria" class="config-secao" hidden aria-labelledby="titulo-auditoria">
+          <div class="bloco-cabecalho auditoria-cabecalho">
+            <div>
+              <h2 id="titulo-auditoria" class="bloco-titulo">Auditoria</h2>
+              <p class="bloco-subtitulo">Quem alterou o quê, quando e como estava antes</p>
+            </div>
+            <button type="button" id="botao-verificar" class="btn-secundario">Verificar integridade</button>
+          </div>
+
+
+      <div id="aud-integridade" class="resultado-caixa" hidden></div>
+
+      <section class="bloco">
+        <div class="bloco-cabecalho">
+          <div class="colab-filtros-topo">
+            <div class="busca-caixa busca-larga">
+              <input type="text" id="aud-busca" placeholder="Buscar no histórico" aria-label="Buscar por descrição ou usuário">
+            </div>
+            <select id="aud-tabela" class="config-select select-curto"><option value="">Todas as tabelas</option></select>
+            <select id="aud-acao" class="config-select select-curto">
+              <option value="">Todas as ações</option>
+              <option value="criou">Criou</option>
+              <option value="alterou">Alterou</option>
+              <option value="arquivou">Arquivou</option>
+            </select>
+          </div>
+          <span id="aud-total" class="kpi-complemento"></span>
+        </div>
+        <div class="tabela-area">
+          <table class="tabela">
+            <thead><tr><th>Quando</th><th>Usuário</th><th>Ação</th><th>Descrição</th><th>Antes → Depois</th></tr></thead>
+            <tbody id="aud-lista"></tbody>
+          </table>
+        </div>
+      </section>
+
+
+        </section>
+
         <!-- 5. MINHA CONTA -->
         <div id="painel-conta" class="config-secao" hidden>
 
@@ -703,8 +747,10 @@
   <div id="toast-retorno" class="toast" hidden></div>
 
   <script src="js/api.js"></script>
+  <script src="js/auditoria.js"></script>
   <script src="js/configuracoes.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/extras.js"></script>
+  <script src="js/usabilidade.js"></script>
 </body>
 </html>

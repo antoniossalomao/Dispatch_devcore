@@ -20,8 +20,8 @@
         <h1 class="login-logo">Dispatch</h1>
 
         <div>
-          <p class="login-chamada">Pessoas, alojamentos e frota num lugar só.</p>
-          <p class="login-texto">Controle total de pessoas, alojamentos e frota, sem planilhas. Saiba quem está em qual leito, quem está com qual veículo, quando e com quantos km. Tudo registrado, validado e pronto para auditoria.</p>
+          <p class="login-chamada">Pessoas, alojamentos e frota num lugar só</p>
+          <p class="login-texto">Saiba quem está em cada leito e com cada veículo. Acompanhe retiradas, devoluções e quilometragem, com o histórico de cada movimentação.</p>
         </div>
       </div>
 
@@ -33,15 +33,15 @@
         <form id="form-login" class="login-form">
 
           <!-- aparece quando a pessoa acabou de criar a conta -->
-          <p id="mensagem-sucesso" class="login-sucesso" hidden></p>
+          <p id="mensagem-sucesso" class="login-sucesso" role="status" hidden></p>
 
           <!-- o "for" do label tem que ser igual ao id do input, aí clicando no texto já vai pro campo -->
           <label for="usuario">Usuário</label>
-          <input type="text" id="usuario" autocomplete="username" placeholder="Digite seu usuário">
+          <input type="text" id="usuario" aria-describedby="mensagem-erro" autocomplete="username" placeholder="Digite seu usuário">
 
           <label for="senha">Senha</label>
           <!-- type password = aparece as bolinhas em vez da senha -->
-          <input type="password" id="senha" autocomplete="current-password" placeholder="Digite sua senha">
+          <input type="password" id="senha" aria-describedby="mensagem-erro" autocomplete="current-password" placeholder="Digite sua senha">
 
           <div class="login-mostrar">
             <input type="checkbox" id="mostrar-senha">
@@ -49,12 +49,13 @@
           </div>
 
           <!-- começa escondido (hidden), o js mostra quando der erro -->
-          <p id="mensagem-erro" class="login-erro" hidden></p>
+          <p id="mensagem-erro" class="login-erro" role="alert" tabindex="-1" hidden></p>
 
           <button type="submit" id="botao-entrar" class="login-botao">Entrar</button>
         </form>
 
         <p class="login-ajuda">Não tem uma conta? <a href="cadastro.html" class="login-link">Cadastre-se</a></p>
+        <p class="login-ajuda"><a href="apresentacao.html" class="login-link">Conheça o DevCore e o Dispatch</a></p>
       </div>
 
     </div>

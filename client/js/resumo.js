@@ -3,23 +3,17 @@
 const numVeiculosUso = document.getElementById('num-veiculos-uso')
 const subVeiculosUso = document.getElementById('sub-veiculos-uso')
 const detalheVeiculosUso = document.getElementById('detalhe-veiculos-uso')
-const barraFrota = document.getElementById('barra-frota')
 
 const numVeiculosDisp = document.getElementById('num-veiculos-disp')
-const barraDisp = document.getElementById('barra-disp')
 
 const numAlojamentos = document.getElementById('num-alojamentos')
 const subAlojamentos = document.getElementById('sub-alojamentos')
 const detalheAlojamentos = document.getElementById('detalhe-alojamentos')
-const barraOcupacao = document.getElementById('barra-ocupacao')
 
 const numVagas = document.getElementById('num-vagas')
-const barraVagas = document.getElementById('barra-vagas')
 
 const listaMov = document.getElementById('lista-movimentacoes')
 const listaAloj = document.getElementById('lista-alojamentos')
-const listaAlertas = document.getElementById('lista-alertas')
-const pontoAlerta = document.getElementById('ponto-alerta')
 
 const usuarioIniciais = document.getElementById('usuario-iniciais')
 const perfilNome = document.getElementById('perfil-nome')
@@ -29,8 +23,6 @@ const blocoMenuAdmin = document.getElementById('bloco-menu-admin')
 const nomeEmpresaMenu = document.getElementById('nome-empresa-menu')
 
 const campoBusca = document.getElementById('campo-busca')
-const botaoNotif = document.getElementById('botao-notificacoes')
-const secaoAlertas = document.getElementById('secao-alertas')
 const avisoTela = document.getElementById('aviso-tela')
 const dataHoje = document.getElementById('data-hoje')
 const abasFiltro = document.querySelectorAll('.aba-item')
@@ -206,38 +198,6 @@ function desenharAlojamentos(lista) {
   })
 }
 
-function desenharAlertas(lista) {
-  listaAlertas.innerHTML = ''
-
-  if (!lista || lista.length === 0) {
-    pontoAlerta.hidden = true
-    const p = document.createElement('p')
-    p.className = 'texto-vazio'
-    p.textContent = 'Nenhuma pendência operacional aberta.'
-    listaAlertas.appendChild(p)
-    return
-  }
-
-  pontoAlerta.hidden = false
-
-  lista.forEach(function (a) {
-    const div = document.createElement('div')
-    div.className = 'alerta-item ' + (a.nivel === 'problema' ? 'alerta-problema' : 'alerta-atencao')
-
-    const titulo = document.createElement('p')
-    titulo.className = 'alerta-titulo'
-    titulo.textContent = a.titulo
-
-    const detalhe = document.createElement('p')
-    detalhe.className = 'alerta-detalhe'
-    detalhe.textContent = a.detalhe
-
-    div.appendChild(titulo)
-    div.appendChild(detalhe)
-    listaAlertas.appendChild(div)
-  })
-}
-
 // filtro por abas (Todas / Frota / Alojamentos)
 abasFiltro.forEach(function (aba) {
   aba.addEventListener('click', function () {
@@ -251,10 +211,6 @@ abasFiltro.forEach(function (aba) {
 })
 
 campoBusca.addEventListener('input', aplicarFiltros)
-
-botaoNotif.addEventListener('click', function () {
-  secaoAlertas.scrollIntoView({ behavior: 'smooth' })
-})
 
 // aviso pra telas que serão implementadas nas próximas tarefas
 const linksEmBreve = document.querySelectorAll('.menu-em-breve')
@@ -296,33 +252,26 @@ async function carregarPainel() {
     if (d.nomeEmpresa) {
       nomeEmpresaMenu.textContent = d.nomeEmpresa
     }
-    const pctFrota = porcentagem(d.veiculosEmUso, d.totalVeiculos)
-    const pctDisp = porcentagem(d.veiculosDisponiveis, d.totalVeiculos)
     const pctOcup = porcentagem(d.leitosOcupados, d.totalLeitos)
-    const pctVagas = porcentagem(d.vagasDisponiveis, d.totalLeitos)
 
     numVeiculosUso.textContent = d.veiculosEmUso
     subVeiculosUso.textContent = 'de ' + d.totalVeiculos + ' na frota'
-    barraFrota.style.width = pctFrota + '%'
     detalheVeiculosUso.textContent = d.veiculosManutencao > 0
       ? d.veiculosManutencao + ' em manutenção no momento'
       : 'Nenhum veículo na oficina'
 
     numVeiculosDisp.textContent = d.veiculosDisponiveis
-    barraDisp.style.width = pctDisp + '%'
+    document.getElementById('detalhe-veiculos-disp').textContent = 'Documentação e CNH validadas na saída'
 
     numAlojamentos.textContent = d.totalAlojamentos
     subAlojamentos.textContent = d.totalLeitos + ' leitos no total'
-    barraOcupacao.style.width = pctOcup + '%'
     detalheAlojamentos.textContent = d.leitosOcupados + ' leitos ocupados hoje (' + pctOcup + '%)'
 
     numVagas.textContent = d.vagasDisponiveis
-    barraVagas.style.width = pctVagas + '%'
 
     movimentacoesAtuais = d.movimentacoes || []
     aplicarFiltros()
     desenharAlojamentos(d.alojamentos)
-    desenharAlertas(d.alertas)
   } catch (erro) {
     mostrarAviso('Sem conexão com o servidor.')
   }

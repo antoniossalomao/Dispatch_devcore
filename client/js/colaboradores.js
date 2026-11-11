@@ -138,7 +138,8 @@ function desenharTabela(lista) {
     const dadosNome = document.createElement('div')
     dadosNome.className = 'colab-dados-nome'
 
-    const spanNome = document.createElement('span')
+    const spanNome = document.createElement('button')
+    spanNome.type = 'button'
     spanNome.className = 'colab-nome'
     spanNome.textContent = c.nome
     spanNome.addEventListener('click', function () {
@@ -195,14 +196,14 @@ function desenharTabela(lista) {
     if (c.alojamento_atual) {
       const divAloj = document.createElement('div')
       divAloj.className = 'situacao-alojamento'
-      divAloj.innerHTML = '🏠 ' + c.alojamento_atual.alojamento + ' (' + c.alojamento_atual.leito + ')'
+      divAloj.textContent = 'Alojamento: ' + c.alojamento_atual.alojamento + ' (' + c.alojamento_atual.leito + ')'
       boxSit.appendChild(divAloj)
     }
 
     if (c.veiculo_atual) {
       const divVeic = document.createElement('div')
       divVeic.className = 'situacao-veiculo'
-      divVeic.innerHTML = '🚗 ' + c.veiculo_atual.modelo + ' · ' + c.veiculo_atual.placa
+      divVeic.textContent = 'Veículo: ' + c.veiculo_atual.modelo + ' · ' + c.veiculo_atual.placa
       boxSit.appendChild(divVeic)
     }
 

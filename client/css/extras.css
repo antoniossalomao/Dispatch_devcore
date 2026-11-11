@@ -4,6 +4,11 @@
   position: relative;
 }
 
+/* O painel fica acima da ajuda flutuante também nas telas pequenas. */
+.topo:has(.sino-painel:not([hidden])) {
+  z-index: 60;
+}
+
 .sino-caixa .botao-notif {
   position: relative;
 }
@@ -12,8 +17,8 @@
   position: absolute;
   top: -4px;
   right: -4px;
-  min-width: 17px;
-  height: 17px;
+  min-width: 20px;
+  height: 20px;
   padding: 0 4px;
   border-radius: 999px;
   background-color: var(--vermelho);
@@ -29,13 +34,13 @@
   position: absolute;
   right: 0;
   top: calc(100% + 8px);
-  width: 360px;
-  max-height: 440px;
+  width: 400px;
+  max-height: min(480px, calc(100dvh - 88px));
   overflow-y: auto;
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
+  box-shadow: var(--sombra-2);
   z-index: 60;
 }
 
@@ -43,7 +48,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 14px;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 16px;
+  position: sticky;
+  top: 0;
+  background-color: var(--claro-cartao);
   border-bottom: 1px solid var(--claro-borda);
   font-size: 13px;
 }
@@ -66,11 +76,12 @@
   border: none;
   border-bottom: 1px solid var(--claro-borda);
   border-left: 3px solid transparent;
-  padding: 10px 14px;
+  padding: 16px;
   font: inherit;
   font-size: 13px;
   color: var(--claro-texto);
   cursor: pointer;
+  line-height: 20px;
 }
 
 .sino-item:hover {
@@ -79,21 +90,42 @@
 
 .sino-item small {
   display: block;
-  margin-top: 2px;
+  margin-top: 8px;
   color: var(--claro-texto-fraco);
-  font-size: 11px;
+  font-size: 12px;
+}
+
+.sino-nivel {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.sino-critico .sino-nivel {
+  color: var(--erro-claro-texto);
+}
+
+.sino-atencao .sino-nivel {
+  color: var(--atencao-claro-texto);
+}
+
+.sino-item:focus-visible,
+.sino-todas:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: -3px;
 }
 
 .sino-critico {
-  border-left-color: var(--vermelho);
+  border-left-color: var(--erro-claro-texto);
 }
 
 .sino-atencao {
-  border-left-color: #f59e0b;
+  border-left-color: var(--atencao-claro-texto);
 }
 
 .sino-vazio {
-  padding: 18px 14px;
+  padding: 20px 16px;
   font-size: 13px;
   color: var(--claro-texto-fraco);
 }
@@ -102,30 +134,30 @@
 
 .chat-caixa {
   position: fixed;
-  right: 22px;
-  bottom: 22px;
+  right: 24px;
+  bottom: 24px;
   z-index: 55;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 10px;
+  gap: 8px;
 }
 
 .chat-botao {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: none;
-  background-color: var(--verde);
-  color: #fff;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--claro-borda);
+  background-color: var(--claro-cartao);
+  color: var(--claro-texto-fraco);
   font-size: 20px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+  transition: background-color 0.16s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .chat-botao:hover {
-  background-color: var(--verde-hover);
+  background-color: var(--claro-suave);
 }
 
 .chat-painel {
@@ -135,8 +167,8 @@
   flex-direction: column;
   background-color: var(--claro-cartao);
   border: 1px solid var(--claro-borda);
-  border-radius: 14px;
-  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.2);
+  border-radius: 16px;
+  box-shadow: var(--sombra-2);
   overflow: hidden;
 }
 
@@ -174,7 +206,7 @@
 
 .chat-msg {
   max-width: 85%;
-  padding: 8px 11px;
+  padding: 8px 12px;
   border-radius: 10px;
   font-size: 13px;
   line-height: 1.45;
@@ -200,8 +232,8 @@
 
 .chat-form {
   display: flex;
-  gap: 6px;
-  padding: 10px;
+  gap: 8px;
+  padding: 12px;
   border-top: 1px solid var(--claro-borda);
 }
 
@@ -264,12 +296,15 @@ body.sem-rolagem {
   width: min(330px, calc(100vw - 44px));
 }
 
-@media (max-width: 560px) {
+@media (max-width: 780px) {
   .sino-painel {
     position: fixed;
-    left: 12px;
-    right: 12px;
-    top: 72px;
+    left: 16px;
+    right: 16px;
     width: auto;
+  }
+
+  .sino-todas {
+    min-height: 44px;
   }
 }

@@ -16,18 +16,25 @@ checkMostrar.addEventListener('change', function () {
   inputConfirmar.type = tipo
 })
 
-function mostrarErro(texto) {
+function mostrarErro(texto, campo) {
   msgErro.textContent = texto
   msgErro.hidden = false
+  if (campo) {
+    campo.setAttribute('aria-invalid', 'true')
+    campo.focus()
+  } else msgErro.focus()
 }
 
 function esconderErro() {
   msgErro.textContent = ''
   msgErro.hidden = true
+  const campos = [inputNome, inputUsuario, inputSenha, inputConfirmar]
+  campos.forEach(function (campo) { campo.removeAttribute('aria-invalid') })
 }
 
 form.addEventListener('submit', async function (e) {
   e.preventDefault()
+  esconderErro()
 
   const nome = inputNome.value.trim()
   const usuario = inputUsuario.value.trim()
@@ -35,22 +42,22 @@ form.addEventListener('submit', async function (e) {
   const confirmar = inputConfirmar.value
 
   if (nome === '' || usuario === '' || senha === '' || confirmar === '') {
-    mostrarErro('Preencha todos os campos.')
+    mostrarErro('Preencha todos os campos.', [inputNome, inputUsuario, inputSenha, inputConfirmar].find(function (campo) { return campo.value.trim() === '' }))
     return
   }
 
   if (usuario.indexOf(' ') !== -1) {
-    mostrarErro('O nome de usuário não pode ter espaços.')
+    mostrarErro('O nome de usuário não pode ter espaços.', inputUsuario)
     return
   }
 
   if (senha.length < 4) {
-    mostrarErro('A senha precisa ter pelo menos 4 caracteres.')
+    mostrarErro('A senha precisa ter pelo menos 4 caracteres.', inputSenha)
     return
   }
 
   if (senha !== confirmar) {
-    mostrarErro('As senhas digitadas não conferem.')
+    mostrarErro('As senhas digitadas não conferem.', inputConfirmar)
     return
   }
 
