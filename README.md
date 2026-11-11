@@ -31,10 +31,10 @@ Telas: Login, Resumo Operacional, Colaboradores, Gestão de Alojamentos, Gestão
 
 | Parte | Tecnologia |
 |---|---|
-| `client/` | HTML + CSS + JavaScript puro (sem framework), Chart.js para gráficos |
-| `server/` | Node.js (22+) + Express, express-session + bcrypt |
-| Banco | SQLite com `better-sqlite3`, SQL puro (tabelas em `server/src/db/schema.sql`) |
-| IA | Groq (`groq-sdk`), chave gratuita, usada só pelo server |
+| `client/` | HTML + CSS + JavaScript puro, com classes por tela |
+| `server/` | Node.js (22.13+) + Express, express-session + bcryptjs |
+| Banco | SQLite com `node:sqlite` (nativo do Node.js), SQL puro (tabelas em `server/src/db/schema.sql`) |
+| IA | Groq via `fetch`, usada só pelo servidor |
 | Avisos | Telegram (Bot API), com modo console para desenvolvimento |
 
 ## Estrutura
@@ -42,13 +42,13 @@ Telas: Login, Resumo Operacional, Colaboradores, Gestão de Alojamentos, Gestão
 ```
 dispatch/
 ├── client/     # front-end (HTML, CSS e JavaScript puro)
-├── server/     # back-end (API, regras de negócio, banco, IA, notificações)
+├── server/     # rotas, controladores, modelos, serviços, banco e testes
 └── docs/       # planejamento
 ```
 
 ## Como rodar
 
-Precisa do **Node.js 22.5+** (ou **Bun**).
+Precisa do **Node.js 22.13+** (ou 24+).
 
 ```bash
 cd server
@@ -67,8 +67,18 @@ Copie `server/.env.example` para `server/.env`:
 - `GROQ_API_KEY`: liga a IA (perguntas, resumo dos relatórios e chat de ajuda). Sem ela os recursos de IA avisam que estão desligados.
 - `TELEGRAM_BOT_TOKEN` e `TELEGRAM_CHAT_ID`: enviam os alertas críticos pelo Telegram (crie o bot no @BotFather). Sem eles a mensagem só aparece no terminal. Depois, ative o envio em Configurações.
 
+## Testes
+
+```bash
+cd server
+npm test
+```
+
+Os testes usam um banco temporário e simulam as chamadas à Groq.
+
 ## Documentação
 
+- [docs/estrutura-codigo.md](docs/estrutura-codigo.md) — classes, responsabilidades, fluxo das telas e testes.
 - [docs/planejamento.md](docs/planejamento.md) — problema, solução proposta, telas, regras de negócio, arquitetura, banco de dados, IA, Telegram, organização do repositório, divisão de trabalho, cronograma e roteiro da apresentação.
 
 ## Roadmap

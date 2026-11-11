@@ -1,4 +1,4 @@
-/* ---- estilos especificos da tela de colaboradores ---- */
+/* estilos especificos da tela de colaboradores */
 
 .colab-filtros-topo {
   display: flex;
@@ -29,7 +29,7 @@
   gap: 12px;
 }
 
-/* bolinha com as iniciais (Avatar do shadcn) */
+/* Iniciais do usuário */
 .colab-avatar {
   width: 32px;
   height: 32px;
@@ -150,7 +150,7 @@
 }
 
 
-/* ---- modal de cadastro / edicao (Dialog do shadcn) ---- */
+/* Cadastro e edição */
 
 .modal-overlay {
   position: fixed;
@@ -175,7 +175,7 @@
   flex-direction: column;
   box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
   overflow: hidden;
-  animation: crescer 0.18s cubic-bezier(0.22, 1, 0.36, 1); /* abre crescendo um pouquinho, igual o do shadcn */
+  animation: crescer 0.18s cubic-bezier(0.22, 1, 0.36, 1); /* Abertura da janela */
 }
 
 @keyframes aparecer {
@@ -258,7 +258,7 @@
   flex-wrap: wrap;
 }
 
-/* cada categoria parece um botão de liga/desliga (Toggle do shadcn) */
+/* Seleção das categorias de CNH */
 .check-categoria {
   display: flex;
   align-items: center;
@@ -299,7 +299,7 @@
 }
 
 
-/* ---- gaveta lateral de historico (Sheet do shadcn) ---- */
+/* Histórico lateral */
 
 .gaveta-overlay {
   position: fixed;

@@ -1,80 +1,85 @@
-// tela de login do Dispatch
-
-const form = document.getElementById('form-login')
-const inputUsuario = document.getElementById('usuario')
-const inputSenha = document.getElementById('senha')
-const checkMostrar = document.getElementById('mostrar-senha')
-const msgErro = document.getElementById('mensagem-erro')
-const msgSucesso = document.getElementById('mensagem-sucesso')
-const botaoEntrar = document.getElementById('botao-entrar')
-
-// se veio da tela de cadastro com ?cadastro=ok, avisa que deu certo
-if (window.location.search.indexOf('cadastro=ok') !== -1) {
-  msgSucesso.textContent = 'Conta criada com sucesso! Agora é só entrar.'
-  msgSucesso.hidden = false
-}
-
-// quando marca/desmarca a caixinha de mostrar senha
-checkMostrar.addEventListener('change', function () {
-  if (checkMostrar.checked) {
-    inputSenha.type = 'text'
-  } else {
-    inputSenha.type = 'password'
-  }
-})
-
-function mostrarErro(texto, campo) {
-  msgErro.textContent = texto
-  msgErro.hidden = false
-  if (campo) {
-    campo.setAttribute('aria-invalid', 'true')
-    campo.focus()
-  } else msgErro.focus()
-}
-
-function esconderErro() {
-  msgErro.textContent = ''
-  msgErro.hidden = true
-  const campos = [inputUsuario, inputSenha]
-  campos.forEach(function (campo) { campo.removeAttribute('aria-invalid') })
-}
-
-// roda quando clica em Entrar (ou aperta enter)
-form.addEventListener('submit', async function (e) {
-  e.preventDefault()
-  esconderErro()
-
-  const usuario = inputUsuario.value.trim()
-  const senha = inputSenha.value
-
-  if (usuario === '' || senha === '') {
-    mostrarErro('Preencha o usuário e a senha.', usuario === '' ? inputUsuario : inputSenha)
-    return
+// Controla a entrada no sistema.
+class TelaLogin {
+  constructor() {
+    this.form = document.getElementById('form-login');
+    this.inputUsuario = document.getElementById('usuario');
+    this.inputSenha = document.getElementById('senha');
+    this.checkMostrar = document.getElementById('mostrar-senha');
+    this.msgErro = document.getElementById('mensagem-erro');
+    this.msgSucesso = document.getElementById('mensagem-sucesso');
+    this.botaoEntrar = document.getElementById('botao-entrar');
+    this.configurarEventos();
   }
 
-  esconderErro()
-  msgSucesso.hidden = true
-  botaoEntrar.disabled = true
-  botaoEntrar.textContent = 'Entrando...'
-
-  try {
-    const res = await chamarApi('/api/auth/login', {
-      metodo: 'POST',
-      corpo: { usuario: usuario, senha: senha }
-    })
-
-    if (!res.ok) {
-      mostrarErro(res.dados.erro || 'Não foi possível entrar.')
-      botaoEntrar.disabled = false
-      botaoEntrar.textContent = 'Entrar'
-      return
+  configurarEventos() {
+    if (window.location.search.indexOf('cadastro=ok') !== -1) {
+      this.msgSucesso.textContent = 'Conta criada com sucesso! Agora é só entrar.';
+      this.msgSucesso.hidden = false;
     }
-
-    // deu certo, manda pro dashboard (Resumo Operacional)
-    window.location.href = 'resumo.html'
-  } catch (erro) {
-    mostrarErro('Não consegui falar com o servidor. Confira se ele está ligado.')
-    botaoEntrar.disabled = false
-    botaoEntrar.textContent = 'Entrar'
+    this.checkMostrar.addEventListener('change', () => {
+      if (this.checkMostrar.checked) {
+        this.inputSenha.type = 'text';
+      } else {
+        this.inputSenha.type = 'password';
+      }
+    });
+    this.form.addEventListener('submit', this.entrar.bind(this));
   }
-})
+
+  async entrar(e) {
+    e.preventDefault();
+    this.esconderErro();
+    const usuario = this.inputUsuario.value.trim();
+    const senha = this.inputSenha.value;
+    if (usuario === '' || senha === '') {
+      this.mostrarErro(
+        'Preencha o usuário e a senha.',
+        usuario === '' ? this.inputUsuario : this.inputSenha
+      );
+      return;
+    }
+    this.esconderErro();
+    this.msgSucesso.hidden = true;
+    this.botaoEntrar.disabled = true;
+    this.botaoEntrar.textContent = 'Entrando...';
+    try {
+      const res = await chamarApi('/api/auth/login', {
+        metodo: 'POST',
+        corpo: {
+          usuario: usuario,
+          senha: senha
+        }
+      });
+      if (!res.ok) {
+        this.mostrarErro(res.dados.erro || 'Não foi possível entrar.');
+        this.botaoEntrar.disabled = false;
+        this.botaoEntrar.textContent = 'Entrar';
+        return;
+      }
+      window.location.href = 'resumo.html';
+    } catch (erro) {
+      this.mostrarErro('Não consegui falar com o servidor. Confira se ele está ligado.');
+      this.botaoEntrar.disabled = false;
+      this.botaoEntrar.textContent = 'Entrar';
+    }
+  }
+
+  mostrarErro(texto, campo) {
+    this.msgErro.textContent = texto;
+    this.msgErro.hidden = false;
+    if (campo) {
+      campo.setAttribute('aria-invalid', 'true');
+      campo.focus();
+    } else this.msgErro.focus();
+  }
+
+  esconderErro() {
+    this.msgErro.textContent = '';
+    this.msgErro.hidden = true;
+    const campos = [this.inputUsuario, this.inputSenha];
+    campos.forEach((campo) => {
+      campo.removeAttribute('aria-invalid');
+    });
+  }
+}
+new TelaLogin();

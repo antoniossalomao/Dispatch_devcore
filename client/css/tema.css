@@ -13,7 +13,7 @@
   --sombra-leve: var(--sombra-1);
 }
 
-/* ===== tema escuro ===== */
+/* tema escuro */
 :root[data-tema='escuro'] {
   --claro-fundo: var(--op-fundo);
   --claro-cartao: var(--op-painel);
@@ -47,7 +47,7 @@
   color-scheme: light;
 }
 
-/* ===== base ===== */
+/* base */
 body.painel-corpo {
   background-color: var(--claro-fundo);
   color: var(--claro-texto);
@@ -70,7 +70,7 @@ body.painel-corpo {
   scrollbar-color: var(--borda-forte) transparent;
 }
 
-/* ===== menu lateral ===== */
+/* menu lateral */
 .menu-lateral {
   background: var(--op-fundo);
   border-right: 1px solid rgba(255, 255, 255, 0.05);
@@ -163,7 +163,7 @@ body.painel-corpo {
   outline-color: var(--capacete);
 }
 
-/* ===== topo ===== */
+/* topo */
 .topo {
   background-color: var(--claro-cartao);
   border-bottom-color: var(--claro-borda);
@@ -181,7 +181,7 @@ body.painel-corpo {
   color: var(--claro-texto-fraco);
 }
 
-/* ===== conteudo: uma entrada suave por pagina ===== */
+/* conteudo: uma entrada suave por pagina */
 @keyframes tema-entrar {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
@@ -191,7 +191,7 @@ body.painel-corpo {
   animation: tema-entrar 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* ===== indicadores: uma faixa unica em vez de quatro cartoes iguais ===== */
+/* indicadores: uma faixa unica em vez de quatro cartoes iguais */
 .indicadores {
   gap: 0;
   background-color: var(--claro-cartao);
@@ -253,7 +253,7 @@ body.painel-corpo {
   }
 }
 
-/* ===== blocos e tabelas ===== */
+/* blocos e tabelas */
 .bloco {
   border-radius: 12px;
   box-shadow: var(--sombra-1);
@@ -303,7 +303,7 @@ body.painel-corpo {
   color: var(--claro-texto-fraco);
 }
 
-/* ===== botoes e campos ===== */
+/* botoes e campos */
 .btn-primario {
   background-color: var(--claro-texto);
   color: var(--claro-cartao);
@@ -356,7 +356,7 @@ body.painel-corpo {
   border-color: var(--claro-cartao);
 }
 
-/* ===== janelas e gavetas ===== */
+/* janelas e gavetas */
 .modal-overlay,
 .gaveta-overlay {
   -webkit-backdrop-filter: blur(3px);
@@ -512,7 +512,7 @@ body.painel-corpo {
   }
 }
 
-/* ===== organização do topo e rodapé compartilhados ===== */
+/* organização do topo e rodapé compartilhados */
 .menu-rodape {
   display: block;
   margin-top: auto;
@@ -718,7 +718,7 @@ body.painel-corpo {
   }
 }
 
-/* ===== tema escuro: ajustes pontuais ===== */
+/* tema escuro: ajustes pontuais */
 :root[data-tema='escuro'] .toast {
   background-color: var(--claro-cartao);
   color: var(--claro-texto);
@@ -741,7 +741,7 @@ body.painel-corpo {
   border-color: var(--claro-borda);
 }
 
-/* ===== movimento reduzido ===== */
+/* movimento reduzido */
 @media (prefers-reduced-motion: reduce) {
   .area-conteudo .conteudo,
   .modal-overlay,

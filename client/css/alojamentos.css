@@ -1,4 +1,4 @@
-/* ---- estilos especificos da tela de alojamentos ---- */
+/* estilos especificos da tela de alojamentos */
 
 .aloj-grade {
   display: grid;
@@ -78,7 +78,7 @@
   color: var(--claro-texto);
 }
 
-/* ---- gaveta: quartos e leitos ---- */
+/* gaveta: quartos e leitos */
 
 .quarto-card {
   border: 1px solid var(--claro-borda);

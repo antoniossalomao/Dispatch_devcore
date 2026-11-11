@@ -17,7 +17,7 @@ body.painel-corpo {
   letter-spacing: normal;
 }
 
-/* ===== menu lateral: noite da apresentacao, item ativo com marcador ouro ===== */
+/* menu lateral: noite da apresentacao, item ativo com marcador ouro */
 .menu-lateral {
   background: var(--dc-noite);
   border-right-color: rgba(237, 236, 230, 0.06);
@@ -69,7 +69,7 @@ body.painel-corpo {
   color: var(--dc-ouro);
 }
 
-/* ===== topo: so o titulo; o subtitulo descritivo sai ===== */
+/* topo: so o titulo; o subtitulo descritivo sai */
 .topo {
   background-color: var(--claro-fundo);
   -webkit-backdrop-filter: none;
@@ -86,7 +86,7 @@ body.painel-corpo {
   display: none;
 }
 
-/* ===== botoes: carvao no claro, creme no escuro (como o botao da apresentacao); texto via --sobre-primario ===== */
+/* botoes: carvao no claro, creme no escuro (como o botao da apresentacao); texto via --sobre-primario */
 .btn-primario {
   box-shadow: none;
   font-weight: 500;
@@ -113,7 +113,7 @@ body.painel-corpo {
   color: var(--claro-texto);
 }
 
-/* ===== indicadores: so rotulo e numero ===== */
+/* indicadores: so rotulo e numero */
 .indicadores {
   box-shadow: none;
 }
@@ -149,7 +149,7 @@ body.painel-corpo {
   display: none;
 }
 
-/* ===== blocos e tabelas: borda fina, sem sombra, linhas mais baixas ===== */
+/* blocos e tabelas: borda fina, sem sombra, linhas mais baixas */
 .bloco {
   box-shadow: none;
 }
@@ -203,14 +203,14 @@ body.painel-corpo {
   background-color: var(--dc-salvia);
 }
 
-/* ===== janelas, cartoes e paineis ===== */
+/* janelas, cartoes e paineis */
 .quarto-card,
 .aloj-card,
 .cartao-saude {
   box-shadow: none;
 }
 
-/* ===== visao geral ===== */
+/* visao geral */
 .vg {
   gap: 24px;
 }
