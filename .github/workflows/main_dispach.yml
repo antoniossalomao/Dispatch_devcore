@@ -23,17 +23,24 @@ jobs:
         with:
           node-version: '26.x'
 
-      - name: npm install, build, and test
+      - name: Install dependencies and test
+        working-directory: server
         run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+          npm ci
+          npm test
+
+      - name: Package Dispatch
+        run: |
+          mkdir deploy
+          git archive HEAD client server | tar -x -C deploy
+          npm ci --prefix deploy/server --omit=dev
+          tar -czf dispatch.tar.gz -C deploy .
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          path: dispatch.tar.gz
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,7 +54,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
-      
+
+      - name: Extract deployment package
+        run: |
+          mkdir deploy
+          tar -xzf dispatch.tar.gz -C deploy
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -61,5 +73,5 @@ jobs:
         with:
           app-name: 'Dispach'
           slot-name: 'Production'
-          package: .
-          
+          package: deploy
+
