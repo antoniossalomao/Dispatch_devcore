@@ -1,10 +1,14 @@
 class Api {
   constructor() {
-    // O Live Server abre o HTML em outra porta durante o desenvolvimento.
-    this.endereco =
-      window.location.port === '3001'
-        ? ''
-        : 'http://' + (window.location.hostname || 'localhost') + ':3001';
+    const local = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
+    const liveServer =
+      local &&
+      window.location.protocol === 'http:' &&
+      ['5500', '5501'].includes(window.location.port);
+
+    // No site publicado, a API usa o mesmo domínio e protocolo da página.
+    // Apenas o Live Server local precisa chamar o servidor em outra porta.
+    this.endereco = liveServer ? 'http://' + window.location.hostname + ':3001' : '';
     this.sequencia = 0;
   }
 
