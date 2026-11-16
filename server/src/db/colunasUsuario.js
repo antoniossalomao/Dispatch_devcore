@@ -1,25 +1,37 @@
-// Colunas de usuario que surgiram depois da primeira versão do banco (login com Google e o
-// cadastro completo). O projeto não tem sistema de migração, então quem carrega este arquivo
-// garante que elas existam: bancos novos já as recebem pelo schema.sql e bancos antigos ganham
-// as colunas aqui, sem perder dados. Os índices únicos impedem duas contas com o mesmo e-mail
-// ou o mesmo CPF/CNPJ.
+// As colunas email, documento (CPF/CNPJ) e telefone foram criadas depois da primeira versão do banco.
+// Como o projeto não tem migração, esta classe confere se elas existem e cria as que faltam,
+// sem apagar nenhum dado. Bancos novos já recebem as colunas pelo schema.sql.
 const db = require('./conexao');
 
-const NOVAS = [
-  ['email', 'TEXT'],
-  ['documento', 'TEXT'],
-  ['telefone', 'TEXT']
-];
+class ColunasUsuario {
+  constructor() {
+    this.novasColunas = [
+      { nome: 'email', tipo: 'TEXT' },
+      { nome: 'documento', tipo: 'TEXT' },
+      { nome: 'telefone', tipo: 'TEXT' }
+    ];
+  }
 
-const existentes = new Set(db.prepare('PRAGMA table_info(usuario)').all().map((c) => c.name));
-NOVAS.forEach(([nome, tipo]) => {
-  if (!existentes.has(nome)) db.exec('ALTER TABLE usuario ADD COLUMN ' + nome + ' ' + tipo);
-});
-db.exec(
-  'CREATE UNIQUE INDEX IF NOT EXISTS idx_usuario_email ON usuario (email) WHERE email IS NOT NULL'
-);
-db.exec(
-  'CREATE UNIQUE INDEX IF NOT EXISTS idx_usuario_documento ON usuario (documento) WHERE documento IS NOT NULL'
-);
+  garantir() {
+    const existentes = db.prepare('PRAGMA table_info(usuario)').all().map((coluna) => coluna.name);
+    this.novasColunas.forEach((coluna) => {
+      if (!existentes.includes(coluna.nome)) {
+        db.exec('ALTER TABLE usuario ADD COLUMN ' + coluna.nome + ' ' + coluna.tipo);
+      }
+    });
 
+    // Índice único: o banco não deixa duas contas com o mesmo e-mail ou o mesmo CPF/CNPJ.
+    // O "WHERE ... IS NOT NULL" deixa várias contas antigas ficarem sem esses dados.
+    db.exec(
+      'CREATE UNIQUE INDEX IF NOT EXISTS idx_usuario_email ON usuario (email) WHERE email IS NOT NULL'
+    );
+    db.exec(
+      'CREATE UNIQUE INDEX IF NOT EXISTS idx_usuario_documento ON usuario (documento) WHERE documento IS NOT NULL'
+    );
+  }
+}
+
+new ColunasUsuario().garantir();
+
+// Quem importa este arquivo recebe a mesma conexão do conexao.js, já com as colunas garantidas.
 module.exports = db;

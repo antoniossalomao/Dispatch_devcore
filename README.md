@@ -25,15 +25,17 @@ Construtora fictícia (Construtora Aguapeí) com obras no interior de SP, equipe
 
 Telas desenhadas no [Figma](https://www.figma.com/design/4ma1oH2S8GnmS6A7NNQTqk/Telas---Dispatch) e implementadas no navegador em `client/`:
 
-- **Públicas:** Apresentação DevCore (`apresentacao.html`), Login (`index.html`) e Cadastro por código de convite (`cadastro.html`).
-- **Operação:** Resumo Operacional (`resumo.html`), Colaboradores (`colaboradores.html`), Alojamentos (`alojamentos.html`), Frota (`frota.html`), Movimentações (`movimentacoes.html`) e Relatórios (`relatorios.html`).
-- **Administração:** Configurações, Usuários, Backup e Auditoria (`configuracoes.html`; o endereço antigo `auditoria.html` redireciona para `configuracoes.html#auditoria`).
+- **Públicas:** Apresentação DevCore (`/`, arquivo `index.html`), Login (`/login`) e Cadastro por código de convite (`/cadastro`). Login com e-mail e senha ou com Google.
+- **Operação:** Resumo Operacional (`/resumo`), Colaboradores, Alojamentos, Frota, Movimentações e Relatórios.
+- **Administração:** Configurações, Usuários, Backup e Auditoria (`/configuracoes`; o endereço antigo `auditoria.html` redireciona para `/configuracoes#auditoria`).
+
+As telas internas abrem dentro de uma página só (`client/app.html`): o menu e o topo ficam fixos e só o conteúdo troca, sem recarregar. Cada tela tem o seu HTML em `client/telas/` e a sua classe em `client/js/`. A paleta Ctrl+K busca telas, ações, pessoas e veículos.
 
 ## Stack
 
 | Parte | Tecnologia |
 |---|---|
-| `client/` | HTML + CSS + JavaScript puro, organizado em classes (`class`) por tela |
+| `client/` | HTML + CSS + JavaScript puro, organizado em classes (`class`) por tela; telas internas carregadas pelo `js/app/App.js` |
 | `server/` | Node.js (22.13+) + Express 5, `express-session` (`SqliteSessionStore`), `bcryptjs`, `helmet` e `express-rate-limit` |
 | Banco | SQLite com `node:sqlite` (nativo do Node.js), SQL puro (14 tabelas em `server/src/db/schema.sql`) |
 | IA | Groq via `fetch`, usada só pelo servidor |
@@ -100,7 +102,7 @@ Os testes (`server/test/`) usam um banco temporário e simulam as chamadas à Gr
 ## Roadmap
 
 1. ~~Pesquisa de referências e desenho das telas (Figma + protótipo navegável)~~
-2. ~~Apresentação institucional e demonstração pública~~ (`client/apresentacao.html` pronta; faltando apenas a apresentação em sala).
+2. ~~Apresentação institucional e demonstração pública~~ (`client/index.html` pronta; faltando apenas a apresentação em sala).
 3. ~~Base do `server` (banco, login, auditoria) e do `client` (layout, rotas).~~
 4. ~~Cadastros (colaboradores, alojamentos/leitos, frota) com auditoria.~~
 5. ~~Estadias e uso de veículo com as regras de validação (CNH, NR-24, km).~~

@@ -1,6 +1,7 @@
-/* Apresentação do DevCore: organização editorial e animações no mesmo sistema do site do
-   Ricardo Salomão (serifa Cormorant nos títulos, Jost no texto, linhas finas, muito respiro),
-   na paleta escura do DevCore: noite, creme e um ouro usado pouco. Espaços em múltiplos de 4. */
+/* Página de apresentação do DevCore.
+   O jeito de organizar e as animações foram inspirados no site do arquiteto Ricardo Salomão:
+   títulos grandes com serifa (Cormorant), texto em Jost, linhas finas e bastante espaço.
+   As cores são as do DevCore: fundo escuro, creme e um dourado usado pouco. */
 @import url("paleta.css");
 
 :root {
@@ -259,9 +260,9 @@ dialog::backdrop { background: rgba(5, 4, 3, 0.88); transition: background-color
 .jnav button:disabled { opacity: 0.35; cursor: default; }
 @media (max-width: 760px) { .jn .txt { grid-template-columns: 1fr; } }
 
-/* cursor sobre as telas: anel fino e translúcido com um ícone de ampliar */
-#cursor { position: fixed; left: 0; top: 0; z-index: 95; display: grid; place-items: center; width: 56px; height: 56px; margin: -28px 0 0 -28px; border: 1px solid rgba(237, 236, 230, 0.55); border-radius: 50%; background: rgba(11, 10, 9, 0.28); color: var(--fg); backdrop-filter: blur(6px); pointer-events: none; opacity: 0; scale: 0.6; transition: opacity 0.35s var(--curva), scale 0.5s var(--curva); will-change: transform; }
-#cursor svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+/* cursor sobre as telas: só um anel pequeno com um ponto no meio */
+#cursor { position: fixed; left: 0; top: 0; z-index: 95; width: 20px; height: 20px; margin: -10px 0 0 -10px; border: 1px solid var(--fg); border-radius: 50%; pointer-events: none; opacity: 0; scale: 0.4; transition: opacity 0.3s var(--curva), scale 0.4s var(--curva); will-change: transform; }
+#cursor::after { content: ""; position: absolute; top: 50%; left: 50%; width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px; border-radius: 50%; background: var(--fg); }
 #cursor.on { opacity: 1; scale: 1; }
 @media (pointer: fine) { .js .frame { cursor: none; } }
 @media (pointer: coarse) { #cursor { display: none; } }

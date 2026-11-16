@@ -1,9 +1,8 @@
-/* Densidade do painel (passo de polimento, 16/11/2026).
-   O painel estava grande e "perto" demais: linhas de tabela de ~60px, controles de 36px, margens
-   de 32px. Este arquivo reduz a escala em ~10% sem mudar paleta, fonte ou layout, e fica por último
-   na casca (app.html) para valer sobre resumo.css e tema.css. Valores na grade de 4px.
-   Os cards de cima mantêm o mesmo desenho; só acompanham a redução.
-   No celular (até 780px) nada muda aqui: alvos de toque continuam com 44px. */
+/* Deixa o painel cerca de 10% menor (antes estava tudo grande e "perto" demais).
+   Diminui menu, topo, botões, campos e linhas das tabelas, sem mudar cores, fonte ou layout.
+   Ele é o último CSS carregado no app.html, por isso as regras daqui ganham das outras.
+   Os números são múltiplos de 4 para tudo ficar alinhado.
+   No celular (até 780px) nada muda, para os botões continuarem fáceis de tocar. */
 
 @media (min-width: 781px) {
   :root {

@@ -1,7 +1,6 @@
-/* Login e cadastro: tela dividida de ponta a ponta.
-   Esquerda: a marca e o que o sistema faz, num painel grafite com uma leve variação de tom.
-   Direita: um cartão pequeno e calmo com o formulário. Mesma paleta do painel (grafite e off-white).
-   Usado por login.html e cadastro.html (que soma cadastro.css). */
+/* Telas de login e cadastro, com a tela dividida em duas metades:
+   à esquerda a marca e o que o sistema faz; à direita um cartão com o formulário.
+   O cadastro usa este arquivo e mais o cadastro.css. */
 
 body:has(.login-pagina) {
   background: #0d0d0c;

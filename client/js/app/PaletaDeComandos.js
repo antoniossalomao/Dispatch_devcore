@@ -1,10 +1,7 @@
-// Paleta de comandos (Ctrl+K / Cmd+K): um campo só que acha qualquer tela, ação ou cadastro
-// sem tirar a mão do teclado.
-//
-// Mesmo comportamento do gestor_atualizacao: busca por subsequência ("nv vei" acha "Novo veículo"),
-// começo do nome vale mais que meio, e o que foi usado há pouco sobe. Telas e ações aparecem na
-// hora; colaboradores, veículos e alojamentos entram quando a API responde, para a paleta nunca
-// abrir vazia esperando a rede.
+// Paleta de comandos (Ctrl+K): um campo de busca que leva para qualquer tela, ação, pessoa ou veículo.
+// Igual à do Gestor de Atualizações: dá para digitar só algumas letras ("nv vei" acha "Novo veículo")
+// e o que foi usado por último aparece primeiro. Telas e ações aparecem na hora; pessoas, veículos e
+// alojamentos chegam quando a API responde.
 const MAX_RESULTADOS = 12;
 const SAIDA_MS = 140;
 const CHAVE_RECENTES = 'dispatch:paleta-recentes';
@@ -21,48 +18,48 @@ const ICONES = {
   busca: '<circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4.5 4.5"/>'
 };
 
-function icone(nome) {
-  return (
-    '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
-    (ICONES[nome] || ICONES.tela) +
-    '</svg>'
-  );
-}
-
-// Tira acentos para "movimentacoes" achar "Movimentações".
-function normalizar(texto) {
-  return String(texto || '')
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase();
-}
-
-// 0 = não casa. Quanto maior, mais alto na lista.
-export function pontuar(cmd, termo, posicaoRecente) {
-  const bonusRecente = posicaoRecente >= 0 ? 40 - posicaoRecente : 0;
-  if (!termo) return cmd.soComBusca ? 0 : 10 + bonusRecente;
-
-  const titulo = normalizar(cmd.titulo);
-  const alvo = titulo + ' ' + normalizar(cmd.subtitulo) + ' ' + normalizar(cmd.grupo);
-
-  if (titulo.startsWith(termo)) return 1000 + bonusRecente;
-  if (titulo.includes(termo)) return 700 + bonusRecente;
-  if (alvo.includes(termo)) return 400 + bonusRecente;
-
-  // Subsequência: "nvc" casa com "NoVo Colaborador". Vale menos que um trecho literal.
-  let i = 0;
-  for (const letra of alvo) {
-    if (letra === termo[i]) i += 1;
-    if (i === termo.length) return 150 + bonusRecente;
-  }
-  return 0;
-}
-
 export class PaletaDeComandos {
-  /**
-   * @param {() => Array<object>} comandosBase telas e ações (sem rede)
-   * @param {() => Promise<Array<object>>} carregarExtras cadastros vindos da API
-   */
+  // Desenha um dos ícones da lista ICONES (todos no mesmo tamanho e traço).
+  icone(nome) {
+    return (
+      '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      (ICONES[nome] || ICONES.tela) +
+      '</svg>'
+    );
+  }
+
+  // Tira acentos e deixa minúsculo, para "movimentacoes" achar "Movimentações".
+  normalizar(texto) {
+    return String(texto || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase();
+  }
+
+  // Dá uma nota para o comando: 0 = não aparece; quanto maior, mais para cima na lista.
+  pontuar(cmd, termo, posicaoRecente) {
+    // o que foi usado há pouco ganha um bônus (o mais recente ganha mais)
+    const bonusRecente = posicaoRecente >= 0 ? 40 - posicaoRecente : 0;
+    if (!termo) return cmd.soComBusca ? 0 : 10 + bonusRecente;
+
+    const titulo = this.normalizar(cmd.titulo);
+    const tudo = titulo + ' ' + this.normalizar(cmd.subtitulo) + ' ' + this.normalizar(cmd.grupo);
+
+    if (titulo.startsWith(termo)) return 1000 + bonusRecente;
+    if (titulo.includes(termo)) return 700 + bonusRecente;
+    if (tudo.includes(termo)) return 400 + bonusRecente;
+
+    // letras na ordem, mesmo com outras no meio: "nvc" acha "NoVo Colaborador"
+    let posicao = 0;
+    for (const letra of tudo) {
+      if (letra === termo[posicao]) posicao++;
+      if (posicao === termo.length) return 150 + bonusRecente;
+    }
+    return 0;
+  }
+
+  // comandosBase: telas e ações (não precisa de internet)
+  // carregarExtras: busca pessoas, veículos e alojamentos na API
   constructor(comandosBase, carregarExtras) {
     this.comandosBase = comandosBase;
     this.carregarExtras = carregarExtras;
@@ -110,7 +107,7 @@ export class PaletaDeComandos {
     this.overlay.innerHTML =
       '<div class="cmdk" role="dialog" aria-modal="true" aria-label="Paleta de comandos">' +
       '<div class="cmdk-campo">' +
-      icone('busca') +
+      this.icone('busca') +
       '<input type="text" class="cmdk-input" role="combobox" aria-expanded="true" aria-controls="cmdk-lista" aria-autocomplete="list" placeholder="Buscar telas, ações, pessoas ou veículos" autocomplete="off" spellcheck="false">' +
       '<kbd>Esc</kbd></div>' +
       '<div class="cmdk-lista" id="cmdk-lista" role="listbox" aria-label="Resultados"></div>' +
@@ -158,10 +155,10 @@ export class PaletaDeComandos {
   }
 
   filtrar() {
-    const termo = normalizar(this.input.value.trim());
+    const termo = this.normalizar(this.input.value.trim());
     const pontuados = [];
     this.comandos.forEach((cmd) => {
-      const pontos = pontuar(cmd, termo, this.recentes.indexOf(cmd.id));
+      const pontos = this.pontuar(cmd, termo, this.recentes.indexOf(cmd.id));
       if (pontos > 0) pontuados.push({ cmd: cmd, pontos: pontos });
     });
     // Sem termo, mantém a ordem dos grupos (telas, ações) e só puxa os recentes para cima.
@@ -199,7 +196,7 @@ export class PaletaDeComandos {
 
       const caixaIcone = document.createElement('span');
       caixaIcone.className = 'cmdk-icone';
-      caixaIcone.innerHTML = icone(cmd.icone);
+      caixaIcone.innerHTML = this.icone(cmd.icone);
       const textos = document.createElement('span');
       textos.className = 'cmdk-textos';
       const titulo = document.createElement('strong');
@@ -212,7 +209,7 @@ export class PaletaDeComandos {
       }
       item.append(caixaIcone, textos);
 
-      // mousedown e não click: o click só chegaria depois do blur do campo.
+      // mousedown em vez de click para o campo de busca não perder o foco antes de executar.
       item.addEventListener('mousedown', (evento) => {
         evento.preventDefault();
         this.executar(cmd);
@@ -227,7 +224,7 @@ export class PaletaDeComandos {
     this.input.setAttribute('aria-activedescendant', 'cmdk-item-' + this.indiceAtivo);
   }
 
-  // Só troca a marcação entre dois itens; reconstruir a lista a cada seta faz a lista cintilar.
+  // Só troca qual item está marcado, sem montar a lista de novo (senão ela pisca a cada seta).
   marcarAtivo() {
     const itens = this.lista.querySelectorAll('.cmdk-item');
     itens.forEach((item, indice) => {

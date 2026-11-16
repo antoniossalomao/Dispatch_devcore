@@ -1,15 +1,17 @@
-// Login com Google (OpenID Connect, fluxo "authorization code" feito todo no servidor).
+// Login com Google.
 //
-// Regra de acesso: o Google só confirma QUEM é a pessoa. Quem pode entrar continua sendo decidido
-// aqui: o e-mail do Google precisa estar associado a um usuário ativo do Dispatch (o admin faz isso
-// em Configurações → Usuários). Não existe cadastro automático por conta Google; sem isso qualquer
-// pessoa com Gmail entraria no painel da construtora.
+// Como funciona: o botão manda a pessoa para a página do Google; ela escolhe a conta e o Google
+// devolve para /api/auth/google/retorno com um código. O servidor troca esse código pelos dados da
+// pessoa (nome e e-mail) direto com o Google.
 //
-// Configuração (variáveis de ambiente, no Azure em "Variáveis de ambiente" do App Service):
-//   GOOGLE_CLIENT_ID      ID do cliente OAuth (Google Cloud → APIs e serviços → Credenciais)
-//   GOOGLE_CLIENT_SECRET  segredo do mesmo cliente
-//   GOOGLE_REDIRECT_URI   opcional; padrão https://<domínio>/api/auth/google/retorno
-// Sem as duas primeiras, o botão "Entrar com Google" simplesmente não aparece.
+// Quem pode entrar continua sendo decidido aqui, e não pelo Google: o e-mail precisa estar ligado
+// a um usuário ativo do Dispatch (pelo cadastro ou pelo admin em Configurações). Sem isso, qualquer
+// pessoa com Gmail entraria no painel.
+//
+// Variáveis de ambiente (no Azure: App Service → Variáveis de ambiente):
+//   GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET  vêm do Google Cloud (APIs e serviços → Credenciais)
+//   GOOGLE_REDIRECT_URI  opcional; se não tiver, usa https://<domínio>/api/auth/google/retorno
+// Sem as duas primeiras, o botão do Google não aparece.
 const crypto = require('crypto');
 // Garante as colunas email/documento/telefone em bancos antigos.
 const db = require('../db/colunasUsuario');
@@ -17,7 +19,7 @@ const db = require('../db/colunasUsuario');
 const URL_AUTORIZACAO = 'https://accounts.google.com/o/oauth2/v2/auth';
 const URL_TOKEN = 'https://oauth2.googleapis.com/token';
 const EMISSORES = new Set(['https://accounts.google.com', 'accounts.google.com']);
-// O estado guardado na sessão vale por 10 minutos: tempo de sobra para escolher a conta no Google.
+// O "estado" guardado na sessão vale 10 minutos, tempo de sobra para escolher a conta no Google.
 const VALIDADE_ESTADO_MS = 10 * 60 * 1000;
 
 class LoginGoogle {
@@ -30,7 +32,7 @@ class LoginGoogle {
   enderecoRetorno(req) {
     const fixo = (process.env.GOOGLE_REDIRECT_URI || '').trim();
     if (fixo) return fixo;
-    // Com "trust proxy" ligado, req.protocol já é https atrás do proxy do Azure.
+    // No Azure o "trust proxy" está ligado, então req.protocol já vem como https.
     return req.protocol + '://' + req.get('host') + '/api/auth/google/retorno';
   }
 
@@ -38,7 +40,8 @@ class LoginGoogle {
     return crypto.randomBytes(32).toString('base64url');
   }
 
-  // Monta o endereço do Google e devolve também o que precisa ficar guardado na sessão.
+  // Monta o endereço do Google. O "estado" e o "nonce" são números aleatórios que guardamos na sessão:
+  // na volta conferimos se são os mesmos, para ninguém conseguir entrar com uma volta forjada.
   iniciar(req) {
     const cfg = this.configuracao();
     const estado = this.novoSegredo();
@@ -59,7 +62,7 @@ class LoginGoogle {
     };
   }
 
-  // Compara em tempo constante para não vazar o estado esperado pela diferença de tempo.
+  // Compara dois textos sempre no mesmo tempo, para não dar pistas pelo tempo de resposta.
   mesmoTexto(a, b) {
     const ha = crypto.createHash('sha256').update(String(a)).digest();
     const hb = crypto.createHash('sha256').update(String(b)).digest();
@@ -78,9 +81,10 @@ class LoginGoogle {
     return JSON.parse(Buffer.from(partes[1], 'base64url').toString('utf8'));
   }
 
-  // Troca o código pelo id_token direto com o Google, por HTTPS e com o segredo do cliente.
-  // Pela especificação do OpenID Connect (3.1.3.7), um id_token recebido assim do próprio endpoint
-  // de token dispensa conferir a assinatura; as demais conferências abaixo continuam obrigatórias.
+  // Troca o código pelos dados da pessoa (o "id_token"), conversando direto com o Google por HTTPS
+  // e com o nosso segredo. Como a resposta vem do próprio Google, não precisamos conferir a
+  // assinatura do token, mas conferimos o resto: quem emitiu, para qual sistema, validade, nonce
+  // e se o e-mail foi confirmado pelo Google.
   async confirmarIdentidade(codigo, guardado) {
     const cfg = this.configuracao();
     const resposta = await fetch(URL_TOKEN, {

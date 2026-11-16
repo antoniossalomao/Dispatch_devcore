@@ -1,6 +1,6 @@
 # Identidade visual DevCore
 
-A apresentação pública está em `client/apresentacao.html`, acessível pelo link na tela de login. O site usa HTML, CSS e JavaScript sem dependências adicionais em produção.
+A apresentação pública é a página inicial do site (`client/index.html`). Usa HTML, CSS e JavaScript puros, com títulos em Cormorant Garamond e texto em Jost; a rolagem suave usa a biblioteca Lenis, servida localmente em `client/js/vendor/`.
 
 ## Paleta compartilhada
 

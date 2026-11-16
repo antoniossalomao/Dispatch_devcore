@@ -1,6 +1,7 @@
 // Tela de configurações (somente admin): parâmetros da operação, alertas/Telegram, contas de usuários, backup do banco, auditoria e dados da própria conta.
 export default class TelaConfiguracoes {
-  // ctx vem da casca (js/app/App.js): sessão em cache, sinal para soltar eventos globais ao sair da tela e navegação sem recarregar.
+  // ctx vem do js/app/App.js: ctx.sessao() diz quem está logado, ctx.sinal desliga os eventos
+  // da janela quando a pessoa sai da tela e ctx.ir('tela') troca de tela sem recarregar.
   constructor(ctx) {
     this.ctx = ctx;
     this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
@@ -125,7 +126,8 @@ export default class TelaConfiguracoes {
     this.carregarDados();
   }
 
-  // A casca pergunta antes de trocar de tela: o beforeunload não dispara numa navegação sem recarregar.
+  // O App.js chama isto antes de trocar de tela pelo menu. O aviso do navegador (beforeunload)
+  // só funciona quando a página fecha ou recarrega, por isso precisamos deste aqui também.
   temAlteracoesPendentes() {
     return Boolean(this.atualizarEstadoParametros());
   }

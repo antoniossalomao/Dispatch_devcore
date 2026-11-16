@@ -1,338 +1,534 @@
-// Apresentação do DevCore. Mesmo sistema de movimento do site do Ricardo Salomão:
-// rolagem suave (Lenis, servido localmente em js/vendor), títulos que sobem palavra por palavra,
-// blocos que aparecem ao entrar na tela, imagens que se abrem com uma cortina, parallax leve,
-// números que contam, cabeçalho que some ao descer e uma janela de detalhes para telas e planos.
-// Com "reduzir movimento" no sistema, tudo aparece no lugar, sem animação.
-(function () {
-  'use strict';
+// Página de apresentação do DevCore (a primeira página do site).
+// Cuida da rolagem suave, das animações que aparecem conforme a pessoa desce a página,
+// da lista de telas do Dispatch, da janela de detalhes e do menu no celular.
+// Se a pessoa marcou "reduzir movimento" no computador, as animações ficam desligadas.
+class TelaApresentacao {
+  constructor() {
+    this.reduzirMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.mouseFino = window.matchMedia('(pointer: fine)').matches && !this.reduzirMovimento;
 
-  var reduzir = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var $ = function (s, r) { return (r || document).querySelector(s); };
-  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+    // telas do Dispatch mostradas na seção "Dispatch"
+    this.telas = [
+      {
+        nome: 'Visão geral',
+        categoria: 'Resumo operacional',
+        imagem: 'assets/apresentacao/tela-resumo.jpg',
+        descricao:
+          'Veículos em uso, vagas livres e as últimas movimentações do dia, com a ocupação de cada alojamento ao lado.'
+      },
+      {
+        nome: 'Colaboradores',
+        categoria: 'Pessoas e habilitações',
+        imagem: 'assets/apresentacao/tela-colaboradores.jpg',
+        descricao:
+          'Equipe, CNH com prazo de vencimento e onde cada pessoa está alocada, com histórico de cada colaborador.'
+      },
+      {
+        nome: 'Frota',
+        categoria: 'Saídas, voltas e manutenções',
+        imagem: 'assets/apresentacao/tela-frota.jpg',
+        descricao:
+          'Quem está com cada veículo, quilometragem e documentos. Licenciamento vencido bloqueia a saída.'
+      },
+      {
+        nome: 'Relatórios',
+        categoria: 'Ocupação e uso da frota',
+        imagem: 'assets/apresentacao/tela-relatorios.jpg',
+        descricao:
+          'Ocupação média por alojamento, uso da frota, gargalos e quem estava dirigindo em cada período.'
+      }
+    ];
 
-  var TELAS = [
-    {
-      nome: 'Visão geral',
-      cat: 'Resumo operacional',
-      img: 'assets/apresentacao/tela-resumo.jpg',
-      desc: 'Veículos em uso, vagas livres e as últimas movimentações do dia, com a ocupação de cada alojamento ao lado.'
-    },
-    {
-      nome: 'Colaboradores',
-      cat: 'Pessoas e habilitações',
-      img: 'assets/apresentacao/tela-colaboradores.jpg',
-      desc: 'Equipe, CNH com prazo de vencimento e onde cada pessoa está alocada, com histórico de cada colaborador.'
-    },
-    {
-      nome: 'Frota',
-      cat: 'Saídas, voltas e manutenções',
-      img: 'assets/apresentacao/tela-frota.jpg',
-      desc: 'Quem está com cada veículo, quilometragem e documentos. Licenciamento vencido bloqueia a saída.'
-    },
-    {
-      nome: 'Relatórios',
-      cat: 'Ocupação e uso da frota',
-      img: 'assets/apresentacao/tela-relatorios.jpg',
-      desc: 'Ocupação média por alojamento, uso da frota, gargalos e quem estava dirigindo em cada período.'
-    }
-  ];
+    // planos mostrados na seção "Planos" (a chave é o data-plano de cada linha no HTML)
+    this.planos = {
+      essencial: {
+        nome: 'Essencial',
+        categoria: 'O primeiro passo',
+        descricao: 'Um ponto de partida para organizar os principais registros da operação.',
+        recursos: [
+          'Cadastro de colaboradores',
+          'Alojamentos, quartos, leitos e estadias',
+          'Frota e movimentações',
+          'Resumo operacional'
+        ]
+      },
+      profissional: {
+        nome: 'Profissional',
+        categoria: 'Mais profundidade',
+        descricao: 'Uma proposta para ampliar a análise e a rastreabilidade da operação.',
+        recursos: [
+          'Escopo do Essencial',
+          'Relatórios de ocupação e frota',
+          'Histórico e auditoria com hashes encadeados',
+          'Central de notificações'
+        ]
+      },
+      'sob-medida': {
+        nome: 'Sob medida',
+        categoria: 'Seu contexto no centro',
+        descricao:
+          'Um convite para mapear necessidades e avaliar possibilidades. Novos recursos e integrações dependem de análise de viabilidade.',
+        recursos: [
+          'Levantamento de necessidades',
+          'Definição conjunta de escopo',
+          'Análise de integrações',
+          'Planejamento de implantação'
+        ]
+      }
+    };
 
-  var PLANOS = {
-    essencial: {
-      nome: 'Essencial',
-      cat: 'O primeiro passo',
-      desc: 'Um ponto de partida para organizar os principais registros da operação.',
-      recursos: ['Cadastro de colaboradores', 'Alojamentos, quartos, leitos e estadias', 'Frota e movimentações', 'Resumo operacional']
-    },
-    profissional: {
-      nome: 'Profissional',
-      cat: 'Mais profundidade',
-      desc: 'Uma proposta para ampliar a análise e a rastreabilidade da operação.',
-      recursos: ['Escopo do Essencial', 'Relatórios de ocupação e frota', 'Histórico e auditoria com hashes encadeados', 'Central de notificações']
-    },
-    'sob-medida': {
-      nome: 'Sob medida',
-      cat: 'Seu contexto no centro',
-      desc: 'Um convite para mapear necessidades e avaliar possibilidades. Novos recursos e integrações dependem de análise de viabilidade.',
-      recursos: ['Levantamento de necessidades', 'Definição conjunta de escopo', 'Análise de integrações', 'Planejamento de implantação']
-    }
-  };
+    // elementos da página
+    this.hero = document.getElementById('topo');
+    this.textoHero = document.getElementById('t1');
+    this.setaHero = document.getElementById('t3');
+    this.fundoHero = document.getElementById('hero-fundo');
+    this.cabecalho = document.getElementById('cabecalho');
+    this.barraProgresso = document.getElementById('progresso');
+    this.janela = document.getElementById('janela');
+    this.janelaImagem = document.getElementById('janela-pic');
+    this.janelaFicha = document.getElementById('janela-ficha');
+    this.botaoAnterior = document.getElementById('janela-ant');
+    this.botaoProximo = document.getElementById('janela-prox');
+    this.textoPosicao = document.getElementById('janela-pos');
+    this.botaoMenu = document.getElementById('menu');
+    this.gaveta = document.getElementById('gaveta');
+    this.cursor = document.getElementById('cursor');
+    this.linksMenu = Array.from(document.querySelectorAll('nav a.l'));
+    this.secoesMenu = this.linksMenu.map((link) => document.querySelector(link.getAttribute('href')));
 
-  var hero = $('#topo'), t1 = $('#t1'), t3 = $('#t3'), fundoHero = $('#hero-fundo');
-  var hdr = $('#cabecalho'), barra = $('#progresso');
-  var janela = $('#janela'), pic = $('#janela-pic'), ficha = $('#janela-ficha');
-  var ant = $('#janela-ant'), prox = $('#janela-prox'), pos = $('#janela-pos');
+    // controle da janela de detalhes: lista de "abrir" e qual item está aberto
+    this.listaJanela = [];
+    this.indiceJanela = 0;
+    this.indiceAnterior = 0;
 
-  function el(tag, classe, texto) {
-    var e = document.createElement(tag);
-    if (classe) e.className = classe;
-    if (texto) e.textContent = texto;
-    return e;
+    // controle da rolagem
+    this.ultimoY = 0;
+    this.ultimoTopo = null;
+    this.pendentes = [];
+    this.lenis = null;
+
+    // posição do cursor (a atual vai "correndo atrás" do mouse para o movimento ficar suave)
+    this.cursorX = -200;
+    this.cursorY = -200;
+    this.mouseX = -200;
+    this.mouseY = -200;
+
+    document.getElementById('ano').textContent = new Date().getFullYear();
+
+    this.montarTelas();
+    this.configurarPlanos();
+    this.configurarJanela();
+    this.configurarMenuCelular();
+    this.prepararAnimacoes();
+    this.configurarRolagemSuave();
+    this.configurarCursor();
+    this.iniciarLaco();
   }
 
-  /* ===== janela de detalhes ===== */
-  var sequencia = [], indice = 0, indiceAnterior = 0;
-  function mostrar() {
-    janela.scrollTop = 0;
-    if (janela.open) return;
-    if (window._lenis) window._lenis.stop();
-    janela.showModal();
+  // Atalho para criar um elemento com classe e texto (o texto entra por textContent, então não vira HTML).
+  criar(tag, classe, texto) {
+    const elemento = document.createElement(tag);
+    if (classe) elemento.className = classe;
+    if (texto) elemento.textContent = texto;
+    return elemento;
   }
-  function ir(lista, i) {
-    if (i < 0 || i >= lista.length) return;
-    var estava = janela.open;
-    sequencia = lista; indice = i; lista[i]();
-    if (estava && !reduzir) {
-      $('.jn', janela).animate(
-        [{ opacity: 0, transform: 'translate3d(' + (i > indiceAnterior ? 24 : -24) + 'px,0,0)' }, { opacity: 1, transform: 'none' }],
+
+  /* ===== seção Dispatch: uma linha por tela ===== */
+
+  montarTelas() {
+    const lista = document.getElementById('lista-telas');
+    const funcoesAbrir = [];
+
+    this.telas.forEach((tela, posicao) => {
+      const artigo = this.criar('article', 'proj');
+
+      const moldura = this.criar('button', 'frame');
+      moldura.type = 'button';
+      moldura.setAttribute('aria-label', 'Ver ' + tela.nome);
+      const imagem = this.criar('img');
+      imagem.src = tela.imagem;
+      imagem.alt = 'Tela ' + tela.nome + ' do Dispatch';
+      imagem.loading = 'lazy';
+      moldura.appendChild(imagem);
+
+      const info = this.criar('div', 'info');
+      const link = this.criar('button', 'link', 'Ver a tela ');
+      link.type = 'button';
+      link.insertAdjacentHTML(
+        'beforeend',
+        '<svg viewBox="0 0 18 10" aria-hidden="true"><path d="M0 5h17M12 1l5 4-5 4"/></svg>'
+      );
+      info.append(
+        this.criar('span', 'idx', '0' + (posicao + 1)),
+        this.criar('h3', '', tela.nome),
+        this.criar('span', 'cat', tela.categoria),
+        this.criar('p', '', tela.descricao),
+        link
+      );
+
+      artigo.append(moldura, info);
+      lista.appendChild(artigo);
+
+      funcoesAbrir.push(() => this.mostrarTela(tela));
+      moldura.addEventListener('click', () => this.irPara(funcoesAbrir, posicao));
+      link.addEventListener('click', () => this.irPara(funcoesAbrir, posicao));
+    });
+  }
+
+  mostrarTela(tela) {
+    this.janelaImagem.className = 'pic';
+    const imagem = this.criar('img');
+    imagem.src = tela.imagem;
+    imagem.alt = 'Tela ' + tela.nome + ' do Dispatch';
+    this.janelaImagem.replaceChildren(imagem);
+    this.preencherJanela(tela.categoria, tela.nome, tela.descricao, [
+      ['Módulo', tela.nome],
+      ['Imagem', 'Tela real, dados fictícios']
+    ]);
+  }
+
+  /* ===== seção Planos: cada linha abre a janela com os recursos ===== */
+
+  configurarPlanos() {
+    const linhas = Array.from(document.querySelectorAll('.ix'));
+    const funcoesAbrir = linhas.map((linha) => () => this.mostrarPlano(this.planos[linha.dataset.plano]));
+
+    linhas.forEach((linha, posicao) => {
+      linha.addEventListener('click', () => this.irPara(funcoesAbrir, posicao));
+      // a linha funciona como botão também pelo teclado
+      linha.addEventListener('keydown', (evento) => {
+        if (evento.key === 'Enter' || evento.key === ' ') {
+          evento.preventDefault();
+          this.irPara(funcoesAbrir, posicao);
+        }
+      });
+    });
+  }
+
+  mostrarPlano(plano) {
+    this.janelaImagem.className = 'pic off';
+    this.janelaImagem.replaceChildren();
+    const ficha = plano.recursos.map((recurso, i) => ['0' + (i + 1), recurso]);
+    this.preencherJanela(
+      plano.categoria,
+      plano.nome,
+      plano.descricao + ' Proposta conceitual, ainda sem contratação ou condição comercial definida.',
+      ficha
+    );
+  }
+
+  /* ===== janela de detalhes (usada pelas telas e pelos planos) ===== */
+
+  configurarJanela() {
+    this.botaoAnterior.addEventListener('click', () => this.irPara(this.listaJanela, this.indiceJanela - 1));
+    this.botaoProximo.addEventListener('click', () => this.irPara(this.listaJanela, this.indiceJanela + 1));
+    this.janela.addEventListener('keydown', (evento) => {
+      if (evento.key === 'ArrowLeft') this.irPara(this.listaJanela, this.indiceJanela - 1);
+      if (evento.key === 'ArrowRight') this.irPara(this.listaJanela, this.indiceJanela + 1);
+    });
+    document.getElementById('janela-fechar').addEventListener('click', () => this.janela.close());
+    // clicar no fundo escuro fora da janela também fecha
+    this.janela.addEventListener('click', (evento) => {
+      if (evento.target === this.janela) this.janela.close();
+    });
+    // enquanto a janela está aberta a rolagem da página fica parada
+    this.janela.addEventListener('close', () => {
+      if (this.lenis) this.lenis.start();
+    });
+  }
+
+  preencherJanela(categoria, nome, descricao, linhasFicha) {
+    document.getElementById('janela-cat').textContent = categoria;
+    document.getElementById('janela-nome').textContent = nome;
+    document.getElementById('janela-desc').textContent = descricao;
+    this.janelaFicha.replaceChildren();
+    linhasFicha.forEach((linha) => {
+      const div = this.criar('div');
+      div.append(this.criar('span', '', linha[0]), this.criar('span', '', linha[1]));
+      this.janelaFicha.appendChild(div);
+    });
+    this.abrirJanela();
+  }
+
+  abrirJanela() {
+    this.janela.scrollTop = 0;
+    if (this.janela.open) return;
+    if (this.lenis) this.lenis.stop();
+    this.janela.showModal();
+  }
+
+  // Abre o item "indice" da lista e atualiza os botões Anterior/Próximo.
+  irPara(lista, indice) {
+    if (indice < 0 || indice >= lista.length) return;
+    const jaEstavaAberta = this.janela.open;
+    this.listaJanela = lista;
+    this.indiceJanela = indice;
+    lista[indice]();
+
+    // trocando de item com a janela aberta, o conteúdo desliza para o lado do botão clicado
+    if (jaEstavaAberta && !this.reduzirMovimento) {
+      const deslocamento = indice > this.indiceAnterior ? 24 : -24;
+      this.janela.querySelector('.jn').animate(
+        [
+          { opacity: 0, transform: 'translateX(' + deslocamento + 'px)' },
+          { opacity: 1, transform: 'none' }
+        ],
         { duration: 600, easing: 'cubic-bezier(.16,1,.3,1)' }
       );
     }
-    indiceAnterior = i;
-    ant.disabled = i <= 0; prox.disabled = i >= lista.length - 1;
-    pos.textContent = (i + 1) + ' de ' + lista.length;
+    this.indiceAnterior = indice;
+    this.botaoAnterior.disabled = indice <= 0;
+    this.botaoProximo.disabled = indice >= lista.length - 1;
+    this.textoPosicao.textContent = indice + 1 + ' de ' + lista.length;
   }
-  function preencherFicha(linhas) {
-    ficha.replaceChildren();
-    linhas.forEach(function (l) {
-      var d = el('div'); d.append(el('span', '', l[0]), el('span', '', l[1])); ficha.appendChild(d);
+
+  /* ===== menu do celular ===== */
+
+  configurarMenuCelular() {
+    this.botaoMenu.addEventListener('click', () => this.abrirMenu(this.gaveta.hidden));
+    this.gaveta.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => this.abrirMenu(false));
+    });
+    window.addEventListener('keydown', (evento) => {
+      if (evento.key === 'Escape') this.abrirMenu(false);
+    });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 900) this.abrirMenu(false);
+      this.ultimoTopo = null;
     });
   }
-  ant.addEventListener('click', function () { ir(sequencia, indice - 1); });
-  prox.addEventListener('click', function () { ir(sequencia, indice + 1); });
-  janela.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowLeft') ir(sequencia, indice - 1);
-    if (e.key === 'ArrowRight') ir(sequencia, indice + 1);
-  });
-  $('#janela-fechar').addEventListener('click', function () { janela.close(); });
-  janela.addEventListener('click', function (e) { if (e.target === janela) janela.close(); });
-  janela.addEventListener('close', function () { if (window._lenis) window._lenis.start(); });
 
-  /* telas do Dispatch em linhas editoriais */
-  var lista = $('#lista-telas'), aberturasTelas = [];
-  TELAS.forEach(function (t, k) {
-    var art = el('article', 'proj');
-    var frame = el('button', 'frame'); frame.type = 'button'; frame.setAttribute('aria-label', 'Ver ' + t.nome);
-    var im = el('img'); im.src = t.img; im.alt = 'Tela ' + t.nome + ' do Dispatch'; im.loading = 'lazy'; im.decoding = 'async';
-    frame.appendChild(im);
-    var info = el('div', 'info');
-    var link = el('button', 'link', 'Ver a tela '); link.type = 'button';
-    link.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 18 10" aria-hidden="true"><path d="M0 5h17M12 1l5 4-5 4"/></svg>');
-    info.append(el('span', 'idx', '0' + (k + 1)), el('h3', '', t.nome), el('span', 'cat', t.cat), el('p', '', t.desc), link);
-    art.append(frame, info);
-    function abrir() {
-      pic.className = 'pic';
-      var g = el('img'); g.src = t.img; g.alt = 'Tela ' + t.nome + ' do Dispatch';
-      pic.replaceChildren(g);
-      $('#janela-cat').textContent = t.cat;
-      $('#janela-nome').textContent = t.nome;
-      $('#janela-desc').textContent = t.desc;
-      preencherFicha([['Módulo', t.nome], ['Imagem', 'Tela real, dados fictícios']]);
-      mostrar();
-    }
-    aberturasTelas.push(abrir);
-    var abrirAqui = function () { ir(aberturasTelas, k); };
-    frame.addEventListener('click', abrirAqui);
-    link.addEventListener('click', abrirAqui);
-    lista.appendChild(art);
-  });
-
-  /* planos */
-  var linhasPlano = $$('.ix');
-  var aberturasPlanos = linhasPlano.map(function (linha) {
-    var p = PLANOS[linha.dataset.plano];
-    return function () {
-      pic.className = 'pic off'; pic.replaceChildren();
-      $('#janela-cat').textContent = p.cat;
-      $('#janela-nome').textContent = p.nome;
-      $('#janela-desc').textContent = p.desc + ' Proposta conceitual, ainda sem contratação ou condição comercial definida.';
-      preencherFicha(p.recursos.map(function (r, i) { return ['0' + (i + 1), r]; }));
-      mostrar();
-    };
-  });
-  linhasPlano.forEach(function (linha, i) {
-    var abrir = function () { ir(aberturasPlanos, i); };
-    linha.addEventListener('click', abrir);
-    linha.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrir(); }
-    });
-  });
-
-  $('#ano').textContent = new Date().getFullYear();
-
-  /* menu do celular */
-  var botaoMenu = $('#menu'), gaveta = $('#gaveta');
-  function menu(aberto) {
-    gaveta.hidden = !aberto;
-    hdr.classList.toggle('aberto', aberto);
-    botaoMenu.setAttribute('aria-expanded', aberto ? 'true' : 'false');
-    botaoMenu.textContent = aberto ? 'Fechar' : 'Menu';
+  abrirMenu(aberto) {
+    this.gaveta.hidden = !aberto;
+    this.cabecalho.classList.toggle('aberto', aberto);
+    this.botaoMenu.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+    this.botaoMenu.textContent = aberto ? 'Fechar' : 'Menu';
   }
-  botaoMenu.addEventListener('click', function () { menu(gaveta.hidden); });
-  $$('a', gaveta).forEach(function (a) { a.addEventListener('click', function () { menu(false); }); });
-  window.addEventListener('keydown', function (e) { if (e.key === 'Escape') menu(false); });
-  window.addEventListener('resize', function () { if (window.innerWidth > 900) menu(false); });
 
   /* ===== animações de entrada ===== */
-  document.documentElement.classList.add('js');
-  var seletorBloco = '.manifesto p,.num,.cabeca .lede,.processo-cabeca .lede,.proj .info>*:not(h3),.ix-h,.ix,.nota,.faixa .label,.sobre p,.pilares>div,.processo div,.integrantes li,.faq details,.contato .dentro>*:not(h2)';
-  var seletorTitulo = '.manifesto h2,.cabeca h2,.processo-cabeca h2,.proj .info h3,.faixa q,.sobre h2,.contato h2';
-  var seletorCortina = '.proj .frame,.sobre-arte,.manifesto .f';
 
-  if (!reduzir) {
-    $$(seletorBloco).forEach(function (e) { e.classList.add('rv'); });
-    $$(seletorCortina).forEach(function (e) { e.classList.add('wipe'); });
-    $$(seletorTitulo).forEach(dividirPalavras);
-    $$('.rv').forEach(function (e) {
-      var irmaos = Array.prototype.filter.call(e.parentElement.children, function (c) { return c.classList.contains('rv'); });
-      var atraso = Math.min(irmaos.indexOf(e), 6) * 0.08 + (e.closest('.cabeca,.processo-cabeca') ? 0.25 : 0);
-      e.style.setProperty('--d', atraso.toFixed(2) + 's');
+  // Marca os elementos que vão animar. Cada classe tem a animação dela no CSS:
+  // rv = sobe e aparece, wipe = imagem abre como cortina, split = título sobe palavra por palavra.
+  prepararAnimacoes() {
+    document.documentElement.classList.add('js');
+    if (this.reduzirMovimento) return;
+
+    const blocos =
+      '.manifesto p, .num, .cabeca .lede, .processo-cabeca .lede, .proj .info > *:not(h3), .ix-h, .ix, .nota, .faixa .label, .sobre p, .pilares > div, .processo div, .integrantes li, .faq details, .contato .dentro > *:not(h2)';
+    const titulos =
+      '.manifesto h2, .cabeca h2, .processo-cabeca h2, .proj .info h3, .faixa q, .sobre h2, .contato h2';
+    const imagens = '.proj .frame, .sobre-arte, .manifesto .f';
+
+    document.querySelectorAll(blocos).forEach((el) => el.classList.add('rv'));
+    document.querySelectorAll(imagens).forEach((el) => el.classList.add('wipe'));
+    document.querySelectorAll(titulos).forEach((el) => this.separarPalavras(el));
+
+    // irmãos aparecem um pouco depois do outro (efeito cascata)
+    document.querySelectorAll('.rv').forEach((el) => {
+      const irmaos = Array.from(el.parentElement.children).filter((c) => c.classList.contains('rv'));
+      let atraso = Math.min(irmaos.indexOf(el), 6) * 0.08;
+      if (el.closest('.cabeca, .processo-cabeca')) atraso += 0.25;
+      el.style.setProperty('--d', atraso.toFixed(2) + 's');
     });
+
+    this.pendentes = Array.from(document.querySelectorAll('.rv, .wipe, .split'));
+    // por segurança: se algo der errado, depois de 15 segundos tudo aparece de qualquer jeito
+    setTimeout(() => this.revelarTudo(), 15000);
   }
 
-  // Quebra o título em palavras, cada uma numa "janela" que a esconde até subir.
-  function dividirPalavras(alvo) {
-    var i = 0;
-    (function andar(no) {
-      Array.prototype.slice.call(no.childNodes).forEach(function (c) {
-        if (c.nodeType === 3) {
-          var frag = document.createDocumentFragment();
-          c.textContent.split(/(\s+)/).forEach(function (w) {
-            if (!w) return;
-            if (/^\s+$/.test(w)) { frag.appendChild(document.createTextNode(w)); return; }
-            var fora = el('span', 'sw'), dentro = el('span', '', w);
-            dentro.style.setProperty('--i', i++);
-            fora.appendChild(dentro); frag.appendChild(fora);
+  // Coloca cada palavra do título dentro de dois spans: o de fora esconde, o de dentro sobe.
+  separarPalavras(titulo) {
+    let contador = 0;
+    const percorrer = (no) => {
+      Array.from(no.childNodes).forEach((filho) => {
+        if (filho.nodeType === Node.TEXT_NODE) {
+          const pedacos = document.createDocumentFragment();
+          filho.textContent.split(/(\s+)/).forEach((parte) => {
+            if (parte === '') return;
+            if (parte.trim() === '') {
+              pedacos.appendChild(document.createTextNode(parte));
+              return;
+            }
+            const fora = this.criar('span', 'sw');
+            const dentro = this.criar('span', '', parte);
+            dentro.style.setProperty('--i', contador);
+            contador++;
+            fora.appendChild(dentro);
+            pedacos.appendChild(fora);
           });
-          no.replaceChild(frag, c);
-        } else if (c.nodeType === 1) {
-          andar(c);
+          no.replaceChild(pedacos, filho);
+        } else if (filho.nodeType === Node.ELEMENT_NODE) {
+          percorrer(filho);
         }
       });
-    })(alvo);
-    alvo.classList.add('split');
+    };
+    percorrer(titulo);
+    titulo.classList.add('split');
   }
 
-  function formatar(v) { return Math.round(v).toLocaleString('pt-BR'); }
-  function contar(b) {
-    var texto = b.textContent.trim();
-    if (!/^\d+$/.test(texto) || reduzir) return;
-    var alvo = parseInt(texto, 10), t0 = performance.now();
-    (function passo(agora) {
-      var k = Math.min(1, (agora - t0) / 1600), v = alvo * (1 - Math.pow(1 - k, 3));
-      b.textContent = formatar(v);
-      if (k < 1) requestAnimationFrame(passo); else b.textContent = texto;
-    })(t0);
-  }
-
-  var pendentes = $$('.rv,.wipe,.split');
-  function revelar() {
-    var vh = window.innerHeight;
-    pendentes = pendentes.filter(function (e) {
-      var r = e.getBoundingClientRect();
-      if (r.top < vh * 0.88 && r.bottom > 0) {
-        e.classList.add('in');
-        if (e.classList.contains('num')) contar($('b', e));
-        return false;
-      }
-      return true;
-    });
-  }
-  // Rede de segurança: nada fica escondido para sempre se algo falhar.
-  setTimeout(function () { pendentes.forEach(function (e) { e.classList.add('in'); }); pendentes = []; }, 15000);
-
-  var ultimoY = 0;
-  function esconderCabecalho(y) {
-    var aberto = hdr.classList.contains('aberto');
-    if (!aberto && y > window.innerHeight * 0.7 && y > ultimoY + 6) hdr.classList.add('esconde');
-    else if (y < ultimoY - 6 || aberto || y < window.innerHeight * 0.7) hdr.classList.remove('esconde');
-    ultimoY = y;
-  }
-
-  var links = $$('nav a.l');
-  var secoes = links.map(function (a) { return $(a.getAttribute('href')); });
-  var camadas = $$('[data-velocidade]');
-  var imagensParallax = $$('.frame img,.sobre-arte img,.manifesto .f img');
-
-  function parallax() {
-    var vh = window.innerHeight;
-    camadas.forEach(function (c) {
-      var p = c.parentElement.getBoundingClientRect();
-      if (p.bottom < -300 || p.top > vh + 300) return;
-      var d = p.top + p.height / 2 - vh / 2;
-      c.style.transform = 'translate3d(0,' + (d * parseFloat(c.dataset.velocidade) * -1).toFixed(1) + 'px,0)';
-    });
-    imagensParallax.forEach(function (im) {
-      var r = im.parentElement.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > vh) return;
-      var t = (r.top + r.height / 2 - vh / 2) / vh;
-      im.style.transform = 'translate3d(0,' + (t * -6).toFixed(2) + '%,0)';
+  // Mostra o que entrou na tela. Os números da faixa contam de 0 até o valor.
+  revelarVisiveis() {
+    const alturaTela = window.innerHeight;
+    this.pendentes = this.pendentes.filter((el) => {
+      const caixa = el.getBoundingClientRect();
+      const visivel = caixa.top < alturaTela * 0.88 && caixa.bottom > 0;
+      if (!visivel) return true;
+      el.classList.add('in');
+      if (el.classList.contains('num')) this.contarNumero(el.querySelector('b'));
+      return false;
     });
   }
 
-  function atualizar() {
-    var y = Math.max(0, -hero.getBoundingClientRect().top);
-    var max = document.documentElement.scrollHeight - window.innerHeight;
-    barra.style.transform = 'scaleX(' + (max > 0 ? Math.min(1, y / max) : 0).toFixed(4) + ')';
-    hdr.classList.toggle('solido', y > hero.offsetHeight - 120);
-    var linha = y + window.innerHeight * 0.4, atual = -1;
-    secoes.forEach(function (s, i) { if (s && s.offsetTop <= linha) atual = i; });
-    links.forEach(function (a, i) { a.classList.toggle('on', i === atual); });
-    revelar();
-    esconderCabecalho(y);
-    if (!reduzir) {
-      var hp = Math.max(0, Math.min(1, y / window.innerHeight));
-      if (hp < 1) {
-        fundoHero.style.transform = 'translate3d(0,' + (y * 0.22).toFixed(1) + 'px,0)';
-        t1.style.opacity = (1 - Math.min(1, hp * 1.6)).toFixed(3);
-        t1.style.transform = 'translate3d(0,' + (-y * 0.18).toFixed(1) + 'px,0)';
-        t3.style.opacity = (1 - Math.min(1, hp * 3)).toFixed(3);
-      }
-      parallax();
-    }
+  revelarTudo() {
+    this.pendentes.forEach((el) => el.classList.add('in'));
+    this.pendentes = [];
   }
 
-  /* rolagem suave */
-  if (!reduzir && window.Lenis) {
+  contarNumero(campo) {
+    const textoFinal = campo.textContent.trim();
+    if (!/^\d+$/.test(textoFinal)) return;
+    const valorFinal = parseInt(textoFinal, 10);
+    const inicio = performance.now();
+    const duracao = 1600;
+
+    const passo = (agora) => {
+      const progresso = Math.min(1, (agora - inicio) / duracao);
+      // começa rápido e desacelera no final
+      const suavizado = 1 - Math.pow(1 - progresso, 3);
+      campo.textContent = Math.round(valorFinal * suavizado);
+      if (progresso < 1) requestAnimationFrame(passo);
+      else campo.textContent = textoFinal;
+    };
+    requestAnimationFrame(passo);
+  }
+
+  /* ===== rolagem ===== */
+
+  // Lenis deixa a rolagem do mouse suave. O arquivo fica em js/vendor porque o site só aceita scripts do próprio domínio.
+  configurarRolagemSuave() {
+    if (this.reduzirMovimento || !window.Lenis) return;
     try {
-      var lenis = window._lenis = new window.Lenis({ lerp: 0.085, smoothWheel: true });
-      $$('a[href^="#"]').forEach(function (a) {
-        a.addEventListener('click', function (e) {
-          var id = a.getAttribute('href');
-          var alvo = id === '#topo' ? 0 : $(id);
-          if (alvo === null) return;
-          e.preventDefault();
-          lenis.start();
-          lenis.scrollTo(alvo, { offset: id === '#topo' ? 0 : -72, duration: 1.6 });
-        });
-      });
+      this.lenis = new window.Lenis({ lerp: 0.085, smoothWheel: true });
     } catch (erro) {
-      window._lenis = null;
+      this.lenis = null;
+      return;
     }
+
+    // links do menu (#dispatch, #planos...) descem até a seção com a mesma suavidade
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (evento) => {
+        const destino = link.getAttribute('href');
+        const alvo = destino === '#topo' ? 0 : document.querySelector(destino);
+        if (alvo === null) return;
+        evento.preventDefault();
+        this.lenis.start();
+        this.lenis.scrollTo(alvo, { offset: destino === '#topo' ? 0 : -72, duration: 1.6 });
+      });
+    });
   }
 
-  /* cursor "Ver" que segue o mouse sobre as telas */
-  var cursor = $('#cursor'), cx = -200, cy = -200, tx = -200, ty = -200;
-  var fino = window.matchMedia('(pointer: fine)').matches && !reduzir;
-  if (fino) {
-    window.addEventListener('pointermove', function (e) {
-      tx = e.clientX; ty = e.clientY;
-      var sobre = e.target.closest && e.target.closest('.frame');
-      cursor.classList.toggle('on', !!sobre);
-    }, { passive: true });
-    document.addEventListener('pointerleave', function () { cursor.classList.remove('on'); });
+  // O cabeçalho some quando a pessoa desce a página e volta quando ela sobe.
+  esconderCabecalho(y) {
+    const menuAberto = this.cabecalho.classList.contains('aberto');
+    const passouDoHero = y > window.innerHeight * 0.7;
+    if (!menuAberto && passouDoHero && y > this.ultimoY + 6) {
+      this.cabecalho.classList.add('esconde');
+    } else if (y < this.ultimoY - 6 || menuAberto || !passouDoHero) {
+      this.cabecalho.classList.remove('esconde');
+    }
+    this.ultimoY = y;
   }
 
-  var ultimoTopo = null;
-  window.addEventListener('resize', function () { ultimoTopo = null; });
-  (function laco(t) {
-    if (window._lenis) window._lenis.raf(t);
-    var topo = hero.getBoundingClientRect().top;
-    if (topo !== ultimoTopo) { ultimoTopo = topo; atualizar(); }
-    if (fino) {
-      cx += (tx - cx) * 0.18; cy += (ty - cy) * 0.18;
-      cursor.style.transform = 'translate3d(' + cx.toFixed(1) + 'px,' + cy.toFixed(1) + 'px,0)';
+  // Imagens marcadas com data-velocidade andam um pouco mais devagar (ou mais rápido) que a página.
+  aplicarParallax() {
+    const alturaTela = window.innerHeight;
+    document.querySelectorAll('[data-velocidade]').forEach((camada) => {
+      const caixa = camada.parentElement.getBoundingClientRect();
+      if (caixa.bottom < -300 || caixa.top > alturaTela + 300) return;
+      const distanciaDoCentro = caixa.top + caixa.height / 2 - alturaTela / 2;
+      const deslocamento = distanciaDoCentro * parseFloat(camada.dataset.velocidade) * -1;
+      camada.style.transform = 'translateY(' + deslocamento.toFixed(1) + 'px)';
+    });
+    document.querySelectorAll('.frame img, .sobre-arte img, .manifesto .f img').forEach((imagem) => {
+      const caixa = imagem.parentElement.getBoundingClientRect();
+      if (caixa.bottom < 0 || caixa.top > alturaTela) return;
+      const posicao = (caixa.top + caixa.height / 2 - alturaTela / 2) / alturaTela;
+      imagem.style.transform = 'translateY(' + (posicao * -6).toFixed(2) + '%)';
+    });
+  }
+
+  // Roda sempre que a página rola: barra de progresso, cabeçalho, menu ativo, animações e parallax.
+  aoRolar() {
+    const y = Math.max(0, -this.hero.getBoundingClientRect().top);
+    const maximo = document.documentElement.scrollHeight - window.innerHeight;
+    const progresso = maximo > 0 ? Math.min(1, y / maximo) : 0;
+    this.barraProgresso.style.transform = 'scaleX(' + progresso.toFixed(4) + ')';
+    this.cabecalho.classList.toggle('solido', y > this.hero.offsetHeight - 120);
+
+    // marca no menu a seção que está na tela
+    const linha = y + window.innerHeight * 0.4;
+    let atual = -1;
+    this.secoesMenu.forEach((secao, i) => {
+      if (secao && secao.offsetTop <= linha) atual = i;
+    });
+    this.linksMenu.forEach((link, i) => link.classList.toggle('on', i === atual));
+
+    this.revelarVisiveis();
+    this.esconderCabecalho(y);
+    if (this.reduzirMovimento) return;
+
+    // na abertura, o texto sobe e some enquanto o fundo desce mais devagar
+    const quantoSaiuDoHero = Math.min(1, y / window.innerHeight);
+    if (quantoSaiuDoHero < 1) {
+      this.fundoHero.style.transform = 'translateY(' + (y * 0.22).toFixed(1) + 'px)';
+      this.textoHero.style.opacity = (1 - Math.min(1, quantoSaiuDoHero * 1.6)).toFixed(3);
+      this.textoHero.style.transform = 'translateY(' + (-y * 0.18).toFixed(1) + 'px)';
+      this.setaHero.style.opacity = (1 - Math.min(1, quantoSaiuDoHero * 3)).toFixed(3);
     }
-    requestAnimationFrame(laco);
-  })(performance.now());
-})();
+    this.aplicarParallax();
+  }
+
+  /* ===== cursor sobre as telas ===== */
+
+  configurarCursor() {
+    if (!this.mouseFino) return;
+    window.addEventListener(
+      'pointermove',
+      (evento) => {
+        this.mouseX = evento.clientX;
+        this.mouseY = evento.clientY;
+        const sobreTela = evento.target.closest && evento.target.closest('.frame');
+        this.cursor.classList.toggle('on', Boolean(sobreTela));
+      },
+      { passive: true }
+    );
+    document.addEventListener('pointerleave', () => this.cursor.classList.remove('on'));
+  }
+
+  moverCursor() {
+    // a cada quadro o cursor anda 18% da distância até o mouse, por isso ele "flutua"
+    this.cursorX += (this.mouseX - this.cursorX) * 0.18;
+    this.cursorY += (this.mouseY - this.cursorY) * 0.18;
+    this.cursor.style.transform =
+      'translate(' + this.cursorX.toFixed(1) + 'px, ' + this.cursorY.toFixed(1) + 'px)';
+  }
+
+  /* ===== laço de animação: roda a cada quadro da tela ===== */
+
+  iniciarLaco() {
+    const quadro = (tempo) => {
+      if (this.lenis) this.lenis.raf(tempo);
+      // só recalcula a página quando ela realmente rolou
+      const topo = this.hero.getBoundingClientRect().top;
+      if (topo !== this.ultimoTopo) {
+        this.ultimoTopo = topo;
+        this.aoRolar();
+      }
+      if (this.mouseFino) this.moverCursor();
+      requestAnimationFrame(quadro);
+    };
+    requestAnimationFrame(quadro);
+  }
+}
+
+new TelaApresentacao();

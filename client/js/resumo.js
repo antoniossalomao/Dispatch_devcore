@@ -1,6 +1,7 @@
 // Tela inicial do sistema: confere se a pessoa está logada, carrega os números do dia e lista as últimas movimentações.
 export default class TelaResumo {
-  // ctx vem da casca (js/app/App.js): sessão em cache, sinal para soltar eventos globais ao sair da tela e navegação sem recarregar.
+  // ctx vem do js/app/App.js: ctx.sessao() diz quem está logado, ctx.sinal desliga os eventos
+  // da janela quando a pessoa sai da tela e ctx.ir('tela') troca de tela sem recarregar.
   constructor(ctx) {
     this.ctx = ctx;
     this.numVeiculosUso = document.getElementById('num-veiculos-uso');

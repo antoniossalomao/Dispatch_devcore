@@ -1,19 +1,20 @@
 # Organização do código
 
-O projeto usa JavaScript puro no navegador e Node.js com Express no servidor. As classes agrupam os dados e as ações de cada parte do sistema. Não há herança entre regras do sistema nem ORM para consultas (a única herança técnica é `SqliteSessionStore`, exigida pelo `express-session`): os controladores e serviços usam SQL diretamente.
+O projeto usa JavaScript puro no navegador e Node.js com Express no servidor. As classes agrupam os dados e as ações de cada parte do sistema. Não há ORM para consultas: os controladores e serviços usam SQL diretamente. Há duas heranças: `SqliteSessionStore` (exigida pelo `express-session`) e `ControladorLoginGoogle extends ControladorAutenticacao`, que reaproveita da classe mãe a abertura de sessão e as regras do cadastro.
 
 ## Pastas
 
 | Pasta | Responsabilidade |
 | --- | --- |
-| `client/js/` | Uma classe por tela (incluindo `TelaApresentacao` e `RedirecionadorAuditoria`) e classes para API, tema, navegação, diálogos e ajuda. |
+| `client/js/` | Uma classe por tela (incluindo `TelaApresentacao` e `RedirecionadorAuditoria`) e classes para API, tema, navegação, diálogos e ajuda. As telas internas são módulos (`export default class`) que o `App` cria a cada visita. |
+| `client/js/app/` | `App` (encaixa o HTML de `client/telas/` e cria a classe da tela), `Roteador` (endereço /frota, /resumo sem recarregar) e `PaletaDeComandos` (Ctrl+K). |
 | `server/src/routes/` | Define os endereços da API e liga cada endereço ao método do controlador. |
 | `server/src/middlewares/` | Classe `ControleAcesso` para exigir login ou perfil administrador nas rotas. |
 | `server/src/controllers/` | Recebe a requisição, confere os dados, consulta o banco e envia a resposta. |
 | `server/src/models/` | Regras de CNH, cadastro de veículo e capacidade do quarto. |
-| `server/src/services/` | Configurações, cálculos dos relatórios, auditoria, sessões no SQLite, notificações, Groq e Telegram. |
-| `server/src/regras/` | Classes `Datas` (datas locais) e `Validador` (IDs, textos, login e senha). |
-| `server/src/db/` | Conexão (`ConexaoBanco`), tabelas e scripts `CriadorBanco` / `CargaExemplos`. |
+| `server/src/services/` | Configurações, cálculos dos relatórios, auditoria, sessões no SQLite, notificações, Groq, Telegram e login com Google (`LoginGoogle`). |
+| `server/src/regras/` | Classes `Datas` (datas locais) e `Validador` (IDs, textos, login, senha, CPF/CNPJ, e-mail e telefone). |
+| `server/src/db/` | Conexão (`ConexaoBanco`), tabelas, scripts `CriadorBanco` / `CargaExemplos` e `ColunasUsuario` (cria email, documento e telefone em bancos antigos). |
 | `server/test/` | Testes das regras e dos fluxos da API. |
 
 ## Exemplo: cadastro de veículo
