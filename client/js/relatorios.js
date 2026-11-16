@@ -175,6 +175,12 @@ export default class TelaRelatorios {
     );
   }
 
+  // Percentual no formato brasileiro e com uma casa só quando ela existe: "29,4" e "13", nunca "29.4".
+  formatarPct(valor) {
+    const numero = Number(valor) || 0;
+    return numero.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+  }
+
   aplicarLarguraBarra(container, pct) {
     const limitado = Math.max(0, Math.min(100, Number(pct) || 0));
     const preench = container.querySelector('.aloj-barra-preench');
@@ -208,7 +214,7 @@ export default class TelaRelatorios {
         '</span></div>' +
         this.barra() +
         '<div class="aloj-numeros"><span><strong>' +
-        alojamento.ocupacao_media_pct +
+        this.formatarPct(alojamento.ocupacao_media_pct) +
         '%</strong> de ocupação média no período</span>' +
         '<span>' +
         alojamento.ocupados_agora +
@@ -258,9 +264,9 @@ export default class TelaRelatorios {
         '<td class="celula-barra">' +
         this.barra() +
         '<span class="rel-pct">' +
-        veiculo.utilizacao_pct +
+        this.formatarPct(veiculo.utilizacao_pct) +
         '% em uso · ' +
-        veiculo.ociosidade_pct +
+        this.formatarPct(veiculo.ociosidade_pct) +
         '% ocioso</span></td>' +
         '<td class="num">' +
         (veiculo.dias_sem_uso === null ? '—' : veiculo.dias_sem_uso + ' dias') +

@@ -234,3 +234,17 @@
 .topo-direita:has(.busca-caixa) .botao-paleta {
   display: none;
 }
+
+/* O conteúdo recebe foco por programa a cada troca de tela (para leitor de tela e teclado começarem
+   por ele). Sem isto, o navegador desenha um contorno em volta da área toda. */
+#conteudo:focus {
+  outline: none;
+}
+
+/* Contador do sino: vermelho cheio gritava mais que qualquer número da tela. Fica no tom de erro
+   da paleta, mais contido, e o número segue legível. */
+.topo-direita .botao-notif .sino-contador {
+  background-color: #b4383c;
+  color: #fff;
+  box-shadow: 0 0 0 2px var(--claro-fundo);
+}
