@@ -8,10 +8,8 @@ class TelaLogin {
     this.msgErro = document.getElementById('mensagem-erro');
     this.msgSucesso = document.getElementById('mensagem-sucesso');
     this.botaoEntrar = document.getElementById('botao-entrar');
-    this.ajudaCadastro = document.getElementById('ajuda-cadastro');
     this.blocoGoogle = document.getElementById('bloco-google');
     this.configurarEventos();
-    this.verificarCadastro();
     this.verificarGoogle();
     this.mostrarRetornoGoogle();
   }
@@ -41,19 +39,6 @@ class TelaLogin {
       falhou: 'Não foi possível confirmar sua conta Google. Tente de novo ou entre com usuário e senha.'
     };
     if (motivo && mensagens[motivo]) this.mostrarErro(mensagens[motivo]);
-  }
-
-  // O link para criar conta só aparece quando o servidor está com código de convite configurado.
-  async verificarCadastro() {
-    if (!this.ajudaCadastro) return;
-    try {
-      const resposta = await chamarApi('/api/auth/cadastro-status');
-      if (resposta.ok && resposta.dados && resposta.dados.ativo) {
-        this.ajudaCadastro.hidden = false;
-      }
-    } catch (erro) {
-      // Se o servidor estiver desligado, deixa o link escondido mesmo.
-    }
   }
 
   configurarEventos() {
