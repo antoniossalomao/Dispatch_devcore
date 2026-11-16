@@ -59,7 +59,9 @@ Precisa do **Node.js 22.13+** (ou 24+).
 cd server
 npm install
 npm run criar-banco
-npm run seed   # opcional: dados de exemplo (colaboradores, alojamentos, frota e 6 meses de histórico)
+npm run seed   # opcional: dados da Construtora Aguapeí (28 colaboradores, 4 alojamentos, 10 veículos e 6 meses de histórico)
+# ou, para gerar um banco novo só para a apresentação:
+# npm run banco:apresentacao   (cria server/data/apresentacao.db já populado)
 npm start
 ```
 
