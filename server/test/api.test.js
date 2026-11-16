@@ -355,7 +355,9 @@ test('cadastros, movimentações, permissões e segurança continuam funcionando
           (
             await novo('/auth/cadastro', 'POST', {
               nome: 'Convidado',
-              usuario: 'convidado1',
+              documento: '529.982.247-25',
+              email: 'convidado1@obra.com.br',
+              telefone: '(14) 99123-4567',
               senha: 'Senha@2026',
               codigo: 'errado'
             })
@@ -366,7 +368,9 @@ test('cadastros, movimentações, permissões e segurança continuam funcionando
           (
             await novo('/auth/cadastro', 'POST', {
               nome: 'Convidado',
-              usuario: 'convidado1',
+              documento: '529.982.247-25',
+              email: 'convidado1@obra.com.br',
+              telefone: '(14) 99123-4567',
               senha: '12345678',
               codigo: 'Convite@2026'
             })
@@ -377,7 +381,37 @@ test('cadastros, movimentações, permissões e segurança continuam funcionando
           (
             await novo('/auth/cadastro', 'POST', {
               nome: 'Convidado',
-              usuario: 'convidado1',
+              documento: '111.111.111-11',
+              email: 'convidado1@obra.com.br',
+              telefone: '(14) 99123-4567',
+              senha: 'Senha@2026',
+              codigo: 'Convite@2026'
+            })
+          ).status,
+          400,
+          'CPF com dígitos repetidos é recusado'
+        );
+        assert.equal(
+          (
+            await novo('/auth/cadastro', 'POST', {
+              nome: 'Convidado',
+              documento: '529.982.247-25',
+              email: 'convidado1@obra.com.br',
+              telefone: '123',
+              senha: 'Senha@2026',
+              codigo: 'Convite@2026'
+            })
+          ).status,
+          400,
+          'telefone sem DDD é recusado'
+        );
+        assert.equal(
+          (
+            await novo('/auth/cadastro', 'POST', {
+              nome: 'Convidado',
+              documento: '529.982.247-25',
+              email: 'Convidado1@Obra.com.br',
+              telefone: '(14) 99123-4567',
               senha: 'Senha@2026',
               perfil: 'admin',
               codigo: 'Convite@2026'
@@ -385,13 +419,47 @@ test('cadastros, movimentações, permissões e segurança continuam funcionando
           ).status,
           201
         );
+        // Mesmo CPF ou mesmo e-mail não abrem segunda conta.
+        assert.equal(
+          (
+            await novo('/auth/cadastro', 'POST', {
+              nome: 'Outro',
+              documento: '52998224725',
+              email: 'outro@obra.com.br',
+              telefone: '14991234567',
+              senha: 'Senha@2026',
+              codigo: 'Convite@2026'
+            })
+          ).status,
+          400
+        );
+        assert.equal(
+          (
+            await novo('/auth/cadastro', 'POST', {
+              nome: 'Outro',
+              documento: '11.222.333/0001-81',
+              email: 'convidado1@obra.com.br',
+              telefone: '14991234567',
+              senha: 'Senha@2026',
+              codigo: 'Convite@2026'
+            })
+          ).status,
+          400
+        );
+        const guardado = db
+          .prepare('SELECT login, email, documento, telefone FROM usuario WHERE email = ?')
+          .get('convidado1@obra.com.br');
+        assert.deepEqual(
+          { ...guardado },
+          { login: 'convidado1', email: 'convidado1@obra.com.br', documento: '52998224725', telefone: '14991234567' }
+        );
         const convidadoBanco = db
           .prepare('SELECT id, perfil FROM usuario WHERE login = ?')
           .get('convidado1');
         assert.equal(convidadoBanco.perfil, 'operador');
 
         assert.equal(
-          (await novo('/auth/login', 'POST', { usuario: 'convidado1', senha: 'Senha@2026' }))
+          (await novo('/auth/login', 'POST', { usuario: 'Convidado1@obra.com.br', senha: 'Senha@2026' }))
             .status,
           200
         );
@@ -738,6 +806,154 @@ test('telas do sistema abrem a casca única e endereços antigos redirecionam', 
     assert.equal((await pegar('/')).status, 200);
     assert.equal((await pegar('/login')).status, 200);
   } finally {
+    await new Promise((ok) => servidor.close(ok));
+  }
+});
+
+test('login com Google só entra em usuário ativo com o e-mail ligado pelo admin', async () => {
+  const servidor = new Servidor().app.listen(0, '127.0.0.1');
+  await new Promise((ok) => servidor.once('listening', ok));
+  const endereco = 'http://127.0.0.1:' + servidor.address().port;
+  const fetchOriginal = globalThis.fetch;
+  const envAntes = { id: process.env.GOOGLE_CLIENT_ID, segredo: process.env.GOOGLE_CLIENT_SECRET };
+  let cargaGoogle = null;
+
+  // Só o endpoint de token do Google é simulado; o resto passa pelo fetch de verdade.
+  globalThis.fetch = async (url, opcoes) => {
+    if (String(url).startsWith('https://oauth2.googleapis.com/token')) {
+      const corpo = new URLSearchParams(opcoes.body);
+      assert.equal(corpo.get('code'), 'codigo-teste');
+      assert.equal(corpo.get('client_secret'), 'segredo-teste');
+      const jwt = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
+      return new Response(
+        JSON.stringify({ id_token: jwt({ alg: 'RS256' }) + '.' + jwt(cargaGoogle) + '.assinatura' }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    return fetchOriginal(url, opcoes);
+  };
+
+  const pegar = async (rota, cookie) => {
+    const r = await fetchOriginal(endereco + rota, {
+      redirect: 'manual',
+      headers: cookie ? { Cookie: cookie } : {}
+    });
+    const novo = r.headers.get('set-cookie');
+    return { r, cookie: novo ? novo.split(';')[0] : cookie };
+  };
+  const tentar = async (claims) => {
+    const ida = await pegar('/api/auth/google');
+    assert.equal(ida.r.status, 302);
+    const destino = new URL(ida.r.headers.get('location'));
+    assert.equal(destino.host, 'accounts.google.com');
+    assert.equal(destino.searchParams.get('client_id'), 'cliente-teste');
+    const estado = destino.searchParams.get('state');
+    cargaGoogle = Object.assign(
+      {
+        iss: 'https://accounts.google.com',
+        aud: 'cliente-teste',
+        exp: Math.floor(Date.now() / 1000) + 300,
+        nonce: destino.searchParams.get('nonce'),
+        email: 'Admin.Teste@Gmail.com',
+        email_verified: true
+      },
+      claims
+    );
+    const volta = await pegar(
+      '/api/auth/google/retorno?code=codigo-teste&state=' + encodeURIComponent(estado),
+      ida.cookie
+    );
+    return { local: volta.r.headers.get('location'), cookie: volta.cookie };
+  };
+
+  try {
+    delete process.env.GOOGLE_CLIENT_ID;
+    delete process.env.GOOGLE_CLIENT_SECRET;
+    const desligado = await (await fetchOriginal(endereco + '/api/auth/google/status')).json();
+    assert.equal(desligado.ativo, false);
+    assert.equal((await pegar('/api/auth/google')).r.headers.get('location'), '/login?google=indisponivel');
+
+    process.env.GOOGLE_CLIENT_ID = 'cliente-teste';
+    process.env.GOOGLE_CLIENT_SECRET = 'segredo-teste';
+    assert.equal((await (await fetchOriginal(endereco + '/api/auth/google/status')).json()).ativo, true);
+
+    // Sem e-mail ligado, a conta Google não entra.
+    assert.equal((await tentar({})).local, '/login?google=sem-acesso');
+
+    // Admin liga o e-mail ao usuário admin.
+    const admin = cliente(endereco);
+    assert.equal((await admin('/auth/login', 'POST', { usuario: 'admin', senha: 'admin123' })).status, 200);
+    const config = await admin('/configuracoes');
+    const idAdmin = config.dados.usuarios.find((u) => u.login === 'admin').id;
+    assert.equal((await admin('/configuracoes/usuarios/' + idAdmin + '/email', 'PUT', { email: 'nao-e-email' })).status, 400);
+    assert.equal((await admin('/configuracoes/usuarios/' + idAdmin + '/email', 'PUT', { email: 'admin.teste@gmail.com' })).status, 200);
+
+    // Estado trocado, token de outro cliente e e-mail não verificado continuam barrados.
+    const ida = await pegar('/api/auth/google');
+    const forjado = await pegar('/api/auth/google/retorno?code=codigo-teste&state=forjado', ida.cookie);
+    assert.equal(forjado.r.headers.get('location'), '/login?google=expirado');
+    assert.equal((await tentar({ aud: 'outro-cliente' })).local, '/login?google=falhou');
+    assert.equal((await tentar({ email_verified: false })).local, '/login?google=falhou');
+    assert.equal((await tentar({ nonce: 'outro' })).local, '/login?google=falhou');
+
+    // Tudo certo: entra e a sessão vale para a API.
+    const ok = await tentar({});
+    assert.equal(ok.local, '/resumo');
+    const eu = await fetchOriginal(endereco + '/api/auth/eu', { headers: { Cookie: ok.cookie } });
+    assert.equal(eu.status, 200);
+    assert.equal((await eu.json()).usuario.login, 'admin');
+
+    // Remover o e-mail tira o acesso pelo Google.
+    assert.equal((await admin('/configuracoes/usuarios/' + idAdmin + '/email', 'PUT', { email: '' })).status, 200);
+    assert.equal((await tentar({})).local, '/login?google=sem-acesso');
+
+    // Cadastro com Google: sem convite aberto, recusa; convite errado, recusa; certo, cria operador ligado ao e-mail.
+    const visitante = cliente(endereco);
+    delete process.env.CADASTRO_CODIGO;
+    assert.equal((await visitante('/auth/google/cadastro', 'POST', { codigo: 'x' })).status, 403);
+    process.env.CADASTRO_CODIGO = 'convite-teste';
+    assert.equal((await visitante('/auth/google/cadastro', 'POST', { codigo: 'errado' })).status, 403);
+    assert.equal(
+      (await visitante('/auth/google/cadastro', 'POST', { codigo: 'convite-teste', documento: '123', telefone: '14991234567' })).status,
+      400
+    );
+    const idaCadastro = await visitante('/auth/google/cadastro', 'POST', {
+      codigo: 'convite-teste',
+      documento: '11.222.333/0001-81',
+      telefone: '(14) 3433-4444'
+    });
+    assert.equal(idaCadastro.status, 200);
+    const destinoCadastro = new URL(idaCadastro.dados.url);
+    cargaGoogle = {
+      iss: 'https://accounts.google.com',
+      aud: 'cliente-teste',
+      exp: Math.floor(Date.now() / 1000) + 300,
+      nonce: destinoCadastro.searchParams.get('nonce'),
+      email: 'Nova.Pessoa@gmail.com',
+      email_verified: true,
+      name: 'Nova Pessoa'
+    };
+    const volta = await pegar(
+      '/api/auth/google/retorno?code=codigo-teste&state=' + encodeURIComponent(destinoCadastro.searchParams.get('state')),
+      visitante.cookie()
+    );
+    assert.equal(volta.r.headers.get('location'), '/resumo');
+    const criado = (await admin('/configuracoes')).dados.usuarios.find((u) => u.email === 'nova.pessoa@gmail.com');
+    assert.ok(criado, 'usuário criado pelo Google');
+    assert.equal(criado.login, 'nova.pessoa');
+    assert.equal(criado.perfil, 'operador');
+    assert.equal(criado.nome, 'Nova Pessoa');
+    const extras = db.prepare('SELECT documento, telefone FROM usuario WHERE id = ?').get(criado.id);
+    assert.deepEqual({ ...extras }, { documento: '11222333000181', telefone: '1434334444' });
+    // A mesma conta Google depois entra pelo login normal com Google.
+    assert.equal((await tentar({ email: 'nova.pessoa@gmail.com' })).local, '/resumo');
+    delete process.env.CADASTRO_CODIGO;
+  } finally {
+    globalThis.fetch = fetchOriginal;
+    if (envAntes.id === undefined) delete process.env.GOOGLE_CLIENT_ID;
+    else process.env.GOOGLE_CLIENT_ID = envAntes.id;
+    if (envAntes.segredo === undefined) delete process.env.GOOGLE_CLIENT_SECRET;
+    else process.env.GOOGLE_CLIENT_SECRET = envAntes.segredo;
     await new Promise((ok) => servidor.close(ok));
   }
 });

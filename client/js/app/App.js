@@ -1,11 +1,11 @@
-// Casca do sistema: menu lateral e topo ficam fixos e só o miolo da tela troca, sem recarregar a página.
+// Casca do sistema (app.html): o menu da esquerda e o topo ficam parados e só o meio da tela troca.
+// Assim, clicar no menu não recarrega a página inteira.
 //
-// Antes cada tela era um HTML inteiro. Clicar no menu baixava tudo de novo (CSS, scripts, sessão),
-// a tela piscava em branco e o estado do menu se perdia. Agora:
-//   - cada tela é um fragmento em client/telas/<rota>.html (cabeçalho, ações do topo, conteúdo e modais);
-//   - o JS da tela é um módulo que exporta a classe da tela, criada de novo a cada visita;
-//   - a URL continua limpa (/frota, /resumo) pela History API. O hash fica livre para a própria tela
-//     usar (Configurações abre abas por #auditoria, #usuarios etc.).
+// Como funciona:
+//   - cada tela tem um arquivo em client/telas/<tela>.html com 4 partes (cabeçalho, botões do topo,
+//     conteúdo e janelas/modais), e esta classe encaixa cada parte no lugar;
+//   - o JS de cada tela é um módulo que exporta a classe da tela; a cada visita criamos um objeto novo;
+//   - o endereço continua /frota, /resumo etc. (quem cuida disso é o Roteador).
 import { Roteador } from './Roteador.js';
 import { PaletaDeComandos } from './PaletaDeComandos.js';
 
@@ -28,7 +28,7 @@ const TELAS = {
     descricao: 'Entradas, saídas, retiradas e devoluções'
   },
   relatorios: { modulos: ['relatorios'], titulo: 'Relatórios', descricao: 'Indicadores por período' },
-  // A ordem importa: a auditoria escuta o evento de troca de aba que Configurações dispara ao abrir.
+  // A auditoria vem primeiro porque ela precisa estar ouvindo antes de Configurações abrir a aba.
   configuracoes: {
     modulos: ['auditoria', 'configuracoes'],
     titulo: 'Configurações',
@@ -36,8 +36,8 @@ const TELAS = {
   }
 };
 
-// Ações rápidas da paleta: abrem a tela e clicam no botão que já existe nela,
-// para a regra de cada formulário continuar morando num lugar só.
+// Ações rápidas da paleta (Ctrl+K): abrem a tela e clicam no botão que já existe nela.
+// Assim não precisamos repetir aqui a lógica de cada formulário.
 const ACOES = [
   { id: 'acao:novo-colaborador', titulo: 'Novo colaborador', tela: 'colaboradores', botao: '#botao-novo-colaborador' },
   { id: 'acao:novo-veiculo', titulo: 'Novo veículo', tela: 'frota', botao: '#botao-novo-veiculo' },
@@ -71,7 +71,7 @@ class App {
     this.roteador.iniciar();
   }
 
-  // Abre a tela (se ainda não estiver nela) e só então roda a ação, com os elementos já no DOM.
+  // Vai para a tela (se ainda não estiver nela) e só depois roda a ação, quando os botões já existem.
   async naTela(rota, acao) {
     await this.roteador.ir(rota);
     if (this.telaAtual === rota) acao();
@@ -121,7 +121,7 @@ class App {
       return telas.concat(acoes, sistema);
     };
 
-    // Cadastros só aparecem quando a pessoa digita: sem termo, a paleta mostra telas e ações.
+    // Pessoas, veículos e alojamentos só aparecem quando a pessoa digita alguma coisa.
     const extras = async () => {
       const [pessoas, frota, alojamentos] = await Promise.all([
         chamarApi('/api/pessoas'),
@@ -178,7 +178,7 @@ class App {
     if (gatilho) gatilho.addEventListener('click', () => this.paleta.abrir());
   }
 
-  // Uma tela pode ter mais de um módulo pedindo a sessão; todos dividem a mesma resposta.
+  // Configurações tem dois módulos que perguntam quem está logado; os dois usam a mesma resposta.
   criarSessao() {
     let pedido = null;
     return () => {
@@ -196,7 +196,7 @@ class App {
     });
   }
 
-  // Passar o mouse (ou o foco do teclado) num item do menu já baixa a tela; o clique chega com tudo pronto.
+  // Quando o mouse passa por cima de um item do menu, a tela já começa a ser baixada.
   configurarPreCarga() {
     const preCarregar = (evento) => {
       const link = evento.target.closest && evento.target.closest('a[data-rota]');
@@ -216,7 +216,7 @@ class App {
           return modelo.content;
         }
       );
-      // Se falhar, tira do cache para a próxima tentativa buscar de novo.
+      // Se der erro, apaga da memória para tentar baixar de novo na próxima vez.
       pedido.catch(() => this.fragmentos.delete(rota));
       this.fragmentos.set(rota, pedido);
     }
@@ -247,7 +247,7 @@ class App {
     });
   }
 
-  // origem: 'inicio' (primeira carga), 'link' (clique) ou 'historico' (voltar/avançar do navegador).
+  // origem: 'inicio' (abriu o site), 'link' (clicou no menu) ou 'historico' (voltar/avançar do navegador).
   async abrir(rota, origem) {
     if (rota === this.telaAtual && origem !== 'inicio') return true;
     if (this.telaAtual && !(await this.podeSair())) return false;
@@ -263,7 +263,7 @@ class App {
       if (numero === this.pedido) this.mostrarFalha(rota);
       return true;
     }
-    // Clicou em outra tela enquanto esta baixava: só a última vale.
+    // Se a pessoa clicou em outra tela enquanto esta baixava, fica valendo só o último clique.
     if (numero !== this.pedido) return true;
 
     const trocar = () => this.montar(rota, carregada);
@@ -280,7 +280,7 @@ class App {
 
     if (origem !== 'inicio') {
       window.scrollTo(0, 0);
-      // Leitor de tela e teclado começam pela tela nova, e não pelo item do menu clicado.
+      // Coloca o foco no conteúdo novo (ajuda quem usa teclado ou leitor de tela).
       this.principal.focus({ preventScroll: true });
     }
     return true;
@@ -308,7 +308,7 @@ class App {
     this.esquerda.replaceChildren(cabecalho.content.cloneNode(true));
 
     this.direita.className = ('topo-direita ' + (acoes.dataset.classe || '')).trim();
-    // As ações da tela entram antes da busca (Ctrl+K), do sino e do perfil, que pertencem à casca.
+    // Os botões da tela entram antes da busca (Ctrl+K), do sino e do perfil, que são fixos.
     const ancora = this.direita.querySelector('#botao-paleta, .sino-caixa, .topo-perfil');
     const novasAcoes = acoes.content.cloneNode(true);
     this.acoesAtuais = Array.from(novasAcoes.childNodes);

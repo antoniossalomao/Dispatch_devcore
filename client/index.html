@@ -1,564 +1,190 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0a0a09" />
-    <meta
-      name="description"
-      content="DevCore. Tecnologia com propósito, do primeiro conceito ao produto. Conheça o Dispatch, nossa solução de gestão de pessoas, alojamentos e frota."
-    />
-    <title>DevCore — Ideias no centro. Tecnologia em movimento.</title>
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="assets/apresentacao/devcore-simbolo.svg"
-    />
-    <link rel="stylesheet" href="css/apresentacao.css" />
-    <script src="js/apresentacao.js" defer></script>
-  </head>
-  <body>
-    <a class="pular" href="#conteudo">Pular para o conteúdo</a>
-    <header class="cabecalho">
-      <a class="marca" href="#inicio" aria-label="DevCore, início"
-        ><img
-          src="assets/apresentacao/devcore-simbolo.svg"
-          width="36"
-          height="36"
-          alt=""
-        /><span>DEVCORE</span></a
-      >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0a09">
+  <meta name="description" content="DevCore. Tecnologia com propósito, do primeiro conceito ao produto. Conheça o Dispatch, nossa solução de gestão de pessoas, alojamentos e frota.">
+  <title>DevCore — Ideias no centro. Tecnologia em movimento.</title>
+  <link rel="icon" type="image/svg+xml" href="assets/apresentacao/devcore-simbolo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=Jost:wght@300;400;500&family=Josefin+Sans:wght@300;400&display=swap">
+  <link rel="stylesheet" href="css/apresentacao.css">
+  <script src="js/vendor/lenis.min.js" defer></script>
+  <script src="js/apresentacao.js" defer></script>
+</head>
+<body>
+  <a class="pular" href="#conteudo">Pular para o conteúdo</a>
+  <div id="progresso" aria-hidden="true"></div>
+
+  <header id="cabecalho">
+    <div class="wrap">
+      <a class="marca" href="#topo" aria-label="DevCore, início">
+        <img src="assets/apresentacao/devcore-simbolo.svg" width="36" height="36" alt="">
+        <span class="marca-nome">DevCore</span>
+      </a>
       <nav aria-label="Navegação principal">
-        <a href="#sobre">Essência</a><a href="#sistema">Dispatch</a
-        ><a href="#planos">Planos</a><a href="#equipe">Equipe</a>
+        <a class="l" href="#essencia">Essência</a>
+        <a class="l" href="#dispatch">Dispatch</a>
+        <a class="l" href="#planos">Planos</a>
+        <a class="l" href="#equipe">Equipe</a>
+        <a class="l" href="#perguntas">Perguntas</a>
+        <a class="acesso" href="login">Acessar Dispatch</a>
+        <button id="menu" type="button" aria-expanded="false" aria-controls="gaveta">Menu</button>
       </nav>
-      <a class="acesso" href="login"
-        >Acessar Dispatch <svg class="icone"><use href="#seta" /></svg
-      ></a>
-    </header>
-    <svg class="icones" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <symbol id="seta" viewBox="0 0 24 24">
-        <path d="M5 19 19 5M5 5h14v14" />
-      </symbol>
-      <symbol id="check" viewBox="0 0 24 24">
-        <path d="m5 12 4 4L19 6" />
-      </symbol>
-      <symbol id="cruz" viewBox="0 0 24 24">
-        <path d="M12 4v16M4 12h16" />
-      </symbol>
-    </svg>
-    <main id="conteudo">
-      <section class="hero" id="inicio" aria-labelledby="titulo">
-        <div class="hero-atmosfera" aria-hidden="true"></div>
-        <div class="hero-trama" aria-hidden="true"></div>
-        <div class="hero-conteudo">
-          <div class="hero-luz" aria-hidden="true"></div>
-          <div class="hero-topo">
-            <span class="sobretitulo"
-              ><i></i> ESTÚDIO DE IDEIAS & TECNOLOGIA</span
-            ><span class="micro"
-              >INDEPENDÊNCIA PARA CRIAR. PROPÓSITO PARA CONSTRUIR.</span
-            >
-          </div>
-          <div class="hero-grade">
-            <div class="hero-texto">
-              <span class="etiqueta">BEM-VINDO AO NOSSO NÚCLEO</span>
-              <h1 id="titulo">
-                Boas ideias.<br />Novas <em>perspectivas.</em><br />Impacto
-                real.
-              </h1>
-              <p>
-                Conectamos pessoas, design e desenvolvimento para transformar
-                complexidade em experiências que fazem sentido.
-              </p>
-              <div class="hero-acoes">
-                <a class="botao botao-creme" href="#sistema"
-                  >Explore o Dispatch
-                  <svg class="icone"><use href="#seta" /></svg></a
-                ><a class="link-suave" href="#sobre"
-                  >Conheça o DevCore <span aria-hidden="true">↓</span></a
-                >
-              </div>
-            </div>
-            <div class="universo" aria-hidden="true">
-              <div class="anel-profundidade anel-um"></div>
-              <div class="anel-profundidade anel-dois"></div>
-              <span class="nucleo-legenda">DEVCORE / O PONTO DE PARTIDA</span>
-              <div class="orbita orbita-a"></div>
-              <div class="orbita orbita-b"></div>
-              <div class="orbita orbita-c"></div>
-              <span class="ponto-orbita ponto-a"></span
-              ><span class="ponto-orbita ponto-b"></span
-              ><img
-                class="logo-hero"
-                src="assets/apresentacao/devcore.svg"
-                width="500"
-                height="330"
-                alt=""
-              /><span class="coordenada coordenada-a"
-                >IDEIA / FORMA / CÓDIGO</span
-              ><span class="coordenada coordenada-b"
-                >UM NÚCLEO. INFINITAS POSSIBILIDADES.</span
-              >
-            </div>
-          </div>
-          <div class="hero-desfecho" aria-hidden="true">
-            <span class="sobretitulo">DO NÚCLEO À OPERAÇÃO</span>
-            <p>Uma ideia.<br /><em>Novas dimensões.</em></p>
-          </div>
-          <div class="hero-rodape">
-            <span>TECNOLOGIA COM RAÍZES HUMANAS.</span>
-            <p>
-              Desenvolvimento que aproxima.<br /><strong
-                >Soluções que levam adiante.</strong
-              >
-            </p>
-            <a href="#sobre" aria-label="Descobrir o DevCore">↓</a>
-          </div>
+    </div>
+    <div id="gaveta" hidden>
+      <a href="#essencia">Essência</a><a href="#dispatch">Dispatch</a><a href="#planos">Planos</a><a href="#equipe">Equipe</a><a href="#perguntas">Perguntas</a><a href="login">Acessar Dispatch</a>
+    </div>
+  </header>
+
+  <main id="conteudo">
+    <!-- Abertura: a marca se desenha, a frase sobe e a cena some ao rolar -->
+    <div class="hero" id="topo">
+      <div class="palco">
+        <div class="hero-fundo" id="hero-fundo" aria-hidden="true">
+          <img src="assets/apresentacao/devcore-simbolo.svg" width="255" height="255" alt="">
         </div>
-      </section>
-      <section class="sobre secao" id="sobre" aria-labelledby="titulo-sobre">
-        <div class="secao-cabeca">
-          <span class="sobretitulo">01 / NOSSA ESSÊNCIA</span
-          ><span class="micro">PENSAR. CONECTAR. CONSTRUIR.</span>
+        <div class="hero-grade" aria-hidden="true"></div>
+        <div class="t t1" id="t1">
+          <h1>
+            <span class="nm"><img src="assets/apresentacao/devcore.svg" width="500" height="330" alt="DevCore"></span>
+            <span class="sb">Estúdio de ideias e tecnologia</span>
+          </h1>
         </div>
-        <div class="sobre-grade">
-          <h2 id="titulo-sobre">
-            O melhor da tecnologia<br />começa com uma<br /><em
-              >boa pergunta.</em
-            >
-          </h2>
-          <div class="sobre-texto">
-            <p>Como tornar o dia a dia mais simples?</p>
-            <p>
-              É dessa inquietação que nasce o DevCore. Somos sete pessoas com
-              ideias diferentes e uma vontade em comum: desenvolver soluções
-              úteis, claras e bem construídas.
-            </p>
-            <p>
-              O nosso trabalho une cuidado com a experiência, visão de produto e
-              atenção a cada detalhe. O Dispatch é a primeira expressão dessa
-              forma de pensar.
-            </p>
-          </div>
-        </div>
-        <div class="pilares">
-          <article>
-            <span>01 — ESTRATÉGIA</span>
-            <h3>Entender antes de criar.</h3>
-            <p>O problema certo é o ponto de partida de uma boa solução.</p>
-          </article>
-          <article>
-            <span>02 — EXPERIÊNCIA</span>
-            <h3>Clareza em cada escolha.</h3>
-            <p>Interfaces que organizam o essencial e respeitam quem usa.</p>
-          </article>
-          <article>
-            <span>03 — DESENVOLVIMENTO</span>
-            <h3>Ideias que ganham forma.</h3>
-            <p>Código e colaboração para transformar intenção em produto.</p>
-          </article>
-        </div>
-      </section>
-      <section
-        class="sistema secao"
-        id="sistema"
-        aria-labelledby="titulo-sistema"
-      >
-        <div class="secao-cabeca">
-          <span class="sobretitulo">02 / PRODUTO EM DESTAQUE</span
-          ><span class="selo"><i></i> DESENVOLVIDO PELO DEVCORE</span>
-        </div>
-        <div class="sistema-intro">
-          <div>
-            <h2 id="titulo-sistema">Dispatch<span>.</span></h2>
-            <p class="chamada">
-              Sua operação.<br /><em>Finalmente conectada.</em>
-            </p>
-          </div>
-          <div class="sistema-descricao">
-            <p>
-              Pessoas, alojamentos e frota.<br />Uma visão completa para decidir
-              melhor.
-            </p>
-            <p>
-              Saiba quem está onde, quem está com cada veículo e o que precisa
-              de atenção. Do primeiro registro ao histórico de auditoria, tudo
-              encontra seu lugar.
-            </p>
-            <a class="link-texto" href="login"
-              >Abrir demonstração <svg class="icone"><use href="#seta" /></svg
-            ></a>
-          </div>
-        </div>
-        <div class="produto-cena">
-          <div class="produto-pin">
-            <div class="produto-luz" aria-hidden="true"></div>
-            <div class="produto-palavra" aria-hidden="true">Dispatch.</div>
-            <div class="vitrine">
-              <div class="vitrine-barra">
-                <span class="janela-pontos" aria-hidden="true">● ● ●</span
-                ><span>DISPATCH / VISÃO DO PRODUTO</span
-                ><span class="vitrine-status"><i></i> INTERFACE REAL</span>
-              </div>
-              <div class="abas" role="tablist" aria-label="Telas do Dispatch">
-                <button
-                  id="aba-resumo"
-                  type="button"
-                  role="tab"
-                  aria-selected="true"
-                  aria-controls="painel-tela"
-                  data-tela="resumo"
-                >
-                  Visão geral <span>01</span></button
-                ><button
-                  id="aba-colaboradores"
-                  type="button"
-                  role="tab"
-                  aria-selected="false"
-                  aria-controls="painel-tela"
-                  tabindex="-1"
-                  data-tela="colaboradores"
-                >
-                  Colaboradores <span>02</span></button
-                ><button
-                  id="aba-configuracoes"
-                  type="button"
-                  role="tab"
-                  aria-selected="false"
-                  aria-controls="painel-tela"
-                  tabindex="-1"
-                  data-tela="configuracoes"
-                >
-                  Configurações <span>03</span>
-                </button>
-              </div>
-              <figure
-                id="painel-tela"
-                role="tabpanel"
-                aria-labelledby="aba-resumo"
-                tabindex="0"
-              >
-                <img
-                  id="tela-dispatch"
-                  src="assets/apresentacao/resumo.png"
-                  width="1440"
-                  height="1000"
-                  alt="Resumo operacional do Dispatch com indicadores e movimentações"
-                  loading="lazy"
-                />
-                <figcaption id="legenda-tela">
-                  Clareza para acompanhar a operação. Tela demonstrativa com
-                  dados fictícios.
-                </figcaption>
-              </figure>
-            </div>
-            <div class="produto-cartao produto-cartao-a" aria-hidden="true">
-              <span>01 / PESSOAS</span
-              ><strong>Cada pessoa.<br />Seu lugar.</strong><i></i>
-            </div>
-            <div class="produto-cartao produto-cartao-b" aria-hidden="true">
-              <span>02 / OPERAÇÃO</span><strong>Tudo se conecta.</strong>
-              <div class="mini-barras"><i></i><i></i><i></i><i></i><i></i></div>
-            </div>
-            <div class="produto-trilha" aria-hidden="true">
-              <span>UMA VISÃO MAIS AMPLA</span><i></i
-              ><span class="produto-contador">01 — 03</span>
-            </div>
-          </div>
-        </div>
-        <div class="recursos">
-          <article>
-            <span class="numero">01 /</span>
-            <h3>Pessoas</h3>
-            <p>
-              Cadastros, CNH e movimentações. Informações conectadas a cada
-              colaborador.
-            </p>
-          </article>
-          <article>
-            <span class="numero">02 /</span>
-            <h3>Alojamentos</h3>
-            <p>
-              Quartos, leitos e estadias. Capacidade acompanhada com as regras
-              da NR-24.
-            </p>
-          </article>
-          <article>
-            <span class="numero">03 /</span>
-            <h3>Frota</h3>
-            <p>
-              Saídas, retornos e quilometragem. Cada veículo com seu histórico
-              completo.
-            </p>
-          </article>
-          <article>
-            <span class="numero">04 /</span>
-            <h3>Rastreabilidade</h3>
-            <p>
-              Relatórios e auditoria com hashes encadeados para conferir cada
-              alteração.
-            </p>
-          </article>
-        </div>
-        <p class="nota-projeto">
-          PROJETO ACADÊMICO · Desafio proposto pela Eficaz Marketing.
-          Demonstração em uma construtora fictícia.
-        </p>
-      </section>
-      <section class="manifesto" aria-label="Nossa visão">
-        <div class="manifesto-fundo" aria-hidden="true">
-          <img
-            src="assets/apresentacao/devcore-simbolo.svg"
-            width="550"
-            height="550"
-            alt=""
-          />
-        </div>
-        <span class="sobretitulo">MENOS RUÍDO. MAIS DIREÇÃO.</span>
-        <p>
-          O essencial não é ter mais ferramentas.<br />É ter
-          <em>as conexões certas.</em>
-        </p>
-        <span class="micro">ESSA É A NOSSA FORMA DE CONSTRUIR.</span>
-      </section>
-      <section class="planos secao" id="planos" aria-labelledby="titulo-planos">
-        <div class="secao-cabeca">
-          <span class="sobretitulo">03 / POSSIBILIDADES PARA SUA OPERAÇÃO</span
-          ><span class="micro">UMA BASE SÓLIDA. ESPAÇO PARA EVOLUIR.</span>
-        </div>
-        <div class="planos-intro">
-          <h2 id="titulo-planos">
-            O tamanho muda.<br /><em>O cuidado permanece.</em>
-          </h2>
-          <p>
-            Do essencial a uma operação mais ampla, conheça as propostas de
-            escopo do Dispatch.
-          </p>
-        </div>
-        <div class="planos-grade">
-          <article class="plano">
-            <span class="plano-indice">01 / O PRIMEIRO PASSO</span>
-            <h3>Essencial</h3>
-            <p class="plano-descricao">
-              Organização para concentrar o que importa no dia a dia.
-            </p>
-            <div class="plano-valor">
-              Sob consulta<span>Escopo e condições a definir</span>
-            </div>
-            <button
-              class="botao botao-contorno"
-              type="button"
-              data-plano="essencial"
-            >
-              Conhecer o plano <svg class="icone"><use href="#seta" /></svg>
-            </button>
-            <ul>
-              <li>Cadastro de colaboradores</li>
-              <li>Gestão de alojamentos e leitos</li>
-              <li>Controle de frota e movimentações</li>
-              <li>Resumo operacional</li>
-            </ul>
-          </article>
-          <article class="plano plano-destaque">
-            <span class="plano-tag">UMA VISÃO MAIS AMPLA</span
-            ><span class="plano-indice">02 / MAIS PROFUNDIDADE</span>
-            <h3>Profissional</h3>
-            <p class="plano-descricao">
-              Mais contexto para acompanhar, analisar e decidir.
-            </p>
-            <div class="plano-valor">
-              Sob consulta<span>Escopo e condições a definir</span>
-            </div>
-            <button
-              class="botao botao-creme"
-              type="button"
-              data-plano="profissional"
-            >
-              Conhecer o plano <svg class="icone"><use href="#seta" /></svg>
-            </button>
-            <ul>
-              <li>Escopo do Essencial</li>
-              <li>Relatórios de ocupação e frota</li>
-              <li>Histórico e auditoria de alterações</li>
-              <li>Central de notificações</li>
-            </ul>
-          </article>
-          <article class="plano">
-            <span class="plano-indice">03 / SEU CONTEXTO NO CENTRO</span>
-            <h3>Sob medida</h3>
-            <p class="plano-descricao">
-              Um ponto de partida para necessidades específicas.
-            </p>
-            <div class="plano-valor">
-              Vamos conversar<span>Viabilidade avaliada em conjunto</span>
-            </div>
-            <button
-              class="botao botao-contorno"
-              type="button"
-              data-plano="sob-medida"
-            >
-              Explorar possibilidades
-              <svg class="icone"><use href="#seta" /></svg>
-            </button>
-            <ul>
-              <li>Levantamento de necessidades</li>
-              <li>Definição conjunta do escopo</li>
-              <li>Análise de integrações</li>
-              <li>Planejamento de implantação</li>
-            </ul>
-          </article>
-        </div>
-        <p class="nota-planos">
-          Planos conceituais de apresentação. Valores, disponibilidade,
-          integrações e condições comerciais ainda não definidos. A demonstração
-          reúne os recursos do projeto acadêmico.
-        </p>
-      </section>
-      <section class="equipe secao" id="equipe" aria-labelledby="titulo-equipe">
-        <div class="secao-cabeca">
-          <span class="sobretitulo">04 / QUEM ESTÁ NO NÚCLEO</span
-          ><span class="micro">SETE PESSOAS. UMA CONSTRUÇÃO COLETIVA.</span>
-        </div>
-        <div class="equipe-intro">
-          <h2 id="titulo-equipe">
-            O código conecta.<br /><em>As pessoas constroem.</em>
-          </h2>
-          <p>
-            Diferentes olhares, aprendizados compartilhados e a vontade de fazer
-            acontecer. Conheça quem transforma o DevCore em movimento.
-          </p>
-        </div>
-        <ul class="integrantes">
-          <li><span>Bruno</span><small>01</small></li>
-          <li><span>Antonio</span><small>02</small></li>
-          <li><span>João</span><small>03</small></li>
-          <li><span>Henrique</span><small>04</small></li>
-          <li><span>Kelvin</span><small>05</small></li>
-          <li><span>Matheus</span><small>06</small></li>
-          <li><span>Vinicius</span><small>07</small></li>
-          <li class="equipe-assinatura">
-            <img
-              src="assets/apresentacao/devcore-simbolo.svg"
-              width="42"
-              height="42"
-              alt=""
-            /><span>Juntos, DevCore.</span>
-          </li>
-        </ul>
-      </section>
-      <section class="faq secao" aria-labelledby="titulo-faq">
-        <span class="sobretitulo">ANTES DO PRÓXIMO PASSO</span>
-        <div class="faq-grade">
-          <h2 id="titulo-faq">Vamos deixar<br /><em>tudo mais claro.</em></h2>
-          <div>
-            <details>
-              <summary>
-                O que é o Dispatch?<svg class="icone"><use href="#cruz" /></svg>
-              </summary>
-              <p>
-                É o sistema desenvolvido pelo DevCore para conectar
-                colaboradores, alojamentos e frota. O projeto acadêmico usa uma
-                construtora fictícia como cenário de demonstração.
-              </p>
-            </details>
-            <details>
-              <summary>
-                Posso conhecer o sistema?<svg class="icone">
-                  <use href="#cruz" />
-                </svg>
-              </summary>
-              <p>
-                Sim. O botão “Acessar Dispatch” abre a tela de login da
-                aplicação. O acesso depende de uma conta cadastrada no ambiente.
-              </p>
-            </details>
-            <details>
-              <summary>
-                Os planos já estão à venda?<svg class="icone">
-                  <use href="#cruz" />
-                </svg>
-              </summary>
-              <p>
-                Ainda não. Os planos apresentam possibilidades de escopo.
-                Preços, disponibilidade e condições comerciais serão definidos
-                antes de uma oferta comercial.
-              </p>
-            </details>
-            <details>
-              <summary>
-                O Dispatch tem recursos de IA?<svg class="icone">
-                  <use href="#cruz" />
-                </svg>
-              </summary>
-              <p>
-                O projeto prevê perguntas sobre os dados, resumos e suporte por
-                IA via Groq. A utilização depende de configuração e credenciais.
-                Alertas pelo Telegram também são opcionais.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-      <section class="convite">
-        <div class="convite-marca" aria-hidden="true">
-          <img
-            src="assets/apresentacao/devcore-simbolo.svg"
-            width="280"
-            height="280"
-            alt=""
-          />
-        </div>
-        <span class="sobretitulo">SEU PRÓXIMO MOVIMENTO COMEÇA AQUI.</span>
-        <h2>Veja as conexões<br /><em>acontecerem.</em></h2>
-        <a class="botao botao-creme" href="login"
-          >Conheça o Dispatch <svg class="icone"><use href="#seta" /></svg
-        ></a>
-      </section>
-    </main>
-    <footer>
-      <div class="footer-principal">
-        <a class="marca" href="#inicio"
-          ><img
-            src="assets/apresentacao/devcore-simbolo.svg"
-            width="36"
-            height="36"
-            alt=""
-          /><span>DEVCORE</span></a
-        >
-        <p>Ideias no centro.<br />Tecnologia em movimento.</p>
-        <a href="#inicio">Voltar ao topo ↑</a>
+        <div class="t t2" id="t2"><div class="in"><p>Boas ideias. Novas perspectivas. Impacto real.</p></div></div>
+        <a class="t t3" id="t3" href="#essencia"><span>Conheça o DevCore</span><i></i></a>
+        <div class="coord">Ideia · Forma · Código</div>
       </div>
-      <div class="footer-final">
-        <span>DEVCORE / PORTFÓLIO</span
-        ><span>CONSTRUÍDO EM EQUIPE. PENSADO PARA PESSOAS.</span
-        ><a href="assets/apresentacao/devcore.svg" download="devcore-logo.svg"
-          >Baixar logo em SVG <svg class="icone"><use href="#seta" /></svg
-        ></a>
+    </div>
+
+    <!-- Manifesto -->
+    <section class="manifesto" id="essencia" aria-labelledby="titulo-manifesto">
+      <div class="f fa" data-velocidade="0.12"><img src="assets/apresentacao/tela-resumo.jpg" alt="" loading="lazy" decoding="async"></div>
+      <div class="f fb" data-velocidade="-0.1"><img src="assets/apresentacao/tela-colaboradores.jpg" alt="" loading="lazy" decoding="async"></div>
+      <div class="wrap txt">
+        <h2 id="titulo-manifesto">O melhor da tecnologia começa com uma boa pergunta</h2>
+        <p>Como tornar o dia a dia mais simples? É dessa inquietação que nasce o DevCore: sete pessoas com ideias diferentes e uma vontade em comum, desenvolver soluções úteis, claras e bem construídas.</p>
       </div>
-    </footer>
-    <dialog
-      id="dialogo-plano"
-      aria-labelledby="dialogo-titulo"
-      aria-describedby="dialogo-descricao"
-    >
-      <button
-        class="dialogo-fechar"
-        type="button"
-        aria-label="Fechar detalhes do plano"
-      >
-        ×</button
-      ><span class="sobretitulo">DISPATCH / PROPOSTA DE ESCOPO</span>
-      <h2 id="dialogo-titulo">Essencial</h2>
-      <p id="dialogo-descricao"></p>
-      <ul id="dialogo-recursos"></ul>
-      <p class="dialogo-nota">
-        Proposta conceitual. Ainda não há contratação, cobrança ou
-        disponibilidade comercial definida.
-      </p>
-      <a class="botao botao-creme" href="login"
-        >Abrir demonstração <svg class="icone"><use href="#seta" /></svg
-      ></a>
-    </dialog>
-  </body>
+    </section>
+
+    <!-- Números -->
+    <div class="numeros"><div class="wrap">
+      <div class="num"><b>7</b><span>pessoas no núcleo do DevCore</span></div>
+      <div class="num"><b>4</b><span>frentes conectadas no Dispatch</span></div>
+      <div class="num"><b>3</b><span>propostas de escopo para começar</span></div>
+    </div></div>
+
+    <!-- Dispatch: telas em formato editorial -->
+    <section class="projetos" id="dispatch" aria-labelledby="titulo-dispatch">
+      <div class="wrap">
+        <div class="cabeca"><h2 id="titulo-dispatch">Dispatch, sua operação finalmente conectada</h2><p class="lede">Pessoas, alojamentos e frota numa visão só. Saiba quem está onde, quem está com cada veículo e o que precisa de atenção.</p></div>
+        <div id="lista-telas"></div>
+        <p class="nota">Projeto acadêmico · Desafio proposto pela Eficaz Marketing. Telas demonstrativas com dados fictícios de uma construtora.</p>
+      </div>
+    </section>
+
+    <!-- Faixa de frase -->
+    <div class="faixa">
+      <div class="fundo" data-velocidade="0.3"><img src="assets/apresentacao/tela-frota.jpg" alt="" loading="lazy" decoding="async"></div>
+      <div class="wrap"><q>O essencial não é ter mais ferramentas. É ter as conexões certas</q><span class="label">Essa é a nossa forma de construir</span></div>
+    </div>
+
+    <!-- Essência -->
+    <section aria-labelledby="titulo-nucleo">
+      <div class="wrap sobre">
+        <div class="sobre-arte"><img src="assets/apresentacao/tela-relatorios.jpg" alt="Relatórios do Dispatch com a ocupação de cada alojamento" loading="lazy" decoding="async"></div>
+        <div>
+          <h2 id="titulo-nucleo">Pensar, conectar, construir</h2>
+          <p>O nosso trabalho une cuidado com a experiência, visão de produto e atenção a cada detalhe. O Dispatch é a primeira expressão dessa forma de pensar.</p>
+          <p>Diferentes olhares, aprendizados compartilhados e a vontade de fazer acontecer.</p>
+          <div class="pilares">
+            <div><b>Estratégia</b><span>Entender antes de criar. O problema certo é o ponto de partida.</span></div>
+            <div><b>Experiência</b><span>Interfaces que organizam o essencial e respeitam quem usa.</span></div>
+            <div><b>Código</b><span>Colaboração para transformar intenção em produto.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- O que o Dispatch cobre -->
+    <section class="projetos" aria-labelledby="titulo-frentes">
+      <div class="wrap">
+        <div class="processo-cabeca"><h2 id="titulo-frentes">Do primeiro registro ao histórico de auditoria</h2><p class="lede">Cada parte da operação encontra seu lugar, com as regras de quem trabalha em obra.</p></div>
+        <div class="processo">
+          <div><h3>Pessoas</h3><p>Cadastros, CNH e movimentações. Informações conectadas a cada colaborador.</p></div>
+          <div><h3>Alojamentos</h3><p>Quartos, leitos e estadias. Capacidade acompanhada com as regras da NR-24.</p></div>
+          <div><h3>Frota</h3><p>Saídas, retornos e quilometragem. Cada veículo com seu histórico completo.</p></div>
+          <div><h3>Rastreio</h3><p>Relatórios e auditoria com hashes encadeados para conferir cada alteração.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Planos em formato de índice -->
+    <section class="indice" id="planos" aria-labelledby="titulo-planos">
+      <div class="wrap">
+        <div class="cabeca"><h2 id="titulo-planos">O tamanho muda, o cuidado permanece</h2><p class="lede">Do essencial a uma operação mais ampla, conheça as propostas de escopo do Dispatch.</p></div>
+        <div class="ix-h" aria-hidden="true"><span>Plano</span><span>Para quem</span><span>Valor</span><span>Situação</span></div>
+        <div class="ix" tabindex="0" role="button" data-plano="essencial"><div class="nm"><h3>Essencial</h3><p>Organização para concentrar o que importa no dia a dia.</p></div><span class="onde">O primeiro passo</span><span class="vl">Sob consulta</span><span class="stc"><span class="st">Conceitual</span></span></div>
+        <div class="ix" tabindex="0" role="button" data-plano="profissional"><div class="nm"><h3>Profissional</h3><p>Mais contexto para acompanhar, analisar e decidir.</p></div><span class="onde">Mais profundidade</span><span class="vl">Sob consulta</span><span class="stc"><span class="st">Conceitual</span></span></div>
+        <div class="ix" tabindex="0" role="button" data-plano="sob-medida"><div class="nm"><h3>Sob medida</h3><p>Um ponto de partida para necessidades específicas.</p></div><span class="onde">Seu contexto no centro</span><span class="vl">Vamos conversar</span><span class="stc"><span class="st">Conceitual</span></span></div>
+        <p class="nota">Planos conceituais de apresentação. Valores, disponibilidade, integrações e condições comerciais ainda não definidos.</p>
+      </div>
+    </section>
+
+    <!-- Equipe -->
+    <section class="equipe" id="equipe" aria-labelledby="titulo-equipe">
+      <div class="wrap">
+        <div class="cabeca"><h2 id="titulo-equipe">O código conecta, as pessoas constroem</h2><p class="lede">Sete pessoas, uma construção coletiva. Conheça quem transforma o DevCore em movimento.</p></div>
+        <ol class="integrantes">
+          <li><span>Bruno</span></li><li><span>Antonio</span></li><li><span>João</span></li><li><span>Henrique</span></li>
+          <li><span>Kelvin</span></li><li><span>Matheus</span></li><li><span>Vinicius</span></li>
+          <li class="assinatura"><img src="assets/apresentacao/devcore-simbolo.svg" width="40" height="40" alt=""><span>Juntos, DevCore</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Perguntas -->
+    <section class="faq" id="perguntas" aria-labelledby="titulo-faq">
+      <div class="wrap">
+        <div class="cabeca"><h2 id="titulo-faq">Perguntas frequentes</h2><p class="lede">O essencial antes do próximo passo.</p></div>
+        <div class="qs">
+          <details><summary>O que é o Dispatch?</summary><p>É o sistema desenvolvido pelo DevCore para conectar colaboradores, alojamentos e frota. O projeto acadêmico usa uma construtora fictícia como cenário de demonstração.</p></details>
+          <details><summary>Posso conhecer o sistema?</summary><p>Sim. O botão “Acessar Dispatch” abre a tela de login da aplicação. O acesso depende de uma conta cadastrada no ambiente.</p></details>
+          <details><summary>Os planos já estão à venda?</summary><p>Ainda não. Os planos apresentam possibilidades de escopo. Preços, disponibilidade e condições comerciais serão definidos antes de uma oferta comercial.</p></details>
+          <details><summary>O Dispatch tem recursos de IA?</summary><p>O projeto prevê perguntas sobre os dados, resumos e suporte por IA via Groq. A utilização depende de configuração e credenciais. Alertas pelo Telegram também são opcionais.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Convite -->
+    <section class="contato" aria-labelledby="titulo-contato">
+      <div class="wrap dentro">
+        <h2 id="titulo-contato">Veja as conexões acontecerem</h2>
+        <p>Seu próximo movimento começa aqui. Abra a demonstração e percorra a operação de uma construtora do primeiro registro ao relatório.</p>
+        <div class="ctas">
+          <a class="btn solido" href="login">Conheça o Dispatch <svg viewBox="0 0 18 10" aria-hidden="true"><path d="M0 5h17M12 1l5 4-5 4"/></svg></a>
+          <a class="btn" href="assets/apresentacao/devcore.svg" download="devcore-logo.svg">Baixar logo em SVG</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="wrap"><span>© <span id="ano">2026</span> DevCore · Ideias no centro, tecnologia em movimento</span><a href="#topo">Voltar ao topo</a></div></footer>
+
+  <dialog id="janela" aria-labelledby="janela-nome">
+    <button class="x" id="janela-fechar" type="button" aria-label="Fechar">×</button>
+    <div class="jn">
+      <div class="pic" id="janela-pic"></div>
+      <div class="txt">
+        <div><span class="label" id="janela-cat"></span><h3 id="janela-nome"></h3></div>
+        <div><div class="ficha" id="janela-ficha"></div><p id="janela-desc"></p><a class="link" href="login" id="janela-cta">Abrir demonstração</a></div>
+      </div>
+      <div class="jnav"><button type="button" id="janela-ant">Anterior</button><span id="janela-pos"></span><button type="button" id="janela-prox">Próximo</button></div>
+    </div>
+  </dialog>
+
+  <div id="cursor" aria-hidden="true"></div>
+</body>
 </html>

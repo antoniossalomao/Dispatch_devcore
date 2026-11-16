@@ -307,7 +307,8 @@
 
 .perfil-admin {
   background-color: var(--claro-texto);
-  color: #fff;
+  /* cor do fundo da tela: escura no tema escuro, clara no claro; o texto nunca some no selo */
+  color: var(--claro-fundo);
 }
 
 .perfil-operador {

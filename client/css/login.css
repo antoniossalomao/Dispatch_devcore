@@ -1,7 +1,6 @@
-/* Login e cadastro: tela dividida de ponta a ponta.
-   Esquerda: a marca e o que o sistema faz, num painel grafite com uma leve variação de tom.
-   Direita: um cartão pequeno e calmo com o formulário. Mesma paleta do painel (grafite e off-white).
-   Usado por login.html e cadastro.html (que soma cadastro.css). */
+/* Telas de login e cadastro, com a tela dividida em duas metades:
+   à esquerda a marca e o que o sistema faz; à direita um cartão com o formulário.
+   O cadastro usa este arquivo e mais o cadastro.css. */
 
 body:has(.login-pagina) {
   background: #0d0d0c;
@@ -277,6 +276,96 @@ body:has(.login-pagina) {
 .login-mostrar input:focus-visible {
   outline: 2px solid var(--destaque);
   outline-offset: 2px;
+}
+
+/* campos lado a lado (CPF/CNPJ e telefone, senha e confirmação) */
+.campo-duplo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.campo-duplo .campo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.login-dica {
+  margin: 0;
+  color: var(--texto-mudo);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .campo-duplo {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+/* login com Google */
+.login-google {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.login-ou {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--texto-mudo);
+  font-size: 12px;
+}
+
+.login-ou::before,
+.login-ou::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--borda);
+}
+
+.login-botao-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 40px;
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  background: var(--campo);
+  color: var(--texto);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: border-color 0.16s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+button.login-botao-google {
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button.login-botao-google:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.login-botao-google:hover {
+  border-color: rgba(237, 236, 230, 0.3);
+  background: #1b1b19;
+}
+
+.login-botao-google:focus-visible {
+  outline: 2px solid var(--destaque);
+  outline-offset: 3px;
 }
 
 /* celular: o painel da marca vira uma faixa curta em cima */

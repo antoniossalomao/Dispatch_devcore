@@ -1,25 +1,49 @@
-// Página de apresentação (DevCore / Dispatch): troca das abas de prévia, animações de rolagem e modal de planos.
-// Usa apenas capturas de tela estáticas locais, sem precisar de login ou chamada de API.
+// Página de apresentação do DevCore (a primeira página do site).
+// Cuida da rolagem suave, das animações que aparecem conforme a pessoa desce a página,
+// da lista de telas do Dispatch, da janela de detalhes e do menu no celular.
+// Se a pessoa marcou "reduzir movimento" no computador, as animações ficam desligadas.
 class TelaApresentacao {
   constructor() {
-    this.telas = {
-      resumo: {
-        alt: 'Resumo operacional do Dispatch com indicadores e movimentações',
-        legenda: 'Clareza para acompanhar a operação. Tela demonstrativa com dados fictícios.'
-      },
-      colaboradores: {
-        alt: 'Colaboradores no Dispatch, com filtros, situação da CNH e histórico',
-        legenda: 'Pessoas e informações conectadas. Tela demonstrativa com dados fictícios.'
-      },
-      configuracoes: {
-        alt: 'Configurações e preferências do Dispatch',
-        legenda: 'Uma base organizada para sua operação. Tela demonstrativa com dados fictícios.'
-      }
-    };
+    this.reduzirMovimento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.mouseFino = window.matchMedia('(pointer: fine)').matches && !this.reduzirMovimento;
 
+    // telas do Dispatch mostradas na seção "Dispatch"
+    this.telas = [
+      {
+        nome: 'Visão geral',
+        categoria: 'Resumo operacional',
+        imagem: 'assets/apresentacao/tela-resumo.jpg',
+        descricao:
+          'Veículos em uso, vagas livres e as últimas movimentações do dia, com a ocupação de cada alojamento ao lado.'
+      },
+      {
+        nome: 'Colaboradores',
+        categoria: 'Pessoas e habilitações',
+        imagem: 'assets/apresentacao/tela-colaboradores.jpg',
+        descricao:
+          'Equipe, CNH com prazo de vencimento e onde cada pessoa está alocada, com histórico de cada colaborador.'
+      },
+      {
+        nome: 'Frota',
+        categoria: 'Saídas, voltas e manutenções',
+        imagem: 'assets/apresentacao/tela-frota.jpg',
+        descricao:
+          'Quem está com cada veículo, quilometragem e documentos. Licenciamento vencido bloqueia a saída.'
+      },
+      {
+        nome: 'Relatórios',
+        categoria: 'Ocupação e uso da frota',
+        imagem: 'assets/apresentacao/tela-relatorios.jpg',
+        descricao:
+          'Ocupação média por alojamento, uso da frota, gargalos e quem estava dirigindo em cada período.'
+      }
+    ];
+
+    // planos mostrados na seção "Planos" (a chave é o data-plano de cada linha no HTML)
     this.planos = {
       essencial: {
         nome: 'Essencial',
+        categoria: 'O primeiro passo',
         descricao: 'Um ponto de partida para organizar os principais registros da operação.',
         recursos: [
           'Cadastro de colaboradores',
@@ -30,6 +54,7 @@ class TelaApresentacao {
       },
       profissional: {
         nome: 'Profissional',
+        categoria: 'Mais profundidade',
         descricao: 'Uma proposta para ampliar a análise e a rastreabilidade da operação.',
         recursos: [
           'Escopo do Essencial',
@@ -40,6 +65,7 @@ class TelaApresentacao {
       },
       'sob-medida': {
         nome: 'Sob medida',
+        categoria: 'Seu contexto no centro',
         descricao:
           'Um convite para mapear necessidades e avaliar possibilidades. Novos recursos e integrações dependem de análise de viabilidade.',
         recursos: [
@@ -51,298 +77,457 @@ class TelaApresentacao {
       }
     };
 
-    this.abas = Array.from(document.querySelectorAll('[role="tab"]'));
-    this.imagem = document.getElementById('tela-dispatch');
-    this.legendaTela = document.getElementById('legenda-tela');
-    this.painelTela = document.getElementById('painel-tela');
+    // elementos da página
+    this.hero = document.getElementById('topo');
+    this.textoHero = document.getElementById('t1');
+    this.setaHero = document.getElementById('t3');
+    this.fundoHero = document.getElementById('hero-fundo');
+    this.cabecalho = document.getElementById('cabecalho');
+    this.barraProgresso = document.getElementById('progresso');
+    this.janela = document.getElementById('janela');
+    this.janelaImagem = document.getElementById('janela-pic');
+    this.janelaFicha = document.getElementById('janela-ficha');
+    this.botaoAnterior = document.getElementById('janela-ant');
+    this.botaoProximo = document.getElementById('janela-prox');
+    this.textoPosicao = document.getElementById('janela-pos');
+    this.botaoMenu = document.getElementById('menu');
+    this.gaveta = document.getElementById('gaveta');
+    this.cursor = document.getElementById('cursor');
+    this.linksMenu = Array.from(document.querySelectorAll('nav a.l'));
+    this.secoesMenu = this.linksMenu.map((link) => document.querySelector(link.getAttribute('href')));
 
-    this.movimentoReduzido = window.matchMedia('(prefers-reduced-motion: reduce)');
-    this.ponteiroPreciso = window.matchMedia('(hover: hover) and (pointer: fine)');
-    this.hero = document.querySelector('.hero');
-    this.produto = document.querySelector('.produto-cena');
-    this.manifesto = document.querySelector('.manifesto');
-    this.convite = document.querySelector('.convite');
+    // controle da janela de detalhes: lista de "abrir" e qual item está aberto
+    this.listaJanela = [];
+    this.indiceJanela = 0;
+    this.indiceAnterior = 0;
 
-    this.estadoMovimento = {
-      hero: 0,
-      produto: 0,
-      manifesto: 0,
-      convite: 0,
-      x: 0,
-      y: 0
-    };
-    this.mouseAlvo = { x: 0, y: 0 };
-    this.frameMovimento = null;
+    // controle da rolagem
+    this.ultimoY = 0;
+    this.ultimoTopo = null;
+    this.pendentes = [];
+    this.lenis = null;
 
-    this.dialogo = document.getElementById('dialogo-plano');
+    // posição do cursor (a atual vai "correndo atrás" do mouse para o movimento ficar suave)
+    this.cursorX = -200;
+    this.cursorY = -200;
+    this.mouseX = -200;
+    this.mouseY = -200;
 
-    this.configurarAbas();
-    this.configurarCenasRolagem();
-    this.configurarDialogoPlanos();
-    this.configurarRevelar();
+    document.getElementById('ano').textContent = new Date().getFullYear();
+
+    this.montarTelas();
+    this.configurarPlanos();
+    this.configurarJanela();
+    this.configurarMenuCelular();
+    this.prepararAnimacoes();
+    this.configurarRolagemSuave();
+    this.configurarCursor();
+    this.iniciarLaco();
   }
 
-  // Faz os blocos das seções subirem suavemente quando entram na tela.
-  // Sem suporte ou com movimento reduzido, nada é escondido.
-  configurarRevelar() {
-    if (this.movimentoReduzido.matches || !('IntersectionObserver' in window)) return;
+  // Atalho para criar um elemento com classe e texto (o texto entra por textContent, então não vira HTML).
+  criar(tag, classe, texto) {
+    const elemento = document.createElement(tag);
+    if (classe) elemento.className = classe;
+    if (texto) elemento.textContent = texto;
+    return elemento;
+  }
 
-    const seletores = [
-      '.secao .secao-cabeca',
-      '.secao h2',
-      '.secao .chamada',
-      '.sobre-grade > div',
-      '.pilares > article',
-      '.sistema-intro > *',
-      '.plano',
-      '.equipe-intro',
-      '.integrantes > *',
-      '.faq-grade > *',
-      'footer'
-    ];
-    const alvos = Array.from(document.querySelectorAll(seletores.join(',')));
-    // Evita animar um bloco dentro de outro que já anima (ficaria com deslocamento dobrado).
-    const unicos = alvos.filter(
-      (el, i) =>
-        alvos.indexOf(el) === i &&
-        !el.closest('.hero') &&
-        !alvos.some((outro) => outro !== el && outro.contains(el))
-    );
+  /* ===== seção Dispatch: uma linha por tela ===== */
 
-    const observador = new IntersectionObserver(
-      (entradas) => {
-        entradas.forEach((entrada) => {
-          if (!entrada.isIntersecting) return;
-          const el = entrada.target;
-          observador.unobserve(el);
-          el.classList.add('visivel');
-          // Depois da entrada, devolve as transições originais do elemento (hover etc.).
-          const limpar = () => {
-            el.classList.remove('revelar', 'visivel');
-            el.style.removeProperty('--atraso');
-          };
-          setTimeout(limpar, 1400);
-        });
-      },
-      { rootMargin: '0px 0px -10% 0px', threshold: 0.12 }
-    );
+  montarTelas() {
+    const lista = document.getElementById('lista-telas');
+    const funcoesAbrir = [];
 
-    unicos.forEach((el) => {
-      const irmaos = el.parentElement ? Array.from(el.parentElement.children) : [];
-      const posicao = Math.max(0, irmaos.indexOf(el));
-      el.style.setProperty('--atraso', Math.min(posicao, 4) * 0.08 + 's');
-      el.classList.add('revelar');
-      observador.observe(el);
+    this.telas.forEach((tela, posicao) => {
+      const artigo = this.criar('article', 'proj');
+
+      const moldura = this.criar('button', 'frame');
+      moldura.type = 'button';
+      moldura.setAttribute('aria-label', 'Ver ' + tela.nome);
+      const imagem = this.criar('img');
+      imagem.src = tela.imagem;
+      imagem.alt = 'Tela ' + tela.nome + ' do Dispatch';
+      imagem.loading = 'lazy';
+      moldura.appendChild(imagem);
+
+      const info = this.criar('div', 'info');
+      const link = this.criar('button', 'link', 'Ver a tela ');
+      link.type = 'button';
+      link.insertAdjacentHTML(
+        'beforeend',
+        '<svg viewBox="0 0 18 10" aria-hidden="true"><path d="M0 5h17M12 1l5 4-5 4"/></svg>'
+      );
+      info.append(
+        this.criar('span', 'idx', '0' + (posicao + 1)),
+        this.criar('h3', '', tela.nome),
+        this.criar('span', 'cat', tela.categoria),
+        this.criar('p', '', tela.descricao),
+        link
+      );
+
+      artigo.append(moldura, info);
+      lista.appendChild(artigo);
+
+      funcoesAbrir.push(() => this.mostrarTela(tela));
+      moldura.addEventListener('click', () => this.irPara(funcoesAbrir, posicao));
+      link.addEventListener('click', () => this.irPara(funcoesAbrir, posicao));
     });
   }
 
-  limitar(valor, minimo = 0, maximo = 1) {
-    return Math.max(minimo, Math.min(maximo, valor));
+  mostrarTela(tela) {
+    this.janelaImagem.className = 'pic';
+    const imagem = this.criar('img');
+    imagem.src = tela.imagem;
+    imagem.alt = 'Tela ' + tela.nome + ' do Dispatch';
+    this.janelaImagem.replaceChildren(imagem);
+    this.preencherJanela(tela.categoria, tela.nome, tela.descricao, [
+      ['Módulo', tela.nome],
+      ['Imagem', 'Tela real, dados fictícios']
+    ]);
   }
 
-  ativarAba(aba) {
-    const chave = aba.dataset.tela;
-    const dadosTela = this.telas[chave];
-    if (!dadosTela) return;
+  /* ===== seção Planos: cada linha abre a janela com os recursos ===== */
 
-    this.abas.forEach((item) => {
-      item.setAttribute('aria-selected', String(item === aba));
-      item.tabIndex = item === aba ? 0 : -1;
-    });
+  configurarPlanos() {
+    const linhas = Array.from(document.querySelectorAll('.ix'));
+    const funcoesAbrir = linhas.map((linha) => () => this.mostrarPlano(this.planos[linha.dataset.plano]));
 
-    if (this.imagem) {
-      this.imagem.src = 'assets/apresentacao/' + chave + '.png';
-      this.imagem.alt = dadosTela.alt;
-    }
-    if (this.legendaTela) {
-      this.legendaTela.textContent = dadosTela.legenda;
-    }
-    if (this.painelTela) {
-      this.painelTela.setAttribute('aria-labelledby', aba.id);
-    }
-  }
-
-  configurarAbas() {
-    this.abas.forEach((aba, indice) => {
-      aba.addEventListener('click', () => this.ativarAba(aba));
-      aba.addEventListener('keydown', (evento) => {
-        let destino;
-        if (evento.key === 'ArrowRight') destino = (indice + 1) % this.abas.length;
-        if (evento.key === 'ArrowLeft')
-          destino = (indice - 1 + this.abas.length) % this.abas.length;
-        if (evento.key === 'Home') destino = 0;
-        if (evento.key === 'End') destino = this.abas.length - 1;
-        if (destino === undefined) return;
-
-        evento.preventDefault();
-        this.abas[destino].focus();
-        this.ativarAba(this.abas[destino]);
+    linhas.forEach((linha, posicao) => {
+      linha.addEventListener('click', () => this.irPara(funcoesAbrir, posicao));
+      // a linha funciona como botão também pelo teclado
+      linha.addEventListener('keydown', (evento) => {
+        if (evento.key === 'Enter' || evento.key === ' ') {
+          evento.preventDefault();
+          this.irPara(funcoesAbrir, posicao);
+        }
       });
     });
   }
 
-  // Calcula de 0 a 1 quanto o usuário já rolou dentro de uma seção presa na tela.
-  progressoCena(elemento, margem) {
-    const caixa = elemento.getBoundingClientRect();
-    const curso = Math.max(1, caixa.height - (window.innerHeight - margem));
-    return this.limitar((margem - caixa.top) / curso);
-  }
-
-  // Calcula de -1 a 1 a posição de uma seção enquanto ela entra e sai da janela.
-  passagem(elemento) {
-    const caixa = elemento.getBoundingClientRect();
-    return (
-      this.limitar((window.innerHeight - caixa.top) / (window.innerHeight + caixa.height)) * 2 - 1
+  mostrarPlano(plano) {
+    this.janelaImagem.className = 'pic off';
+    this.janelaImagem.replaceChildren();
+    const ficha = plano.recursos.map((recurso, i) => ['0' + (i + 1), recurso]);
+    this.preencherJanela(
+      plano.categoria,
+      plano.nome,
+      plano.descricao + ' Proposta conceitual, ainda sem contratação ou condição comercial definida.',
+      ficha
     );
   }
 
-  // Atualiza as variáveis CSS (--hero-p, --mouse-x etc.) aos poucos para a animação ficar suave.
-  animarCenas() {
-    this.frameMovimento = null;
-    if (this.movimentoReduzido.matches || document.hidden) return;
-    if (!this.hero || !this.produto || !this.manifesto || !this.convite) return;
+  /* ===== janela de detalhes (usada pelas telas e pelos planos) ===== */
 
-    const desktopPreso = window.innerWidth > 1000 && window.innerHeight >= 700;
-    const alvos = {
-      hero: desktopPreso
-        ? this.progressoCena(this.hero, 88)
-        : this.limitar(-this.hero.getBoundingClientRect().top / this.hero.offsetHeight),
-      produto: this.progressoCena(this.produto, window.innerWidth <= 760 ? 145 : 105),
-      manifesto: this.passagem(this.manifesto),
-      convite: this.passagem(this.convite),
-      x: this.mouseAlvo.x,
-      y: this.mouseAlvo.y
-    };
-
-    let continuar = false;
-    Object.keys(alvos).forEach((chave) => {
-      const diferenca = alvos[chave] - this.estadoMovimento[chave];
-      if (Math.abs(diferenca) < 0.0005) {
-        this.estadoMovimento[chave] = alvos[chave];
-      } else {
-        this.estadoMovimento[chave] = this.estadoMovimento[chave] + diferenca * 0.14;
-        continuar = true;
-      }
+  configurarJanela() {
+    this.botaoAnterior.addEventListener('click', () => this.irPara(this.listaJanela, this.indiceJanela - 1));
+    this.botaoProximo.addEventListener('click', () => this.irPara(this.listaJanela, this.indiceJanela + 1));
+    this.janela.addEventListener('keydown', (evento) => {
+      if (evento.key === 'ArrowLeft') this.irPara(this.listaJanela, this.indiceJanela - 1);
+      if (evento.key === 'ArrowRight') this.irPara(this.listaJanela, this.indiceJanela + 1);
     });
-
-    this.hero.style.setProperty('--hero-p', this.estadoMovimento.hero.toFixed(4));
-    this.hero.style.setProperty('--mouse-x', this.estadoMovimento.x.toFixed(4));
-    this.hero.style.setProperty('--mouse-y', this.estadoMovimento.y.toFixed(4));
-    this.produto.style.setProperty('--produto-p', this.estadoMovimento.produto.toFixed(4));
-    this.manifesto.style.setProperty('--manifesto-p', this.estadoMovimento.manifesto.toFixed(4));
-    this.convite.style.setProperty('--convite-p', this.estadoMovimento.convite.toFixed(4));
-
-    if (continuar) {
-      this.frameMovimento = requestAnimationFrame(this.animarCenas.bind(this));
-    }
+    document.getElementById('janela-fechar').addEventListener('click', () => this.janela.close());
+    // clicar no fundo escuro fora da janela também fecha
+    this.janela.addEventListener('click', (evento) => {
+      if (evento.target === this.janela) this.janela.close();
+    });
+    // enquanto a janela está aberta a rolagem da página fica parada
+    this.janela.addEventListener('close', () => {
+      if (this.lenis) this.lenis.start();
+    });
   }
 
-  agendarMovimento() {
-    if (this.frameMovimento === null && !this.movimentoReduzido.matches && !document.hidden) {
-      this.frameMovimento = requestAnimationFrame(this.animarCenas.bind(this));
-    }
+  preencherJanela(categoria, nome, descricao, linhasFicha) {
+    document.getElementById('janela-cat').textContent = categoria;
+    document.getElementById('janela-nome').textContent = nome;
+    document.getElementById('janela-desc').textContent = descricao;
+    this.janelaFicha.replaceChildren();
+    linhasFicha.forEach((linha) => {
+      const div = this.criar('div');
+      div.append(this.criar('span', '', linha[0]), this.criar('span', '', linha[1]));
+      this.janelaFicha.appendChild(div);
+    });
+    this.abrirJanela();
   }
 
-  // Respeita quem configurou "reduzir movimento" no sistema operacional desligando os efeitos de rolagem.
-  configurarMovimento() {
-    if (this.frameMovimento !== null) cancelAnimationFrame(this.frameMovimento);
-    this.frameMovimento = null;
-    document.body.classList.toggle('movimento-ativo', !this.movimentoReduzido.matches);
+  abrirJanela() {
+    this.janela.scrollTop = 0;
+    if (this.janela.open) return;
+    if (this.lenis) this.lenis.stop();
+    this.janela.showModal();
+  }
 
-    if (this.movimentoReduzido.matches) {
-      [this.hero, this.produto, this.manifesto, this.convite].forEach((elemento) => {
-        if (!elemento) return;
+  // Abre o item "indice" da lista e atualiza os botões Anterior/Próximo.
+  irPara(lista, indice) {
+    if (indice < 0 || indice >= lista.length) return;
+    const jaEstavaAberta = this.janela.open;
+    this.listaJanela = lista;
+    this.indiceJanela = indice;
+    lista[indice]();
+
+    // trocando de item com a janela aberta, o conteúdo desliza para o lado do botão clicado
+    if (jaEstavaAberta && !this.reduzirMovimento) {
+      const deslocamento = indice > this.indiceAnterior ? 24 : -24;
+      this.janela.querySelector('.jn').animate(
         [
-          '--hero-p',
-          '--mouse-x',
-          '--mouse-y',
-          '--produto-p',
-          '--manifesto-p',
-          '--convite-p'
-        ].forEach((propriedade) => elemento.style.removeProperty(propriedade));
+          { opacity: 0, transform: 'translateX(' + deslocamento + 'px)' },
+          { opacity: 1, transform: 'none' }
+        ],
+        { duration: 600, easing: 'cubic-bezier(.16,1,.3,1)' }
+      );
+    }
+    this.indiceAnterior = indice;
+    this.botaoAnterior.disabled = indice <= 0;
+    this.botaoProximo.disabled = indice >= lista.length - 1;
+    this.textoPosicao.textContent = indice + 1 + ' de ' + lista.length;
+  }
+
+  /* ===== menu do celular ===== */
+
+  configurarMenuCelular() {
+    this.botaoMenu.addEventListener('click', () => this.abrirMenu(this.gaveta.hidden));
+    this.gaveta.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => this.abrirMenu(false));
+    });
+    window.addEventListener('keydown', (evento) => {
+      if (evento.key === 'Escape') this.abrirMenu(false);
+    });
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 900) this.abrirMenu(false);
+      this.ultimoTopo = null;
+    });
+  }
+
+  abrirMenu(aberto) {
+    this.gaveta.hidden = !aberto;
+    this.cabecalho.classList.toggle('aberto', aberto);
+    this.botaoMenu.setAttribute('aria-expanded', aberto ? 'true' : 'false');
+    this.botaoMenu.textContent = aberto ? 'Fechar' : 'Menu';
+  }
+
+  /* ===== animações de entrada ===== */
+
+  // Marca os elementos que vão animar. Cada classe tem a animação dela no CSS:
+  // rv = sobe e aparece, wipe = imagem abre como cortina, split = título sobe palavra por palavra.
+  prepararAnimacoes() {
+    document.documentElement.classList.add('js');
+    if (this.reduzirMovimento) return;
+
+    const blocos =
+      '.manifesto p, .num, .cabeca .lede, .processo-cabeca .lede, .proj .info > *:not(h3), .ix-h, .ix, .nota, .faixa .label, .sobre p, .pilares > div, .processo div, .integrantes li, .faq details, .contato .dentro > *:not(h2)';
+    const titulos =
+      '.manifesto h2, .cabeca h2, .processo-cabeca h2, .proj .info h3, .faixa q, .sobre h2, .contato h2';
+    const imagens = '.proj .frame, .sobre-arte, .manifesto .f';
+
+    document.querySelectorAll(blocos).forEach((el) => el.classList.add('rv'));
+    document.querySelectorAll(imagens).forEach((el) => el.classList.add('wipe'));
+    document.querySelectorAll(titulos).forEach((el) => this.separarPalavras(el));
+
+    // irmãos aparecem um pouco depois do outro (efeito cascata)
+    document.querySelectorAll('.rv').forEach((el) => {
+      const irmaos = Array.from(el.parentElement.children).filter((c) => c.classList.contains('rv'));
+      let atraso = Math.min(irmaos.indexOf(el), 6) * 0.08;
+      if (el.closest('.cabeca, .processo-cabeca')) atraso += 0.25;
+      el.style.setProperty('--d', atraso.toFixed(2) + 's');
+    });
+
+    this.pendentes = Array.from(document.querySelectorAll('.rv, .wipe, .split'));
+    // por segurança: se algo der errado, depois de 15 segundos tudo aparece de qualquer jeito
+    setTimeout(() => this.revelarTudo(), 15000);
+  }
+
+  // Coloca cada palavra do título dentro de dois spans: o de fora esconde, o de dentro sobe.
+  separarPalavras(titulo) {
+    let contador = 0;
+    const percorrer = (no) => {
+      Array.from(no.childNodes).forEach((filho) => {
+        if (filho.nodeType === Node.TEXT_NODE) {
+          const pedacos = document.createDocumentFragment();
+          filho.textContent.split(/(\s+)/).forEach((parte) => {
+            if (parte === '') return;
+            if (parte.trim() === '') {
+              pedacos.appendChild(document.createTextNode(parte));
+              return;
+            }
+            const fora = this.criar('span', 'sw');
+            const dentro = this.criar('span', '', parte);
+            dentro.style.setProperty('--i', contador);
+            contador++;
+            fora.appendChild(dentro);
+            pedacos.appendChild(fora);
+          });
+          no.replaceChild(pedacos, filho);
+        } else if (filho.nodeType === Node.ELEMENT_NODE) {
+          percorrer(filho);
+        }
       });
-      Object.keys(this.estadoMovimento).forEach((chave) => {
-        this.estadoMovimento[chave] = 0;
-      });
+    };
+    percorrer(titulo);
+    titulo.classList.add('split');
+  }
+
+  // Mostra o que entrou na tela. Os números da faixa contam de 0 até o valor.
+  revelarVisiveis() {
+    const alturaTela = window.innerHeight;
+    this.pendentes = this.pendentes.filter((el) => {
+      const caixa = el.getBoundingClientRect();
+      const visivel = caixa.top < alturaTela * 0.88 && caixa.bottom > 0;
+      if (!visivel) return true;
+      el.classList.add('in');
+      if (el.classList.contains('num')) this.contarNumero(el.querySelector('b'));
+      return false;
+    });
+  }
+
+  revelarTudo() {
+    this.pendentes.forEach((el) => el.classList.add('in'));
+    this.pendentes = [];
+  }
+
+  contarNumero(campo) {
+    const textoFinal = campo.textContent.trim();
+    if (!/^\d+$/.test(textoFinal)) return;
+    const valorFinal = parseInt(textoFinal, 10);
+    const inicio = performance.now();
+    const duracao = 1600;
+
+    const passo = (agora) => {
+      const progresso = Math.min(1, (agora - inicio) / duracao);
+      // começa rápido e desacelera no final
+      const suavizado = 1 - Math.pow(1 - progresso, 3);
+      campo.textContent = Math.round(valorFinal * suavizado);
+      if (progresso < 1) requestAnimationFrame(passo);
+      else campo.textContent = textoFinal;
+    };
+    requestAnimationFrame(passo);
+  }
+
+  /* ===== rolagem ===== */
+
+  // Lenis deixa a rolagem do mouse suave. O arquivo fica em js/vendor porque o site só aceita scripts do próprio domínio.
+  configurarRolagemSuave() {
+    if (this.reduzirMovimento || !window.Lenis) return;
+    try {
+      this.lenis = new window.Lenis({ lerp: 0.085, smoothWheel: true });
+    } catch (erro) {
+      this.lenis = null;
       return;
     }
 
-    this.agendarMovimento();
-  }
-
-  configurarCenasRolagem() {
-    if (this.hero) {
-      this.hero.addEventListener('pointermove', (evento) => {
-        if (!this.ponteiroPreciso.matches || this.movimentoReduzido.matches) return;
-        const blocoHero = this.hero.querySelector('.hero-conteudo');
-        if (!blocoHero) return;
-
-        const caixa = blocoHero.getBoundingClientRect();
-        this.mouseAlvo.x = this.limitar(((evento.clientX - caixa.left) / caixa.width) * 2 - 1, -1, 1);
-        this.mouseAlvo.y = this.limitar(((evento.clientY - caixa.top) / caixa.height) * 2 - 1, -1, 1);
-        this.agendarMovimento();
-      });
-
-      this.hero.addEventListener('pointerleave', () => {
-        this.mouseAlvo.x = 0;
-        this.mouseAlvo.y = 0;
-        this.agendarMovimento();
-      });
-    }
-
-    window.addEventListener('scroll', this.agendarMovimento.bind(this), { passive: true });
-    window.addEventListener('resize', this.agendarMovimento.bind(this));
-    document.addEventListener('visibilitychange', this.agendarMovimento.bind(this));
-    window.addEventListener('pageshow', this.agendarMovimento.bind(this));
-    this.movimentoReduzido.addEventListener('change', this.configurarMovimento.bind(this));
-    this.configurarMovimento();
-  }
-
-  configurarDialogoPlanos() {
-    if (!this.dialogo) return;
-
-    document.querySelectorAll('[data-plano]').forEach((botao) => {
-      botao.addEventListener('click', () => {
-        const plano = this.planos[botao.dataset.plano];
-        if (!plano) return;
-
-        document.getElementById('dialogo-titulo').textContent = plano.nome;
-        document.getElementById('dialogo-descricao').textContent = plano.descricao;
-        document.getElementById('dialogo-recursos').replaceChildren(
-          ...plano.recursos.map((texto) => {
-            const item = document.createElement('li');
-            item.textContent = texto;
-            return item;
-          })
-        );
-
-        this.dialogo.showModal();
-        document.body.classList.add('dialogo-aberto');
+    // links do menu (#dispatch, #planos...) descem até a seção com a mesma suavidade
+    document.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (evento) => {
+        const destino = link.getAttribute('href');
+        const alvo = destino === '#topo' ? 0 : document.querySelector(destino);
+        if (alvo === null) return;
+        evento.preventDefault();
+        this.lenis.start();
+        this.lenis.scrollTo(alvo, { offset: destino === '#topo' ? 0 : -72, duration: 1.6 });
       });
     });
+  }
 
-    const botaoFechar = this.dialogo.querySelector('.dialogo-fechar');
-    if (botaoFechar) {
-      botaoFechar.addEventListener('click', () => this.dialogo.close());
+  // O cabeçalho some quando a pessoa desce a página e volta quando ela sobe.
+  esconderCabecalho(y) {
+    const menuAberto = this.cabecalho.classList.contains('aberto');
+    const passouDoHero = y > window.innerHeight * 0.7;
+    if (!menuAberto && passouDoHero && y > this.ultimoY + 6) {
+      this.cabecalho.classList.add('esconde');
+    } else if (y < this.ultimoY - 6 || menuAberto || !passouDoHero) {
+      this.cabecalho.classList.remove('esconde');
     }
+    this.ultimoY = y;
+  }
 
-    // Permite fechar o diálogo clicando na parte escura fora do cartão.
-    this.dialogo.addEventListener('click', (evento) => {
-      const caixa = this.dialogo.getBoundingClientRect();
-      if (
-        evento.target === this.dialogo &&
-        (evento.clientX < caixa.left ||
-          evento.clientX > caixa.right ||
-          evento.clientY < caixa.top ||
-          evento.clientY > caixa.bottom)
-      ) {
-        this.dialogo.close();
+  // Imagens marcadas com data-velocidade andam um pouco mais devagar (ou mais rápido) que a página.
+  aplicarParallax() {
+    const alturaTela = window.innerHeight;
+    document.querySelectorAll('[data-velocidade]').forEach((camada) => {
+      const caixa = camada.parentElement.getBoundingClientRect();
+      if (caixa.bottom < -300 || caixa.top > alturaTela + 300) return;
+      const distanciaDoCentro = caixa.top + caixa.height / 2 - alturaTela / 2;
+      const deslocamento = distanciaDoCentro * parseFloat(camada.dataset.velocidade) * -1;
+      camada.style.transform = 'translateY(' + deslocamento.toFixed(1) + 'px)';
+    });
+    document.querySelectorAll('.frame img, .sobre-arte img, .manifesto .f img').forEach((imagem) => {
+      const caixa = imagem.parentElement.getBoundingClientRect();
+      if (caixa.bottom < 0 || caixa.top > alturaTela) return;
+      const posicao = (caixa.top + caixa.height / 2 - alturaTela / 2) / alturaTela;
+      imagem.style.transform = 'translateY(' + (posicao * -6).toFixed(2) + '%)';
+    });
+  }
+
+  // Roda sempre que a página rola: barra de progresso, cabeçalho, menu ativo, animações e parallax.
+  aoRolar() {
+    const y = Math.max(0, -this.hero.getBoundingClientRect().top);
+    const maximo = document.documentElement.scrollHeight - window.innerHeight;
+    const progresso = maximo > 0 ? Math.min(1, y / maximo) : 0;
+    this.barraProgresso.style.transform = 'scaleX(' + progresso.toFixed(4) + ')';
+    this.cabecalho.classList.toggle('solido', y > this.hero.offsetHeight - 120);
+
+    // marca no menu a seção que está na tela
+    const linha = y + window.innerHeight * 0.4;
+    let atual = -1;
+    this.secoesMenu.forEach((secao, i) => {
+      if (secao && secao.offsetTop <= linha) atual = i;
+    });
+    this.linksMenu.forEach((link, i) => link.classList.toggle('on', i === atual));
+
+    this.revelarVisiveis();
+    this.esconderCabecalho(y);
+    if (this.reduzirMovimento) return;
+
+    // na abertura, o texto sobe e some enquanto o fundo desce mais devagar
+    const quantoSaiuDoHero = Math.min(1, y / window.innerHeight);
+    if (quantoSaiuDoHero < 1) {
+      this.fundoHero.style.transform = 'translateY(' + (y * 0.22).toFixed(1) + 'px)';
+      this.textoHero.style.opacity = (1 - Math.min(1, quantoSaiuDoHero * 1.6)).toFixed(3);
+      this.textoHero.style.transform = 'translateY(' + (-y * 0.18).toFixed(1) + 'px)';
+      this.setaHero.style.opacity = (1 - Math.min(1, quantoSaiuDoHero * 3)).toFixed(3);
+    }
+    this.aplicarParallax();
+  }
+
+  /* ===== cursor sobre as telas ===== */
+
+  configurarCursor() {
+    if (!this.mouseFino) return;
+    window.addEventListener(
+      'pointermove',
+      (evento) => {
+        this.mouseX = evento.clientX;
+        this.mouseY = evento.clientY;
+        const sobreTela = evento.target.closest && evento.target.closest('.frame');
+        this.cursor.classList.toggle('on', Boolean(sobreTela));
+      },
+      { passive: true }
+    );
+    document.addEventListener('pointerleave', () => this.cursor.classList.remove('on'));
+  }
+
+  moverCursor() {
+    // a cada quadro o cursor anda 18% da distância até o mouse, por isso ele "flutua"
+    this.cursorX += (this.mouseX - this.cursorX) * 0.18;
+    this.cursorY += (this.mouseY - this.cursorY) * 0.18;
+    this.cursor.style.transform =
+      'translate(' + this.cursorX.toFixed(1) + 'px, ' + this.cursorY.toFixed(1) + 'px)';
+  }
+
+  /* ===== laço de animação: roda a cada quadro da tela ===== */
+
+  iniciarLaco() {
+    const quadro = (tempo) => {
+      if (this.lenis) this.lenis.raf(tempo);
+      // só recalcula a página quando ela realmente rolou
+      const topo = this.hero.getBoundingClientRect().top;
+      if (topo !== this.ultimoTopo) {
+        this.ultimoTopo = topo;
+        this.aoRolar();
       }
-    });
-
-    this.dialogo.addEventListener('close', () => {
-      document.body.classList.remove('dialogo-aberto');
-    });
+      if (this.mouseFino) this.moverCursor();
+      requestAnimationFrame(quadro);
+    };
+    requestAnimationFrame(quadro);
   }
 }
 

@@ -256,6 +256,7 @@ class Servidor {
 
     this.app.use('/api', limiteGeralApi);
     this.app.use('/api/auth/login', limiteLogin);
+    this.app.use('/api/auth/google', limiteLogin);
     this.app.use('/api/auth/cadastro', limiteCadastro);
     this.app.use('/api/ia', limiteIa);
   }

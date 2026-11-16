@@ -1,5 +1,6 @@
 const Cnh = require('../models/Cnh');
 const db = require('../db/conexao');
+const CargaExemplos = require('../db/seed');
 const auditoria = require('../services/Auditoria');
 const configuracao = require('../services/Configuracao');
 const datas = require('../regras/datas');
@@ -431,178 +432,27 @@ class ControladorPessoas {
     });
   }
 
-  carregarExemplos(req, res) {
-    const existentes = db.prepare('SELECT COUNT(*) AS total FROM pessoa').get().total;
-    if (existentes > 0) {
-      return res.status(400).json({ erro: 'O banco já possui colaboradores cadastrados.' });
-    }
-
-    const equipe = [
-      {
-        nome: 'João Vitor Santos',
-        matricula: 'AG-101',
-        cargo: 'Técnico de Obras',
-        obra: 'Marília Norte',
-        tel: '14991230001',
-        cnh: 'B',
-        val: '2027-08-15'
-      },
-      {
-        nome: 'Kelvin Gomes',
-        matricula: 'AG-102',
-        cargo: 'Engenheiro Residente',
-        obra: 'Sede / Rodovia SP-294',
-        tel: '14991230002',
-        cnh: 'B,D',
-        val: '2028-01-20'
-      },
-      {
-        nome: 'Bruno Martins',
-        matricula: 'AG-103',
-        cargo: 'Mestre de Obras',
-        obra: 'Alojamento Centro',
-        tel: '14991230003',
-        cnh: 'B',
-        val: '2027-05-10'
-      },
-      {
-        nome: 'Henrique Di Manno',
-        matricula: 'AG-104',
-        cargo: 'Topógrafo',
-        obra: 'Assis Sul',
-        tel: '14991230004',
-        cnh: 'A,B',
-        val: '2026-11-20'
-      },
-      {
-        nome: 'Matheus Silva',
-        matricula: 'AG-105',
-        cargo: 'Eletricista Predial',
-        obra: 'Marília Norte',
-        tel: '14991230005',
-        cnh: 'B',
-        val: '2027-10-30'
-      },
-      {
-        nome: 'Carlos Eduardo Ramos',
-        matricula: 'AG-106',
-        cargo: 'Motorista de Van',
-        obra: 'Transporte Intermunicipal',
-        tel: '14991230006',
-        cnh: 'D',
-        val: '2026-11-12'
-      },
-      {
-        nome: 'Vinicius Almeida',
-        matricula: 'AG-107',
-        cargo: 'Operador de Máquinas',
-        obra: 'Rodovia SP-294',
-        tel: '14991230007',
-        cnh: 'C,E',
-        val: '2028-03-14'
-      },
-      {
-        nome: 'Antônio Ferreira',
-        matricula: 'AG-108',
-        cargo: 'Encanador Industrial',
-        obra: 'Alojamento Sul',
-        tel: '14991230008',
-        cnh: null,
-        val: null
-      },
-      {
-        nome: 'Lucas Oliveira',
-        matricula: 'AG-109',
-        cargo: 'Carpinteiro',
-        obra: 'Marília Norte',
-        tel: '14991230009',
-        cnh: null,
-        val: null
-      },
-      {
-        nome: 'Rafael Costa',
-        matricula: 'AG-110',
-        cargo: 'Pedreiro de Acabamento',
-        obra: 'Assis Sul',
-        tel: '14991230010',
-        cnh: null,
-        val: null
-      },
-      {
-        nome: 'Guilherme Souza',
-        matricula: 'AG-111',
-        cargo: 'Auxiliar de Almoxarifado',
-        obra: 'Sede',
-        tel: '14991230011',
-        cnh: 'B',
-        val: '2026-09-01'
-      },
-      {
-        nome: 'Fernando Dias',
-        matricula: 'AG-112',
-        cargo: 'Soldador',
-        obra: 'Rodovia SP-294',
-        tel: '14991230012',
-        cnh: 'B',
-        val: '2027-12-05'
-      },
-      {
-        nome: 'Rodrigo Pires',
-        matricula: 'AG-113',
-        cargo: 'Pintor Industrial',
-        obra: 'Alojamento Centro',
-        tel: '14991230013',
-        cnh: null,
-        val: null
-      },
-      {
-        nome: 'Marcos Vinicius',
-        matricula: 'AG-114',
-        cargo: 'Apontador de Obra',
-        obra: 'Marília Norte',
-        tel: '14991230014',
-        cnh: 'B',
-        val: '2028-06-18'
-      },
-      {
-        nome: 'Leandro Barbosa',
-        matricula: 'AG-115',
-        cargo: 'Encarregado Geral',
-        obra: 'Assis Sul',
-        tel: '14991230015',
-        cnh: 'B,C',
-        val: '2027-04-22'
+  // Carrega os dados de demonstração da Construtora Aguapeí (os mesmos do "npm run seed").
+  // Só funciona com o banco ainda sem colaboradores, para nunca misturar com dados de verdade.
+  carregarExemplos(req, res, next) {
+    try {
+      const resumo = new CargaExemplos().carregar();
+      res.json({
+        mensagem:
+          'Dados de demonstração carregados: ' +
+          resumo.colaboradores +
+          ' colaboradores, ' +
+          resumo.alojamentos +
+          ' alojamentos e ' +
+          resumo.veiculos +
+          ' veículos com 6 meses de histórico.'
+      });
+    } catch (erro) {
+      if (/já possui colaboradores/.test(erro.message)) {
+        return res.status(400).json({ erro: erro.message });
       }
-    ];
-
-    const inserir = db.prepare(
-      'INSERT INTO pessoa (nome, matricula, cargo, obra, telefone, cnh_categorias, cnh_validade, ativo) ' +
-        'VALUES (?, ?, ?, ?, ?, ?, ?, 1)'
-    );
-    equipe.forEach((pessoa) => {
-      inserir.run(
-        pessoa.nome,
-        pessoa.matricula,
-        pessoa.cargo,
-        pessoa.obra,
-        pessoa.tel,
-        pessoa.cnh,
-        pessoa.val
-      );
-    });
-
-    auditoria.registrarLog({
-      usuarioId: req.session.usuario.id,
-      acao: 'criou',
-      tabela: 'pessoa',
-      registroId: 1,
-      resumo: 'Carregou 15 colaboradores de demonstração (Construtora Aguapeí)'
-    });
-
-    res.json({
-      mensagem: '15 colaboradores de demonstração carregados com sucesso!',
-      total: equipe.length
-    });
+      next(erro);
+    }
   }
 }
 

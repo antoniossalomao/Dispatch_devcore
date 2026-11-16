@@ -1,16 +1,11 @@
-// Roteamento pela History API: /frota, /resumo etc. continuam sendo endereços reais.
+// Roteador: troca de tela sem recarregar e mantendo o endereço certo na barra (/frota, /resumo...).
 //
-// Escolhemos caminho em vez de hash (#/frota) porque o hash já tem dono: Configurações usa
-// #auditoria, #usuarios para abrir abas, e links antigos com esses hashes continuam valendo.
-// O servidor devolve a casca (app.html) para qualquer uma dessas rotas, então recarregar a
-// página ou colar o link numa conversa abre a tela certa.
+// Usamos o caminho (/frota) e não #/frota porque o # já é usado em Configurações para abrir as abas
+// (#auditoria, #usuarios). O servidor devolve o app.html para todas essas rotas, então dá para
+// recarregar a página ou mandar o link para alguém que abre na tela certa.
 export class Roteador {
-  /**
-   * @param {string[]} rotas telas conhecidas
-   * @param {string} padrao tela aberta quando a URL não aponta para nenhuma
-   * @param {(rota: string, origem: 'inicio'|'link'|'historico') => Promise<boolean>} aoMudar
-   *   devolve false quando a tela atual recusou a saída (alterações não salvas)
-   */
+  // rotas: nomes das telas | padrao: tela que abre quando o endereço não é de nenhuma
+  // aoMudar: função chamada ao trocar de tela; devolve false se a tela atual não deixou sair
   constructor(rotas, padrao, aoMudar) {
     this.rotas = new Set(rotas);
     this.padrao = padrao;

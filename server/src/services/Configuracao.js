@@ -12,7 +12,7 @@ class Configuracao {
     this.configPadrao = {
       nomeEmpresa: 'Construtora Aguapeí',
       cidadeBase: 'Marília/SP',
-      documentoEmpresa: '45.123.890/0001-12',
+      documentoEmpresa: '45.123.890/0001-67',
       diasAvisoVencimento: 30,
       horasAlertaRetorno: 12,
       kmConfirmacaoViagem: 2000,

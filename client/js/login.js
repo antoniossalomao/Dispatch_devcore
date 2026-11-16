@@ -9,8 +9,38 @@ class TelaLogin {
     this.msgSucesso = document.getElementById('mensagem-sucesso');
     this.botaoEntrar = document.getElementById('botao-entrar');
     this.ajudaCadastro = document.getElementById('ajuda-cadastro');
+    this.blocoGoogle = document.getElementById('bloco-google');
     this.configurarEventos();
     this.verificarCadastro();
+    this.verificarGoogle();
+    this.mostrarRetornoGoogle();
+  }
+
+  // O botão do Google só aparece quando o servidor tem GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET.
+  async verificarGoogle() {
+    if (!this.blocoGoogle) return;
+    try {
+      const resposta = await chamarApi('/api/auth/google/status');
+      if (resposta.ok && resposta.dados && resposta.dados.ativo) {
+        this.blocoGoogle.hidden = false;
+      }
+    } catch (erro) {
+      // Sem servidor, fica só o login por senha.
+    }
+  }
+
+  // Quando o Google devolve a pessoa sem conseguir entrar, o servidor manda o motivo em ?google=.
+  mostrarRetornoGoogle() {
+    const motivo = new URLSearchParams(window.location.search).get('google');
+    const mensagens = {
+      'sem-acesso':
+        'Essa conta Google não está liberada no Dispatch. Peça a um administrador para ligar o seu e-mail ao seu usuário.',
+      cancelado: 'O login com Google foi cancelado.',
+      expirado: 'O login com Google demorou demais ou veio de outra aba. Tente de novo.',
+      indisponivel: 'O login com Google não está configurado neste servidor.',
+      falhou: 'Não foi possível confirmar sua conta Google. Tente de novo ou entre com usuário e senha.'
+    };
+    if (motivo && mensagens[motivo]) this.mostrarErro(mensagens[motivo]);
   }
 
   // O link para criar conta só aparece quando o servidor está com código de convite configurado.
@@ -47,7 +77,7 @@ class TelaLogin {
     const senha = this.inputSenha.value;
     if (usuario === '' || senha === '') {
       this.mostrarErro(
-        'Preencha o usuário e a senha.',
+        'Preencha o e-mail e a senha.',
         usuario === '' ? this.inputUsuario : this.inputSenha
       );
       return;

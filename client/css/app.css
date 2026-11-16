@@ -1,5 +1,6 @@
-/* Peças da casca (app.html): busca Ctrl+K no topo, paleta de comandos e estado de falha ao abrir tela.
-   Usa os mesmos tokens das telas (--claro-*), então acompanha o tema claro e o escuro. */
+/* Estilos que valem para o sistema todo (app.html): botão de busca Ctrl+K do topo, a paleta de
+   comandos e a mensagem de erro quando uma tela não carrega.
+   Usa as mesmas variáveis de cor das telas (--claro-*), então funciona no tema claro e no escuro. */
 
 /* gatilho da paleta: parece um campo de busca, mas é um botão. Deixa o Ctrl+K fácil de descobrir. */
 .botao-paleta {

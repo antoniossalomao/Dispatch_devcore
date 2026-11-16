@@ -10,6 +10,8 @@ const configuracao = require('../services/Configuracao');
 const sessionStore = require('../services/SessionStore');
 const telegram = require('../services/Telegram');
 const validador = require('../regras/validacao');
+// Carregar o serviço garante a coluna usuario.email em bancos criados antes do login com Google.
+const loginGoogle = require('../services/LoginGoogle');
 
 // Reúne as configurações da empresa, gerenciamento de usuários, teste do Telegram e cópia de segurança do banco.
 class ControladorConfiguracoes {
@@ -59,7 +61,7 @@ class ControladorConfiguracoes {
   consultar(req, res) {
     const usuarios = db
       .prepare(
-        'SELECT id, nome, login, perfil, telegram_chat_id, ativo FROM usuario ORDER BY ativo DESC, id ASC'
+        'SELECT id, nome, login, perfil, telegram_chat_id, email, ativo FROM usuario ORDER BY ativo DESC, id ASC'
       )
       .all();
     const meuUsuario = db
@@ -73,6 +75,7 @@ class ControladorConfiguracoes {
       banco: this.montarDadosBanco(),
       ambiente: {
         iaConfigurada: Boolean(process.env.GROQ_API_KEY),
+        googleConfigurado: loginGoogle.configuracao().ativo,
         telegramAtivo: telegram.configurado(),
         telegramModo: telegram.configurado() ? 'Bot conectado' : 'Simulação no terminal'
       }
@@ -555,6 +558,51 @@ class ControladorConfiguracoes {
     } catch (erro) {
       next(erro);
     }
+  }
+
+  // Liga (ou desliga, com e-mail vazio) a conta Google que pode entrar como este usuário.
+  alterarEmailGoogle(req, res) {
+    const idAlvo = validador.lerIdPositivo(req.params.id);
+    if (!idAlvo) {
+      return res.status(400).json({ erro: 'ID de usuário inválido.' });
+    }
+    const alvo = db.prepare('SELECT id, login, email FROM usuario WHERE id = ?').get(idAlvo);
+    if (!alvo) {
+      return res.status(404).json({ erro: 'Usuário não encontrado.' });
+    }
+
+    const bruto = typeof (req.body && req.body.email) === 'string' ? req.body.email : '';
+    const email = bruto.trim().toLowerCase();
+    if (email !== '' && (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) {
+      return res.status(400).json({ erro: 'Informe um e-mail válido.' });
+    }
+    if (email !== '') {
+      const dono = db
+        .prepare('SELECT login FROM usuario WHERE lower(email) = ? AND id <> ?')
+        .get(email, idAlvo);
+      if (dono) {
+        return res.status(400).json({ erro: 'Esse e-mail já está ligado a @' + dono.login + '.' });
+      }
+    }
+
+    db.prepare('UPDATE usuario SET email = ? WHERE id = ?').run(email || null, idAlvo);
+    auditoria.registrarLog({
+      usuarioId: req.session.usuario.id,
+      acao: 'alterou',
+      tabela: 'usuario',
+      registroId: idAlvo,
+      resumo: email
+        ? 'Ligou o login com Google de @' + alvo.login + ' ao e-mail ' + email
+        : 'Removeu o login com Google de @' + alvo.login,
+      antes: { email: alvo.email || null },
+      depois: { email: email || null }
+    });
+
+    res.json({
+      mensagem: email
+        ? 'Login com Google liberado para @' + alvo.login + '.'
+        : 'Login com Google removido de @' + alvo.login + '.'
+    });
   }
 }
 

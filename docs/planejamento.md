@@ -91,15 +91,15 @@ Não vamos fazer: GPS, controle de combustível e custos, checklist de vistoria 
 
 | Tela | Arquivo | O que tem |
 |---|---|---|
-| Apresentação | `client/apresentacao.html` | Página institucional da DevCore com prévias das telas e planos conceituais |
-| Login e Cadastro | `client/index.html`, `client/cadastro.html` | Cartão dividido com usuário/senha e criação de conta via código de convite |
-| Resumo | `client/resumo.html` | Números gerais, últimas movimentações e ocupação por unidade |
-| Colaboradores | `client/colaboradores.html` | Lista com busca, filtros de CNH, cadastro/edição e gaveta de histórico |
-| Alojamentos | `client/alojamentos.html` | Ocupação, mapa de leitos pra alocar/liberar, aba de ocorrências e cadastro com responsável |
-| Frota | `client/frota.html` | Lista de veículos com status, saída/volta, manutenções e cadastro com licenciamento e seguro |
-| Movimentações | `client/movimentacoes.html` | Histórico unificado de alojamentos e frota com exportação para CSV |
-| Relatórios | `client/relatorios.html` | Ocupação, uso da frota, movimentação, gargalos, quem estava dirigindo e perguntas pra IA |
-| Configurações e Auditoria | `client/configuracoes.html` | Regras da empresa, alertas/Telegram, usuários, backup do banco, verificação da cadeia SHA-256 e minha conta (`auditoria.html` redireciona pra cá) |
+| Apresentação | `client/index.html` (`/`) | Página institucional da DevCore com prévias das telas e planos conceituais |
+| Login e Cadastro | `client/login.html`, `client/cadastro.html` | Tela dividida com e-mail/senha ou Google; cadastro com nome, CPF/CNPJ, e-mail, telefone e senha via código de convite |
+| Resumo | `client/telas/resumo.html` | Números gerais, últimas movimentações e ocupação por unidade |
+| Colaboradores | `client/telas/colaboradores.html` | Lista com busca, filtros de CNH, cadastro/edição e gaveta de histórico |
+| Alojamentos | `client/telas/alojamentos.html` | Ocupação, mapa de leitos pra alocar/liberar, aba de ocorrências e cadastro com responsável |
+| Frota | `client/telas/frota.html` | Lista de veículos com status, saída/volta, manutenções e cadastro com licenciamento e seguro |
+| Movimentações | `client/telas/movimentacoes.html` | Histórico unificado de alojamentos e frota com exportação para CSV |
+| Relatórios | `client/telas/relatorios.html` | Ocupação, uso da frota, movimentação, gargalos, quem estava dirigindo e perguntas pra IA |
+| Configurações e Auditoria | `client/telas/configuracoes.html` | Regras da empresa, alertas/Telegram, usuários, backup do banco, verificação da cadeia SHA-256 e minha conta (`auditoria.html` redireciona pra cá) |
 
 Visual: superfícies operacionais em grafite e cinza, texto claro, ações principais discretas e cores semânticas para status. Os tokens da marca e a apresentação DevCore permanecem em `paleta.css`; a interface usa os tokens neutros `--op-*`. A documentação atual está em `docs/identidade-visual.md` e `docs/ui-ux.md`.
 
@@ -257,14 +257,16 @@ Pro Telegram vamos usar a **Bot API**, que é gratuita: cria-se um bot no @BotFa
 dispatch/
 ├── .github/workflows/      # build, testes e deploy automático na Azure Web App
 ├── client/                 # front-end (HTML, CSS e classes JS por tela)
-│   ├── apresentacao.html   # apresentação pública DevCore / Dispatch
-│   ├── index.html          # login
+│   ├── index.html          # apresentação pública DevCore / Dispatch (página inicial)
+│   ├── login.html          # login (e-mail e senha ou Google)
 │   ├── cadastro.html       # criação de conta via código de convite
-│   ├── resumo.html, colaboradores.html, alojamentos.html, frota.html
-│   ├── movimentacoes.html, relatorios.html, configuracoes.html
-│   ├── auditoria.html      # redireciona para configuracoes.html#auditoria
-│   ├── css/                # paleta.css, base.css, tema.css, usabilidade.css, extras.css + css por tela
+│   ├── app.html            # página única das telas internas (menu e topo fixos)
+│   ├── telas/              # HTML de cada tela interna (resumo, colaboradores, frota...)
+│   ├── auditoria.html      # redireciona para /configuracoes#auditoria
+│   ├── css/                # paleta.css, base.css, tema.css, densidade.css, app.css + css por tela
 │   └── js/                 # api.js, tema.js, ui.js, usabilidade.js, extras.js + uma classe por tela
+│       ├── app/            # App (troca de telas), Roteador e PaletaDeComandos (Ctrl+K)
+│       └── vendor/         # Lenis (rolagem suave da apresentação)
 │
 ├── server/                 # back-end (Node.js)
 │   ├── src/
