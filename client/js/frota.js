@@ -1,6 +1,8 @@
 // Tela da frota: cadastro de veículos, registro de saída/retorno com validação de CNH e histórico de manutenções.
-class TelaFrota {
-  constructor() {
+export default class TelaFrota {
+  // ctx vem da casca (js/app/App.js): sessão em cache, sinal para soltar eventos globais ao sair da tela e navegação sem recarregar.
+  constructor(ctx) {
+    this.ctx = ctx;
     this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
     this.usuarioIniciais = document.getElementById('usuario-iniciais');
     this.perfilNome = document.getElementById('perfil-nome');
@@ -100,10 +102,6 @@ class TelaFrota {
       .getElementById('form-manutencao')
       .addEventListener('submit', this.salvarManutencao.bind(this));
 
-    this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', { metodo: 'POST' });
-      window.location.href = 'login';
-    });
 
     document.querySelectorAll('.menu-em-breve').forEach((link) => {
       link.addEventListener('click', (evento) => {
@@ -611,7 +609,7 @@ class TelaFrota {
   }
 
   async iniciar() {
-    const sessao = await chamarApi('/api/auth/eu');
+    const sessao = await this.ctx.sessao();
     if (!sessao.ok) {
       window.location.href = 'login';
       return;
@@ -629,5 +627,3 @@ class TelaFrota {
     this.carregarVeiculos();
   }
 }
-
-new TelaFrota();

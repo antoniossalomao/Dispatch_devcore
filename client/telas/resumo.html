@@ -1,0 +1,114 @@
+<!-- Fragmento da tela "Resumo Operacional": a casca (app.html) encaixa cada parte no lugar certo. -->
+<template data-parte="cabecalho" data-titulo="Resumo Operacional">
+        <h1 class="topo-titulo">Resumo operacional</h1>
+        <span id="data-hoje" class="topo-data"></span>
+        <span id="aviso-tela" class="topo-aviso" hidden></span>
+</template>
+<template data-parte="acoes" data-classe=""><div class="busca-caixa">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+          </svg>
+          <input type="text" id="campo-busca" placeholder="Buscar na operação" aria-label="Buscar por colaborador, placa ou alojamento">
+        </div>
+</template>
+<template data-parte="conteudo" data-classe="conteudo">
+
+      <!-- linha de indicadores -->
+      <section class="indicadores">
+
+        <div class="cartao-kpi">
+          <div class="kpi-topo">
+            <span class="kpi-rotulo">Veículos em uso</span>
+          </div>
+          <div class="kpi-valor-linha">
+            <strong id="num-veiculos-uso" class="kpi-numero">—</strong>
+            <span id="sub-veiculos-uso" class="kpi-complemento">Carregando</span>
+          </div>
+          <p id="detalhe-veiculos-uso" class="kpi-detalhe">Carregando dados</p>
+        </div>
+
+        <div class="cartao-kpi">
+          <div class="kpi-topo">
+            <span class="kpi-rotulo">Veículos disponíveis</span>
+          </div>
+          <div class="kpi-valor-linha">
+            <strong id="num-veiculos-disp" class="kpi-numero">—</strong>
+            <span class="kpi-complemento">prontos para saída</span>
+          </div>
+          <p id="detalhe-veiculos-disp" class="kpi-detalhe">Carregando dados</p>
+        </div>
+
+        <div class="cartao-kpi">
+          <div class="kpi-topo">
+            <span class="kpi-rotulo">Alojamentos ativos</span>
+          </div>
+          <div class="kpi-valor-linha">
+            <strong id="num-alojamentos" class="kpi-numero">—</strong>
+            <span id="sub-alojamentos" class="kpi-complemento">Carregando</span>
+          </div>
+          <p id="detalhe-alojamentos" class="kpi-detalhe">Carregando dados</p>
+        </div>
+
+        <div class="cartao-kpi">
+          <div class="kpi-topo">
+            <span class="kpi-rotulo">Vagas disponíveis</span>
+          </div>
+          <div class="kpi-valor-linha">
+            <strong id="num-vagas" class="kpi-numero">—</strong>
+            <span class="kpi-complemento">leitos livres</span>
+          </div>
+          <p class="kpi-detalhe">Capacidade dentro do limite da NR-24</p>
+        </div>
+
+      </section>
+
+      <!-- grade principal: movimentações à esquerda e lateral de acompanhamento à direita -->
+      <div class="grade-operacional">
+
+        <section class="bloco">
+          <div class="bloco-cabecalho">
+            <div>
+              <h2 class="bloco-titulo">Movimentações recentes</h2>
+              <p class="bloco-subtitulo">Últimas entradas, retiradas e devoluções registradas</p>
+            </div>
+
+            <div class="filtro-abas">
+              <button type="button" class="aba-item ativa" data-filtro="todos">Todas</button>
+              <button type="button" class="aba-item" data-filtro="frota">Frota</button>
+              <button type="button" class="aba-item" data-filtro="alojamento">Alojamentos</button>
+            </div>
+          </div>
+
+          <div class="tabela-area">
+            <table class="tabela">
+              <thead>
+                <tr>
+                  <th>Colaborador</th>
+                  <th>Tipo</th>
+                  <th>Recurso</th>
+                  <th>Horário</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="lista-movimentacoes"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <div class="coluna-lateral">
+
+          <section class="bloco">
+            <div class="bloco-cabecalho bloco-cabecalho-simples">
+              <h2 class="bloco-titulo">Ocupação por unidade</h2>
+            </div>
+            <div id="lista-alojamentos" class="lista-unidades"></div>
+          </section>
+
+
+        </div>
+
+      </div>
+</template>
+<template data-parte="extras">
+</template>

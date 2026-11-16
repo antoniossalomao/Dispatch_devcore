@@ -1,6 +1,8 @@
 // Aba de auditoria dentro de Configurações: filtra alterações antigas e verifica a cadeia de hashes.
-class TelaAuditoria {
-  constructor() {
+export default class TelaAuditoria {
+  // ctx vem da casca (js/app/App.js): sessão em cache, sinal para soltar eventos globais ao sair da tela e navegação sem recarregar.
+  constructor(ctx) {
+    this.ctx = ctx;
     this.acoes = {
       criou: ['status-ativo', 'Criou'],
       alterou: ['status-uso', 'Alterou'],
@@ -46,9 +48,13 @@ class TelaAuditoria {
     });
 
     // Só carrega a tabela quando a pessoa abre a aba de Auditoria em Configurações.
-    document.addEventListener('dispatch:config-aba', (evento) => {
-      if (evento.detail === 'auditoria') this.carregarLog();
-    });
+    document.addEventListener(
+      'dispatch:config-aba',
+      (evento) => {
+        if (evento.detail === 'auditoria') this.carregarLog();
+      },
+      { signal: this.ctx.sinal }
+    );
   }
 
   formatarData(texto) {
@@ -172,5 +178,3 @@ class TelaAuditoria {
     });
   }
 }
-
-new TelaAuditoria();

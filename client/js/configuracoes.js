@@ -1,6 +1,8 @@
 // Tela de configurações (somente admin): parâmetros da operação, alertas/Telegram, contas de usuários, backup do banco, auditoria e dados da própria conta.
-class TelaConfiguracoes {
-  constructor() {
+export default class TelaConfiguracoes {
+  // ctx vem da casca (js/app/App.js): sessão em cache, sinal para soltar eventos globais ao sair da tela e navegação sem recarregar.
+  constructor(ctx) {
+    this.ctx = ctx;
     this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
     this.usuarioIniciais = document.getElementById('usuario-iniciais');
     this.perfilNome = document.getElementById('perfil-nome');
@@ -123,6 +125,11 @@ class TelaConfiguracoes {
     this.carregarDados();
   }
 
+  // A casca pergunta antes de trocar de tela: o beforeunload não dispara numa navegação sem recarregar.
+  temAlteracoesPendentes() {
+    return Boolean(this.atualizarEstadoParametros());
+  }
+
   configurarEventos() {
     this.botoesNav.forEach((botao) => {
       botao.addEventListener('click', () => {
@@ -132,9 +139,13 @@ class TelaConfiguracoes {
       });
     });
 
-    window.addEventListener('hashchange', () => {
-      this.abrirAbaConfig(window.location.hash.slice(1));
-    });
+    window.addEventListener(
+      'hashchange',
+      () => {
+        this.abrirAbaConfig(window.location.hash.slice(1));
+      },
+      { signal: this.ctx.sinal }
+    );
 
     this.camposMonitorados.forEach((campo) => {
       campo.addEventListener('input', this.atualizarEstadoParametros.bind(this));
@@ -142,12 +153,16 @@ class TelaConfiguracoes {
     });
 
     // Se o admin alterou alguma regra e tentar fechar a guia sem salvar, o navegador avisa antes.
-    window.addEventListener('beforeunload', (evento) => {
-      if (this.atualizarEstadoParametros()) {
-        evento.preventDefault();
-        evento.returnValue = '';
-      }
-    });
+    window.addEventListener(
+      'beforeunload',
+      (evento) => {
+        if (this.atualizarEstadoParametros()) {
+          evento.preventDefault();
+          evento.returnValue = '';
+        }
+      },
+      { signal: this.ctx.sinal }
+    );
     this.atualizarEstadoParametros();
 
     this.formRegras.addEventListener('submit', this.salvarParametros.bind(this));
@@ -197,10 +212,6 @@ class TelaConfiguracoes {
       });
     });
 
-    this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', { metodo: 'POST' });
-      window.location.href = 'login';
-    });
   }
 
   async restaurarParametros() {
@@ -723,7 +734,7 @@ class TelaConfiguracoes {
 
   async carregarDados() {
     try {
-      const sessao = await chamarApi('/api/auth/eu');
+      const sessao = await this.ctx.sessao();
       if (!sessao.ok) {
         window.location.href = 'login';
         return;
@@ -732,7 +743,7 @@ class TelaConfiguracoes {
       const usuario = sessao.dados.usuario;
       // Quem não é administrador volta para o resumo caso tente abrir esta página pela URL.
       if (usuario.perfil !== 'admin') {
-        window.location.href = 'resumo';
+        this.ctx.ir('resumo');
         return;
       }
 
@@ -771,5 +782,3 @@ class TelaConfiguracoes {
     }
   }
 }
-
-new TelaConfiguracoes();

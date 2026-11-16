@@ -1,6 +1,8 @@
 // Tela de movimentações: junta entradas/saídas dos alojamentos e retiradas/devoluções da frota, com exportação em CSV.
-class TelaMovimentacoes {
-  constructor() {
+export default class TelaMovimentacoes {
+  // ctx vem da casca (js/app/App.js): sessão em cache, sinal para soltar eventos globais ao sair da tela e navegação sem recarregar.
+  constructor(ctx) {
+    this.ctx = ctx;
     this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
     this.usuarioIniciais = document.getElementById('usuario-iniciais');
     this.perfilNome = document.getElementById('perfil-nome');
@@ -63,10 +65,6 @@ class TelaMovimentacoes {
       .getElementById('botao-exportar')
       .addEventListener('click', this.exportarCsv.bind(this));
 
-    this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', { metodo: 'POST' });
-      window.location.href = 'login';
-    });
   }
 
   async exportarCsv() {
@@ -261,7 +259,7 @@ class TelaMovimentacoes {
   }
 
   async iniciar() {
-    const sessao = await chamarApi('/api/auth/eu');
+    const sessao = await this.ctx.sessao();
     if (!sessao.ok) {
       window.location.href = 'login';
       return;
@@ -278,5 +276,3 @@ class TelaMovimentacoes {
     this.aoIniciar();
   }
 }
-
-new TelaMovimentacoes();

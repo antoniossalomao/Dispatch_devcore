@@ -1,6 +1,8 @@
 // Tela de relatórios: ocupação média, uso/ociosidade da frota, gargalos, consulta de condutor (multas) e perguntas à IA.
-class TelaRelatorios {
-  constructor() {
+export default class TelaRelatorios {
+  // ctx vem da casca (js/app/App.js): sessão em cache, sinal para soltar eventos globais ao sair da tela e navegação sem recarregar.
+  constructor(ctx) {
+    this.ctx = ctx;
     this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
     this.usuarioIniciais = document.getElementById('usuario-iniciais');
     this.perfilNome = document.getElementById('perfil-nome');
@@ -49,10 +51,6 @@ class TelaRelatorios {
       this.perguntarIa('/api/ia/resumo', {});
     });
 
-    this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', { metodo: 'POST' });
-      window.location.href = 'login';
-    });
   }
 
   async consultarCondutor(evento) {
@@ -362,7 +360,7 @@ class TelaRelatorios {
   }
 
   async iniciar() {
-    const sessao = await chamarApi('/api/auth/eu');
+    const sessao = await this.ctx.sessao();
     if (!sessao.ok) {
       window.location.href = 'login';
       return;
@@ -379,5 +377,3 @@ class TelaRelatorios {
     this.aoIniciar();
   }
 }
-
-new TelaRelatorios();

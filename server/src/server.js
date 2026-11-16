@@ -281,7 +281,12 @@ class Servidor {
     this.pastaClient = path.join(__dirname, '..', '..', 'client');
     // URLs limpas: /resumo.html vira /resumo (301) e /index.html vira /. O express.static acha o .html sozinho.
     this.app.use((req, res, next) => {
-      if ((req.method === 'GET' || req.method === 'HEAD') && req.path.endsWith('.html')) {
+      // Os fragmentos das telas (/telas/*.html) são buscados pela casca e ficam fora da regra.
+      if (
+        (req.method === 'GET' || req.method === 'HEAD') &&
+        req.path.endsWith('.html') &&
+        !req.path.startsWith('/telas/')
+      ) {
         const limpo = ['/index.html', '/apresentacao.html'].includes(req.path) ? '/' : req.path.slice(0, -'.html'.length);
         // A página de login era o index.html; links antigos para ela continuam caindo no login.
         if (req.path === '/index.html' && req.query.cadastro) {
@@ -296,23 +301,29 @@ class Servidor {
       }
       next();
     });
-    // Speculation Rules: o navegador pré-carrega a tela quando o mouse para em cima do link do menu.
-    this.app.use((req, res, next) => {
-      if (req.method === 'GET' && !path.extname(req.path)) {
-        res.setHeader('Speculation-Rules', '"/speculationrules.json"');
+    // Telas internas: todas abrem a mesma casca (client/app.html), que monta a tela pelo endereço.
+    // Recarregar /frota ou colar o link dela abre direto na Frota, sem passar pelo Resumo.
+    const telasDoSistema = [
+      'resumo',
+      'colaboradores',
+      'alojamentos',
+      'frota',
+      'movimentacoes',
+      'relatorios',
+      'configuracoes'
+    ];
+    const casca = path.join(this.pastaClient, 'app.html');
+    this.app.get(
+      telasDoSistema.map((tela) => '/' + tela),
+      (req, res) => {
+        // A casca muda junto com os módulos das telas; sem cache para ninguém ficar com versões misturadas.
+        res.setHeader('Cache-Control', 'no-cache');
+        res.sendFile(casca);
       }
-      next();
-    });
-    this.app.use(
-      express.static(this.pastaClient, {
-        extensions: ['html'],
-        setHeaders: (res, arquivo) => {
-          if (arquivo.endsWith('speculationrules.json')) {
-            res.setHeader('Content-Type', 'application/speculationrules+json');
-          }
-        }
-      })
     );
+    // /app.html não é um endereço público; quem cair nele vai para o Resumo.
+    this.app.get('/app', (req, res) => res.redirect(301, '/resumo'));
+    this.app.use(express.static(this.pastaClient, { extensions: ['html'] }));
   }
 
   // Trata erros inesperados no fim da fila para nunca mostrar detalhes internos do sistema ao usuário.

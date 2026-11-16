@@ -30,11 +30,7 @@ class Janelas {
       }
     });
 
-    document.querySelectorAll('.modal-overlay, .gaveta-overlay').forEach(this.preparar.bind(this));
-    document.querySelectorAll('.toast').forEach((aviso) => {
-      aviso.setAttribute('role', 'status');
-      aviso.setAttribute('aria-live', 'polite');
-    });
+    this.prepararTela();
 
     this.sair = document.getElementById('botao-sair');
     if (this.sair && !this.sair.getAttribute('aria-label')) {
@@ -98,6 +94,21 @@ class Janelas {
         config.cancelar || 'Cancelar'
       );
     };
+  }
+
+  // Chamado de novo pela casca (js/app/App.js) a cada troca de tela, porque os modais chegam junto com ela.
+  prepararTela() {
+    document.querySelectorAll('.modal-overlay, .gaveta-overlay').forEach(this.preparar.bind(this));
+    document.querySelectorAll('.toast').forEach((aviso) => {
+      aviso.setAttribute('role', 'status');
+      aviso.setAttribute('aria-live', 'polite');
+    });
+  }
+
+  // Ao sair de uma tela, as janelas dela somem do DOM sem passar pelo "fechar"; zera a pilha para o Tab e o Esc não apontarem para elas.
+  limparTela() {
+    this.abertos = [];
+    this.atualizarRolagem();
   }
 
   focaveis(elemento) {
@@ -228,4 +239,4 @@ class Janelas {
   }
 }
 
-new Janelas();
+window.janelas = new Janelas();

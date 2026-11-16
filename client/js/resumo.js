@@ -1,6 +1,8 @@
 // Tela inicial do sistema: confere se a pessoa está logada, carrega os números do dia e lista as últimas movimentações.
-class TelaResumo {
-  constructor() {
+export default class TelaResumo {
+  // ctx vem da casca (js/app/App.js): sessão em cache, sinal para soltar eventos globais ao sair da tela e navegação sem recarregar.
+  constructor(ctx) {
+    this.ctx = ctx;
     this.numVeiculosUso = document.getElementById('num-veiculos-uso');
     this.subVeiculosUso = document.getElementById('sub-veiculos-uso');
     this.detalheVeiculosUso = document.getElementById('detalhe-veiculos-uso');
@@ -57,10 +59,6 @@ class TelaResumo {
       });
     });
 
-    this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', { metodo: 'POST' });
-      window.location.href = 'login';
-    });
   }
 
   mostrarAviso(texto) {
@@ -225,7 +223,7 @@ class TelaResumo {
   async carregarPainel() {
     try {
       // Confere primeiro se existe sessão aberta; sem login, volta para a tela inicial.
-      const sessao = await chamarApi('/api/auth/eu');
+      const sessao = await this.ctx.sessao();
       if (!sessao.ok) {
         window.location.href = 'login';
         return;
@@ -275,5 +273,3 @@ class TelaResumo {
     }
   }
 }
-
-new TelaResumo();
