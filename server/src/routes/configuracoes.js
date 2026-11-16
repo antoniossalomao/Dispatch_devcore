@@ -20,5 +20,6 @@ router.post('/usuarios', controlador.cadastrarUsuario.bind(controlador));
 router.put('/usuarios/:id/perfil', controlador.alterarPerfil.bind(controlador));
 router.put('/usuarios/:id/ativo', controlador.alterarStatus.bind(controlador));
 router.put('/usuarios/:id/senha', controlador.redefinirSenha.bind(controlador));
+router.put('/usuarios/:id/email', controlador.alterarEmailGoogle.bind(controlador));
 
 module.exports = router;

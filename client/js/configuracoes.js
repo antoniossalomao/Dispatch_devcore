@@ -525,7 +525,7 @@ export default class TelaConfiguracoes {
       spanNome.textContent = usuario.nome + (ehEu ? ' (você)' : '');
       const spanLogin = document.createElement('span');
       spanLogin.className = 'pessoa-cargo';
-      spanLogin.textContent = '@' + usuario.login;
+      spanLogin.textContent = '@' + usuario.login + (usuario.email ? ' · Google: ' + usuario.email : '');
       tdPessoa.appendChild(spanNome);
       tdPessoa.appendChild(spanLogin);
 
@@ -565,6 +565,34 @@ export default class TelaConfiguracoes {
         this.redefinirInput.focus();
       });
       box.appendChild(btnSenha);
+
+      // Liga a conta Google que pode entrar como este usuário. Deixar vazio remove o acesso pelo Google.
+      const btnGoogle = document.createElement('button');
+      btnGoogle.type = 'button';
+      btnGoogle.className = 'btn-secundario btn-pequeno';
+      btnGoogle.textContent = usuario.email ? 'Google ligado' : 'Ligar Google';
+      btnGoogle.title = usuario.email
+        ? 'Entra com a conta Google ' + usuario.email
+        : 'Liberar login com Google para este usuário';
+      btnGoogle.addEventListener('click', async () => {
+        const email = await window.pedirTexto(
+          'Login com Google de @' + usuario.login,
+          'E-mail da conta Google (deixe vazio para remover)',
+          { obrigatorio: false, confirmar: 'Salvar' }
+        );
+        if (email === null) return;
+        const resposta = await chamarApi('/api/configuracoes/usuarios/' + usuario.id + '/email', {
+          metodo: 'PUT',
+          corpo: { email: email }
+        });
+        if (!resposta.ok) {
+          this.mostrarToast(resposta.dados.erro || 'Erro ao salvar o e-mail.', 'erro');
+          return;
+        }
+        this.mostrarToast(resposta.dados.mensagem, 'ok');
+        this.carregarDados();
+      });
+      box.appendChild(btnGoogle);
 
       // O próprio usuário logado não pode tirar o próprio acesso admin nem se desativar por engano.
       if (!ehEu) {

@@ -5,6 +5,7 @@ const auditoria = require('../services/Auditoria');
 const configuracao = require('../services/Configuracao');
 const controleAcesso = require('../middlewares/autenticacao');
 const validador = require('../regras/validacao');
+const loginGoogle = require('../services/LoginGoogle');
 
 // Cuida de login, logout, verificação de sessão aberta e auto-cadastro por convite.
 class ControladorAutenticacao {
@@ -42,19 +43,9 @@ class ControladorAutenticacao {
         return res.status(401).json({ erro: 'Usuário ou senha incorretos.' });
       }
 
-      // Gera um ID de sessão novo ao logar para evitar aproveitamento de cookie antigo (fixação de sessão).
-      req.session.regenerate((erroRegen) => {
-        if (erroRegen) return next(erroRegen);
-        req.session.usuario = {
-          id: usuarioBanco.id,
-          nome: usuarioBanco.nome,
-          login: usuarioBanco.login,
-          perfil: usuarioBanco.perfil
-        };
-        req.session.save((erroSalvar) => {
-          if (erroSalvar) return next(erroSalvar);
-          res.json({ usuario: req.session.usuario });
-        });
+      this.abrirSessao(req, usuarioBanco, (erro) => {
+        if (erro) return next(erro);
+        res.json({ usuario: req.session.usuario });
       });
     } catch (erro) {
       next(erro);
@@ -132,6 +123,61 @@ class ControladorAutenticacao {
       res.status(201).json({ mensagem: 'Conta criada com sucesso!' });
     } catch (erro) {
       next(erro);
+    }
+  }
+
+  // Abre a sessão do usuário (senha ou Google) com um ID novo, contra fixação de sessão.
+  abrirSessao(req, usuarioBanco, aoTerminar) {
+    req.session.regenerate((erroRegen) => {
+      if (erroRegen) return aoTerminar(erroRegen);
+      req.session.usuario = {
+        id: usuarioBanco.id,
+        nome: usuarioBanco.nome,
+        login: usuarioBanco.login,
+        perfil: usuarioBanco.perfil
+      };
+      req.session.save(aoTerminar);
+    });
+  }
+
+  googleStatus(req, res) {
+    res.json({ ativo: loginGoogle.configuracao().ativo });
+  }
+
+  googleIniciar(req, res, next) {
+    if (!loginGoogle.configuracao().ativo) {
+      return res.redirect(302, '/login?google=indisponivel');
+    }
+    const { url, guardar } = loginGoogle.iniciar(req);
+    req.session.google = guardar;
+    req.session.save((erro) => {
+      if (erro) return next(erro);
+      res.redirect(302, url);
+    });
+  }
+
+  async googleRetorno(req, res) {
+    const guardado = req.session.google;
+    delete req.session.google;
+    const voltar = (motivo) => res.redirect(302, '/login?google=' + motivo);
+
+    try {
+      if (!loginGoogle.configuracao().ativo) return voltar('indisponivel');
+      if (req.query.error) return voltar('cancelado');
+      const codigo = typeof req.query.code === 'string' ? req.query.code : '';
+      if (!codigo || !loginGoogle.estadoValido(guardado, req.query.state)) return voltar('expirado');
+
+      const identidade = await loginGoogle.confirmarIdentidade(codigo, guardado);
+      const usuarioBanco = loginGoogle.buscarUsuarioPorEmail(identidade.email);
+      if (!usuarioBanco) return voltar('sem-acesso');
+
+      this.abrirSessao(req, usuarioBanco, (erro) => {
+        if (erro) return voltar('falhou');
+        res.redirect(302, '/resumo');
+      });
+    } catch (erro) {
+      console.error('Login com Google falhou:', erro.message);
+      voltar('falhou');
     }
   }
 

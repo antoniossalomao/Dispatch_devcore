@@ -742,6 +742,112 @@ test('telas do sistema abrem a casca única e endereços antigos redirecionam', 
   }
 });
 
+test('login com Google só entra em usuário ativo com o e-mail ligado pelo admin', async () => {
+  const servidor = new Servidor().app.listen(0, '127.0.0.1');
+  await new Promise((ok) => servidor.once('listening', ok));
+  const endereco = 'http://127.0.0.1:' + servidor.address().port;
+  const fetchOriginal = globalThis.fetch;
+  const envAntes = { id: process.env.GOOGLE_CLIENT_ID, segredo: process.env.GOOGLE_CLIENT_SECRET };
+  let cargaGoogle = null;
+
+  // Só o endpoint de token do Google é simulado; o resto passa pelo fetch de verdade.
+  globalThis.fetch = async (url, opcoes) => {
+    if (String(url).startsWith('https://oauth2.googleapis.com/token')) {
+      const corpo = new URLSearchParams(opcoes.body);
+      assert.equal(corpo.get('code'), 'codigo-teste');
+      assert.equal(corpo.get('client_secret'), 'segredo-teste');
+      const jwt = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
+      return new Response(
+        JSON.stringify({ id_token: jwt({ alg: 'RS256' }) + '.' + jwt(cargaGoogle) + '.assinatura' }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+    return fetchOriginal(url, opcoes);
+  };
+
+  const pegar = async (rota, cookie) => {
+    const r = await fetchOriginal(endereco + rota, {
+      redirect: 'manual',
+      headers: cookie ? { Cookie: cookie } : {}
+    });
+    const novo = r.headers.get('set-cookie');
+    return { r, cookie: novo ? novo.split(';')[0] : cookie };
+  };
+  const tentar = async (claims) => {
+    const ida = await pegar('/api/auth/google');
+    assert.equal(ida.r.status, 302);
+    const destino = new URL(ida.r.headers.get('location'));
+    assert.equal(destino.host, 'accounts.google.com');
+    assert.equal(destino.searchParams.get('client_id'), 'cliente-teste');
+    const estado = destino.searchParams.get('state');
+    cargaGoogle = Object.assign(
+      {
+        iss: 'https://accounts.google.com',
+        aud: 'cliente-teste',
+        exp: Math.floor(Date.now() / 1000) + 300,
+        nonce: destino.searchParams.get('nonce'),
+        email: 'Admin.Teste@Gmail.com',
+        email_verified: true
+      },
+      claims
+    );
+    const volta = await pegar(
+      '/api/auth/google/retorno?code=codigo-teste&state=' + encodeURIComponent(estado),
+      ida.cookie
+    );
+    return { local: volta.r.headers.get('location'), cookie: volta.cookie };
+  };
+
+  try {
+    delete process.env.GOOGLE_CLIENT_ID;
+    delete process.env.GOOGLE_CLIENT_SECRET;
+    const desligado = await (await fetchOriginal(endereco + '/api/auth/google/status')).json();
+    assert.equal(desligado.ativo, false);
+    assert.equal((await pegar('/api/auth/google')).r.headers.get('location'), '/login?google=indisponivel');
+
+    process.env.GOOGLE_CLIENT_ID = 'cliente-teste';
+    process.env.GOOGLE_CLIENT_SECRET = 'segredo-teste';
+    assert.equal((await (await fetchOriginal(endereco + '/api/auth/google/status')).json()).ativo, true);
+
+    // Sem e-mail ligado, a conta Google não entra.
+    assert.equal((await tentar({})).local, '/login?google=sem-acesso');
+
+    // Admin liga o e-mail ao usuário admin.
+    const admin = cliente(endereco);
+    assert.equal((await admin('/auth/login', 'POST', { usuario: 'admin', senha: 'admin123' })).status, 200);
+    const config = await admin('/configuracoes');
+    const idAdmin = config.dados.usuarios.find((u) => u.login === 'admin').id;
+    assert.equal((await admin('/configuracoes/usuarios/' + idAdmin + '/email', 'PUT', { email: 'nao-e-email' })).status, 400);
+    assert.equal((await admin('/configuracoes/usuarios/' + idAdmin + '/email', 'PUT', { email: 'admin.teste@gmail.com' })).status, 200);
+
+    // Estado trocado, token de outro cliente e e-mail não verificado continuam barrados.
+    const ida = await pegar('/api/auth/google');
+    const forjado = await pegar('/api/auth/google/retorno?code=codigo-teste&state=forjado', ida.cookie);
+    assert.equal(forjado.r.headers.get('location'), '/login?google=expirado');
+    assert.equal((await tentar({ aud: 'outro-cliente' })).local, '/login?google=falhou');
+    assert.equal((await tentar({ email_verified: false })).local, '/login?google=falhou');
+    assert.equal((await tentar({ nonce: 'outro' })).local, '/login?google=falhou');
+
+    // Tudo certo: entra e a sessão vale para a API.
+    const ok = await tentar({});
+    assert.equal(ok.local, '/resumo');
+    const eu = await fetchOriginal(endereco + '/api/auth/eu', { headers: { Cookie: ok.cookie } });
+    assert.equal(eu.status, 200);
+    assert.equal((await eu.json()).usuario.login, 'admin');
+
+    // Remover o e-mail tira o acesso pelo Google.
+    assert.equal((await admin('/configuracoes/usuarios/' + idAdmin + '/email', 'PUT', { email: '' })).status, 200);
+    assert.equal((await tentar({})).local, '/login?google=sem-acesso');
+  } finally {
+    globalThis.fetch = fetchOriginal;
+    if (envAntes.id === undefined) delete process.env.GOOGLE_CLIENT_ID;
+    else process.env.GOOGLE_CLIENT_ID = envAntes.id;
+    if (envAntes.segredo === undefined) delete process.env.GOOGLE_CLIENT_SECRET;
+    else process.env.GOOGLE_CLIENT_SECRET = envAntes.segredo;
+    await new Promise((ok) => servidor.close(ok));
+  }
+});
+
 test.after(() => {
   db.close();
   fs.rmSync(pasta, { recursive: true, force: true });

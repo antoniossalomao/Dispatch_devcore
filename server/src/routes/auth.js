@@ -10,5 +10,9 @@ router.get('/cadastro-status', controlador.cadastroStatus.bind(controlador));
 router.post('/cadastro', controlador.cadastrar.bind(controlador));
 router.get('/eu', controlador.consultarSessao.bind(controlador));
 router.post('/sair', controlador.sair.bind(controlador));
+// Login com Google: status (mostra ou esconde o botão), ida ao Google e volta com o código.
+router.get('/google/status', controlador.googleStatus.bind(controlador));
+router.get('/google', controlador.googleIniciar.bind(controlador));
+router.get('/google/retorno', controlador.googleRetorno.bind(controlador));
 
 module.exports = router;
