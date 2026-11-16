@@ -1,4 +1,4 @@
-// Controla o cadastro de acesso.
+// Tela de criação de conta por convite: verifica se o servidor liberou cadastros e valida os campos antes de enviar.
 class TelaCadastro {
   constructor() {
     this.form = document.getElementById('form-cadastro');
@@ -15,17 +15,18 @@ class TelaCadastro {
     this.verificarDisponibilidade();
   }
 
+  // Sem código de convite configurado no servidor, o cadastro público fica fechado.
   async verificarDisponibilidade() {
     try {
-      const res = await chamarApi('/api/auth/cadastro-status');
-      if (res.ok && res.dados && res.dados.ativo) {
+      const resposta = await chamarApi('/api/auth/cadastro-status');
+      if (resposta.ok && resposta.dados && resposta.dados.ativo) {
         this.form.hidden = false;
         if (this.avisoDesativado) this.avisoDesativado.hidden = true;
       } else {
         this.form.hidden = true;
         if (this.avisoDesativado) this.avisoDesativado.hidden = false;
       }
-    } catch (_) {
+    } catch (erro) {
       this.form.hidden = true;
       if (this.avisoDesativado) {
         this.avisoDesativado.textContent =
@@ -44,25 +45,30 @@ class TelaCadastro {
     this.form.addEventListener('submit', this.cadastrar.bind(this));
   }
 
-  async cadastrar(e) {
-    e.preventDefault();
+  async cadastrar(evento) {
+    evento.preventDefault();
     this.esconderErro();
+
     const codigo = this.inputCodigo ? this.inputCodigo.value.trim() : '';
     const nome = this.inputNome.value.trim();
     const usuario = this.inputUsuario.value.trim();
     const senha = this.inputSenha.value;
     const confirmar = this.inputConfirmar.value;
+
     if (codigo === '' || nome === '' || usuario === '' || senha === '' || confirmar === '') {
-      this.mostrarErro(
-        'Preencha todos os campos.',
-        [this.inputCodigo, this.inputNome, this.inputUsuario, this.inputSenha, this.inputConfirmar].find(
-          (campo) => {
-            return campo && campo.value.trim() === '';
-          }
-        )
-      );
+      const primeiroVazio = [
+        this.inputCodigo,
+        this.inputNome,
+        this.inputUsuario,
+        this.inputSenha,
+        this.inputConfirmar
+      ].find((campo) => {
+        return campo && campo.value.trim() === '';
+      });
+      this.mostrarErro('Preencha todos os campos.', primeiroVazio);
       return;
     }
+
     if (usuario.indexOf(' ') !== -1) {
       this.mostrarErro('O nome de usuário não pode ter espaços.', this.inputUsuario);
       return;
@@ -75,11 +81,12 @@ class TelaCadastro {
       this.mostrarErro('As senhas digitadas não conferem.', this.inputConfirmar);
       return;
     }
-    this.esconderErro();
+
     this.botaoCadastrar.disabled = true;
     this.botaoCadastrar.textContent = 'Cadastrando...';
+
     try {
-      const res = await chamarApi('/api/auth/cadastro', {
+      const resposta = await chamarApi('/api/auth/cadastro', {
         metodo: 'POST',
         corpo: {
           codigo: codigo,
@@ -88,12 +95,14 @@ class TelaCadastro {
           senha: senha
         }
       });
-      if (!res.ok) {
-        this.mostrarErro(res.dados.erro || 'Erro ao criar a conta.');
+
+      if (!resposta.ok) {
+        this.mostrarErro(resposta.dados.erro || 'Erro ao criar a conta.');
         this.botaoCadastrar.disabled = false;
         this.botaoCadastrar.textContent = 'Criar conta';
         return;
       }
+
       window.location.href = 'index.html?cadastro=ok';
     } catch (erro) {
       this.mostrarErro('Não consegui falar com o servidor. Confira se ele está ligado.');
@@ -108,22 +117,24 @@ class TelaCadastro {
     if (campo) {
       campo.setAttribute('aria-invalid', 'true');
       campo.focus();
-    } else this.msgErro.focus();
+    } else {
+      this.msgErro.focus();
+    }
   }
 
   esconderErro() {
     this.msgErro.textContent = '';
     this.msgErro.hidden = true;
-    const campos = [
+    [
       this.inputCodigo,
       this.inputNome,
       this.inputUsuario,
       this.inputSenha,
       this.inputConfirmar
-    ];
-    campos.forEach((campo) => {
+    ].forEach((campo) => {
       if (campo) campo.removeAttribute('aria-invalid');
     });
   }
 }
+
 new TelaCadastro();

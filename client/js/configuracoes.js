@@ -1,4 +1,4 @@
-// Controla a tela de configuracoes.
+// Tela de configurações (somente admin): parâmetros da operação, alertas/Telegram, contas de usuários, backup do banco, auditoria e dados da própria conta.
 class TelaConfiguracoes {
   constructor() {
     this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
@@ -9,6 +9,7 @@ class TelaConfiguracoes {
     this.avisoTela = document.getElementById('aviso-tela');
     this.seloAlterado = document.getElementById('selo-alterado');
     this.toast = document.getElementById('toast-retorno');
+
     this.botoesNav = document.querySelectorAll('.config-nav-item');
     this.paineis = {
       regras: document.getElementById('painel-regras'),
@@ -18,9 +19,11 @@ class TelaConfiguracoes {
       auditoria: document.getElementById('painel-auditoria'),
       conta: document.getElementById('painel-conta')
     };
+
     this.formRegras = document.getElementById('painel-regras');
     this.formAlertas = document.getElementById('form-alertas');
     this.botaoRestaurar = document.getElementById('botao-restaurar');
+
     this.cfgEmpresa = document.getElementById('cfg-empresa');
     this.cfgCidade = document.getElementById('cfg-cidade');
     this.cfgDocumento = document.getElementById('cfg-documento');
@@ -36,6 +39,7 @@ class TelaConfiguracoes {
     this.cfgDiasPendencia = document.getElementById('cfg-dias-pendencia');
     this.cfgLotacaoPct = document.getElementById('cfg-lotacao-pct');
     this.cfgTelegram = document.getElementById('cfg-telegram');
+
     this.badgeIa = document.getElementById('badge-ia');
     this.descIa = document.getElementById('desc-ia');
     this.badgeTelegram = document.getElementById('badge-telegram');
@@ -43,6 +47,7 @@ class TelaConfiguracoes {
     this.botaoTestarAlerta = document.getElementById('botao-testar-alerta');
     this.caixaPreviaAlerta = document.getElementById('caixa-previa-alerta');
     this.textoPreviaAlerta = document.getElementById('texto-previa-alerta');
+
     this.contAtivos = document.getElementById('cont-ativos');
     this.contAdmins = document.getElementById('cont-admins');
     this.contOperadores = document.getElementById('cont-operadores');
@@ -57,11 +62,13 @@ class TelaConfiguracoes {
     this.novoTelefone = document.getElementById('novo-telefone');
     this.novoPerfil = document.getElementById('novo-perfil');
     this.novoSenha = document.getElementById('novo-senha');
+
     this.caixaRedefinir = document.getElementById('caixa-redefinir');
     this.redefinirRotulo = document.getElementById('redefinir-rotulo');
     this.redefinirInput = document.getElementById('redefinir-input');
     this.redefinirSalvar = document.getElementById('redefinir-salvar');
     this.redefinirCancelar = document.getElementById('redefinir-cancelar');
+
     this.linkBackup = document.getElementById('link-backup');
     this.dbTamanho = document.getElementById('db-tamanho');
     this.dbTabelas = document.getElementById('db-tabelas');
@@ -72,6 +79,7 @@ class TelaConfiguracoes {
     this.integridadeTitulo = document.getElementById('integridade-titulo');
     this.integridadeMotivo = document.getElementById('integridade-motivo');
     this.tabelaLogsRecentes = document.getElementById('tabela-logs-recentes');
+
     this.formMinhaConta = document.getElementById('form-minha-conta');
     this.contaAvatarPrevia = document.getElementById('conta-avatar-previa');
     this.contaTituloPrevia = document.getElementById('conta-titulo-previa');
@@ -83,11 +91,13 @@ class TelaConfiguracoes {
     this.senhaNova = document.getElementById('senha-nova');
     this.senhaConfirmar = document.getElementById('senha-confirmar');
     this.mostrarSenhasConta = document.getElementById('mostrar-senhas-conta');
+
     this.meuId = null;
     this.meuLogin = '';
     this.todosUsuarios = [];
     this.usuarioRedefinindoId = null;
     this.timerToast = null;
+
     this.linkBackup.href = baseApi + '/api/configuracoes/backup';
     this.camposMonitorados = [
       this.cfgEmpresa,
@@ -108,6 +118,7 @@ class TelaConfiguracoes {
     ];
     this.parametrosSalvos = null;
     this.linksEmBreve = document.querySelectorAll('.menu-em-breve');
+
     this.configurarEventos();
     this.carregarDados();
   }
@@ -120,13 +131,17 @@ class TelaConfiguracoes {
         this.abrirAbaConfig(alvo);
       });
     });
+
     window.addEventListener('hashchange', () => {
       this.abrirAbaConfig(window.location.hash.slice(1));
     });
+
     this.camposMonitorados.forEach((campo) => {
       campo.addEventListener('input', this.atualizarEstadoParametros.bind(this));
       campo.addEventListener('change', this.atualizarEstadoParametros.bind(this));
     });
+
+    // Se o admin alterou alguma regra e tentar fechar a guia sem salvar, o navegador avisa antes.
     window.addEventListener('beforeunload', (evento) => {
       if (this.atualizarEstadoParametros()) {
         evento.preventDefault();
@@ -134,10 +149,12 @@ class TelaConfiguracoes {
       }
     });
     this.atualizarEstadoParametros();
+
     this.formRegras.addEventListener('submit', this.salvarParametros.bind(this));
     this.formAlertas.addEventListener('submit', this.salvarParametros.bind(this));
     this.botaoRestaurar.addEventListener('click', this.restaurarParametros.bind(this));
     this.botaoTestarAlerta.addEventListener('click', this.testarAlerta.bind(this));
+
     this.abrirNovoUsuario.addEventListener('click', () => {
       this.formNovoUsuario.hidden = false;
       this.novoNome.focus();
@@ -148,6 +165,7 @@ class TelaConfiguracoes {
     this.buscaUsuario.addEventListener('input', () => {
       this.desenharUsuarios();
     });
+
     this.redefinirCancelar.addEventListener('click', () => {
       this.caixaRedefinir.hidden = true;
       this.usuarioRedefinindoId = null;
@@ -155,95 +173,92 @@ class TelaConfiguracoes {
     this.redefinirSalvar.addEventListener('click', this.salvarSenhaUsuario.bind(this));
     this.formNovoUsuario.addEventListener('submit', this.cadastrarUsuario.bind(this));
     this.botaoVerificarLog.addEventListener('click', this.verificarIntegridade.bind(this));
+
     this.contaNome.addEventListener('input', () => {
       const nome = this.contaNome.value.trim() || 'Administrador';
       this.contaTituloPrevia.textContent = nome;
       this.contaAvatarPrevia.textContent = this.pegarIniciais(nome);
     });
+
     this.mostrarSenhasConta.addEventListener('change', () => {
       const tipo = this.mostrarSenhasConta.checked ? 'text' : 'password';
       this.senhaAtual.type = tipo;
       this.senhaNova.type = tipo;
       this.senhaConfirmar.type = tipo;
     });
+
     this.formMinhaConta.addEventListener('submit', this.salvarMinhaConta.bind(this));
     this.formMinhaSenha.addEventListener('submit', this.salvarMinhaSenha.bind(this));
+
     this.linksEmBreve.forEach((link) => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
+      link.addEventListener('click', (evento) => {
+        evento.preventDefault();
         this.mostrarAvisoTopo('Módulo "' + link.dataset.tela + '" em construção.');
       });
     });
+
     this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', {
-        metodo: 'POST'
-      });
+      await chamarApi('/api/auth/sair', { metodo: 'POST' });
       window.location.href = 'index.html';
     });
   }
 
   async restaurarParametros() {
-    if (
-      !(await confirmar(
-        'As regras atuais e as alterações não salvas serão substituídas pelos parâmetros padrão.',
-        {
-          titulo: 'Restaurar parâmetros padrão',
-          confirmar: 'Restaurar padrões'
-        }
-      ))
-    )
-      return;
-    const r = await chamarApi('/api/configuracoes/restaurar-padrao', {
-      metodo: 'POST'
-    });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Não foi possível restaurar.', 'erro');
+    const confirmado = await confirmar(
+      'As regras atuais e as alterações não salvas serão substituídas pelos parâmetros padrão.',
+      {
+        titulo: 'Restaurar parâmetros padrão',
+        confirmar: 'Restaurar padrões'
+      }
+    );
+    if (!confirmado) return;
+
+    const resposta = await chamarApi('/api/configuracoes/restaurar-padrao', { metodo: 'POST' });
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Não foi possível restaurar.', 'erro');
       return;
     }
-    this.preencherParametros(r.dados.parametros);
-    this.mostrarToast(r.dados.mensagem, 'ok');
+
+    this.preencherParametros(resposta.dados.parametros);
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.carregarDados();
   }
 
   async testarAlerta() {
-    const r = await chamarApi('/api/configuracoes/testar-alerta', {
-      metodo: 'POST'
-    });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao simular alerta.', 'erro');
+    const resposta = await chamarApi('/api/configuracoes/testar-alerta', { metodo: 'POST' });
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao simular alerta.', 'erro');
       return;
     }
-    this.textoPreviaAlerta.textContent = r.dados.previa;
+    this.textoPreviaAlerta.textContent = resposta.dados.previa;
     this.caixaPreviaAlerta.hidden = false;
-    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
   }
 
   async salvarSenhaUsuario() {
-    if (!this.usuarioRedefinindoId) {
-      return;
-    }
-    const r = await chamarApi(
+    if (!this.usuarioRedefinindoId) return;
+
+    const resposta = await chamarApi(
       '/api/configuracoes/usuarios/' + this.usuarioRedefinindoId + '/senha',
       {
         metodo: 'PUT',
-        corpo: {
-          novaSenha: this.redefinirInput.value
-        }
+        corpo: { novaSenha: this.redefinirInput.value }
       }
     );
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao redefinir a senha.', 'erro');
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao redefinir a senha.', 'erro');
       return;
     }
+
     this.caixaRedefinir.hidden = true;
     this.usuarioRedefinindoId = null;
-    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.carregarDados();
   }
 
-  async cadastrarUsuario(e) {
-    e.preventDefault();
-    const r = await chamarApi('/api/configuracoes/usuarios', {
+  async cadastrarUsuario(evento) {
+    evento.preventDefault();
+    const resposta = await chamarApi('/api/configuracoes/usuarios', {
       metodo: 'POST',
       corpo: {
         nome: this.novoNome.value,
@@ -253,82 +268,85 @@ class TelaConfiguracoes {
         senha: this.novoSenha.value
       }
     });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao cadastrar usuário.', 'erro');
+
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao cadastrar usuário.', 'erro');
       return;
     }
+
     this.formNovoUsuario.reset();
     this.formNovoUsuario.hidden = true;
-    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.carregarDados();
   }
 
   async verificarIntegridade() {
-    const r = await chamarApi('/api/configuracoes/verificar-log');
-    if (!r.ok) {
+    const resposta = await chamarApi('/api/configuracoes/verificar-log');
+    if (!resposta.ok) {
       this.mostrarToast('Não foi possível verificar o log.', 'erro');
       return;
     }
-    this.desenharBanco(r.dados.banco);
+    this.desenharBanco(resposta.dados.banco);
     this.mostrarToast('Verificação de integridade concluída.', 'ok');
   }
 
-  async salvarMinhaConta(e) {
-    e.preventDefault();
-    const r = await chamarApi('/api/configuracoes/minha-conta', {
+  async salvarMinhaConta(evento) {
+    evento.preventDefault();
+    const resposta = await chamarApi('/api/configuracoes/minha-conta', {
       metodo: 'PUT',
       corpo: {
         nome: this.contaNome.value,
         telegram_chat_id: this.contaTelefone.value
       }
     });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao atualizar dados.', 'erro');
+
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao atualizar dados.', 'erro');
       return;
     }
-    const novoNome = r.dados.usuario.nome;
+
+    const novoNome = resposta.dados.usuario.nome;
     this.perfilNome.textContent = novoNome;
     this.usuarioIniciais.textContent = this.pegarIniciais(novoNome);
     this.contaTituloPrevia.textContent = novoNome;
     this.contaAvatarPrevia.textContent = this.pegarIniciais(novoNome);
-    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.carregarDados();
   }
 
-  async salvarMinhaSenha(e) {
-    e.preventDefault();
+  async salvarMinhaSenha(evento) {
+    evento.preventDefault();
     if (this.senhaNova.value !== this.senhaConfirmar.value) {
       this.mostrarToast('A confirmação da nova senha não confere.', 'erro');
       return;
     }
-    const r = await chamarApi('/api/configuracoes/minha-senha', {
+
+    const resposta = await chamarApi('/api/configuracoes/minha-senha', {
       metodo: 'PUT',
       corpo: {
         senhaAtual: this.senhaAtual.value,
         novaSenha: this.senhaNova.value
       }
     });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao alterar a senha.', 'erro');
+
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao alterar a senha.', 'erro');
       return;
     }
+
     this.formMinhaSenha.reset();
     this.senhaAtual.type = 'password';
     this.senhaNova.type = 'password';
     this.senhaConfirmar.type = 'password';
-    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.carregarDados();
   }
 
   pegarIniciais(nome) {
     const texto = (nome || '').trim();
-    if (texto === '') {
-      return '--';
-    }
+    if (texto === '') return '--';
     const partes = texto.split(' ');
-    if (partes.length === 1) {
-      return partes[0].slice(0, 2).toUpperCase();
-    }
+    if (partes.length === 1) return partes[0].slice(0, 2).toUpperCase();
     return (partes[0][0] + partes[partes.length - 1][0]).toUpperCase();
   }
 
@@ -336,9 +354,7 @@ class TelaConfiguracoes {
     this.toast.textContent = texto;
     this.toast.className = tipo === 'erro' ? 'toast toast-erro' : 'toast';
     this.toast.hidden = false;
-    if (this.timerToast) {
-      clearTimeout(this.timerToast);
-    }
+    if (this.timerToast) clearTimeout(this.timerToast);
     this.timerToast = setTimeout(() => {
       this.toast.hidden = true;
     }, 3200);
@@ -353,21 +369,23 @@ class TelaConfiguracoes {
   }
 
   abrirAbaConfig(alvo) {
-    if (!Object.prototype.hasOwnProperty.call(this.paineis, alvo)) alvo = 'regras';
+    // Aceita somente os nomes das abas que existem na tela (ignora qualquer valor estranho no #hash da URL).
+    const abasValidas = ['regras', 'alertas', 'usuarios', 'banco', 'auditoria', 'conta'];
+    if (!abasValidas.includes(alvo)) alvo = 'regras';
+
     this.botoesNav.forEach((botao) => {
       const ativa = botao.dataset.aba === alvo;
       botao.classList.toggle('ativa', ativa);
       if (ativa) botao.setAttribute('aria-current', 'true');
       else botao.removeAttribute('aria-current');
     });
+
     Object.keys(this.paineis).forEach((chave) => {
       this.paineis[chave].hidden = chave !== alvo;
     });
-    document.dispatchEvent(
-      new CustomEvent('dispatch:config-aba', {
-        detail: alvo
-      })
-    );
+
+    // Avisa a classe TelaAuditoria (no arquivo auditoria.js) quando a aba de auditoria for aberta.
+    document.dispatchEvent(new CustomEvent('dispatch:config-aba', { detail: alvo }));
   }
 
   atualizarEstadoParametros() {
@@ -375,11 +393,12 @@ class TelaConfiguracoes {
       this.parametrosSalvos !== null &&
       this.parametrosSalvos !== JSON.stringify(this.lerFormularioParametros());
     this.seloAlterado.hidden = !alterados;
-    const formularios = [this.formRegras, this.formAlertas];
-    formularios.forEach((formulario) => {
+
+    [this.formRegras, this.formAlertas].forEach((formulario) => {
       formulario.querySelector('button[type="submit"]').disabled =
         !alterados || formulario.getAttribute('aria-busy') === 'true';
     });
+
     return alterados;
   }
 
@@ -403,39 +422,41 @@ class TelaConfiguracoes {
     };
   }
 
-  preencherParametros(p) {
-    this.nomeEmpresaMenu.textContent = p.nomeEmpresa;
-    this.cfgEmpresa.value = p.nomeEmpresa || '';
-    this.cfgCidade.value = p.cidadeBase || '';
-    this.cfgDocumento.value = p.documentoEmpresa || '';
-    this.cfgDiasVencimento.value = p.diasAvisoVencimento;
-    this.cfgHorasRetorno.value = p.horasAlertaRetorno;
-    this.cfgKmConfirmacao.value = p.kmConfirmacaoViagem;
-    this.cfgDiasPendencia.value = p.diasAlertaPendencia;
-    this.cfgMaxLeitos.value = p.maxLeitosQuarto;
-    this.cfgAreaCama.value = p.areaMinimaCama;
-    this.cfgAreaBeliche.value = p.areaMinimaBeliche;
-    this.cfgLotacaoPct.value = p.lotacaoAlertaPct;
-    this.cfgBloquearDoc.checked = Boolean(p.bloquearDocVencido);
-    this.cfgAvisarSeguro.checked = Boolean(p.avisarSeguroVencido);
-    this.cfgValidarNr24.checked = Boolean(p.validarNr24);
-    this.cfgTelegram.checked = Boolean(p.telegramCriticos);
+  preencherParametros(parametros) {
+    this.nomeEmpresaMenu.textContent = parametros.nomeEmpresa;
+    this.cfgEmpresa.value = parametros.nomeEmpresa || '';
+    this.cfgCidade.value = parametros.cidadeBase || '';
+    this.cfgDocumento.value = parametros.documentoEmpresa || '';
+    this.cfgDiasVencimento.value = parametros.diasAvisoVencimento;
+    this.cfgHorasRetorno.value = parametros.horasAlertaRetorno;
+    this.cfgKmConfirmacao.value = parametros.kmConfirmacaoViagem;
+    this.cfgDiasPendencia.value = parametros.diasAlertaPendencia;
+    this.cfgMaxLeitos.value = parametros.maxLeitosQuarto;
+    this.cfgAreaCama.value = parametros.areaMinimaCama;
+    this.cfgAreaBeliche.value = parametros.areaMinimaBeliche;
+    this.cfgLotacaoPct.value = parametros.lotacaoAlertaPct;
+    this.cfgBloquearDoc.checked = Boolean(parametros.bloquearDocVencido);
+    this.cfgAvisarSeguro.checked = Boolean(parametros.avisarSeguroVencido);
+    this.cfgValidarNr24.checked = Boolean(parametros.validarNr24);
+    this.cfgTelegram.checked = Boolean(parametros.telegramCriticos);
+
     this.parametrosSalvos = JSON.stringify(this.lerFormularioParametros());
     this.atualizarEstadoParametros();
   }
 
-  async salvarParametros(e) {
-    e.preventDefault();
-    const r = await chamarApi('/api/configuracoes/parametros', {
+  async salvarParametros(evento) {
+    evento.preventDefault();
+    const resposta = await chamarApi('/api/configuracoes/parametros', {
       metodo: 'PUT',
       corpo: this.lerFormularioParametros()
     });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao salvar configurações.', 'erro');
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao salvar configurações.', 'erro');
       return;
     }
-    this.preencherParametros(r.dados.parametros);
-    this.mostrarToast(r.dados.mensagem, 'ok');
+
+    this.preencherParametros(resposta.dados.parametros);
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.carregarDados();
   }
 
@@ -444,18 +465,17 @@ class TelaConfiguracoes {
     let admins = 0;
     let operadores = 0;
     let inativos = 0;
-    lista.forEach((u) => {
-      if (u.ativo === 1) {
+
+    lista.forEach((usuario) => {
+      if (usuario.ativo === 1) {
         ativos++;
-        if (u.perfil === 'admin') {
-          admins++;
-        } else {
-          operadores++;
-        }
+        if (usuario.perfil === 'admin') admins++;
+        else operadores++;
       } else {
         inativos++;
       }
     });
+
     this.contAtivos.textContent = ativos;
     this.contAdmins.textContent = admins;
     this.contOperadores.textContent = operadores;
@@ -465,14 +485,14 @@ class TelaConfiguracoes {
   desenharUsuarios() {
     this.tabelaUsuarios.innerHTML = '';
     const termo = this.buscaUsuario.value.trim().toLowerCase();
-    const filtrados = this.todosUsuarios.filter((u) => {
-      if (termo === '') {
-        return true;
-      }
+    const filtrados = this.todosUsuarios.filter((usuario) => {
+      if (termo === '') return true;
       return (
-        u.nome.toLowerCase().indexOf(termo) !== -1 || u.login.toLowerCase().indexOf(termo) !== -1
+        usuario.nome.toLowerCase().indexOf(termo) !== -1 ||
+        usuario.login.toLowerCase().indexOf(termo) !== -1
       );
     });
+
     if (filtrados.length === 0) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
@@ -483,90 +503,101 @@ class TelaConfiguracoes {
       this.tabelaUsuarios.appendChild(tr);
       return;
     }
-    filtrados.forEach((u) => {
+
+    filtrados.forEach((usuario) => {
       const tr = document.createElement('tr');
-      const ehEu = u.id === this.meuId;
+      const ehEu = usuario.id === this.meuId;
+
       const tdPessoa = document.createElement('td');
-      const sNome = document.createElement('span');
-      sNome.className = 'pessoa-nome';
-      sNome.textContent = u.nome + (ehEu ? ' (você)' : '');
-      const sLogin = document.createElement('span');
-      sLogin.className = 'pessoa-cargo';
-      sLogin.textContent = '@' + u.login;
-      tdPessoa.appendChild(sNome);
-      tdPessoa.appendChild(sLogin);
+      const spanNome = document.createElement('span');
+      spanNome.className = 'pessoa-nome';
+      spanNome.textContent = usuario.nome + (ehEu ? ' (você)' : '');
+      const spanLogin = document.createElement('span');
+      spanLogin.className = 'pessoa-cargo';
+      spanLogin.textContent = '@' + usuario.login;
+      tdPessoa.appendChild(spanNome);
+      tdPessoa.appendChild(spanLogin);
+
       const tdTel = document.createElement('td');
-      tdTel.textContent = u.telegram_chat_id || '—';
+      tdTel.textContent = usuario.telegram_chat_id || '—';
+
       const tdPerfil = document.createElement('td');
       const badge = document.createElement('span');
       badge.className =
-        'perfil-badge ' + (u.perfil === 'admin' ? 'perfil-admin' : 'perfil-operador');
-      badge.textContent = u.perfil === 'admin' ? 'Admin' : 'Operador';
+        'perfil-badge ' + (usuario.perfil === 'admin' ? 'perfil-admin' : 'perfil-operador');
+      badge.textContent = usuario.perfil === 'admin' ? 'Admin' : 'Operador';
       tdPerfil.appendChild(badge);
+
       const tdStatus = document.createElement('td');
       const tag = document.createElement('span');
-      tag.className = u.ativo === 1 ? 'status-tag status-ativo' : 'status-tag status-concluido';
+      tag.className =
+        usuario.ativo === 1 ? 'status-tag status-ativo' : 'status-tag status-concluido';
       const ponto = document.createElement('span');
       ponto.className = 'status-ponto';
       tag.appendChild(ponto);
-      tag.appendChild(document.createTextNode(u.ativo === 1 ? 'Ativo' : 'Inativo'));
+      tag.appendChild(document.createTextNode(usuario.ativo === 1 ? 'Ativo' : 'Inativo'));
       tdStatus.appendChild(tag);
+
       const tdAcoes = document.createElement('td');
       const box = document.createElement('div');
       box.className = 'acoes-linha';
+
       const btnSenha = document.createElement('button');
       btnSenha.type = 'button';
       btnSenha.className = 'btn-secundario btn-pequeno';
       btnSenha.textContent = 'Nova senha';
       btnSenha.addEventListener('click', () => {
-        this.usuarioRedefinindoId = u.id;
-        this.redefinirRotulo.textContent = 'Nova senha para @' + u.login + ':';
+        this.usuarioRedefinindoId = usuario.id;
+        this.redefinirRotulo.textContent = 'Nova senha para @' + usuario.login + ':';
         this.redefinirInput.value = '';
         this.caixaRedefinir.hidden = false;
         this.redefinirInput.focus();
       });
       box.appendChild(btnSenha);
+
+      // O próprio usuário logado não pode tirar o próprio acesso admin nem se desativar por engano.
       if (!ehEu) {
         const btnPerfil = document.createElement('button');
         btnPerfil.type = 'button';
         btnPerfil.className = 'btn-secundario btn-pequeno';
-        const outroPerfil = u.perfil === 'admin' ? 'operador' : 'admin';
-        btnPerfil.textContent = u.perfil === 'admin' ? 'Tornar operador' : 'Tornar admin';
+        const outroPerfil = usuario.perfil === 'admin' ? 'operador' : 'admin';
+        btnPerfil.textContent = usuario.perfil === 'admin' ? 'Tornar operador' : 'Tornar admin';
         btnPerfil.addEventListener('click', async () => {
-          const r = await chamarApi('/api/configuracoes/usuarios/' + u.id + '/perfil', {
-            metodo: 'PUT',
-            corpo: {
-              perfil: outroPerfil
+          const resposta = await chamarApi(
+            '/api/configuracoes/usuarios/' + usuario.id + '/perfil',
+            {
+              metodo: 'PUT',
+              corpo: { perfil: outroPerfil }
             }
-          });
-          if (!r.ok) {
-            this.mostrarToast(r.dados.erro || 'Erro ao alterar perfil.', 'erro');
+          );
+          if (!resposta.ok) {
+            this.mostrarToast(resposta.dados.erro || 'Erro ao alterar perfil.', 'erro');
             return;
           }
-          this.mostrarToast(r.dados.mensagem, 'ok');
+          this.mostrarToast(resposta.dados.mensagem, 'ok');
           this.carregarDados();
         });
         box.appendChild(btnPerfil);
+
         const btnAtivo = document.createElement('button');
         btnAtivo.type = 'button';
         btnAtivo.className = 'btn-secundario btn-pequeno';
-        btnAtivo.textContent = u.ativo === 1 ? 'Desativar' : 'Reativar';
+        btnAtivo.textContent = usuario.ativo === 1 ? 'Desativar' : 'Reativar';
         btnAtivo.addEventListener('click', async () => {
-          const r = await chamarApi('/api/configuracoes/usuarios/' + u.id + '/ativo', {
+          const resposta = await chamarApi('/api/configuracoes/usuarios/' + usuario.id + '/ativo', {
             metodo: 'PUT',
-            corpo: {
-              ativo: u.ativo === 1 ? 0 : 1
-            }
+            corpo: { ativo: usuario.ativo === 1 ? 0 : 1 }
           });
-          if (!r.ok) {
-            this.mostrarToast(r.dados.erro || 'Erro ao alterar acesso.', 'erro');
+          if (!resposta.ok) {
+            this.mostrarToast(resposta.dados.erro || 'Erro ao alterar acesso.', 'erro');
             return;
           }
-          this.mostrarToast(r.dados.mensagem, 'ok');
+          this.mostrarToast(resposta.dados.mensagem, 'ok');
           this.carregarDados();
         });
         box.appendChild(btnAtivo);
       }
+
       tdAcoes.appendChild(box);
       tr.appendChild(tdPessoa);
       tr.appendChild(tdTel);
@@ -577,25 +608,27 @@ class TelaConfiguracoes {
     });
   }
 
-  desenharBanco(b) {
-    this.dbTamanho.textContent = b.tamanhoKb + ' KB';
-    this.dbTabelas.textContent = b.totalTabelas;
-    this.dbPessoas.textContent = b.contagens.colaboradores;
-    this.dbLogs.textContent = b.contagens.logs;
-    const intg = b.integridade;
-    if (intg.integro) {
+  desenharBanco(banco) {
+    this.dbTamanho.textContent = banco.tamanhoKb + ' KB';
+    this.dbTabelas.textContent = banco.totalTabelas;
+    this.dbPessoas.textContent = banco.contagens.colaboradores;
+    this.dbLogs.textContent = banco.contagens.logs;
+
+    const integridade = banco.integridade;
+    if (integridade.integro) {
       this.caixaIntegridade.className = 'integridade-status integridade-ok';
       this.integridadeTitulo.textContent =
-        'Cadeia íntegra (' + intg.totalLinhas + ' registros verificados)';
-      this.integridadeMotivo.textContent = intg.motivo;
+        'Cadeia íntegra (' + integridade.totalLinhas + ' registros verificados)';
+      this.integridadeMotivo.textContent = integridade.motivo;
     } else {
       this.caixaIntegridade.className = 'integridade-status integridade-erro';
       this.integridadeTitulo.textContent =
-        'Adulteração detectada na linha #' + intg.linhaComProblema;
-      this.integridadeMotivo.textContent = intg.motivo;
+        'Adulteração detectada na linha #' + integridade.linhaComProblema;
+      this.integridadeMotivo.textContent = integridade.motivo;
     }
+
     this.tabelaLogsRecentes.innerHTML = '';
-    const logs = b.ultimosLogs || [];
+    const logs = banco.ultimosLogs || [];
     if (logs.length === 0) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
@@ -606,18 +639,23 @@ class TelaConfiguracoes {
       this.tabelaLogsRecentes.appendChild(tr);
       return;
     }
-    logs.forEach((l) => {
+
+    logs.forEach((registro) => {
       const tr = document.createElement('tr');
       const tdId = document.createElement('td');
       tdId.className = 'celula-horario';
-      tdId.textContent = '#' + l.id;
+      tdId.textContent = '#' + registro.id;
+
       const tdQuando = document.createElement('td');
       tdQuando.className = 'celula-horario';
-      tdQuando.textContent = l.quando.slice(0, 16);
+      tdQuando.textContent = registro.quando.slice(0, 16);
+
       const tdAutor = document.createElement('td');
-      tdAutor.textContent = '@' + l.autor;
+      tdAutor.textContent = '@' + registro.autor;
+
       const tdResumo = document.createElement('td');
-      tdResumo.textContent = l.resumo;
+      tdResumo.textContent = registro.resumo;
+
       tr.appendChild(tdId);
       tr.appendChild(tdQuando);
       tr.appendChild(tdAutor);
@@ -633,29 +671,32 @@ class TelaConfiguracoes {
   }
 
   desenharSaude(dados) {
-    const b = dados.banco;
-    if (b) {
-      this.marcarSaude('banco', 'ok', b.tamanhoKb + ' KB · ' + b.totalTabelas + ' tabelas');
-      const intg = b.integridade;
-      if (intg.integro)
-        this.marcarSaude('log', 'ok', 'Íntegro · ' + intg.totalLinhas + ' registros');
-      else this.marcarSaude('log', 'erro', 'Adulteração na linha #' + intg.linhaComProblema);
+    const banco = dados.banco;
+    if (banco) {
+      this.marcarSaude('banco', 'ok', banco.tamanhoKb + ' KB · ' + banco.totalTabelas + ' tabelas');
+      const integridade = banco.integridade;
+      if (integridade.integro) {
+        this.marcarSaude('log', 'ok', 'Íntegro · ' + integridade.totalLinhas + ' registros');
+      } else {
+        this.marcarSaude('log', 'erro', 'Adulteração na linha #' + integridade.linhaComProblema);
+      }
     }
-    const amb = dados.ambiente;
+
+    const ambiente = dados.ambiente;
     this.marcarSaude(
       'ia',
-      amb.iaConfigurada ? 'ok' : 'off',
-      amb.iaConfigurada ? 'Conectada à Groq' : 'Desligada (sem GROQ_API_KEY)'
+      ambiente.iaConfigurada ? 'ok' : 'off',
+      ambiente.iaConfigurada ? 'Conectada à Groq' : 'Desligada (sem GROQ_API_KEY)'
     );
     this.marcarSaude(
       'telegram',
-      amb.telegramAtivo ? 'ok' : 'off',
-      amb.telegramAtivo ? 'Bot conectado' : 'Modo terminal (sem token)'
+      ambiente.telegramAtivo ? 'ok' : 'off',
+      ambiente.telegramAtivo ? 'Bot conectado' : 'Modo terminal (sem token)'
     );
   }
 
-  desenharAmbiente(amb) {
-    if (amb.iaConfigurada) {
+  desenharAmbiente(ambiente) {
+    if (ambiente.iaConfigurada) {
       this.badgeIa.className = 'status-tag status-ativo';
       this.badgeIa.innerHTML = '<span class="status-ponto"></span>Conectada';
       this.descIa.textContent =
@@ -666,7 +707,8 @@ class TelaConfiguracoes {
       this.descIa.textContent =
         'Defina GROQ_API_KEY no arquivo server/.env para ativar os recursos de IA.';
     }
-    if (amb.telegramAtivo) {
+
+    if (ambiente.telegramAtivo) {
       this.badgeTelegram.className = 'status-tag status-ativo';
       this.badgeTelegram.innerHTML = '<span class="status-ponto"></span>Bot ativo';
       this.descTelegram.textContent =
@@ -686,40 +728,48 @@ class TelaConfiguracoes {
         window.location.href = 'index.html';
         return;
       }
-      const user = sessao.dados.usuario;
-      if (user.perfil !== 'admin') {
+
+      const usuario = sessao.dados.usuario;
+      // Quem não é administrador volta para o resumo caso tente abrir esta página pela URL.
+      if (usuario.perfil !== 'admin') {
         window.location.href = 'resumo.html';
         return;
       }
-      this.meuId = user.id;
-      this.meuLogin = user.login;
-      this.perfilNome.textContent = user.nome;
-      this.perfilTipo.textContent = user.perfil;
-      this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
-      const res = await chamarApi('/api/configuracoes');
-      if (!res.ok) {
-        this.mostrarToast(res.dados.erro || 'Erro ao carregar configurações.', 'erro');
+
+      this.meuId = usuario.id;
+      this.meuLogin = usuario.login;
+      this.perfilNome.textContent = usuario.nome;
+      this.perfilTipo.textContent = usuario.perfil;
+      this.usuarioIniciais.textContent = this.pegarIniciais(usuario.nome);
+
+      const resposta = await chamarApi('/api/configuracoes');
+      if (!resposta.ok) {
+        this.mostrarToast(resposta.dados.erro || 'Erro ao carregar configurações.', 'erro');
         return;
       }
-      this.preencherParametros(res.dados.parametros);
-      this.desenharAmbiente(res.dados.ambiente);
-      this.todosUsuarios = res.dados.usuarios || [];
+
+      this.preencherParametros(resposta.dados.parametros);
+      this.desenharAmbiente(resposta.dados.ambiente);
+      this.todosUsuarios = resposta.dados.usuarios || [];
       this.atualizarResumoUsuarios(this.todosUsuarios);
       this.desenharUsuarios();
-      if (res.dados.banco) {
-        this.desenharBanco(res.dados.banco);
+      if (resposta.dados.banco) {
+        this.desenharBanco(resposta.dados.banco);
       }
-      this.desenharSaude(res.dados);
-      const eu = res.dados.meuUsuario;
+      this.desenharSaude(resposta.dados);
+
+      const eu = resposta.dados.meuUsuario;
       this.contaNome.value = eu.nome;
       this.contaTelefone.value = eu.telegram_chat_id || '';
       this.contaTituloPrevia.textContent = eu.nome;
       this.contaLoginPrevia.textContent = '@' + eu.login + ' · Perfil administrador';
       this.contaAvatarPrevia.textContent = this.pegarIniciais(eu.nome);
+
       this.abrirAbaConfig(window.location.hash.slice(1));
     } catch (erro) {
       this.mostrarToast('Sem conexão com o servidor.', 'erro');
     }
   }
 }
+
 new TelaConfiguracoes();

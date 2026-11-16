@@ -1,12 +1,13 @@
-// Endereços da API de configuracoes.
+// Rotas de configurações, parâmetros de alerta, backup e gestão de contas.
 const express = require('express');
 const ControladorConfiguracoes = require('../controllers/ControladorConfiguracoes');
-const { exigirAdmin } = require('../middlewares/autenticacao');
+const controleAcesso = require('../middlewares/autenticacao');
 
 const controlador = new ControladorConfiguracoes();
 const router = express.Router();
 
-router.use(exigirAdmin);
+// Somente administradores acessam ajustes do sistema, backup e contas de usuários.
+router.use(controleAcesso.exigirAdmin);
 router.get('/', controlador.consultar.bind(controlador));
 router.put('/parametros', controlador.salvarParametros.bind(controlador));
 router.post('/restaurar-padrao', controlador.restaurarPadrao.bind(controlador));

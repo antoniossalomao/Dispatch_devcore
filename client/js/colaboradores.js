@@ -1,4 +1,4 @@
-// Controla a tela de colaboradores.
+// Tela de colaboradores: listagem, busca, filtros de CNH, cadastro/edição no modal e histórico na gaveta lateral.
 class TelaColaboradores {
   constructor() {
     this.subtituloContagem = document.getElementById('subtitulo-contagem');
@@ -11,17 +11,20 @@ class TelaColaboradores {
     this.botaoSeed = document.getElementById('botao-seed');
     this.avisoTela = document.getElementById('aviso-tela');
     this.toast = document.getElementById('toast-colab');
+
     this.kpiTotalAtivos = document.getElementById('kpi-total-ativos');
     this.kpiComCnh = document.getElementById('kpi-com-cnh');
     this.kpiPctCnh = document.getElementById('kpi-pct-cnh');
     this.kpiCnhAlerta = document.getElementById('kpi-cnh-alerta');
     this.kpiAlojados = document.getElementById('kpi-alojados');
     this.kpiEmTransito = document.getElementById('kpi-em-transito');
+
     this.campoBusca = document.getElementById('campo-busca');
     this.seletorStatusAtivo = document.getElementById('seletor-status-ativo');
     this.abasFiltroCnh = document.querySelectorAll('.colab-filtros-topo .aba-item');
     this.listaColaboradores = document.getElementById('lista-colaboradores');
     this.botaoNovoColab = document.getElementById('botao-novo-colaborador');
+
     this.modalColab = document.getElementById('modal-colaborador');
     this.fecharModal = document.getElementById('fechar-modal');
     this.cancelarModal = document.getElementById('cancelar-modal');
@@ -36,6 +39,7 @@ class TelaColaboradores {
     this.colabTemCnh = document.getElementById('colab-tem-cnh');
     this.camposCnh = document.getElementById('campos-cnh');
     this.colabCnhValidade = document.getElementById('colab-cnh-validade');
+
     this.gavetaHistorico = document.getElementById('gaveta-historico');
     this.fecharGaveta = document.getElementById('fechar-gaveta');
     this.gavetaAvatar = document.getElementById('gaveta-avatar');
@@ -63,11 +67,13 @@ class TelaColaboradores {
       alojamentos: document.getElementById('gaveta-secao-alojamentos'),
       frota: document.getElementById('gaveta-secao-frota')
     };
+
     this.colaboradoresCache = [];
     this.filtroCnhAtual = 'todos';
     this.colaboradorSelecionado = null;
     this.ehAdmin = false;
     this.timerToast = null;
+
     this.configurarEventos();
     this.iniciar();
   }
@@ -75,29 +81,34 @@ class TelaColaboradores {
   configurarEventos() {
     this.campoBusca.addEventListener('input', this.carregarColaboradores.bind(this));
     this.seletorStatusAtivo.addEventListener('change', this.carregarColaboradores.bind(this));
+
     this.abasFiltroCnh.forEach((aba) => {
       aba.addEventListener('click', () => {
-        this.abasFiltroCnh.forEach((b) => {
-          b.classList.remove('ativa');
+        this.abasFiltroCnh.forEach((outra) => {
+          outra.classList.remove('ativa');
         });
         aba.classList.add('ativa');
         this.filtroCnhAtual = aba.dataset.filtroCnh;
         this.carregarColaboradores();
       });
     });
+
     this.botaoSeed.addEventListener('click', this.carregarExemplos.bind(this));
     this.botaoNovoColab.addEventListener('click', this.novoColaborador.bind(this));
     this.fecharModal.addEventListener('click', this.fecharModalColab.bind(this));
     this.cancelarModal.addEventListener('click', this.fecharModalColab.bind(this));
+
     this.colabTemCnh.addEventListener('change', () => {
       this.camposCnh.hidden = !this.colabTemCnh.checked;
     });
+
     this.formColab.addEventListener('submit', this.salvarColaborador.bind(this));
     this.fecharGaveta.addEventListener('click', this.fecharGavetaColab.bind(this));
+
     this.gavetaAbas.forEach((aba) => {
       aba.addEventListener('click', () => {
-        this.gavetaAbas.forEach((a) => {
-          a.classList.remove('ativa');
+        this.gavetaAbas.forEach((outra) => {
+          outra.classList.remove('ativa');
         });
         aba.classList.add('ativa');
         const alvo = aba.dataset.gaveta;
@@ -106,28 +117,27 @@ class TelaColaboradores {
         });
       });
     });
+
     this.gavetaBotaoEditar.addEventListener('click', () => {
       if (!this.colaboradorSelecionado) return;
       this.abrirEdicaoColaborador(this.colaboradorSelecionado);
     });
+
     this.gavetaBotaoStatus.addEventListener('click', this.alterarStatusColaborador.bind(this));
+
     this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', {
-        metodo: 'POST'
-      });
+      await chamarApi('/api/auth/sair', { metodo: 'POST' });
       window.location.href = 'index.html';
     });
   }
 
   async carregarExemplos() {
-    const r = await chamarApi('/api/pessoas/seed-exemplos', {
-      metodo: 'POST'
-    });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao carregar exemplos.', 'erro');
+    const resposta = await chamarApi('/api/pessoas/seed-exemplos', { metodo: 'POST' });
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao carregar exemplos.', 'erro');
       return;
     }
-    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.carregarColaboradores();
   }
 
@@ -136,44 +146,50 @@ class TelaColaboradores {
     this.formColab.reset();
     this.colabId.value = '';
     this.camposCnh.hidden = true;
-    document.querySelectorAll('input[name="cat"]').forEach((c) => {
-      c.checked = false;
+    document.querySelectorAll('input[name="cat"]').forEach((checkbox) => {
+      checkbox.checked = false;
     });
     this.modalColab.hidden = false;
     this.colabNome.focus();
   }
 
-  async salvarColaborador(e) {
-    e.preventDefault();
+  async salvarColaborador(evento) {
+    evento.preventDefault();
     const id = this.colabId.value;
     const temCnh = this.colabTemCnh.checked;
-    const cats = [];
+    const categorias = [];
+
     if (temCnh) {
-      document.querySelectorAll('input[name="cat"]:checked').forEach((chk) => {
-        cats.push(chk.value);
+      document.querySelectorAll('input[name="cat"]:checked').forEach((checkbox) => {
+        categorias.push(checkbox.value);
       });
     }
+
     const corpo = {
       nome: this.colabNome.value,
       matricula: this.colabMatricula.value,
       cargo: this.colabCargo.value,
       obra: this.colabObra.value,
       telefone: this.colabTelefone.value,
-      cnh_categorias: temCnh ? cats.join(',') : '',
+      cnh_categorias: temCnh ? categorias.join(',') : '',
       cnh_validade: temCnh ? this.colabCnhValidade.value : ''
     };
+
+    // O mesmo formulário cria um colaborador novo (POST) ou atualiza quem já tinha id (PUT).
     const metodo = id ? 'PUT' : 'POST';
     const endpoint = id ? '/api/pessoas/' + id : '/api/pessoas';
-    const r = await chamarApi(endpoint, {
+    const resposta = await chamarApi(endpoint, {
       metodo: metodo,
       corpo: corpo
     });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao salvar colaborador.', 'erro');
+
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao salvar colaborador.', 'erro');
       return;
     }
+
     this.fecharModalColab();
-    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.carregarColaboradores();
     if (this.colaboradorSelecionado && this.colaboradorSelecionado.id === Number(id)) {
       this.abrirHistoricoColaborador(id);
@@ -183,17 +199,15 @@ class TelaColaboradores {
   async alterarStatusColaborador() {
     if (!this.colaboradorSelecionado) return;
     const novoAtivo = this.colaboradorSelecionado.ativo === 1 ? 0 : 1;
-    const r = await chamarApi('/api/pessoas/' + this.colaboradorSelecionado.id + '/status', {
+    const resposta = await chamarApi('/api/pessoas/' + this.colaboradorSelecionado.id + '/status', {
       metodo: 'PUT',
-      corpo: {
-        ativo: novoAtivo
-      }
+      corpo: { ativo: novoAtivo }
     });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao alterar status.', 'erro');
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao alterar status.', 'erro');
       return;
     }
-    this.mostrarToast(r.dados.mensagem, 'ok');
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.fecharGavetaColab();
     this.carregarColaboradores();
   }
@@ -243,18 +257,22 @@ class TelaColaboradores {
   criarItemTimeline(titulo, detalhe, data, ativo) {
     const item = document.createElement('div');
     item.className = 'timeline-item' + (ativo ? ' timeline-ativo' : '');
-    const sTitulo = document.createElement('span');
-    sTitulo.className = 'timeline-titulo';
-    sTitulo.textContent = titulo;
-    const sDetalhe = document.createElement('span');
-    sDetalhe.className = 'timeline-detalhe';
-    sDetalhe.textContent = detalhe;
-    const sData = document.createElement('span');
-    sData.className = 'timeline-data';
-    sData.textContent = data;
-    item.appendChild(sTitulo);
-    item.appendChild(sDetalhe);
-    item.appendChild(sData);
+
+    const spanTitulo = document.createElement('span');
+    spanTitulo.className = 'timeline-titulo';
+    spanTitulo.textContent = titulo;
+
+    const spanDetalhe = document.createElement('span');
+    spanDetalhe.className = 'timeline-detalhe';
+    spanDetalhe.textContent = detalhe;
+
+    const spanData = document.createElement('span');
+    spanData.className = 'timeline-data';
+    spanData.textContent = data;
+
+    item.appendChild(spanTitulo);
+    item.appendChild(spanDetalhe);
+    item.appendChild(spanData);
     return item;
   }
 
@@ -270,97 +288,112 @@ class TelaColaboradores {
       this.listaColaboradores.appendChild(tr);
       return;
     }
-    lista.forEach((c) => {
+
+    lista.forEach((colab) => {
       const tr = document.createElement('tr');
-      if (c.ativo === 0) tr.className = 'colab-inativo';
+      if (colab.ativo === 0) tr.className = 'colab-inativo';
+
       const tdColab = document.createElement('td');
       const boxColab = document.createElement('div');
       boxColab.className = 'colab-celula';
+
       const avatar = document.createElement('div');
       avatar.className = 'colab-avatar';
-      avatar.textContent = this.pegarIniciais(c.nome);
+      avatar.textContent = this.pegarIniciais(colab.nome);
+
       const dadosNome = document.createElement('div');
       dadosNome.className = 'colab-dados-nome';
-      const spanNome = document.createElement('button');
-      spanNome.type = 'button';
-      spanNome.className = 'colab-nome';
-      spanNome.textContent = c.nome;
-      spanNome.addEventListener('click', () => {
-        this.abrirHistoricoColaborador(c.id);
+
+      const botaoNome = document.createElement('button');
+      botaoNome.type = 'button';
+      botaoNome.className = 'colab-nome';
+      botaoNome.textContent = colab.nome;
+      botaoNome.addEventListener('click', () => {
+        this.abrirHistoricoColaborador(colab.id);
       });
+
       const spanMatricula = document.createElement('span');
       spanMatricula.className = 'colab-matricula';
-      spanMatricula.textContent = c.matricula + (c.ativo === 0 ? ' · (Inativo)' : '');
-      dadosNome.appendChild(spanNome);
+      spanMatricula.textContent = colab.matricula + (colab.ativo === 0 ? ' · (Inativo)' : '');
+
+      dadosNome.appendChild(botaoNome);
       dadosNome.appendChild(spanMatricula);
       boxColab.appendChild(avatar);
       boxColab.appendChild(dadosNome);
       tdColab.appendChild(boxColab);
-      const tdCargo = document.createElement('td');
-      const pCargo = document.createElement('div');
-      pCargo.className = 'colab-cargo';
-      pCargo.textContent = c.cargo;
-      tdCargo.appendChild(pCargo);
 
-      // CNH
+      const tdCargo = document.createElement('td');
+      const divCargo = document.createElement('div');
+      divCargo.className = 'colab-cargo';
+      divCargo.textContent = colab.cargo;
+      tdCargo.appendChild(divCargo);
+
       const tdCnh = document.createElement('td');
       const boxCnh = document.createElement('div');
       boxCnh.className = 'cnh-celula';
 
-      // na lista so aparece a categoria; a etiqueta colorida fica pra CNH vencendo ou vencida
+      // Na tabela mostramos só a categoria; a etiqueta colorida aparece só se estiver vencendo ou vencida.
       const cat = document.createElement('span');
       cat.className = 'cnh-texto';
-      cat.textContent = c.cnh_categorias ? 'Cat. ' + c.cnh_categorias : '—';
+      cat.textContent = colab.cnh_categorias ? 'Cat. ' + colab.cnh_categorias : '—';
       boxCnh.appendChild(cat);
-      if (c.cnh_info.status === 'vencendo' || c.cnh_info.status === 'vencida') {
-        const spanTag = document.createElement('div');
-        spanTag.appendChild(this.criarTagCnh(c.cnh_info));
-        boxCnh.appendChild(spanTag);
+
+      if (colab.cnh_info.status === 'vencendo' || colab.cnh_info.status === 'vencida') {
+        const divTag = document.createElement('div');
+        divTag.appendChild(this.criarTagCnh(colab.cnh_info));
+        boxCnh.appendChild(divTag);
       }
       tdCnh.appendChild(boxCnh);
+
       const tdSituacao = document.createElement('td');
       const boxSit = document.createElement('div');
       boxSit.className = 'situacao-celula';
-      if (c.alojamento_atual) {
+
+      if (colab.alojamento_atual) {
         const divAloj = document.createElement('div');
         divAloj.className = 'situacao-alojamento';
-        divAloj.textContent = c.alojamento_atual.alojamento + ' · ' + c.alojamento_atual.leito;
+        divAloj.textContent = colab.alojamento_atual.alojamento + ' · ' + colab.alojamento_atual.leito;
         boxSit.appendChild(divAloj);
       }
-      if (c.veiculo_atual) {
+      if (colab.veiculo_atual) {
         const divVeic = document.createElement('div');
         divVeic.className = 'situacao-veiculo';
-        divVeic.textContent = c.veiculo_atual.modelo + ' · ' + c.veiculo_atual.placa;
+        divVeic.textContent = colab.veiculo_atual.modelo + ' · ' + colab.veiculo_atual.placa;
         boxSit.appendChild(divVeic);
       }
-      if (!c.alojamento_atual && !c.veiculo_atual) {
+      if (!colab.alojamento_atual && !colab.veiculo_atual) {
         const divLivre = document.createElement('div');
         divLivre.className = 'situacao-livre';
         divLivre.textContent = '—';
         boxSit.appendChild(divLivre);
       }
       tdSituacao.appendChild(boxSit);
+
       const tdAcoes = document.createElement('td');
       tdAcoes.className = 'coluna-acoes';
       const boxAcoes = document.createElement('div');
       boxAcoes.className = 'botoes-acoes';
+
       const btnHist = document.createElement('button');
       btnHist.type = 'button';
       btnHist.className = 'btn-secundario btn-pequeno';
       btnHist.textContent = 'Histórico';
       btnHist.addEventListener('click', () => {
-        this.abrirHistoricoColaborador(c.id);
+        this.abrirHistoricoColaborador(colab.id);
       });
+
       const btnEditar = document.createElement('button');
       btnEditar.type = 'button';
       btnEditar.className = 'btn-secundario btn-pequeno';
       btnEditar.textContent = 'Editar';
       btnEditar.addEventListener('click', () => {
-        this.abrirEdicaoColaborador(c);
+        this.abrirEdicaoColaborador(colab);
       });
+
       boxAcoes.appendChild(btnHist);
       boxAcoes.appendChild(btnEditar);
       tdAcoes.appendChild(boxAcoes);
+
       tr.appendChild(tdColab);
       tr.appendChild(tdCargo);
       tr.appendChild(tdCnh);
@@ -374,16 +407,19 @@ class TelaColaboradores {
     const status = this.seletorStatusAtivo.value;
     const busca = encodeURIComponent(this.campoBusca.value.trim());
     const cnh = this.filtroCnhAtual;
+
     try {
-      const res = await chamarApi(
+      const resposta = await chamarApi(
         '/api/pessoas?status=' + status + '&cnh=' + cnh + '&busca=' + busca
       );
-      if (!res.ok) {
-        this.mostrarToast(res.dados.erro || 'Erro ao carregar colaboradores.', 'erro');
+      if (!resposta.ok) {
+        this.mostrarToast(resposta.dados.erro || 'Erro ao carregar colaboradores.', 'erro');
         return;
       }
-      const totais = res.dados.totais;
-      this.colaboradoresCache = res.dados.colaboradores || [];
+
+      const totais = resposta.dados.totais;
+      this.colaboradoresCache = resposta.dados.colaboradores || [];
+
       this.subtituloContagem.textContent =
         totais.ativos +
         ' ativos · ' +
@@ -398,11 +434,10 @@ class TelaColaboradores {
       this.kpiCnhAlerta.textContent = totais.cnhAlerta;
       this.kpiAlojados.textContent = totais.alojados;
       this.kpiEmTransito.textContent = totais.emTransito + ' com veículo da frota';
-      if (this.ehAdmin && totais.total === 0) {
-        this.botaoSeed.hidden = false;
-      } else {
-        this.botaoSeed.hidden = true;
-      }
+
+      // Só o admin vê o botão de gerar colaboradores de exemplo quando a base ainda estiver vazia.
+      this.botaoSeed.hidden = !(this.ehAdmin && totais.total === 0);
+
       this.desenharTabela(this.colaboradoresCache);
     } catch (erro) {
       this.mostrarToast('Sem conexão com o servidor.', 'erro');
@@ -413,30 +448,32 @@ class TelaColaboradores {
     this.modalColab.hidden = true;
   }
 
-  abrirEdicaoColaborador(c) {
+  abrirEdicaoColaborador(colab) {
     this.modalTitulo.textContent = 'Editar colaborador';
-    this.colabId.value = c.id;
-    this.colabNome.value = c.nome;
-    this.colabMatricula.value = c.matricula;
-    this.colabCargo.value = c.cargo;
-    this.colabObra.value = c.obra;
-    this.colabTelefone.value = c.telefone || '';
-    if (c.cnh_categorias) {
+    this.colabId.value = colab.id;
+    this.colabNome.value = colab.nome;
+    this.colabMatricula.value = colab.matricula;
+    this.colabCargo.value = colab.cargo;
+    this.colabObra.value = colab.obra;
+    this.colabTelefone.value = colab.telefone || '';
+
+    if (colab.cnh_categorias) {
       this.colabTemCnh.checked = true;
       this.camposCnh.hidden = false;
-      this.colabCnhValidade.value = c.cnh_validade || '';
-      const cats = c.cnh_categorias.split(',');
-      document.querySelectorAll('input[name="cat"]').forEach((chk) => {
-        chk.checked = cats.indexOf(chk.value) !== -1;
+      this.colabCnhValidade.value = colab.cnh_validade || '';
+      const categorias = colab.cnh_categorias.split(',');
+      document.querySelectorAll('input[name="cat"]').forEach((checkbox) => {
+        checkbox.checked = categorias.indexOf(checkbox.value) !== -1;
       });
     } else {
       this.colabTemCnh.checked = false;
       this.camposCnh.hidden = true;
       this.colabCnhValidade.value = '';
-      document.querySelectorAll('input[name="cat"]').forEach((chk) => {
-        chk.checked = false;
+      document.querySelectorAll('input[name="cat"]').forEach((checkbox) => {
+        checkbox.checked = false;
       });
     }
+
     this.modalColab.hidden = false;
     this.colabNome.focus();
   }
@@ -448,35 +485,36 @@ class TelaColaboradores {
 
   async abrirHistoricoColaborador(id) {
     try {
-      const res = await chamarApi('/api/pessoas/' + id);
-      if (!res.ok) {
-        this.mostrarToast(res.dados.erro || 'Erro ao carregar dados do colaborador.', 'erro');
+      const resposta = await chamarApi('/api/pessoas/' + id);
+      if (!resposta.ok) {
+        this.mostrarToast(resposta.dados.erro || 'Erro ao carregar dados do colaborador.', 'erro');
         return;
       }
-      const c = res.dados.colaborador;
-      this.colaboradorSelecionado = c;
-      this.gavetaAvatar.textContent = this.pegarIniciais(c.nome);
-      this.gavetaNome.textContent = c.nome;
-      this.gavetaSub.textContent = c.matricula + ' · ' + c.cargo;
-      this.gavetaTel.textContent = c.telefone || 'Não informado';
-      this.gavetaObra.textContent = c.obra || 'Sede';
-      this.gavetaCnhCat.textContent = c.cnh_categorias
-        ? 'Categoria(s) ' + c.cnh_categorias
+
+      const colab = resposta.dados.colaborador;
+      this.colaboradorSelecionado = colab;
+      this.gavetaAvatar.textContent = this.pegarIniciais(colab.nome);
+      this.gavetaNome.textContent = colab.nome;
+      this.gavetaSub.textContent = colab.matricula + ' · ' + colab.cargo;
+      this.gavetaTel.textContent = colab.telefone || 'Não informado';
+      this.gavetaObra.textContent = colab.obra || 'Sede';
+      this.gavetaCnhCat.textContent = colab.cnh_categorias
+        ? 'Categoria(s) ' + colab.cnh_categorias
         : 'Sem CNH cadastrada';
-      this.gavetaCnhVal.textContent = c.cnh_validade
-        ? c.cnh_validade.split('-').reverse().join('/')
+      this.gavetaCnhVal.textContent = colab.cnh_validade
+        ? colab.cnh_validade.split('-').reverse().join('/')
         : '—';
-      const visualCnh = this.infoCnhVisual(c.cnh_info);
+
+      const visualCnh = this.infoCnhVisual(colab.cnh_info);
       this.gavetaCnhTag.className = 'status-tag ' + visualCnh.classe;
       this.gavetaCnhTag.textContent = '';
       const pontoCnh = document.createElement('span');
       pontoCnh.className = 'status-ponto';
       this.gavetaCnhTag.appendChild(pontoCnh);
       this.gavetaCnhTag.appendChild(document.createTextNode(visualCnh.texto));
-      const estadias = res.dados.estadias || [];
-      const estadiaAtual = estadias.find((e) => {
-        return !e.fim;
-      });
+
+      const estadias = resposta.dados.estadias || [];
+      const estadiaAtual = estadias.find((estadia) => !estadia.fim);
       if (estadiaAtual) {
         this.gavetaAtualAlojamento.textContent =
           estadiaAtual.alojamento + ' · Quarto ' + estadiaAtual.quarto;
@@ -489,10 +527,9 @@ class TelaColaboradores {
         this.gavetaAtualAlojamento.textContent = 'Não alojado no momento';
         this.gavetaAtualDesde.textContent = 'Sem estadia em aberto';
       }
-      const viagensMotorista = res.dados.usos_motorista || [];
-      const viagemAtual = viagensMotorista.find((u) => {
-        return !u.retorno;
-      });
+
+      const viagensMotorista = resposta.dados.usos_motorista || [];
+      const viagemAtual = viagensMotorista.find((viagem) => !viagem.retorno);
       if (viagemAtual) {
         this.gavetaAtualVeiculo.textContent = viagemAtual.modelo + ' (' + viagemAtual.placa + ')';
         this.gavetaAtualDestino.textContent =
@@ -501,67 +538,71 @@ class TelaColaboradores {
         this.gavetaAtualVeiculo.textContent = 'Nenhum veículo em posse';
         this.gavetaAtualDestino.textContent = 'Sem saída de veículo ativa';
       }
+
       this.contEstadias.textContent = estadias.length;
       this.gavetaListaEstadias.innerHTML = '';
       if (estadias.length === 0) {
         this.gavetaListaEstadias.innerHTML =
           '<p class="texto-vazio">Nenhuma estadia registrada no histórico deste colaborador.</p>';
       } else {
-        estadias.forEach((e) => {
+        estadias.forEach((estadia) => {
           this.gavetaListaEstadias.appendChild(
             this.criarItemTimeline(
-              e.alojamento + ' · Quarto ' + e.quarto + ' (Leito ' + e.leito + ')',
-              !e.fim ? 'Estadia atual (em andamento)' : 'Saída registrada',
+              estadia.alojamento + ' · Quarto ' + estadia.quarto + ' (Leito ' + estadia.leito + ')',
+              !estadia.fim ? 'Estadia atual (em andamento)' : 'Saída registrada',
               'Entrada: ' +
-                e.inicio.slice(0, 16) +
-                (e.fim ? ' | Saída: ' + e.fim.slice(0, 16) : ''),
-              !e.fim
+                estadia.inicio.slice(0, 16) +
+                (estadia.fim ? ' | Saída: ' + estadia.fim.slice(0, 16) : ''),
+              !estadia.fim
             )
           );
         });
       }
 
-      // preenche abas de frota (motorista e passageiro)
-      const viagensPassageiro = res.dados.usos_passageiro || [];
+      const viagensPassageiro = resposta.dados.usos_passageiro || [];
       this.contViagens.textContent = viagensMotorista.length + viagensPassageiro.length;
       this.gavetaListaMotorista.innerHTML = '';
       if (viagensMotorista.length === 0) {
         this.gavetaListaMotorista.innerHTML =
           '<p class="texto-vazio">Nenhum registro de condução como motorista.</p>';
       } else {
-        viagensMotorista.forEach((u) => {
+        viagensMotorista.forEach((viagem) => {
           this.gavetaListaMotorista.appendChild(
             this.criarItemTimeline(
-              u.modelo + ' · Placa ' + u.placa,
+              viagem.modelo + ' · Placa ' + viagem.placa,
               'Destino: ' +
-                u.destino +
-                (u.km_rodados !== null
-                  ? ' (' + u.km_rodados + ' km percorridos)'
+                viagem.destino +
+                (viagem.km_rodados !== null
+                  ? ' (' + viagem.km_rodados + ' km percorridos)'
                   : ' (Em trânsito)'),
-              'Saída: ' + u.saida.slice(0, 16) + (u.retorno ? ' | Volta: ' + u.retorno.slice(0, 16) : ''),
-              !u.retorno
+              'Saída: ' +
+                viagem.saida.slice(0, 16) +
+                (viagem.retorno ? ' | Volta: ' + viagem.retorno.slice(0, 16) : ''),
+              !viagem.retorno
             )
           );
         });
       }
+
       this.gavetaListaPassageiro.innerHTML = '';
       if (viagensPassageiro.length === 0) {
         this.gavetaListaPassageiro.innerHTML =
           '<p class="texto-vazio">Nenhuma viagem como passageiro registrada.</p>';
       } else {
-        viagensPassageiro.forEach((up) => {
+        viagensPassageiro.forEach((viagemPass) => {
           this.gavetaListaPassageiro.appendChild(
             this.criarItemTimeline(
-              up.modelo + ' (' + up.placa + ')',
-              'Motorista: ' + up.motorista + ' · Destino: ' + up.destino,
-              'Data: ' + up.saida.slice(0, 16),
+              viagemPass.modelo + ' (' + viagemPass.placa + ')',
+              'Motorista: ' + viagemPass.motorista + ' · Destino: ' + viagemPass.destino,
+              'Data: ' + viagemPass.saida.slice(0, 16),
               false
             )
           );
         });
       }
+
       this.gavetaBotaoStatus.textContent =
-        c.ativo === 1 ? 'Desativar colaborador' : 'Reativar colaborador';
+        colab.ativo === 1 ? 'Desativar colaborador' : 'Reativar colaborador';
       this.gavetaHistorico.hidden = false;
     } catch (erro) {
       this.mostrarToast('Não foi possível abrir o histórico.', 'erro');
@@ -575,11 +616,12 @@ class TelaColaboradores {
         window.location.href = 'index.html';
         return;
       }
-      const user = sessao.dados.usuario;
-      this.perfilNome.textContent = user.nome;
-      this.perfilTipo.textContent = user.perfil;
-      this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
-      this.ehAdmin = user.perfil === 'admin';
+
+      const usuario = sessao.dados.usuario;
+      this.perfilNome.textContent = usuario.nome;
+      this.perfilTipo.textContent = usuario.perfil;
+      this.usuarioIniciais.textContent = this.pegarIniciais(usuario.nome);
+      this.ehAdmin = usuario.perfil === 'admin';
       if (this.ehAdmin) {
         this.blocoMenuAdmin.hidden = false;
       }
@@ -587,9 +629,10 @@ class TelaColaboradores {
         this.nomeEmpresaMenu.textContent = sessao.dados.nomeEmpresa;
       }
       this.carregarColaboradores();
-    } catch (e) {
+    } catch (erro) {
       this.carregarColaboradores();
     }
   }
 }
+
 new TelaColaboradores();

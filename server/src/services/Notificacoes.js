@@ -1,17 +1,17 @@
-// Serviço de notificacoes.
+// Analisa o banco em busca de pendências (CNH, documentos de carro, viagens atrasadas, lotação etc.) e cria os alertas.
 const db = require('../db/conexao');
 const auditoria = require('./Auditoria');
 const telegram = require('./Telegram');
 const ia = require('./InteligenciaArtificial');
 const Cnh = require('../models/Cnh');
-const { diasAte } = require('../regras/datas');
+const datas = require('../regras/datas');
+
 class Notificacoes {
   constructor() {
     this.ultimaVerificacao = 0;
   }
 
-  // Não repete um aviso não lido ou criado nas últimas 24 horas.
-
+  // Só grava um alerta novo se ainda não existir outro igual sem leitura ou criado nas últimas 24h.
   criar(lista, tipo, severidade, mensagem, tabela, registroId) {
     const existe = db
       .prepare(
@@ -20,13 +20,15 @@ class Notificacoes {
       )
       .get(tipo, tabela || '', registroId || 0);
     if (existe) return;
-    const r = db
+
+    const resultado = db
       .prepare(
         'INSERT INTO notificacao (tipo, severidade, mensagem, tabela, registro_id) VALUES (?, ?, ?, ?, ?)'
       )
       .run(tipo, severidade, mensagem, tabela || null, registroId || null);
+
     lista.push({
-      id: Number(r.lastInsertRowid),
+      id: Number(resultado.lastInsertRowid),
       severidade: severidade,
       mensagem: mensagem
     });
@@ -34,180 +36,227 @@ class Notificacoes {
 
   gerarAvisos(cfg) {
     const novos = [];
-    const dias = cfg.diasAvisoVencimento;
+    const diasAlerta = cfg.diasAvisoVencimento;
     const agora = Date.now();
-    const MS_H = 3600000;
+    const horaEmMs = 3600000;
 
-    // CNH vencendo ou vencida (vencida com o carro na rua e critico)
+    // 1. CNH vencendo ou vencida (se o motorista estiver na rua com a CNH vencida, vira alerta crítico)
     db.prepare(
       'SELECT id, nome, cnh_categorias, cnh_validade FROM pessoa WHERE ativo = 1 AND cnh_categorias IS NOT NULL'
     )
       .all()
-      .forEach((p) => {
-        const s = new Cnh(p.cnh_categorias, p.cnh_validade).situacao(dias);
-        if (s.status === 'vencendo') {
+      .forEach((pessoa) => {
+        const situacao = new Cnh(pessoa.cnh_categorias, pessoa.cnh_validade).situacao(diasAlerta);
+        if (situacao.status === 'vencendo') {
           this.criar(
             novos,
             'cnh_vencendo',
             'atencao',
-            'A CNH de ' + p.nome + ' vence em ' + s.diasRestantes + ' dias.',
+            'A CNH de ' + pessoa.nome + ' vence em ' + situacao.diasRestantes + ' dias.',
             'pessoa',
-            p.id
+            pessoa.id
           );
-        } else if (s.status === 'vencida') {
+        } else if (situacao.status === 'vencida') {
           const naRua = db
             .prepare('SELECT id FROM uso_veiculo WHERE motorista_id = ? AND retorno IS NULL')
-            .get(p.id);
+            .get(pessoa.id);
           this.criar(
             novos,
             naRua ? 'cnh_vencida_na_rua' : 'cnh_vencida',
             naRua ? 'critico' : 'atencao',
             'A CNH de ' +
-              p.nome +
+              pessoa.nome +
               ' está vencida' +
               (naRua ? ' e a pessoa está com um veículo na rua.' : '.'),
             'pessoa',
-            p.id
+            pessoa.id
           );
         }
       });
 
-    // licenciamento e seguro
+    // 2. Licenciamento e seguro dos veículos
     db.prepare(
       'SELECT id, placa, modelo, licenciamento_validade, seguro_validade FROM veiculo WHERE ativo = 1'
     )
       .all()
-      .forEach((v) => {
-        [
-          ['licenciamento', 'Licenciamento', v.licenciamento_validade],
-          ['seguro', 'Seguro', v.seguro_validade]
-        ].forEach((d) => {
-          const n = diasAte(d[2]);
-          if (n === null) return;
-          if (n < 0)
+      .forEach((veiculo) => {
+        const documentos = [
+          ['licenciamento', 'Licenciamento', veiculo.licenciamento_validade],
+          ['seguro', 'Seguro', veiculo.seguro_validade]
+        ];
+        documentos.forEach((doc) => {
+          const diasFaltando = datas.diasAte(doc[2]);
+          if (diasFaltando === null) return;
+          if (diasFaltando < 0) {
             this.criar(
               novos,
-              d[0] + '_vencido',
+              doc[0] + '_vencido',
               'atencao',
-              d[1] + ' do ' + v.modelo + ' ' + v.placa + ' venceu há ' + Math.abs(n) + ' dias.',
+              doc[1] +
+                ' do ' +
+                veiculo.modelo +
+                ' ' +
+                veiculo.placa +
+                ' venceu há ' +
+                Math.abs(diasFaltando) +
+                ' dias.',
               'veiculo',
-              v.id
+              veiculo.id
             );
-          else if (n <= dias)
+          } else if (diasFaltando <= diasAlerta) {
             this.criar(
               novos,
-              d[0] + '_vencendo',
+              doc[0] + '_vencendo',
               'atencao',
-              d[1] + ' do ' + v.modelo + ' ' + v.placa + ' vence em ' + n + ' dias.',
+              doc[1] +
+                ' do ' +
+                veiculo.modelo +
+                ' ' +
+                veiculo.placa +
+                ' vence em ' +
+                diasFaltando +
+                ' dias.',
               'veiculo',
-              v.id
+              veiculo.id
             );
+          }
         });
       });
 
-    // km sem registro (F10): saida com km maior que a ultima volta, nos ultimos 30 dias
+    // 3. Diferença de quilometragem sem registro (quando o carro sai com km maior do que voltou da última viagem)
     const veiculos = db.prepare('SELECT id, placa, modelo, km_inicial FROM veiculo').all();
-    const limite = new Date(agora - 30 * 24 * MS_H);
-    veiculos.forEach((v) => {
+    const limite30Dias = new Date(agora - 30 * 24 * horaEmMs);
+    veiculos.forEach((veiculo) => {
       const usos = db
         .prepare(
           'SELECT id, saida, km_saida, km_retorno FROM uso_veiculo WHERE veiculo_id = ? ORDER BY saida, id'
         )
-        .all(v.id);
-      let esperado = v.km_inicial;
-      usos.forEach((u) => {
-        if (u.km_saida > esperado && new Date(u.saida.replace(' ', 'T')) >= limite) {
+        .all(veiculo.id);
+      let kmEsperado = veiculo.km_inicial;
+      usos.forEach((uso) => {
+        if (uso.km_saida > kmEsperado && new Date(uso.saida.replace(' ', 'T')) >= limite30Dias) {
           this.criar(
             novos,
             'km_sem_registro',
             'critico',
             'O ' +
-              v.modelo +
+              veiculo.modelo +
               ' ' +
-              v.placa +
+              veiculo.placa +
               ' rodou ' +
-              (u.km_saida - esperado) +
+              (uso.km_saida - kmEsperado) +
               ' km sem registro antes da saída de ' +
-              u.saida.slice(0, 16) +
+              uso.saida.slice(0, 16) +
               '.',
             'uso_veiculo',
-            u.id
+            uso.id
           );
         }
-        if (u.km_retorno !== null) esperado = u.km_retorno;
+        if (uso.km_retorno !== null) kmEsperado = uso.km_retorno;
       });
     });
+
+    // 4. Veículos que passaram do horário previsto sem registrar devolução
     db.prepare(
       'SELECT u.id, u.saida, v.modelo, v.placa FROM uso_veiculo u JOIN veiculo v ON v.id = u.veiculo_id WHERE u.retorno IS NULL'
     )
       .all()
-      .forEach((u) => {
-        const h = Math.floor((agora - new Date(u.saida.replace(' ', 'T')).getTime()) / MS_H);
-        if (h >= cfg.horasAlertaRetorno) {
+      .forEach((uso) => {
+        const horasFora = Math.floor((agora - new Date(uso.saida.replace(' ', 'T')).getTime()) / horaEmMs);
+        if (horasFora >= cfg.horasAlertaRetorno) {
           this.criar(
             novos,
             'nao_voltou',
             'critico',
-            'O ' + u.modelo + ' ' + u.placa + ' saiu há ' + h + 'h e ainda não voltou.',
+            'O ' + uso.modelo + ' ' + uso.placa + ' saiu há ' + horasFora + 'h e ainda não voltou.',
             'uso_veiculo',
-            u.id
+            uso.id
           );
         }
       });
+
+    // 5. Alojamentos com ocupação igual ou acima da porcentagem de alerta
     db.prepare(
       'SELECT a.id, a.nome, (SELECT COUNT(*) FROM leito l JOIN quarto q ON q.id = l.quarto_id WHERE q.alojamento_id = a.id) AS leitos, ' +
         '(SELECT COUNT(*) FROM estadia e JOIN leito l ON l.id = e.leito_id JOIN quarto q ON q.id = l.quarto_id WHERE q.alojamento_id = a.id AND e.fim IS NULL) AS ocupados ' +
         'FROM alojamento a WHERE a.ativo = 1'
     )
       .all()
-      .forEach((a) => {
-        if (a.leitos > 0 && Math.round((a.ocupados / a.leitos) * 100) >= cfg.lotacaoAlertaPct) {
+      .forEach((alojamento) => {
+        if (
+          alojamento.leitos > 0 &&
+          Math.round((alojamento.ocupados / alojamento.leitos) * 100) >= cfg.lotacaoAlertaPct
+        ) {
           this.criar(
             novos,
             'alojamento_lotado',
             'atencao',
-            a.nome + ' está com ' + a.ocupados + ' de ' + a.leitos + ' leitos ocupados.',
+            alojamento.nome +
+              ' está com ' +
+              alojamento.ocupados +
+              ' de ' +
+              alojamento.leitos +
+              ' leitos ocupados.',
             'alojamento',
-            a.id
+            alojamento.id
           );
         }
       });
+
+    // 6. Ocorrências em alojamentos abertas há muitos dias
     db.prepare(
       'SELECT o.id, o.aberta_em, o.descricao, a.nome FROM ocorrencia o JOIN alojamento a ON a.id = o.alojamento_id WHERE o.resolvida_em IS NULL'
     )
       .all()
-      .forEach((o) => {
-        const d = Math.floor(
-          (agora - new Date(o.aberta_em.replace(' ', 'T')).getTime()) / (24 * MS_H)
+      .forEach((ocorrencia) => {
+        const diasAbertos = Math.floor(
+          (agora - new Date(ocorrencia.aberta_em.replace(' ', 'T')).getTime()) / (24 * horaEmMs)
         );
-        if (d >= cfg.diasAlertaPendencia)
+        if (diasAbertos >= cfg.diasAlertaPendencia) {
           this.criar(
             novos,
             'ocorrencia_antiga',
             'atencao',
-            'Ocorrência aberta há ' + d + ' dias em ' + o.nome + ': ' + o.descricao,
+            'Ocorrência aberta há ' +
+              diasAbertos +
+              ' dias em ' +
+              ocorrencia.nome +
+              ': ' +
+              ocorrencia.descricao,
             'ocorrencia',
-            o.id
+            ocorrencia.id
           );
+        }
       });
+
+    // 7. Veículos parados na oficina há muitos dias
     db.prepare(
       'SELECT m.id, m.inicio, v.modelo, v.placa FROM manutencao m JOIN veiculo v ON v.id = m.veiculo_id WHERE m.fim IS NULL'
     )
       .all()
-      .forEach((m) => {
-        const d = Math.floor(
-          (agora - new Date(m.inicio.replace(' ', 'T')).getTime()) / (24 * MS_H)
+      .forEach((manutencao) => {
+        const diasOficina = Math.floor(
+          (agora - new Date(manutencao.inicio.replace(' ', 'T')).getTime()) / (24 * horaEmMs)
         );
-        if (d >= cfg.diasAlertaPendencia)
+        if (diasOficina >= cfg.diasAlertaPendencia) {
           this.criar(
             novos,
             'oficina_longa',
             'atencao',
-            'O ' + m.modelo + ' ' + m.placa + ' está na oficina há ' + d + ' dias.',
+            'O ' +
+              manutencao.modelo +
+              ' ' +
+              manutencao.placa +
+              ' está na oficina há ' +
+              diasOficina +
+              ' dias.',
             'manutencao',
-            m.id
+            manutencao.id
           );
+        }
       });
+
+    // 8. Integridade do histórico de auditoria
     const integridade = auditoria.verificarIntegridadeLog();
     if (!integridade.integro) {
       this.criar(
@@ -219,6 +268,7 @@ class Notificacoes {
         integridade.linhaComProblema
       );
     }
+
     return novos;
   }
 
@@ -226,9 +276,7 @@ class Notificacoes {
     this.ultimaVerificacao = Date.now();
     const novos = this.gerarAvisos(cfg);
     if (cfg.telegramCriticos) {
-      const criticos = novos.filter((n) => {
-        return n.severidade === 'critico';
-      });
+      const criticos = novos.filter((aviso) => aviso.severidade === 'critico');
       for (let i = 0; i < criticos.length; i++) {
         const texto = await ia.redigirAlerta(
           '[DISPATCH · ' + cfg.nomeEmpresa + '] ' + criticos[i].mensagem
@@ -238,26 +286,28 @@ class Notificacoes {
             "SELECT telegram_chat_id FROM usuario WHERE perfil = 'admin' AND ativo = 1 AND telegram_chat_id IS NOT NULL"
           )
           .all();
+
         let enviado = false;
         if (admins.length === 0) {
           enviado = (await telegram.enviar(texto)).enviado;
         }
         for (let j = 0; j < admins.length; j++) {
-          if ((await telegram.enviar(texto, admins[j].telegram_chat_id)).enviado) enviado = true;
+          if ((await telegram.enviar(texto, admins[j].telegram_chat_id)).enviado) {
+            enviado = true;
+          }
         }
-        if (enviado)
-          db.prepare('UPDATE notificacao SET enviada_telegram = 1 WHERE id = ?').run(
-            criticos[i].id
-          );
+        if (enviado) {
+          db.prepare('UPDATE notificacao SET enviada_telegram = 1 WHERE id = ?').run(criticos[i].id);
+        }
       }
     }
     return novos;
   }
 
-  // As telas compartilham a verificação: no máximo uma vez por minuto.
-
+  // Evita rodar toda a varredura de avisos a cada clique: limita a uma vez por minuto.
   precisaVerificar() {
     return Date.now() - this.ultimaVerificacao > 60000;
   }
 }
+
 module.exports = new Notificacoes();

@@ -1,4 +1,4 @@
-// Controla a tela de auditoria.
+// Aba de auditoria dentro de Configurações: filtra alterações antigas e verifica a cadeia de hashes.
 class TelaAuditoria {
   constructor() {
     this.acoes = {
@@ -17,39 +17,38 @@ class TelaAuditoria {
   configurarEventos() {
     this.campoBusca.addEventListener('input', () => {
       if (this.timerBusca) clearTimeout(this.timerBusca);
+      // Espera 300 ms após parar de digitar para não fazer uma busca a cada tecla.
       this.timerBusca = setTimeout(this.carregarLog.bind(this), 300);
     });
+
     this.seletorTabela.addEventListener('change', this.carregarLog.bind(this));
     this.seletorAcao.addEventListener('change', this.carregarLog.bind(this));
+
     document.getElementById('botao-verificar').addEventListener('click', async () => {
       const caixa = document.getElementById('aud-integridade');
-      const r = await chamarApi('/api/auditoria/integridade');
+      const resposta = await chamarApi('/api/auditoria/integridade');
       caixa.hidden = false;
-      if (!r.ok) {
+
+      if (!resposta.ok) {
         caixa.className = 'resultado-caixa resultado-erro';
-        caixa.textContent = r.dados.erro || 'Erro ao verificar.';
+        caixa.textContent = resposta.dados.erro || 'Erro ao verificar.';
         return;
       }
-      const d = r.dados;
-      caixa.className = 'resultado-caixa ' + (d.integro ? 'resultado-ok' : 'resultado-erro');
+
+      const dados = resposta.dados;
+      caixa.className = 'resultado-caixa ' + (dados.integro ? 'resultado-ok' : 'resultado-erro');
       caixa.textContent =
-        (d.integro ? 'Log íntegro. ' : 'ATENÇÃO: log adulterado! ') +
-        d.motivo +
+        (dados.integro ? 'Log íntegro. ' : 'ATENÇÃO: log adulterado! ') +
+        dados.motivo +
         ' (' +
-        d.totalLinhas +
+        dados.totalLinhas +
         ' linhas conferidas)';
     });
+
+    // Só carrega a tabela quando a pessoa abre a aba de Auditoria em Configurações.
     document.addEventListener('dispatch:config-aba', (evento) => {
       if (evento.detail === 'auditoria') this.carregarLog();
     });
-  }
-
-  esc(texto) {
-    return String(texto === null || texto === undefined ? '' : texto)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
   }
 
   formatarData(texto) {
@@ -59,85 +58,105 @@ class TelaAuditoria {
   resumirJson(texto) {
     if (!texto) return '—';
     try {
-      const o = JSON.parse(texto);
-      return Object.keys(o)
-        .map((k) => {
-          return (
-            k +
-            ': ' +
-            (o[k] === null ? 'vazio' : typeof o[k] === 'object' ? JSON.stringify(o[k]) : o[k])
-          );
+      const objeto = JSON.parse(texto);
+      return Object.keys(objeto)
+        .map((chave) => {
+          const valor = objeto[chave];
+          let valorFormatado;
+          if (valor === null) {
+            valorFormatado = 'vazio';
+          } else if (typeof valor === 'object') {
+            valorFormatado = JSON.stringify(valor);
+          } else {
+            valorFormatado = valor;
+          }
+          return chave + ': ' + valorFormatado;
         })
         .join(' · ');
-    } catch (e) {
+    } catch (erro) {
       return texto;
     }
   }
 
+  mostrarLinhaAviso(texto) {
+    const linha = document.createElement('tr');
+    const celula = document.createElement('td');
+    celula.colSpan = 5;
+    celula.className = 'texto-vazio';
+    celula.textContent = texto;
+    linha.appendChild(celula);
+    this.corpo.replaceChildren(linha);
+  }
+
   async carregarLog() {
-    const q =
+    const consulta =
       '?busca=' +
       encodeURIComponent(this.campoBusca.value) +
       '&tabela=' +
       encodeURIComponent(this.seletorTabela.value) +
       '&acao=' +
       encodeURIComponent(this.seletorAcao.value);
-    const r = await chamarApi('/api/auditoria' + q);
+
+    const resposta = await chamarApi('/api/auditoria' + consulta);
     this.corpo.innerHTML = '';
-    if (!r.ok) {
-      this.corpo.innerHTML =
-        '<tr><td colspan="5" class="texto-vazio">' +
-        this.esc(r.dados.erro || 'Erro ao carregar o log.') +
-        '</td></tr>';
+
+    if (!resposta.ok) {
+      this.mostrarLinhaAviso(resposta.dados.erro || 'Erro ao carregar o log.');
       return;
     }
+
     if (this.seletorTabela.options.length === 1) {
-      r.dados.tabelas.forEach((t) => {
-        const o = document.createElement('option');
-        o.value = t;
-        o.textContent = t;
-        this.seletorTabela.appendChild(o);
+      resposta.dados.tabelas.forEach((nomeTabela) => {
+        const opcao = document.createElement('option');
+        opcao.value = nomeTabela;
+        opcao.textContent = nomeTabela;
+        this.seletorTabela.appendChild(opcao);
       });
     }
-    document.getElementById('aud-total').textContent = r.dados.total + ' registros no log';
-    if (r.dados.linhas.length === 0) {
-      this.corpo.innerHTML =
-        '<tr><td colspan="5" class="texto-vazio">Nenhum registro encontrado.</td></tr>';
+
+    document.getElementById('aud-total').textContent = resposta.dados.total + ' registros no log';
+    if (resposta.dados.linhas.length === 0) {
+      this.mostrarLinhaAviso('Nenhum registro encontrado.');
       return;
     }
-    r.dados.linhas.forEach((l) => {
-      const a = this.acoes[l.acao] || ['status-concluido', l.acao || ''];
+
+    resposta.dados.linhas.forEach((registro) => {
+      const acaoVisual = this.acoes[registro.acao] || ['status-concluido', registro.acao || ''];
       const tr = document.createElement('tr');
 
       const tdQuando = document.createElement('td');
-      tdQuando.textContent = this.formatarData(l.quando);
+      tdQuando.textContent = this.formatarData(registro.quando);
 
       const tdUsuario = document.createElement('td');
-      tdUsuario.textContent = l.usuario || '';
+      tdUsuario.textContent = registro.usuario || '';
 
       const tdAcao = document.createElement('td');
       const tagAcao = document.createElement('span');
-      tagAcao.className = 'status-tag ' + a[0];
+      tagAcao.className = 'status-tag ' + acaoVisual[0];
       const ponto = document.createElement('span');
       ponto.className = 'status-ponto';
       tagAcao.appendChild(ponto);
-      tagAcao.appendChild(document.createTextNode(a[1]));
+      tagAcao.appendChild(document.createTextNode(acaoVisual[1]));
       tdAcao.appendChild(tagAcao);
 
       const tdResumo = document.createElement('td');
-      tdResumo.appendChild(document.createTextNode(l.resumo || ''));
+      tdResumo.appendChild(document.createTextNode(registro.resumo || ''));
       const spanTabela = document.createElement('span');
       spanTabela.className = 'aud-tabela';
-      spanTabela.textContent = (l.tabela || '') + ' #' + (l.registro_id ?? '');
+      const idTexto =
+        registro.registro_id !== null && registro.registro_id !== undefined
+          ? registro.registro_id
+          : '';
+      spanTabela.textContent = (registro.tabela || '') + ' #' + idTexto;
       tdResumo.appendChild(spanTabela);
 
       const tdDiff = document.createElement('td');
       tdDiff.className = 'aud-diff';
-      if (l.antes_json || l.depois_json) {
+      if (registro.antes_json || registro.depois_json) {
         const spanAntes = document.createElement('span');
-        spanAntes.textContent = this.resumirJson(l.antes_json);
+        spanAntes.textContent = this.resumirJson(registro.antes_json);
         const spanDepois = document.createElement('span');
-        spanDepois.textContent = '→ ' + this.resumirJson(l.depois_json);
+        spanDepois.textContent = '→ ' + this.resumirJson(registro.depois_json);
         tdDiff.appendChild(spanAntes);
         tdDiff.appendChild(spanDepois);
       } else {
@@ -153,4 +172,5 @@ class TelaAuditoria {
     });
   }
 }
+
 new TelaAuditoria();

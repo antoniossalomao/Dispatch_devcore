@@ -1,11 +1,11 @@
-const { agoraLocal } = require('../regras/datas');
-// Serviço de auditoria.
-// grava alterações no log_auditoria e confere se o encadeamento de hashes está íntegro (regras U1 e U3)
 const crypto = require('crypto');
 const db = require('../db/conexao');
-class Auditoria {
-  // O hash anterior liga os registros e permite detectar alterações externas.
+const datas = require('../regras/datas');
 
+// Registra tudo que foi criado, editado ou excluído no sistema e confere se o histórico não foi mexido por fora.
+class Auditoria {
+  // Cada registro gera uma "impressão digital" (SHA-256) juntando seus dados com o hash da linha anterior.
+  // Se alguém editar uma linha direto no arquivo do banco, todos os hashes seguintes deixam de bater.
   gerarHash(dados) {
     const texto = [
       dados.hashAnterior,
@@ -22,11 +22,12 @@ class Auditoria {
   }
 
   registrarLog(info) {
+    // SAVEPOINT cria um ponto de restauração no SQLite caso dê algum erro no meio da gravação.
     db.exec('SAVEPOINT auditoria_sp');
     try {
       const ultimo = db.prepare('SELECT hash FROM log_auditoria ORDER BY id DESC LIMIT 1').get();
       const hashAnterior = ultimo ? ultimo.hash : 'INICIO';
-      const quando = agoraLocal();
+      const quando = datas.agoraLocal();
       const antesJson = info.antes ? JSON.stringify(info.antes) : null;
       const depoisJson = info.depois ? JSON.stringify(info.depois) : null;
       const hash = this.gerarHash({
@@ -40,6 +41,7 @@ class Auditoria {
         antesJson: antesJson,
         depoisJson: depoisJson
       });
+
       db.prepare(
         'INSERT INTO log_auditoria ' +
           '(quando, usuario_id, acao, tabela, registro_id, resumo, antes_json, depois_json, hash_anterior, hash) ' +
@@ -64,40 +66,43 @@ class Auditoria {
     }
   }
 
+  // Recalcula linha por linha do começo ao fim para confirmar que ninguém apagou ou alterou registros.
   verificarIntegridadeLog() {
     const linhas = db.prepare('SELECT * FROM log_auditoria ORDER BY id ASC').all();
     let esperadoAnterior = 'INICIO';
+
     for (let i = 0; i < linhas.length; i++) {
-      const l = linhas[i];
-      if (l.hash_anterior !== esperadoAnterior) {
+      const registro = linhas[i];
+      if (registro.hash_anterior !== esperadoAnterior) {
         return {
           integro: false,
           totalLinhas: linhas.length,
-          linhaComProblema: l.id,
-          motivo: 'O elo com o registro anterior foi quebrado na linha #' + l.id + '.'
+          linhaComProblema: registro.id,
+          motivo: 'O elo com o registro anterior foi quebrado na linha #' + registro.id + '.'
         };
       }
       const recalculado = this.gerarHash({
-        hashAnterior: l.hash_anterior,
-        quando: l.quando,
-        usuarioId: l.usuario_id,
-        acao: l.acao,
-        tabela: l.tabela,
-        registroId: l.registro_id,
-        resumo: l.resumo,
-        antesJson: l.antes_json,
-        depoisJson: l.depois_json
+        hashAnterior: registro.hash_anterior,
+        quando: registro.quando,
+        usuarioId: registro.usuario_id,
+        acao: registro.acao,
+        tabela: registro.tabela,
+        registroId: registro.registro_id,
+        resumo: registro.resumo,
+        antesJson: registro.antes_json,
+        depoisJson: registro.depois_json
       });
-      if (l.hash !== recalculado) {
+      if (registro.hash !== recalculado) {
         return {
           integro: false,
           totalLinhas: linhas.length,
-          linhaComProblema: l.id,
-          motivo: 'Os dados da linha #' + l.id + ' foram alterados fora do sistema.'
+          linhaComProblema: registro.id,
+          motivo: 'Os dados da linha #' + registro.id + ' foram alterados fora do sistema.'
         };
       }
-      esperadoAnterior = l.hash;
+      esperadoAnterior = registro.hash;
     }
+
     return {
       integro: true,
       totalLinhas: linhas.length,
@@ -106,4 +111,5 @@ class Auditoria {
     };
   }
 }
+
 module.exports = new Auditoria();

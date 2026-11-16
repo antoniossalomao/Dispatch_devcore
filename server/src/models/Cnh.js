@@ -1,10 +1,11 @@
-// Validade e categorias da habilitação do colaborador.
+// Representa a CNH de um colaborador e ajuda a checar validade e categorias permitidas.
 class Cnh {
   constructor(categorias, validade) {
     this.categorias = categorias;
     this.validade = validade;
   }
 
+  // Confere se a habilitação está sem cadastro, vencida, perto de vencer ou em dia.
   situacao(diasAlerta) {
     if (!this.categorias || this.categorias.trim() === '') {
       return {
@@ -21,13 +22,14 @@ class Cnh {
       };
     }
 
-    // Compara as datas à meia-noite local para não deslocar o dia pelo fuso.
+    // Zera a hora para meia-noite local nos dois lados, evitando erro de 1 dia por causa do fuso horário.
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
     const dataValidade = new Date(this.validade + 'T00:00:00');
     const diferencaMs = dataValidade.getTime() - hoje.getTime();
     const diasRestantes = Math.ceil(diferencaMs / (1000 * 60 * 60 * 24));
     const prazoAlerta = diasAlerta || 30;
+
     if (diasRestantes < 0) {
       return {
         status: 'vencida',
@@ -49,39 +51,39 @@ class Cnh {
     };
   }
 
+  // Verifica se as categorias da CNH da pessoa cobrem o tipo exigido pelo veículo (regra do CTB).
   podeDirigir(categoriaExigida) {
     if (!this.categorias || !categoriaExigida) {
       return false;
     }
 
-    // normaliza para letras maiusculas e pega as categorias separadas (ex: 'A,B' ou 'AB' ou 'B')
-    const texto = this.categorias.toUpperCase().replace(/[^A-E]/g, '');
+    // Limpa espaços e vírgulas para comparar apenas as letras A, B, C, D e E.
+    const letras = this.categorias.toUpperCase().replace(/[^A-E]/g, '');
     const exigida = categoriaExigida.toUpperCase().trim();
+
     if (exigida === 'A') {
-      return texto.indexOf('A') !== -1;
+      return letras.includes('A');
     }
     if (exigida === 'B') {
-      // B, C, D ou E podem dirigir veículo tipo B
+      // Quem tem B, C, D ou E pode dirigir carro de passeio (categoria B).
       return (
-        texto.indexOf('B') !== -1 ||
-        texto.indexOf('C') !== -1 ||
-        texto.indexOf('D') !== -1 ||
-        texto.indexOf('E') !== -1
+        letras.includes('B') ||
+        letras.includes('C') ||
+        letras.includes('D') ||
+        letras.includes('E')
       );
     }
     if (exigida === 'C') {
-      // carga: C ou E
-      return texto.indexOf('C') !== -1 || texto.indexOf('E') !== -1;
+      return letras.includes('C') || letras.includes('E');
     }
     if (exigida === 'D') {
-      // van/passageiros: D ou E
-      return texto.indexOf('D') !== -1 || texto.indexOf('E') !== -1;
+      return letras.includes('D') || letras.includes('E');
     }
     if (exigida === 'E') {
-      // articulado/pesado: apenas E
-      return texto.indexOf('E') !== -1;
+      return letras.includes('E');
     }
     return false;
   }
 }
+
 module.exports = Cnh;

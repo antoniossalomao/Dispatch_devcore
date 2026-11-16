@@ -1,4 +1,4 @@
-// Controla a tela de alojamentos.
+// Tela de alojamentos: cartões por unidade, gaveta com mapa de quartos/leitos, entradas, saídas e ocorrências.
 class TelaAlojamentos {
   constructor() {
     this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
@@ -8,6 +8,7 @@ class TelaAlojamentos {
     this.botaoSair = document.getElementById('botao-sair');
     this.blocoMenuAdmin = document.getElementById('bloco-menu-admin');
     this.toast = document.getElementById('toast-aloj');
+
     this.grade = document.getElementById('grade-alojamentos');
     this.seletorStatus = document.getElementById('seletor-status');
     this.gaveta = document.getElementById('gaveta-alojamento');
@@ -21,9 +22,11 @@ class TelaAlojamentos {
       leitos: document.getElementById('gaveta-secao-leitos'),
       ocorrencias: document.getElementById('gaveta-secao-ocorrencias')
     };
+
     this.alojamentoAtual = null;
     this.colaboradoresAtivos = [];
     this.timerToast = null;
+
     this.nomesTipoLeito = {
       cama: 'Cama',
       beliche_baixo: 'Beliche (baixo)',
@@ -36,52 +39,63 @@ class TelaAlojamentos {
       regra: 'Regra',
       outro: 'Outro'
     };
+
     this.quartoCamas = document.getElementById('quarto-camas');
     this.quartoBeliches = document.getElementById('quarto-beliches');
     this.quartoArea = document.getElementById('quarto-area');
+
     this.configurarEventos();
     this.iniciar();
   }
 
   configurarEventos() {
-    document.querySelectorAll('[data-fechar]').forEach((b) => {
-      b.addEventListener('click', () => {
-        this.fecharModal(b.dataset.fechar);
+    document.querySelectorAll('[data-fechar]').forEach((botao) => {
+      botao.addEventListener('click', () => {
+        this.fecharModal(botao.dataset.fechar);
       });
     });
+
     this.seletorStatus.addEventListener('change', this.carregarAlojamentos.bind(this));
+
     document.getElementById('fechar-gaveta').addEventListener('click', () => {
       this.gaveta.hidden = true;
       this.alojamentoAtual = null;
     });
+
     document.querySelectorAll('.gaveta-aba').forEach((aba) => {
       aba.addEventListener('click', () => {
-        document.querySelectorAll('.gaveta-aba').forEach((x) => {
-          x.classList.remove('ativa');
+        document.querySelectorAll('.gaveta-aba').forEach((outra) => {
+          outra.classList.remove('ativa');
         });
         aba.classList.add('ativa');
-        Object.keys(this.secoesGaveta).forEach((k) => {
-          this.secoesGaveta[k].hidden = k !== aba.dataset.gaveta;
+        Object.keys(this.secoesGaveta).forEach((chave) => {
+          this.secoesGaveta[chave].hidden = chave !== aba.dataset.gaveta;
         });
       });
     });
+
     document.getElementById('botao-novo-alojamento').addEventListener('click', () => {
       this.abrirFormAlojamento(null);
     });
+
     document.getElementById('gaveta-botao-editar').addEventListener('click', () => {
       if (this.alojamentoAtual) this.abrirFormAlojamento(this.alojamentoAtual.alojamento);
     });
+
     document
       .getElementById('form-alojamento')
       .addEventListener('submit', this.salvarAlojamento.bind(this));
+
     this.gavetaBotaoStatus.addEventListener('click', this.alterarStatusAlojamento.bind(this));
     this.quartoCamas.addEventListener('input', this.resumoQuarto.bind(this));
     this.quartoBeliches.addEventListener('input', this.resumoQuarto.bind(this));
+
     document.getElementById('botao-novo-quarto').addEventListener('click', () => {
       document.getElementById('form-quarto').reset();
       this.resumoQuarto();
       this.abrirModal('modal-quarto');
     });
+
     document.getElementById('form-quarto').addEventListener('submit', this.salvarQuarto.bind(this));
     document
       .getElementById('form-alojar')
@@ -92,22 +106,22 @@ class TelaAlojamentos {
     document
       .getElementById('form-ocorrencia')
       .addEventListener('submit', this.salvarOcorrencia.bind(this));
+
     this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', {
-        metodo: 'POST'
-      });
+      await chamarApi('/api/auth/sair', { metodo: 'POST' });
       window.location.href = 'index.html';
     });
+
     document.querySelectorAll('.menu-em-breve').forEach((link) => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
+      link.addEventListener('click', (evento) => {
+        evento.preventDefault();
         this.mostrarToast('Módulo "' + link.dataset.tela + '" em construção.', 'ok');
       });
     });
   }
 
-  async salvarAlojamento(e) {
-    e.preventDefault();
+  async salvarAlojamento(evento) {
+    evento.preventDefault();
     const id = document.getElementById('aloj-id').value;
     const corpo = {
       nome: document.getElementById('aloj-nome').value,
@@ -119,66 +133,63 @@ class TelaAlojamentos {
       observacoes: document.getElementById('aloj-obs').value,
       responsavel_id: document.getElementById('aloj-responsavel').value
     };
-    const r = await chamarApi(id ? '/api/alojamentos/' + id : '/api/alojamentos', {
+
+    const resposta = await chamarApi(id ? '/api/alojamentos/' + id : '/api/alojamentos', {
       metodo: id ? 'PUT' : 'POST',
       corpo: corpo
     });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao salvar.', 'erro');
+
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao salvar.', 'erro');
       return;
     }
-    this.mostrarToast(r.dados.mensagem, 'ok');
+
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.fecharModal('modal-alojamento');
     this.recarregarTudo();
   }
 
   async alterarStatusAlojamento() {
     if (!this.alojamentoAtual) return;
-    const a = this.alojamentoAtual.alojamento;
-    const r = await chamarApi('/api/alojamentos/' + a.id + '/status', {
+    const alojamento = this.alojamentoAtual.alojamento;
+    const resposta = await chamarApi('/api/alojamentos/' + alojamento.id + '/status', {
       metodo: 'PUT',
-      corpo: {
-        ativo: a.ativo === 1 ? 0 : 1
-      }
+      corpo: { ativo: alojamento.ativo === 1 ? 0 : 1 }
     });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao alterar status.', 'erro');
+
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao alterar status.', 'erro');
       return;
     }
-    this.mostrarToast(r.dados.mensagem, 'ok');
+
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.recarregarTudo();
   }
 
-  async salvarQuarto(e) {
-    const codigo = () => {
-      return nome + '-' + (n < 10 ? '0' + n : n);
-    };
-    e.preventDefault();
+  async salvarQuarto(evento) {
+    evento.preventDefault();
     const nome = document.getElementById('quarto-nome').value.trim();
     const camas = Number(this.quartoCamas.value) || 0;
     const beliches = Number(this.quartoBeliches.value) || 0;
     const leitos = [];
-    let n = 1;
+    let numeroLeito = 1;
+
+    const proximoCodigo = () => {
+      const codigo = nome + '-' + (numeroLeito < 10 ? '0' + numeroLeito : numeroLeito);
+      numeroLeito++;
+      return codigo;
+    };
+
     for (let i = 0; i < camas; i++) {
-      leitos.push({
-        codigo: codigo(),
-        tipo: 'cama'
-      });
-      n++;
+      leitos.push({ codigo: proximoCodigo(), tipo: 'cama' });
     }
+    // Cada beliche vira dois leitos ligados na lista (baixo e cima).
     for (let i = 0; i < beliches; i++) {
-      leitos.push({
-        codigo: codigo(),
-        tipo: 'beliche_baixo'
-      });
-      n++;
-      leitos.push({
-        codigo: codigo(),
-        tipo: 'beliche_cima'
-      });
-      n++;
+      leitos.push({ codigo: proximoCodigo(), tipo: 'beliche_baixo' });
+      leitos.push({ codigo: proximoCodigo(), tipo: 'beliche_cima' });
     }
-    const r = await chamarApi(
+
+    const resposta = await chamarApi(
       '/api/alojamentos/' + this.alojamentoAtual.alojamento.id + '/quartos',
       {
         metodo: 'POST',
@@ -189,29 +200,33 @@ class TelaAlojamentos {
         }
       }
     );
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao salvar quarto.', 'erro');
+
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao salvar quarto.', 'erro');
       return;
     }
-    this.mostrarToast(r.dados.mensagem, 'ok');
+
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.fecharModal('modal-quarto');
     this.recarregarTudo();
   }
 
-  async alojarColaborador(e) {
-    e.preventDefault();
-    const r = await chamarApi('/api/alojamentos/estadias', {
+  async alojarColaborador(evento) {
+    evento.preventDefault();
+    const resposta = await chamarApi('/api/alojamentos/estadias', {
       metodo: 'POST',
       corpo: {
         pessoa_id: Number(document.getElementById('alojar-pessoa').value),
         leito_id: Number(document.getElementById('alojar-leito-id').value)
       }
     });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao registrar entrada.', 'erro');
+
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao registrar entrada.', 'erro');
       return;
     }
-    this.mostrarToast(r.dados.mensagem, 'ok');
+
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.fecharModal('modal-alojar');
     await this.carregarColaboradores();
     this.recarregarTudo();
@@ -219,20 +234,20 @@ class TelaAlojamentos {
 
   novaOcorrencia() {
     document.getElementById('form-ocorrencia').reset();
-    const sel = document.getElementById('ocor-pessoa');
-    sel.innerHTML = '<option value="">Ninguém</option>';
-    this.colaboradoresAtivos.forEach((c) => {
-      const o = document.createElement('option');
-      o.value = c.id;
-      o.textContent = c.nome;
-      sel.appendChild(o);
+    const select = document.getElementById('ocor-pessoa');
+    select.innerHTML = '<option value="">Ninguém</option>';
+    this.colaboradoresAtivos.forEach((colab) => {
+      const opcao = document.createElement('option');
+      opcao.value = colab.id;
+      opcao.textContent = colab.nome;
+      select.appendChild(opcao);
     });
     this.abrirModal('modal-ocorrencia');
   }
 
-  async salvarOcorrencia(e) {
-    e.preventDefault();
-    const r = await chamarApi(
+  async salvarOcorrencia(evento) {
+    evento.preventDefault();
+    const resposta = await chamarApi(
       '/api/alojamentos/' + this.alojamentoAtual.alojamento.id + '/ocorrencias',
       {
         metodo: 'POST',
@@ -243,11 +258,13 @@ class TelaAlojamentos {
         }
       }
     );
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao abrir ocorrência.', 'erro');
+
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao abrir ocorrência.', 'erro');
       return;
     }
-    this.mostrarToast(r.dados.mensagem, 'ok');
+
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.fecharModal('modal-ocorrencia');
     this.recarregarTudo();
   }
@@ -287,43 +304,47 @@ class TelaAlojamentos {
   }
 
   async carregarAlojamentos() {
-    const r = await chamarApi('/api/alojamentos?status=' + this.seletorStatus.value);
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao carregar alojamentos.', 'erro');
+    const resposta = await chamarApi('/api/alojamentos?status=' + this.seletorStatus.value);
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao carregar alojamentos.', 'erro');
       return;
     }
-    const t = r.dados.totais;
-    document.getElementById('kpi-alojamentos').textContent = t.alojamentos;
-    document.getElementById('kpi-leitos').textContent = t.leitos;
-    document.getElementById('kpi-livres').textContent = t.leitos - t.ocupados + ' livres';
+
+    const totais = resposta.dados.totais;
+    document.getElementById('kpi-alojamentos').textContent = totais.alojamentos;
+    document.getElementById('kpi-leitos').textContent = totais.leitos;
+    document.getElementById('kpi-livres').textContent = totais.leitos - totais.ocupados + ' livres';
     document.getElementById('kpi-ocupacao').textContent =
-      (t.leitos > 0 ? Math.round((t.ocupados / t.leitos) * 100) : 0) + '%';
-    document.getElementById('kpi-ocupados').textContent = t.ocupados + ' leitos ocupados';
-    document.getElementById('kpi-ocorrencias').textContent = t.ocorrenciasAbertas;
+      (totais.leitos > 0 ? Math.round((totais.ocupados / totais.leitos) * 100) : 0) + '%';
+    document.getElementById('kpi-ocupados').textContent = totais.ocupados + ' leitos ocupados';
+    document.getElementById('kpi-ocorrencias').textContent = totais.ocorrenciasAbertas;
+
     this.grade.innerHTML = '';
-    if (r.dados.alojamentos.length === 0) {
+    if (resposta.dados.alojamentos.length === 0) {
       this.grade.innerHTML = '<p class="texto-vazio">Nenhum alojamento encontrado.</p>';
       return;
     }
-    r.dados.alojamentos.forEach((a) => {
+
+    resposta.dados.alojamentos.forEach((alojamento) => {
       const card = document.createElement('button');
       card.type = 'button';
-      card.className = 'aloj-cartao' + (a.ativo === 0 ? ' aloj-inativo' : '');
-      const cheio = a.total_leitos > 0 && a.leitos_ocupados === a.total_leitos;
-      const pct = Math.max(0, Math.min(100, Number(a.ocupacao_pct) || 0));
+      card.className = 'aloj-cartao' + (alojamento.ativo === 0 ? ' aloj-inativo' : '');
+      const cheio = alojamento.total_leitos > 0 && alojamento.leitos_ocupados === alojamento.total_leitos;
+      const pct = Math.max(0, Math.min(100, Number(alojamento.ocupacao_pct) || 0));
+
       card.innerHTML =
         '<div class="aloj-cartao-topo">' +
         '<div><div class="aloj-nome">' +
-        this.esc(a.nome) +
+        this.esc(alojamento.nome) +
         '</div>' +
         '<div class="aloj-local">' +
-        this.esc(a.cidade) +
-        (a.bairro ? ' · ' + this.esc(a.bairro) : '') +
+        this.esc(alojamento.cidade) +
+        (alojamento.bairro ? ' · ' + this.esc(alojamento.bairro) : '') +
         '</div></div>' +
-        (a.ocorrencias_abertas > 0
+        (alojamento.ocorrencias_abertas > 0
           ? '<span class="status-tag status-atencao"><span class="status-ponto"></span>' +
-            a.ocorrencias_abertas +
-            (a.ocorrencias_abertas === 1 ? ' ocorrência' : ' ocorrências') +
+            alojamento.ocorrencias_abertas +
+            (alojamento.ocorrencias_abertas === 1 ? ' ocorrência' : ' ocorrências') +
             '</span>'
           : '') +
         '</div>' +
@@ -331,131 +352,141 @@ class TelaAlojamentos {
         (cheio ? ' cheio' : '') +
         '"></div></div>' +
         '<div class="aloj-numeros"><span><strong>' +
-        a.leitos_ocupados +
+        alojamento.leitos_ocupados +
         '/' +
-        a.total_leitos +
+        alojamento.total_leitos +
         '</strong> leitos ocupados</span><span>' +
-        a.total_quartos +
-        (a.total_quartos === 1 ? ' quarto' : ' quartos') +
+        alojamento.total_quartos +
+        (alojamento.total_quartos === 1 ? ' quarto' : ' quartos') +
         '</span></div>' +
         '<div class="aloj-resp">Responsável: ' +
-        this.esc(a.responsavel_nome || 'não definido') +
+        this.esc(alojamento.responsavel_nome || 'não definido') +
         '</div>';
+
       card.querySelector('.aloj-barra-preench').style.width = pct + '%';
       card.addEventListener('click', () => {
-        this.abrirGaveta(a.id);
+        this.abrirGaveta(alojamento.id);
       });
       this.grade.appendChild(card);
     });
   }
 
   async abrirGaveta(id) {
-    const r = await chamarApi('/api/alojamentos/' + id);
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Não foi possível abrir o alojamento.', 'erro');
+    const resposta = await chamarApi('/api/alojamentos/' + id);
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Não foi possível abrir o alojamento.', 'erro');
       return;
     }
-    this.alojamentoAtual = r.dados;
+    this.alojamentoAtual = resposta.dados;
     this.desenharGaveta();
     this.gaveta.hidden = false;
   }
 
   desenharGaveta() {
-    const a = this.alojamentoAtual.alojamento;
-    this.gavetaNome.textContent = a.nome;
-    const endereco = [a.rua, a.numero].filter(Boolean).join(', ');
+    const alojamento = this.alojamentoAtual.alojamento;
+    this.gavetaNome.textContent = alojamento.nome;
+    const endereco = [alojamento.rua, alojamento.numero].filter(Boolean).join(', ');
     this.gavetaSub.textContent =
-      [endereco, a.bairro, a.cidade].filter(Boolean).join(' · ') +
+      [endereco, alojamento.bairro, alojamento.cidade].filter(Boolean).join(' · ') +
       ' · Responsável: ' +
-      (a.responsavel_nome || 'não definido');
-    this.gavetaBotaoStatus.textContent = a.ativo === 1 ? 'Desativar' : 'Reativar';
+      (alojamento.responsavel_nome || 'não definido');
+    this.gavetaBotaoStatus.textContent = alojamento.ativo === 1 ? 'Desativar' : 'Reativar';
+
     this.gavetaQuartos.innerHTML = '';
     if (this.alojamentoAtual.quartos.length === 0) {
       this.gavetaQuartos.innerHTML = '<p class="texto-vazio">Nenhum quarto cadastrado ainda.</p>';
     }
-    this.alojamentoAtual.quartos.forEach((q) => {
-      const ocupados = q.leitos.filter((l) => {
-        return l.estadia_id;
-      }).length;
+
+    this.alojamentoAtual.quartos.forEach((quarto) => {
+      const ocupados = quarto.leitos.filter((leito) => leito.estadia_id).length;
       const card = document.createElement('div');
       card.className = 'quarto-card';
       card.innerHTML =
         '<div class="quarto-titulo">' +
-        this.esc(q.nome) +
+        this.esc(quarto.nome) +
         '<span>' +
-        q.area_m2 +
+        quarto.area_m2 +
         ' m² · ' +
         ocupados +
         '/' +
-        q.leitos.length +
+        quarto.leitos.length +
         ' ocupados</span></div>';
-      const g = document.createElement('div');
-      g.className = 'leitos-grade';
-      q.leitos.forEach((l) => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'leito ' + (l.estadia_id ? 'ocupado' : 'livre');
-        b.innerHTML =
+
+      const gradeLeitos = document.createElement('div');
+      gradeLeitos.className = 'leitos-grade';
+
+      quarto.leitos.forEach((leito) => {
+        const botaoLeito = document.createElement('button');
+        botaoLeito.type = 'button';
+        botaoLeito.className = 'leito ' + (leito.estadia_id ? 'ocupado' : 'livre');
+        botaoLeito.innerHTML =
           '<span class="leito-codigo">' +
-          this.esc(l.codigo) +
+          this.esc(leito.codigo) +
           '</span>' +
           '<span class="leito-tipo">' +
-          this.esc(this.nomesTipoLeito[l.tipo] || l.tipo) +
+          this.esc(this.nomesTipoLeito[leito.tipo] || leito.tipo) +
           '</span>' +
           '<span class="leito-pessoa">' +
-          (l.estadia_id ? this.esc(l.pessoa_nome) : 'Livre') +
+          (leito.estadia_id ? this.esc(leito.pessoa_nome) : 'Livre') +
           '</span>';
-        b.addEventListener('click', () => {
-          if (l.estadia_id) this.registrarSaida(l);
-          else this.abrirAlojar(l);
+
+        // Leito livre abre a seleção de colaborador; leito ocupado pergunta se deseja registrar saída.
+        botaoLeito.addEventListener('click', () => {
+          if (leito.estadia_id) this.registrarSaida(leito);
+          else this.abrirAlojar(leito);
         });
-        g.appendChild(b);
+        gradeLeitos.appendChild(botaoLeito);
       });
-      card.appendChild(g);
+
+      card.appendChild(gradeLeitos);
       this.gavetaQuartos.appendChild(card);
     });
+
     this.contOcorrencias.textContent = this.alojamentoAtual.ocorrencias.length;
     this.gavetaOcorrencias.innerHTML = '';
     if (this.alojamentoAtual.ocorrencias.length === 0) {
       this.gavetaOcorrencias.innerHTML =
         '<p class="texto-vazio">Nenhuma ocorrência registrada.</p>';
     }
-    this.alojamentoAtual.ocorrencias.forEach((o) => {
+
+    this.alojamentoAtual.ocorrencias.forEach((ocorrencia) => {
       const item = document.createElement('div');
-      item.className = 'timeline-item' + (!o.resolvida_em ? ' timeline-ativo' : '');
+      item.className = 'timeline-item' + (!ocorrencia.resolvida_em ? ' timeline-ativo' : '');
       item.innerHTML =
         '<span class="timeline-titulo">' +
-        this.esc(this.nomesTipoOcorrencia[o.tipo] || o.tipo) +
+        this.esc(this.nomesTipoOcorrencia[ocorrencia.tipo] || ocorrencia.tipo) +
         ' · ' +
-        this.esc(o.descricao) +
+        this.esc(ocorrencia.descricao) +
         '</span>' +
         '<span class="timeline-detalhe">' +
-        (o.pessoa_nome ? 'Envolvido: ' + this.esc(o.pessoa_nome) + ' · ' : '') +
-        (o.resolvida_em ? 'Solução: ' + this.esc(o.solucao) : 'Em aberto') +
+        (ocorrencia.pessoa_nome ? 'Envolvido: ' + this.esc(ocorrencia.pessoa_nome) + ' · ' : '') +
+        (ocorrencia.resolvida_em ? 'Solução: ' + this.esc(ocorrencia.solucao) : 'Em aberto') +
         '</span>' +
         '<span class="timeline-data">Aberta: ' +
-        o.aberta_em.slice(0, 16) +
-        (o.resolvida_em ? ' | Resolvida: ' + o.resolvida_em.slice(0, 16) : '') +
+        ocorrencia.aberta_em.slice(0, 16) +
+        (ocorrencia.resolvida_em ? ' | Resolvida: ' + ocorrencia.resolvida_em.slice(0, 16) : '') +
         '</span>';
-      if (!o.resolvida_em) {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'btn-secundario btn-pequeno ocor-acoes';
-        b.textContent = 'Resolver';
-        b.addEventListener('click', () => {
-          this.resolverOcorrencia(o);
+
+      if (!ocorrencia.resolvida_em) {
+        const botaoResolver = document.createElement('button');
+        botaoResolver.type = 'button';
+        botaoResolver.className = 'btn-secundario btn-pequeno ocor-acoes';
+        botaoResolver.textContent = 'Resolver';
+        botaoResolver.addEventListener('click', () => {
+          this.resolverOcorrencia(ocorrencia);
         });
-        item.appendChild(b);
+        item.appendChild(botaoResolver);
       }
+
       this.gavetaOcorrencias.appendChild(item);
     });
   }
 
   async recarregarTudo() {
     if (this.alojamentoAtual) {
-      const r = await chamarApi('/api/alojamentos/' + this.alojamentoAtual.alojamento.id);
-      if (r.ok) {
-        this.alojamentoAtual = r.dados;
+      const resposta = await chamarApi('/api/alojamentos/' + this.alojamentoAtual.alojamento.id);
+      if (resposta.ok) {
+        this.alojamentoAtual = resposta.dados;
         this.desenharGaveta();
       }
     }
@@ -463,33 +494,37 @@ class TelaAlojamentos {
   }
 
   preencherResponsaveis(selecionado) {
-    const sel = document.getElementById('aloj-responsavel');
-    sel.innerHTML = '<option value="">Sem responsável</option>';
-    this.colaboradoresAtivos.forEach((c) => {
-      const o = document.createElement('option');
-      o.value = c.id;
-      o.textContent = c.nome + ' (' + c.matricula + ')';
-      sel.appendChild(o);
+    const select = document.getElementById('aloj-responsavel');
+    select.innerHTML = '<option value="">Sem responsável</option>';
+    this.colaboradoresAtivos.forEach((colab) => {
+      const opcao = document.createElement('option');
+      opcao.value = colab.id;
+      opcao.textContent = colab.nome + ' (' + colab.matricula + ')';
+      select.appendChild(opcao);
     });
-    sel.value = selecionado ? String(selecionado) : '';
+    select.value = selecionado ? String(selecionado) : '';
   }
 
-  abrirFormAlojamento(a) {
-    document.getElementById('modal-aloj-titulo').textContent = a
+  abrirFormAlojamento(alojamento) {
+    document.getElementById('modal-aloj-titulo').textContent = alojamento
       ? 'Editar alojamento'
       : 'Novo alojamento';
-    document.getElementById('aloj-id').value = a ? a.id : '';
-    document.getElementById('aloj-nome').value = a ? a.nome : '';
-    document.getElementById('aloj-cidade').value = a ? a.cidade : '';
-    document.getElementById('aloj-rua').value = a && a.rua ? a.rua : '';
-    document.getElementById('aloj-numero').value = a && a.numero ? a.numero : '';
-    document.getElementById('aloj-bairro').value = a && a.bairro ? a.bairro : '';
-    document.getElementById('aloj-cep').value = a && a.cep ? a.cep : '';
-    document.getElementById('aloj-obs').value = a && a.observacoes ? a.observacoes : '';
-    this.preencherResponsaveis(a ? a.responsavel_id : null);
+    document.getElementById('aloj-id').value = alojamento ? alojamento.id : '';
+    document.getElementById('aloj-nome').value = alojamento ? alojamento.nome : '';
+    document.getElementById('aloj-cidade').value = alojamento ? alojamento.cidade : '';
+    document.getElementById('aloj-rua').value = alojamento && alojamento.rua ? alojamento.rua : '';
+    document.getElementById('aloj-numero').value =
+      alojamento && alojamento.numero ? alojamento.numero : '';
+    document.getElementById('aloj-bairro').value =
+      alojamento && alojamento.bairro ? alojamento.bairro : '';
+    document.getElementById('aloj-cep').value = alojamento && alojamento.cep ? alojamento.cep : '';
+    document.getElementById('aloj-obs').value =
+      alojamento && alojamento.observacoes ? alojamento.observacoes : '';
+    this.preencherResponsaveis(alojamento ? alojamento.responsavel_id : null);
     this.abrirModal('modal-alojamento');
   }
 
+  // Prévia em tempo real da regra da NR-24: 3 m² por cama simples e 4,5 m² por beliche.
   resumoQuarto() {
     const camas = Number(this.quartoCamas.value) || 0;
     const beliches = Number(this.quartoBeliches.value) || 0;
@@ -500,14 +535,14 @@ class TelaAlojamentos {
   }
 
   abrirAlojar(leito) {
-    const sel = document.getElementById('alojar-pessoa');
-    sel.innerHTML = '';
-    this.colaboradoresAtivos.forEach((c) => {
-      const o = document.createElement('option');
-      o.value = c.id;
-      o.textContent = c.nome + (c.alojamento_atual ? ' (já alojado)' : '');
-      o.disabled = !!c.alojamento_atual;
-      sel.appendChild(o);
+    const select = document.getElementById('alojar-pessoa');
+    select.innerHTML = '';
+    this.colaboradoresAtivos.forEach((colab) => {
+      const opcao = document.createElement('option');
+      opcao.value = colab.id;
+      opcao.textContent = colab.nome + (colab.alojamento_atual ? ' (já alojado)' : '');
+      opcao.disabled = !!colab.alojamento_atual;
+      select.appendChild(opcao);
     });
     document.getElementById('alojar-leito-id').value = leito.id;
     document.getElementById('alojar-leito-txt').textContent =
@@ -516,51 +551,54 @@ class TelaAlojamentos {
   }
 
   async registrarSaida(leito) {
-    if (
-      !(await confirmar(
-        'Registrar a saída de ' + leito.pessoa_nome + ' do leito ' + leito.codigo + '?',
-        {
-          titulo: 'Registrar saída',
-          confirmar: 'Registrar saída'
-        }
-      ))
-    )
-      return;
-    const r = await chamarApi('/api/alojamentos/estadias/' + leito.estadia_id + '/saida', {
+    const confirmado = await confirmar(
+      'Registrar a saída de ' + leito.pessoa_nome + ' do leito ' + leito.codigo + '?',
+      {
+        titulo: 'Registrar saída',
+        confirmar: 'Registrar saída'
+      }
+    );
+    if (!confirmado) return;
+
+    const resposta = await chamarApi('/api/alojamentos/estadias/' + leito.estadia_id + '/saida', {
       metodo: 'PUT',
       corpo: {}
     });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao registrar saída.', 'erro');
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao registrar saída.', 'erro');
       return;
     }
-    this.mostrarToast(r.dados.mensagem, 'ok');
+
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     await this.carregarColaboradores();
     this.recarregarTudo();
   }
 
-  async resolverOcorrencia(o) {
+  async resolverOcorrencia(ocorrencia) {
     const solucao = await pedirTexto('Resolver ocorrência', 'Como foi resolvido?', {
       confirmar: 'Resolver'
     });
     if (solucao === null) return;
-    const r = await chamarApi('/api/alojamentos/ocorrencias/' + o.id + '/resolver', {
-      metodo: 'PUT',
-      corpo: {
-        solucao: solucao
+
+    const resposta = await chamarApi(
+      '/api/alojamentos/ocorrencias/' + ocorrencia.id + '/resolver',
+      {
+        metodo: 'PUT',
+        corpo: { solucao: solucao }
       }
-    });
-    if (!r.ok) {
-      this.mostrarToast(r.dados.erro || 'Erro ao resolver.', 'erro');
+    );
+    if (!resposta.ok) {
+      this.mostrarToast(resposta.dados.erro || 'Erro ao resolver.', 'erro');
       return;
     }
-    this.mostrarToast(r.dados.mensagem, 'ok');
+
+    this.mostrarToast(resposta.dados.mensagem, 'ok');
     this.recarregarTudo();
   }
 
   async carregarColaboradores() {
-    const r = await chamarApi('/api/pessoas?status=ativos');
-    this.colaboradoresAtivos = r.ok ? r.dados.colaboradores : [];
+    const resposta = await chamarApi('/api/pessoas?status=ativos');
+    this.colaboradoresAtivos = resposta.ok ? resposta.dados.colaboradores : [];
   }
 
   async iniciar() {
@@ -569,11 +607,12 @@ class TelaAlojamentos {
       window.location.href = 'index.html';
       return;
     }
-    const user = sessao.dados.usuario;
-    this.perfilNome.textContent = user.nome;
-    this.perfilTipo.textContent = user.perfil;
-    this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
-    if (user.perfil === 'admin') this.blocoMenuAdmin.hidden = false;
+
+    const usuario = sessao.dados.usuario;
+    this.perfilNome.textContent = usuario.nome;
+    this.perfilTipo.textContent = usuario.perfil;
+    this.usuarioIniciais.textContent = this.pegarIniciais(usuario.nome);
+    if (usuario.perfil === 'admin') this.blocoMenuAdmin.hidden = false;
     if (sessao.dados.nomeEmpresa) {
       this.nomeEmpresaMenu.textContent = sessao.dados.nomeEmpresa;
     }
@@ -581,4 +620,5 @@ class TelaAlojamentos {
     this.carregarAlojamentos();
   }
 }
+
 new TelaAlojamentos();

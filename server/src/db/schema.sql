@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS notificacao (
 );
 
 
--- sessões autenticadas persistidas no banco
+-- logins ativos salvos no banco (assim quem está logado não cai se o servidor reiniciar)
 CREATE TABLE IF NOT EXISTS sessao (
     sid         TEXT PRIMARY KEY,
     usuario_id  INTEGER REFERENCES usuario(id) ON DELETE CASCADE,

@@ -31,7 +31,7 @@ Na pesquisa a gente achou dois exemplos que mostram que isso custa dinheiro de v
 
 Uma construtora inventada, a **Construtora Aguapeí**, com obras no interior de SP. Os funcionários ficam em repúblicas pagas pela empresa e usam carros e vans que são divididos entre as obras.
 
-Pra testar e apresentar, o banco vai ter uns 15 colaboradores, 3 alojamentos (uns 22 leitos), 6 veículos e 6 meses de histórico inventado, criados por um script (`seed.js`). Sem histórico os relatórios ficariam vazios.
+Pra testar e apresentar, o banco tem 15 colaboradores, 3 alojamentos (23 leitos), 6 veículos e 6 meses de histórico inventado, criados por um script (`seed.js`). Sem histórico os relatórios ficariam vazios.
 
 Quem usa o sistema tem um de dois perfis:
 
@@ -50,7 +50,7 @@ Quem usa o sistema tem um de dois perfis:
 7. **IA (Groq):** responder perguntas sobre os dados, escrever um resumo dos relatórios, ajudar a usar o sistema e escrever as notificações.
 8. **Notificações:** avisos no sistema (CNH vencendo, carro que não voltou...) e os mais importantes também por Telegram.
 
-Os itens 7 e 8 são extras que o grupo quis colocar. O sistema tem que funcionar sem eles.
+Os itens 7 e 8 são extras que o grupo quis colocar. O sistema funciona normalmente mesmo sem eles ligados.
 
 ### O que o professor pediu x onde o sistema atende
 
@@ -87,18 +87,19 @@ Não vamos fazer: GPS, controle de combustível e custos, checklist de vistoria 
 ## 4. Telas
 
 - Figma: https://www.figma.com/design/4ma1oH2S8GnmS6A7NNQTqk/Telas---Dispatch
-- Protótipo navegável (HTML com dados de exemplo): pedir acesso pro Antonio
+- As capturas atualizadas do sistema funcionando estão na galeria em [docs/prints/index.html](prints/index.html).
 
-| Tela | O que tem |
-|---|---|
-| Login | Cartão dividido: na esquerda um painel azul-marinho apresentando o sistema, na direita usuário e senha (**já feita**, em `client/index.html`) |
-| Resumo | Números gerais, avisos, últimas movimentações e gráficos de ocupação e uso da frota |
-| Colaboradores | Lista com busca; clicando abre o histórico da pessoa; formulário de cadastro |
-| Alojamentos | Ocupação, mapa de leitos pra alocar/liberar, aba de ocorrências, cadastro com responsável, quartos e leitos |
-| Frota | Lista de veículos com status, saída e volta, aba de manutenções, cadastro com licenciamento e seguro |
-| Relatórios e Auditoria | Relatórios (ocupação, uso, movimentação, gargalos, quem estava dirigindo, pergunta pra IA) e o log de alterações |
-
-Ainda falta colocar no Figma: aba de ocorrências, campo de responsável, cadastro de veículo com documentação, aba de manutenções, relatórios de movimentação e gargalos, sininho de notificações e o chat de ajuda.
+| Tela | Arquivo | O que tem |
+|---|---|---|
+| Apresentação | `client/apresentacao.html` | Página institucional da DevCore com prévias das telas e planos conceituais |
+| Login e Cadastro | `client/index.html`, `client/cadastro.html` | Cartão dividido com usuário/senha e criação de conta via código de convite |
+| Resumo | `client/resumo.html` | Números gerais, últimas movimentações e ocupação por unidade |
+| Colaboradores | `client/colaboradores.html` | Lista com busca, filtros de CNH, cadastro/edição e gaveta de histórico |
+| Alojamentos | `client/alojamentos.html` | Ocupação, mapa de leitos pra alocar/liberar, aba de ocorrências e cadastro com responsável |
+| Frota | `client/frota.html` | Lista de veículos com status, saída/volta, manutenções e cadastro com licenciamento e seguro |
+| Movimentações | `client/movimentacoes.html` | Histórico unificado de alojamentos e frota com exportação para CSV |
+| Relatórios | `client/relatorios.html` | Ocupação, uso da frota, movimentação, gargalos, quem estava dirigindo e perguntas pra IA |
+| Configurações e Auditoria | `client/configuracoes.html` | Regras da empresa, alertas/Telegram, usuários, backup do banco, verificação da cadeia SHA-256 e minha conta (`auditoria.html` redireciona pra cá) |
 
 Visual: superfícies operacionais em grafite e cinza, texto claro, ações principais discretas e cores semânticas para status. Os tokens da marca e a apresentação DevCore permanecem em `paleta.css`; a interface usa os tokens neutros `--op-*`. A documentação atual está em `docs/identidade-visual.md` e `docs/ui-ux.md`.
 
@@ -146,10 +147,10 @@ Essas são as validações que o back-end faz antes de salvar. O front pode avis
 
 ## 6. Tecnologias
 
-- **Front (`client/`):** HTML, CSS e JavaScript puro, uma página pra cada tela. As telas usam classes para organizar os eventos e os dados.
-- **Back (`server/`):** Node.js com Express.
-- **Banco:** SQLite (ver seção 7).
-- **Login:** senha salva com `bcryptjs` (nunca a senha pura) e sessão com `express-session`.
+- **Front (`client/`):** HTML, CSS e JavaScript puro, uma página pra cada tela. Cada arquivo em `client/js/` usa uma classe (`class`) para organizar os eventos e os dados, sem scripts ou estilos inline (respeitando CSP estrita).
+- **Back (`server/`):** Node.js com Express 5, organizado em POO (`Servidor`, rotas, middlewares, controladores, modelos e serviços).
+- **Banco:** SQLite nativo (`node:sqlite`, ver seção 7).
+- **Login e segurança:** senha salva com `bcryptjs` (nunca a senha pura), sessão salva no SQLite (`SqliteSessionStore` + `express-session` com cookie `HttpOnly` e `SameSite=Lax`), cabeçalhos com `helmet`, trava de origem contra CSRF, limite de tentativas (`express-rate-limit`) e código de convite (`CADASTRO_CODIGO`) para auto-cadastro.
 - **IA:** Groq, que tem chave grátis.
 - **Telegram:** Telegram Bot API, que é gratuita: o admin cria um bot no @BotFather e põe o token no `.env`.
 
@@ -170,7 +171,7 @@ Usamos **SQLite** pelo módulo nativo `node:sqlite`, com consultas SQL. O banco 
 
 As tabelas estão em [server/src/db/schema.sql](../server/src/db/schema.sql), e o banco é criado com `npm run criar-banco` (dentro da pasta `server`). Cada um do grupo tem o próprio banco no seu computador. Pra todo mundo ter os mesmos dados de teste tem o comando `npm run seed`.
 
-Por padrão, o banco fica em `server/data/dispatch.db`. Se a pasta do projeto estiver sincronizada pelo OneDrive, use `DB_CAMINHO` no `.env` para guardar o banco fora dela.
+Por padrão, o banco fica em `server/data/dispatch.db`. Se a pasta do projeto estiver sincronizada pelo OneDrive ou publicada na Azure, use `DB_CAMINHO` no `.env` para guardar o banco em um caminho dedicado (ex.: `/home/data/dispatch.db`).
 
 Algumas decisões:
 
@@ -182,6 +183,7 @@ Algumas decisões:
 ```mermaid
 erDiagram
     USUARIO ||--o{ LOG_AUDITORIA : registra
+    USUARIO ||--o{ SESSAO : mantem
     PESSOA ||--o{ ESTADIA : ocupa
     PESSOA ||--o{ USO_VEICULO : dirige
     PESSOA ||--o{ USO_PASSAGEIRO : viaja
@@ -195,7 +197,7 @@ erDiagram
     USO_VEICULO ||--o{ USO_PASSAGEIRO : leva
 ```
 
-As tabelas são: `usuario`, `pessoa`, `alojamento`, `quarto`, `leito`, `estadia`, `ocorrencia`, `veiculo`, `uso_veiculo`, `uso_passageiro`, `manutencao`, `log_auditoria` e `notificacao`.
+As 14 tabelas são: `usuario`, `sessao`, `pessoa`, `alojamento`, `quarto`, `leito`, `estadia`, `ocorrencia`, `veiculo`, `uso_veiculo`, `uso_passageiro`, `manutencao`, `log_auditoria` e `notificacao`.
 
 Pra saber se um leito (ou carro) já está ocupado num período, a consulta é essa (é só trocar a tabela e a coluna pros outros casos):
 
@@ -251,29 +253,35 @@ Pro Telegram vamos usar a **Bot API**, que é gratuita: cria-se um bot no @BotFa
 
 ## 10. Organização do repositório
 
-```
+```text
 dispatch/
-├── client/                 # front-end (HTML, CSS e JS)
+├── .github/workflows/      # build, testes e deploy automático na Azure Web App
+├── client/                 # front-end (HTML, CSS e classes JS por tela)
+│   ├── apresentacao.html   # apresentação pública DevCore / Dispatch
 │   ├── index.html          # login
+│   ├── cadastro.html       # criação de conta via código de convite
 │   ├── resumo.html, colaboradores.html, alojamentos.html, frota.html
-│   ├── relatorios.html, auditoria.html, configuracoes.html
-│   ├── css/                # base.css (cores e botões) + um css por tela (+ extras.css do sininho e do chat)
-│   └── js/                 # api.js (chamadas pro server), extras.js (sininho e chat de ajuda) + um js por tela
+│   ├── movimentacoes.html, relatorios.html, configuracoes.html
+│   ├── auditoria.html      # redireciona para configuracoes.html#auditoria
+│   ├── css/                # paleta.css, base.css, tema.css, usabilidade.css, extras.css + css por tela
+│   └── js/                 # api.js, tema.js, ui.js, usabilidade.js, extras.js + uma classe por tela
 │
 ├── server/                 # back-end (Node.js)
 │   ├── src/
-│   │   ├── server.js       # liga o servidor, confere os avisos e entrega a pasta client
+│   │   ├── server.js       # classe Servidor: segurança (Helmet/CORS/CSRF/rate limit), API e arquivos estáticos
 │   │   ├── routes/         # uma rota por assunto: auth, pessoas, alojamentos, frota, relatorios,
 │   │   │                   # auditoria, notificacoes, ia, resumo, configuracoes
-│   │   ├── controllers/    # ações da API
+│   │   ├── middlewares/    # autenticacao.js (classe ControleAcesso: login e perfil admin)
+│   │   ├── controllers/    # ações da API (Controlador*)
 │   │   ├── models/         # Cnh, Quarto e Veiculo
-│   │   ├── services/       # configurações, relatórios, auditoria, notificações, IA e Telegram
-│   │   ├── regras/         # funções de data compartilhadas
-│   │   └── db/             # schema.sql, criar-banco.js, conexao.js, seed.js
+│   │   ├── services/       # configurações, relatórios, auditoria, sessões no SQLite, notificações, IA e Telegram
+│   │   ├── regras/         # datas.js (Datas) e validacao.js (Validador)
+│   │   └── db/             # schema.sql, ConexaoBanco, CriadorBanco, CargaExemplos (seed)
+│   ├── test/               # testes automatizados (api, api-cliente, modelos, ia)
 │   ├── .env.example
 │   └── package.json
 │
-├── docs/planejamento.md    # esse arquivo
+├── docs/                   # planejamento.md, estrutura-codigo.md, identidade-visual.md, ui-ux.md, prints/
 └── README.md
 ```
 
@@ -289,7 +297,7 @@ npm run seed   # opcional: dados de exemplo
 npm start
 ```
 
-O próprio server vai entregar as páginas do `client`, então front e back abrem no mesmo endereço (`http://localhost:3001`). Enquanto o server não existe, dá pra abrir o login com a extensão Live Server do VS Code.
+O próprio server entrega as páginas do `client`, então front e back abrem no mesmo endereço (`http://localhost:3001`). Fora de produção, o servidor também libera as portas locais `5500` e `5501` caso abra algum HTML pelo Live Server do VS Code.
 
 
 ## 11. Divisão do trabalho
@@ -362,14 +370,13 @@ Os dados são inventados, mas a gente levou em conta:
 - pra IA e pro Telegram vai só o mínimo necessário (a IA recebe números, não nomes).
 
 
-## 15. O que ainda falta decidir
+## 15. Decisões e pendências
 
-- [ ] Confirmar com o professor se SQLite serve ou se ele quer MySQL/PostgreSQL.
-- [ ] Prazo final e o que tem que ser entregue.
-- [ ] Quem fica com cada parte (seção 11).
-- [ ] No relatório de uso da frota, contar o dia todo (24 h) ou só o horário comercial?
-- [ ] Atualizar o Figma com o que falta (seção 4).
-- [ ] Publicar na internet ou só rodar no computador na apresentação.
+- [x] Banco adotado: SQLite nativo (`node:sqlite`) com caminho configurável em `DB_CAMINHO`.
+- [x] Publicação na internet: deploy automático na Azure Web App via `.github/workflows/main_dispach.yml`.
+- [ ] Prazo final e entrega formal para a disciplina.
+- [ ] No relatório de uso da frota, confirmar se fica em 24 h por dia ou só horário comercial.
+- [ ] Atualizar o Figma caso queiram espelhar todas as telas extras já prontas no sistema (seção 4).
 
 
 ## 16. Fontes

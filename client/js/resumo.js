@@ -1,4 +1,4 @@
-// Controla a tela de resumo.
+// Tela inicial do sistema: confere se a pessoa está logada, carrega os números do dia e lista as últimas movimentações.
 class TelaResumo {
   constructor() {
     this.numVeiculosUso = document.getElementById('num-veiculos-uso');
@@ -21,14 +21,17 @@ class TelaResumo {
     this.avisoTela = document.getElementById('aviso-tela');
     this.dataHoje = document.getElementById('data-hoje');
     this.abasFiltro = document.querySelectorAll('.aba-item');
+
     this.movimentacoesAtuais = [];
     this.filtroCategoria = 'todos';
+
     this.dataHoje.textContent = new Date().toLocaleDateString('pt-BR', {
       weekday: 'long',
       day: '2-digit',
       month: 'short'
     });
     this.linksEmBreve = document.querySelectorAll('.menu-em-breve');
+
     this.configurarEventos();
     this.carregarPainel();
   }
@@ -44,17 +47,18 @@ class TelaResumo {
         this.aplicarFiltros();
       });
     });
+
     this.campoBusca.addEventListener('input', this.aplicarFiltros.bind(this));
+
     this.linksEmBreve.forEach((link) => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
+      link.addEventListener('click', (evento) => {
+        evento.preventDefault();
         this.mostrarAviso('Módulo "' + link.dataset.tela + '" em construção.');
       });
     });
+
     this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', {
-        metodo: 'POST'
-      });
+      await chamarApi('/api/auth/sair', { metodo: 'POST' });
       window.location.href = 'index.html';
     });
   }
@@ -123,26 +127,33 @@ class TelaResumo {
       this.listaMov.appendChild(tr);
       return;
     }
+
     lista.forEach((item) => {
       const tr = document.createElement('tr');
+
       const tdPessoa = document.createElement('td');
       const spanNome = document.createElement('span');
       spanNome.className = 'pessoa-nome';
       spanNome.textContent = item.colaborador;
       tdPessoa.appendChild(spanNome);
+
       if (item.cargo) {
         const spanCargo = document.createElement('span');
         spanCargo.className = 'pessoa-cargo';
         spanCargo.textContent = item.cargo;
         tdPessoa.appendChild(spanCargo);
       }
+
       const tdTipo = document.createElement('td');
       tdTipo.textContent = item.tipo;
+
       const tdRecurso = document.createElement('td');
       tdRecurso.textContent = item.recurso;
+
       const tdHorario = document.createElement('td');
       tdHorario.className = 'celula-horario';
       tdHorario.textContent = item.horario;
+
       const tdStatus = document.createElement('td');
       const tag = document.createElement('span');
       tag.className = this.classeStatus(item.status);
@@ -151,6 +162,7 @@ class TelaResumo {
       tag.appendChild(ponto);
       tag.appendChild(document.createTextNode(item.status));
       tdStatus.appendChild(tag);
+
       tr.appendChild(tdPessoa);
       tr.appendChild(tdTipo);
       tr.appendChild(tdRecurso);
@@ -163,86 +175,105 @@ class TelaResumo {
   desenharAlojamentos(lista) {
     this.listaAloj.innerHTML = '';
     if (!lista || lista.length === 0) {
-      const p = document.createElement('p');
-      p.className = 'texto-vazio';
-      p.textContent = 'Nenhum alojamento cadastrado ainda.';
-      this.listaAloj.appendChild(p);
+      const paragrafo = document.createElement('p');
+      paragrafo.className = 'texto-vazio';
+      paragrafo.textContent = 'Nenhum alojamento cadastrado ainda.';
+      this.listaAloj.appendChild(paragrafo);
       return;
     }
-    lista.forEach((aloj) => {
-      const pct = this.porcentagem(aloj.ocupados, aloj.total);
-      const div = document.createElement('div');
+
+    lista.forEach((alojamento) => {
+      const porcentagem = this.porcentagem(alojamento.ocupados, alojamento.total);
+      const caixa = document.createElement('div');
+
       const topo = document.createElement('div');
       topo.className = 'unidade-topo';
+
       const nome = document.createElement('span');
       nome.className = 'unidade-nome';
-      nome.textContent = aloj.nome;
-      if (aloj.cidade) {
-        const cid = document.createElement('span');
-        cid.className = 'unidade-cidade';
-        cid.textContent = '· ' + aloj.cidade;
-        nome.appendChild(cid);
+      nome.textContent = alojamento.nome;
+
+      if (alojamento.cidade) {
+        const cidade = document.createElement('span');
+        cidade.className = 'unidade-cidade';
+        cidade.textContent = '· ' + alojamento.cidade;
+        nome.appendChild(cidade);
       }
+
       const numeros = document.createElement('span');
       numeros.className = 'unidade-numeros';
-      numeros.textContent = aloj.ocupados + '/' + aloj.total + ' leitos';
+      numeros.textContent = alojamento.ocupados + '/' + alojamento.total + ' leitos';
+
       topo.appendChild(nome);
       topo.appendChild(numeros);
-      const fundo = document.createElement('div');
-      fundo.className = 'barra-fundo';
-      const barra = document.createElement('div');
-      barra.className = 'barra-preenchimento ' + (pct >= 80 ? 'barra-azul' : 'barra-verde');
-      barra.style.width = pct + '%';
-      fundo.appendChild(barra);
-      div.appendChild(topo);
-      div.appendChild(fundo);
-      this.listaAloj.appendChild(div);
+
+      const fundoBarra = document.createElement('div');
+      fundoBarra.className = 'barra-fundo';
+
+      const preenchimento = document.createElement('div');
+      preenchimento.className =
+        'barra-preenchimento ' + (porcentagem >= 80 ? 'barra-azul' : 'barra-verde');
+      preenchimento.style.width = porcentagem + '%';
+      fundoBarra.appendChild(preenchimento);
+
+      caixa.appendChild(topo);
+      caixa.appendChild(fundoBarra);
+      this.listaAloj.appendChild(caixa);
     });
   }
 
   async carregarPainel() {
     try {
+      // Confere primeiro se existe sessão aberta; sem login, volta para a tela inicial.
       const sessao = await chamarApi('/api/auth/eu');
       if (!sessao.ok) {
         window.location.href = 'index.html';
         return;
       }
-      const user = sessao.dados.usuario;
-      this.perfilNome.textContent = user.nome;
-      this.perfilTipo.textContent = user.perfil;
-      this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
-      if (user.perfil === 'admin') {
+
+      const usuario = sessao.dados.usuario;
+      this.perfilNome.textContent = usuario.nome;
+      this.perfilTipo.textContent = usuario.perfil;
+      this.usuarioIniciais.textContent = this.pegarIniciais(usuario.nome);
+      if (usuario.perfil === 'admin') {
         this.blocoMenuAdmin.hidden = false;
       }
-      const res = await chamarApi('/api/resumo');
-      if (!res.ok) {
+
+      const resposta = await chamarApi('/api/resumo');
+      if (!resposta.ok) {
         return;
       }
-      const d = res.dados;
-      if (d.nomeEmpresa) {
-        this.nomeEmpresaMenu.textContent = d.nomeEmpresa;
+
+      const dados = resposta.dados;
+      if (dados.nomeEmpresa) {
+        this.nomeEmpresaMenu.textContent = dados.nomeEmpresa;
       }
-      const pctOcup = this.porcentagem(d.leitosOcupados, d.totalLeitos);
-      this.numVeiculosUso.textContent = d.veiculosEmUso;
-      this.subVeiculosUso.textContent = 'de ' + d.totalVeiculos + ' na frota';
+
+      const pctOcupacao = this.porcentagem(dados.leitosOcupados, dados.totalLeitos);
+      this.numVeiculosUso.textContent = dados.veiculosEmUso;
+      this.subVeiculosUso.textContent = 'de ' + dados.totalVeiculos + ' na frota';
       this.detalheVeiculosUso.textContent =
-        d.veiculosManutencao > 0
-          ? d.veiculosManutencao + ' em manutenção no momento'
+        dados.veiculosManutencao > 0
+          ? dados.veiculosManutencao + ' em manutenção no momento'
           : 'Nenhum veículo na oficina';
-      this.numVeiculosDisp.textContent = d.veiculosDisponiveis;
+
+      this.numVeiculosDisp.textContent = dados.veiculosDisponiveis;
       document.getElementById('detalhe-veiculos-disp').textContent =
         'Documentação e CNH validadas na saída';
-      this.numAlojamentos.textContent = d.totalAlojamentos;
-      this.subAlojamentos.textContent = d.totalLeitos + ' leitos no total';
+
+      this.numAlojamentos.textContent = dados.totalAlojamentos;
+      this.subAlojamentos.textContent = dados.totalLeitos + ' leitos no total';
       this.detalheAlojamentos.textContent =
-        d.leitosOcupados + ' leitos ocupados hoje (' + pctOcup + '%)';
-      this.numVagas.textContent = d.vagasDisponiveis;
-      this.movimentacoesAtuais = d.movimentacoes || [];
+        dados.leitosOcupados + ' leitos ocupados hoje (' + pctOcupacao + '%)';
+
+      this.numVagas.textContent = dados.vagasDisponiveis;
+      this.movimentacoesAtuais = dados.movimentacoes || [];
       this.aplicarFiltros();
-      this.desenharAlojamentos(d.alojamentos);
+      this.desenharAlojamentos(dados.alojamentos);
     } catch (erro) {
       this.mostrarAviso('Sem conexão com o servidor.');
     }
   }
 }
+
 new TelaResumo();

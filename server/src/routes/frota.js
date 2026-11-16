@@ -1,12 +1,13 @@
-// Endereços da API de frota.
+// Rotas da frota: cadastro de veículos, retiradas, retornos e manutenções.
 const express = require('express');
 const ControladorFrota = require('../controllers/ControladorFrota');
-const { exigirLogin } = require('../middlewares/autenticacao');
+const controleAcesso = require('../middlewares/autenticacao');
 
 const controlador = new ControladorFrota();
 const router = express.Router();
 
-router.use(exigirLogin);
+// Exige usuário logado para todas as rotas de veículos abaixo.
+router.use(controleAcesso.exigirLogin);
 router.post('/usos', controlador.registrarSaida.bind(controlador));
 router.put('/usos/:id/retorno', controlador.registrarRetorno.bind(controlador));
 router.put('/manutencoes/:id/concluir', controlador.concluirManutencao.bind(controlador));

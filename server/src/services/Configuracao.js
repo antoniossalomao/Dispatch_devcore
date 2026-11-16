@@ -1,12 +1,14 @@
 const fs = require('fs');
 const path = require('path');
-// Lê os parâmetros salvos e usa os padrões para os campos ausentes.
+
+// Guarda e lê as regras da empresa num arquivo JSON (com valores padrão caso ainda não exista).
 class Configuracao {
   constructor() {
     const pastaDados = process.env.DB_CAMINHO
       ? path.dirname(process.env.DB_CAMINHO)
       : path.join(__dirname, '..', '..', 'data');
     this.caminhoConfig = process.env.CONFIG_CAMINHO || path.join(pastaDados, 'config.json');
+
     this.configPadrao = {
       nomeEmpresa: 'Construtora Aguapeí',
       cidadeBase: 'Marília/SP',
@@ -26,6 +28,7 @@ class Configuracao {
     };
   }
 
+  // Junta o que foi salvo no arquivo com o padrão, para nunca faltar nenhum campo novo.
   lerConfig() {
     if (!fs.existsSync(this.caminhoConfig)) {
       return Object.assign({}, this.configPadrao);
@@ -40,10 +43,9 @@ class Configuracao {
   }
 
   salvarConfig(dados) {
-    fs.mkdirSync(path.dirname(this.caminhoConfig), {
-      recursive: true
-    });
+    fs.mkdirSync(path.dirname(this.caminhoConfig), { recursive: true });
     fs.writeFileSync(this.caminhoConfig, JSON.stringify(dados, null, 2), 'utf-8');
   }
 }
+
 module.exports = new Configuracao();

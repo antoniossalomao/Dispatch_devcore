@@ -1,158 +1,170 @@
-// Controla os diálogos e o foco.
+// Cuida das janelas (modais e gavetas), da navegação por teclado dentro delas e dos avisos de confirmação.
 class Janelas {
   constructor() {
     this.seletorFoco =
       'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
     this.abertos = [];
     this.contador = 0;
-    document.addEventListener('keydown', (e) => {
+
+    document.addEventListener('keydown', (evento) => {
       if (this.abertos.length === 0) return;
-      if (e.key === 'Escape') {
-        if (this.fecharTopo()) e.preventDefault();
+
+      if (evento.key === 'Escape') {
+        if (this.fecharTopo()) evento.preventDefault();
         return;
       }
-      if (e.key === 'Tab') {
-        // mantem o foco dentro da janela aberta
+
+      // Prende a tecla Tab dentro da janela aberta no momento para ninguém sair navegando no fundo escondido.
+      if (evento.key === 'Tab') {
         const itens = this.focaveis(this.abertos[this.abertos.length - 1].el);
         if (itens.length === 0) return;
         const primeiro = itens[0];
         const ultimo = itens[itens.length - 1];
-        if (e.shiftKey && document.activeElement === primeiro) {
-          e.preventDefault();
+        if (evento.shiftKey && document.activeElement === primeiro) {
+          evento.preventDefault();
           ultimo.focus();
-        } else if (!e.shiftKey && document.activeElement === ultimo) {
-          e.preventDefault();
+        } else if (!evento.shiftKey && document.activeElement === ultimo) {
+          evento.preventDefault();
           primeiro.focus();
         }
       }
     });
+
     document.querySelectorAll('.modal-overlay, .gaveta-overlay').forEach(this.preparar.bind(this));
-    document.querySelectorAll('.toast').forEach((t) => {
-      t.setAttribute('role', 'status');
-      t.setAttribute('aria-live', 'polite');
+    document.querySelectorAll('.toast').forEach((aviso) => {
+      aviso.setAttribute('role', 'status');
+      aviso.setAttribute('aria-live', 'polite');
     });
+
     this.sair = document.getElementById('botao-sair');
-    if (this.sair && !this.sair.getAttribute('aria-label'))
+    if (this.sair && !this.sair.getAttribute('aria-label')) {
       this.sair.setAttribute('aria-label', 'Sair do sistema');
+    }
+
     this.sino = document.getElementById('botao-notificacoes');
-    if (this.sino && !this.sino.getAttribute('aria-label'))
+    if (this.sino && !this.sino.getAttribute('aria-label')) {
       this.sino.setAttribute('aria-label', 'Ver pendências');
+    }
+
+    // Substitui o window.confirm() e o window.prompt() padrões do navegador por janelas no visual do sistema.
     window.confirmar = (texto, opcoes) => {
-      const o = opcoes || {};
+      const config = opcoes || {};
       return this.criarDialogo(
-        o.titulo || 'Confirmar',
+        config.titulo || 'Confirmar',
         (corpo) => {
-          const p = document.createElement('p');
-          p.className = 'modal-subtitulo';
-          p.textContent = texto;
-          corpo.appendChild(p);
-          return () => {
-            return true;
-          };
+          const paragrafo = document.createElement('p');
+          paragrafo.className = 'modal-subtitulo';
+          paragrafo.textContent = texto;
+          corpo.appendChild(paragrafo);
+          return () => true;
         },
-        o.confirmar || 'Confirmar',
-        o.cancelar || 'Cancelar'
-      ).then((v) => {
-        return v === true;
-      });
+        config.confirmar || 'Confirmar',
+        config.cancelar || 'Cancelar'
+      ).then((confirmado) => confirmado === true);
     };
+
     window.pedirTexto = (titulo, rotulo, opcoes) => {
-      const o = opcoes || {};
+      const config = opcoes || {};
       return this.criarDialogo(
         titulo,
         (corpo) => {
           const grupo = document.createElement('div');
           grupo.className = 'campo-grupo';
+
           const label = document.createElement('label');
           label.className = 'campo-label';
           label.textContent = rotulo;
+
           const campo = document.createElement('textarea');
           campo.className = 'config-input campo-texto-longo';
           campo.rows = 3;
           campo.maxLength = 500;
           label.htmlFor = campo.id = 'ui-texto-' + ++this.contador;
+
           grupo.appendChild(label);
           grupo.appendChild(campo);
           corpo.appendChild(grupo);
+
           return () => {
-            const v = campo.value.trim();
-            if (o.obrigatorio !== false && v === '') {
+            const valor = campo.value.trim();
+            if (config.obrigatorio !== false && valor === '') {
               campo.focus();
               return undefined;
             }
-            return v;
+            return valor;
           };
         },
-        o.confirmar || 'Salvar',
-        o.cancelar || 'Cancelar'
+        config.confirmar || 'Salvar',
+        config.cancelar || 'Cancelar'
       );
     };
   }
 
-  focaveis(el) {
-    return Array.prototype.filter.call(el.querySelectorAll(this.seletorFoco), (x) => {
-      return x.offsetParent !== null;
-    });
+  focaveis(elemento) {
+    return Array.from(elemento.querySelectorAll(this.seletorFoco)).filter(
+      (item) => item.offsetParent !== null
+    );
   }
 
   atualizarRolagem() {
     document.body.classList.toggle('sem-rolagem', this.abertos.length > 0);
   }
 
-  aoAbrir(el) {
-    if (
-      this.abertos.some((a) => {
-        return a.el === el;
-      })
-    )
-      return;
+  aoAbrir(elemento) {
+    if (this.abertos.some((registro) => registro.el === elemento)) return;
+
     this.abertos.push({
-      el: el,
+      el: elemento,
       abriuPor: document.activeElement
     });
     this.atualizarRolagem();
+
     setTimeout(() => {
-      const itens = this.focaveis(el).filter((x) => {
-        return !x.classList.contains('modal-fechar');
-      });
-      const alvo = itens[0] || this.focaveis(el)[0];
+      const campos = this.focaveis(elemento).filter((item) => !item.classList.contains('modal-fechar'));
+      const alvo = campos[0] || this.focaveis(elemento)[0];
       if (alvo) alvo.focus();
     }, 0);
   }
 
-  aoFechar(el) {
-    const i = this.abertos.findIndex((a) => {
-      return a.el === el;
-    });
-    if (i === -1) return;
-    const origem = this.abertos[i].abriuPor;
-    this.abertos.splice(i, 1);
+  aoFechar(elemento) {
+    const indice = this.abertos.findIndex((registro) => registro.el === elemento);
+    if (indice === -1) return;
+
+    // Devolve o foco para o botão que abriu a janela antes dela fechar.
+    const origem = this.abertos[indice].abriuPor;
+    this.abertos.splice(indice, 1);
     this.atualizarRolagem();
-    if (origem && document.body.contains(origem) && typeof origem.focus === 'function')
+    if (origem && document.body.contains(origem) && typeof origem.focus === 'function') {
       origem.focus();
+    }
   }
 
-  preparar(el) {
-    if (el.dataset.uiPronto) return;
-    el.dataset.uiPronto = '1';
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-modal', 'true');
-    const titulo = el.querySelector('.modal-titulo, .gaveta-titulo');
+  preparar(elemento) {
+    if (elemento.dataset.uiPronto) return;
+    elemento.dataset.uiPronto = '1';
+    elemento.setAttribute('role', 'dialog');
+    elemento.setAttribute('aria-modal', 'true');
+
+    const titulo = elemento.querySelector('.modal-titulo, .gaveta-titulo');
     if (titulo) {
       if (!titulo.id) titulo.id = 'ui-titulo-' + ++this.contador;
-      el.setAttribute('aria-labelledby', titulo.id);
+      elemento.setAttribute('aria-labelledby', titulo.id);
     }
-    el.querySelectorAll('.modal-fechar').forEach((b) => {
-      if (!b.getAttribute('aria-label')) b.setAttribute('aria-label', 'Fechar');
+
+    elemento.querySelectorAll('.modal-fechar').forEach((botao) => {
+      if (!botao.getAttribute('aria-label')) botao.setAttribute('aria-label', 'Fechar');
     });
+
+    // Observa quando o atributo hidden muda para saber a hora exata em que uma tela abre ou fecha a janela.
     new MutationObserver(() => {
-      if (el.hidden) this.aoFechar(el);
-      else this.aoAbrir(el);
-    }).observe(el, {
+      if (elemento.hidden) this.aoFechar(elemento);
+      else this.aoAbrir(elemento);
+    }).observe(elemento, {
       attributes: true,
       attributeFilter: ['hidden']
     });
-    if (!el.hidden) this.aoAbrir(el);
+
+    if (!elemento.hidden) this.aoAbrir(elemento);
   }
 
   fecharTopo() {
@@ -166,6 +178,11 @@ class Janelas {
 
   criarDialogo(titulo, montarCorpo, rotuloOk, rotuloCancelar) {
     return new Promise((resolve) => {
+      let resolvido = false;
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.hidden = true;
+
       const terminar = (valor) => {
         if (resolvido) return;
         resolvido = true;
@@ -175,9 +192,7 @@ class Janelas {
         }, 0);
         resolve(valor);
       };
-      const overlay = document.createElement('div');
-      overlay.className = 'modal-overlay';
-      overlay.hidden = true;
+
       overlay.innerHTML =
         '<div class="modal-card modal-pequeno"><form>' +
         '<div class="modal-cabecalho"><div><h2 class="modal-titulo"></h2></div>' +
@@ -185,27 +200,32 @@ class Janelas {
         '<div class="modal-corpo"></div>' +
         '<div class="modal-rodape"><button type="button" class="btn-secundario" data-acao="cancelar"></button>' +
         '<button type="submit" class="btn-primario"></button></div></form></div>';
+
+      // Textos entram sempre por textContent para nunca serem interpretados como código HTML.
       overlay.querySelector('.modal-titulo').textContent = titulo;
       overlay.querySelector('[data-acao="cancelar"]').textContent = rotuloCancelar;
       overlay.querySelector('.btn-primario').textContent = rotuloOk;
+
       const corpo = overlay.querySelector('.modal-corpo');
       const pegarValor = montarCorpo(corpo);
       document.body.appendChild(overlay);
-      let resolvido = false;
+
       overlay.querySelector('.modal-fechar').addEventListener('click', () => {
         terminar(null);
       });
       overlay.querySelector('[data-acao="cancelar"]').addEventListener('click', () => {
         terminar(null);
       });
-      overlay.querySelector('form').addEventListener('submit', (e) => {
-        e.preventDefault();
+      overlay.querySelector('form').addEventListener('submit', (evento) => {
+        evento.preventDefault();
         const valor = pegarValor();
         if (valor !== undefined) terminar(valor);
       });
+
       this.preparar(overlay);
       overlay.hidden = false;
     });
   }
 }
+
 new Janelas();

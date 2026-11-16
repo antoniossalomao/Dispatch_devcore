@@ -1,72 +1,70 @@
-const relatorios = require('../services/Relatorios');
-// Ações de relatorios.
 const db = require('../db/conexao');
-const { normalizarData } = require('../regras/datas');
-const { lerIdPositivo } = require('../regras/validacao');
+const relatorios = require('../services/Relatorios');
+const datas = require('../regras/datas');
+const validador = require('../regras/validacao');
+
+// Entrega os dados dos relatórios gerenciais e responde quem estava dirigindo um carro em uma data específica.
 class ControladorRelatorios {
   consultarOcupacao(req, res) {
     const periodo = relatorios.lerPeriodo(req.query);
-    if (!periodo)
-      return res.status(400).json({
-        erro: 'Período inválido.'
-      });
+    if (!periodo) {
+      return res.status(400).json({ erro: 'Período inválido.' });
+    }
     res.json(relatorios.calcularOcupacao(periodo));
   }
 
   consultarFrota(req, res) {
     const periodo = relatorios.lerPeriodo(req.query);
-    if (!periodo)
-      return res.status(400).json({
-        erro: 'Período inválido.'
-      });
+    if (!periodo) {
+      return res.status(400).json({ erro: 'Período inválido.' });
+    }
     res.json(relatorios.calcularFrota(periodo));
   }
 
   consultarMovimentacoes(req, res) {
     const periodo = relatorios.lerPeriodo(req.query);
-    if (!periodo)
-      return res.status(400).json({
-        erro: 'Período inválido.'
-      });
+    if (!periodo) {
+      return res.status(400).json({ erro: 'Período inválido.' });
+    }
     res.json(relatorios.calcularMovimentacoes(periodo, req.query));
   }
 
   consultarGargalos(req, res) {
     const periodo = relatorios.lerPeriodo(req.query);
-    if (!periodo)
-      return res.status(400).json({
-        erro: 'Período inválido.'
-      });
+    if (!periodo) {
+      return res.status(400).json({ erro: 'Período inválido.' });
+    }
     res.json(relatorios.calcularGargalos(periodo));
   }
 
+  // Útil para multas ou ocorrências: procura qual viagem cobria aquela data/hora ou se houve uso sem registro.
   consultarCondutor(req, res) {
-    const veiculoId = lerIdPositivo(req.query.veiculo_id);
-    const quando = normalizarData(req.query.quando);
-    if (!veiculoId || !quando)
-      return res.status(400).json({
-        erro: 'Informe o veículo e a data/hora.'
-      });
+    const veiculoId = validador.lerIdPositivo(req.query.veiculo_id);
+    const quando = datas.normalizarData(req.query.quando);
+    if (!veiculoId || !quando) {
+      return res.status(400).json({ erro: 'Informe o veículo e a data/hora.' });
+    }
+
     const veiculo = db.prepare('SELECT id, placa, modelo FROM veiculo WHERE id = ?').get(veiculoId);
-    if (!veiculo)
-      return res.status(404).json({
-        erro: 'Veículo não encontrado.'
-      });
+    if (!veiculo) {
+      return res.status(404).json({ erro: 'Veículo não encontrado.' });
+    }
+
     const uso = db
       .prepare(
         'SELECT u.*, p.nome AS motorista, p.matricula FROM uso_veiculo u JOIN pessoa p ON p.id = u.motorista_id ' +
           'WHERE u.veiculo_id = ? AND u.saida <= ? AND (u.retorno IS NULL OR u.retorno >= ?) ORDER BY u.saida DESC LIMIT 1'
       )
       .get(veiculoId, quando, quando);
+
     if (uso) {
       const passageiros = db
         .prepare(
           'SELECT p.nome FROM uso_passageiro up JOIN pessoa p ON p.id = up.pessoa_id WHERE up.uso_veiculo_id = ? ORDER BY p.nome'
         )
         .all(uso.id)
-        .map((p) => {
-          return p.nome;
-        });
+        .map((pessoa) => pessoa.nome);
+
       return res.json({
         encontrado: true,
         veiculo: veiculo,
@@ -79,6 +77,8 @@ class ControladorRelatorios {
         passageiros: passageiros
       });
     }
+
+    // Se não havia viagem aberta no horário, confere se o hodômetro pulou entre a viagem anterior e a próxima.
     const anterior = db
       .prepare(
         'SELECT retorno, km_retorno FROM uso_veiculo WHERE veiculo_id = ? AND retorno IS NOT NULL AND retorno < ? ORDER BY retorno DESC LIMIT 1'
@@ -89,6 +89,7 @@ class ControladorRelatorios {
         'SELECT saida, km_saida FROM uso_veiculo WHERE veiculo_id = ? AND saida > ? ORDER BY saida ASC LIMIT 1'
       )
       .get(veiculoId, quando);
+
     if (anterior && seguinte && seguinte.km_saida > anterior.km_retorno) {
       return res.json({
         encontrado: false,
@@ -109,6 +110,7 @@ class ControladorRelatorios {
           ' km).'
       });
     }
+
     res.json({
       encontrado: false,
       uso_sem_registro: false,
@@ -118,4 +120,5 @@ class ControladorRelatorios {
     });
   }
 }
+
 module.exports = ControladorRelatorios;

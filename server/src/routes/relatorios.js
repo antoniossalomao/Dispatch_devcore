@@ -1,12 +1,13 @@
-// Endereços da API de relatorios.
+// Rotas dos relatórios operacionais e consulta de quem estava dirigindo.
 const express = require('express');
 const ControladorRelatorios = require('../controllers/ControladorRelatorios');
-const { exigirLogin } = require('../middlewares/autenticacao');
+const controleAcesso = require('../middlewares/autenticacao');
 
 const controlador = new ControladorRelatorios();
 const router = express.Router();
 
-router.use(exigirLogin);
+// Exige usuário autenticado para gerar qualquer relatório.
+router.use(controleAcesso.exigirLogin);
 router.get('/ocupacao', controlador.consultarOcupacao.bind(controlador));
 router.get('/frota', controlador.consultarFrota.bind(controlador));
 router.get('/movimentacoes', controlador.consultarMovimentacoes.bind(controlador));

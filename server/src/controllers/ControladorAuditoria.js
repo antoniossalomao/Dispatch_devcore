@@ -1,7 +1,7 @@
-// Ações de auditoria.
 const db = require('../db/conexao');
 const auditoria = require('../services/Auditoria');
 
+// Consulta os logs de auditoria com filtros e dispara a checagem da cadeia de hashes.
 class ControladorAuditoria {
   listar(req, res) {
     const busca = String(req.query.busca || '').trim().toLowerCase().slice(0, 200);
@@ -12,10 +12,12 @@ class ControladorAuditoria {
       Number.isFinite(brutoLimite) && brutoLimite > 0
         ? Math.min(Math.trunc(brutoLimite), 500)
         : 100;
+
     let sql =
       'SELECT l.id, l.quando, l.acao, l.tabela, l.registro_id, l.resumo, l.antes_json, l.depois_json, l.hash, u.nome AS usuario ' +
       'FROM log_auditoria l JOIN usuario u ON u.id = l.usuario_id WHERE 1=1 ';
     const params = [];
+
     if (tabela !== '') {
       sql += 'AND l.tabela = ? ';
       params.push(tabela);
@@ -28,16 +30,17 @@ class ControladorAuditoria {
       sql += 'AND (LOWER(l.resumo) LIKE ? OR LOWER(u.nome) LIKE ?) ';
       params.push('%' + busca + '%', '%' + busca + '%');
     }
+
     sql += 'ORDER BY l.id DESC LIMIT ?';
     params.push(limite);
+
     const linhas = db.prepare(sql).all(...params);
     const tabelas = db
       .prepare('SELECT DISTINCT tabela FROM log_auditoria ORDER BY tabela')
       .all()
-      .map((t) => {
-        return t.tabela;
-      });
+      .map((item) => item.tabela);
     const total = db.prepare('SELECT COUNT(*) AS n FROM log_auditoria').get().n;
+
     res.json({
       total: total,
       tabelas: tabelas,
@@ -49,4 +52,5 @@ class ControladorAuditoria {
     res.json(auditoria.verificarIntegridadeLog());
   }
 }
+
 module.exports = ControladorAuditoria;

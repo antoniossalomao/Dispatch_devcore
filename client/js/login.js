@@ -1,4 +1,4 @@
-// Controla a entrada no sistema.
+// Tela de entrada no sistema: valida os campos, envia usuário e senha e mostra o atalho de cadastro se habilitado.
 class TelaLogin {
   constructor() {
     this.form = document.getElementById('form-login');
@@ -13,15 +13,16 @@ class TelaLogin {
     this.verificarCadastro();
   }
 
+  // O link para criar conta só aparece quando o servidor está com código de convite configurado.
   async verificarCadastro() {
     if (!this.ajudaCadastro) return;
     try {
-      const res = await chamarApi('/api/auth/cadastro-status');
-      if (res.ok && res.dados && res.dados.ativo) {
+      const resposta = await chamarApi('/api/auth/cadastro-status');
+      if (resposta.ok && resposta.dados && resposta.dados.ativo) {
         this.ajudaCadastro.hidden = false;
       }
-    } catch (_) {
-      // Se o servidor estiver indisponível, mantém oculto.
+    } catch (erro) {
+      // Se o servidor estiver desligado, deixa o link escondido mesmo.
     }
   }
 
@@ -30,19 +31,18 @@ class TelaLogin {
       this.msgSucesso.textContent = 'Conta criada com sucesso! Agora é só entrar.';
       this.msgSucesso.hidden = false;
     }
+
     this.checkMostrar.addEventListener('change', () => {
-      if (this.checkMostrar.checked) {
-        this.inputSenha.type = 'text';
-      } else {
-        this.inputSenha.type = 'password';
-      }
+      this.inputSenha.type = this.checkMostrar.checked ? 'text' : 'password';
     });
+
     this.form.addEventListener('submit', this.entrar.bind(this));
   }
 
-  async entrar(e) {
-    e.preventDefault();
+  async entrar(evento) {
+    evento.preventDefault();
     this.esconderErro();
+
     const usuario = this.inputUsuario.value.trim();
     const senha = this.inputSenha.value;
     if (usuario === '' || senha === '') {
@@ -52,24 +52,24 @@ class TelaLogin {
       );
       return;
     }
-    this.esconderErro();
+
     this.msgSucesso.hidden = true;
     this.botaoEntrar.disabled = true;
     this.botaoEntrar.textContent = 'Entrando...';
+
     try {
-      const res = await chamarApi('/api/auth/login', {
+      const resposta = await chamarApi('/api/auth/login', {
         metodo: 'POST',
-        corpo: {
-          usuario: usuario,
-          senha: senha
-        }
+        corpo: { usuario: usuario, senha: senha }
       });
-      if (!res.ok) {
-        this.mostrarErro(res.dados.erro || 'Não foi possível entrar.');
+
+      if (!resposta.ok) {
+        this.mostrarErro(resposta.dados.erro || 'Não foi possível entrar.');
         this.botaoEntrar.disabled = false;
         this.botaoEntrar.textContent = 'Entrar';
         return;
       }
+
       window.location.href = 'resumo.html';
     } catch (erro) {
       this.mostrarErro('Não consegui falar com o servidor. Confira se ele está ligado.');
@@ -84,16 +84,18 @@ class TelaLogin {
     if (campo) {
       campo.setAttribute('aria-invalid', 'true');
       campo.focus();
-    } else this.msgErro.focus();
+    } else {
+      this.msgErro.focus();
+    }
   }
 
   esconderErro() {
     this.msgErro.textContent = '';
     this.msgErro.hidden = true;
-    const campos = [this.inputUsuario, this.inputSenha];
-    campos.forEach((campo) => {
+    [this.inputUsuario, this.inputSenha].forEach((campo) => {
       campo.removeAttribute('aria-invalid');
     });
   }
 }
+
 new TelaLogin();

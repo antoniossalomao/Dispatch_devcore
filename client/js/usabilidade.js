@@ -1,33 +1,36 @@
-// Controla a navegação e os controles compartilhados.
+// Cuida da navegação compartilhada: atalho de acessibilidade, menu no celular, botão X na busca, abas por teclado e trava de duplo envio.
 class Navegacao {
   constructor() {
     this.principal = document.querySelector('main.conteudo');
     if (!this.principal) return;
+
     this.principal.id = this.principal.id || 'ui-conteudo';
     this.principal.tabIndex = -1;
+
+    // Link invisível que aparece no Tab para quem usa teclado/leitor de tela pular direto para o conteúdo.
     this.pular = document.createElement('a');
     this.pular.className = 'ui-pular';
     this.pular.href = '#' + this.principal.id;
     this.pular.textContent = 'Pular para o conteúdo';
     this.pular.addEventListener('click', (evento) => {
       evento.preventDefault();
-      this.principal.focus({
-        preventScroll: true
-      });
-      this.principal.scrollIntoView({
-        block: 'start'
-      });
+      this.principal.focus({ preventScroll: true });
+      this.principal.scrollIntoView({ block: 'start' });
     });
     document.body.prepend(this.pular);
+
     this.menu = document.querySelector('.menu-lateral');
     this.marca = this.menu.querySelector('.menu-marca');
     this.nav = this.menu.querySelector('.menu-lista');
     this.nav.id = 'ui-menu-operacao';
     this.nav.setAttribute('aria-label', 'Operação');
+
     this.menu.querySelectorAll('a.menu-item').forEach((link) => {
-      if (new URL(link.href).pathname === window.location.pathname)
+      if (new URL(link.href).pathname === window.location.pathname) {
         link.setAttribute('aria-current', 'page');
+      }
     });
+
     this.botaoMenu = document.createElement('button');
     this.botaoMenu.type = 'button';
     this.botaoMenu.className = 'ui-menu-botao';
@@ -35,10 +38,12 @@ class Navegacao {
     this.botaoMenu.setAttribute('aria-controls', 'ui-menu-operacao bloco-menu-admin');
     this.botaoMenu.setAttribute('aria-expanded', 'false');
     this.marca.appendChild(this.botaoMenu);
+
     this.celular = window.matchMedia('(max-width: 780px)');
     this.botaoMenu.addEventListener('click', () => {
       this.mostrarMenu(!this.menu.classList.contains('menu-aberto'));
     });
+
     this.menu.addEventListener('keydown', (evento) => {
       if (
         evento.key === 'Escape' &&
@@ -50,9 +55,11 @@ class Navegacao {
         this.botaoMenu.focus();
       }
     });
+
     this.celular.addEventListener('change', () => {
       this.mostrarMenu(false);
     });
+
     this.configurarBuscas();
     this.configurarGruposDeAbas();
     this.configurarFiltros();
@@ -62,29 +69,30 @@ class Navegacao {
 
   configurarBuscas() {
     document.querySelectorAll('.busca-caixa input[type="text"]').forEach((campo) => {
-      const atualizar = () => {
-        limpar.hidden = campo.value.length === 0;
-      };
       const limpar = document.createElement('button');
       limpar.type = 'button';
       limpar.className = 'ui-limpar-busca';
       limpar.setAttribute('aria-label', 'Limpar busca');
       limpar.innerHTML =
         '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>';
+
+      const atualizar = () => {
+        limpar.hidden = campo.value.length === 0;
+      };
+
       limpar.addEventListener('click', () => {
         campo.value = '';
-        campo.dispatchEvent(
-          new Event('input', {
-            bubbles: true
-          })
-        );
+        campo.dispatchEvent(new Event('input', { bubbles: true }));
         campo.focus();
       });
+
       campo.addEventListener('input', atualizar);
-      campo.form &&
+      if (campo.form) {
         campo.form.addEventListener('reset', () => {
           setTimeout(atualizar, 0);
         });
+      }
+
       campo.parentElement.appendChild(limpar);
       atualizar();
     });
@@ -95,46 +103,43 @@ class Navegacao {
       .querySelectorAll('.config-nav, .rel-abas, .gaveta-abas .filtro-abas')
       .forEach((grupo, indice) => {
         grupo.id = grupo.id || 'ui-abas-' + indice;
-        if (grupo.matches('.config-nav'))
+        if (grupo.matches('.config-nav')) {
           this.prepararAbas(
             grupo,
             '.config-nav-item',
-            (b) => {
-              return document.getElementById('painel-' + b.dataset.aba);
-            },
+            (botao) => document.getElementById('painel-' + botao.dataset.aba),
             'Seções de configurações'
           );
-        else if (grupo.matches('.rel-abas'))
+        } else if (grupo.matches('.rel-abas')) {
           this.prepararAbas(
             grupo,
             '.rel-aba',
-            (b) => {
-              return document.getElementById('aba-' + b.dataset.aba);
-            },
+            (botao) => document.getElementById('aba-' + botao.dataset.aba),
             'Relatórios'
           );
-        else
+        } else {
           this.prepararAbas(
             grupo,
             '.gaveta-aba',
-            (b) => {
-              return document.getElementById('gaveta-secao-' + b.dataset.gaveta);
-            },
+            (botao) => document.getElementById('gaveta-secao-' + botao.dataset.gaveta),
             'Detalhes do registro'
           );
+        }
       });
   }
 
   configurarFiltros() {
     document.querySelectorAll('.filtro-abas:not([role="tablist"])').forEach((grupo) => {
+      grupo.setAttribute('role', 'group');
+      grupo.setAttribute('aria-label', 'Filtros da lista');
+      const botoes = grupo.querySelectorAll('button');
+
       const sincronizar = () => {
         botoes.forEach((botao) => {
           botao.setAttribute('aria-pressed', String(botao.classList.contains('ativa')));
         });
       };
-      grupo.setAttribute('role', 'group');
-      grupo.setAttribute('aria-label', 'Filtros da lista');
-      const botoes = grupo.querySelectorAll('button');
+
       const observador = new MutationObserver(sincronizar);
       botoes.forEach((botao) => {
         observador.observe(botao, {
@@ -148,6 +153,20 @@ class Navegacao {
 
   configurarTabelas() {
     document.querySelectorAll('.tabela-area').forEach((area, indice) => {
+      const tabela = area.querySelector('table');
+      if (!tabela) return;
+
+      const titulo =
+        area.closest('.bloco')?.querySelector('.bloco-titulo')?.textContent.trim() || 'Registros';
+
+      const dica = document.createElement('p');
+      dica.id = 'ui-rolagem-' + indice;
+      dica.className = 'ui-tabela-dica';
+      dica.textContent = 'Role para ver todas as colunas';
+      dica.hidden = true;
+      area.before(dica);
+
+      // Mostra a dica de rolagem só quando a tabela realmente fica mais larga que a tela (ex.: celular).
       const atualizar = () => {
         const precisaRolar = area.scrollWidth > area.clientWidth + 1;
         dica.hidden = !precisaRolar;
@@ -163,28 +182,19 @@ class Navegacao {
           area.removeAttribute('aria-describedby');
         }
       };
-      const tabela = area.querySelector('table');
-      if (!tabela) return;
-      const titulo =
-        area.closest('.bloco')?.querySelector('.bloco-titulo')?.textContent.trim() || 'Registros';
-      const dica = document.createElement('p');
-      dica.id = 'ui-rolagem-' + indice;
-      dica.className = 'ui-tabela-dica';
-      dica.textContent = 'Role para ver todas as colunas';
-      dica.hidden = true;
-      area.before(dica);
+
       const observador = new ResizeObserver(atualizar);
       observador.observe(area);
       observador.observe(tabela);
     });
-
-    // Bloqueia reenvio enquanto o servidor processa a mesma submissão.
   }
 
+  // Bloqueia cliques repetidos no botão de enviar enquanto o servidor ainda processa o formulário.
   configurarEnvios() {
     this.envios = new Map();
     this.ocupados = new WeakMap();
     this.envioAtual = null;
+
     document.addEventListener(
       'submit',
       (evento) => {
@@ -193,16 +203,18 @@ class Navegacao {
           evento.stopImmediatePropagation();
           return;
         }
+
         const envio = {
           form: evento.target,
-          botoes: Array.from(evento.target.querySelectorAll('button[type="submit"]')).map((b) => {
+          botoes: Array.from(evento.target.querySelectorAll('button[type="submit"]')).map((botao) => {
             return {
-              el: b,
-              texto: b.textContent,
-              desativado: b.disabled
+              el: botao,
+              texto: botao.textContent,
+              desativado: botao.disabled
             };
           })
         };
+
         this.envioAtual = envio;
         setTimeout(() => {
           if (this.envioAtual === envio) this.envioAtual = null;
@@ -210,32 +222,34 @@ class Navegacao {
       },
       true
     );
+
     document.addEventListener('dispatch:requisicao-inicio', (evento) => {
       if (!this.envioAtual || evento.detail.metodo === 'GET') return;
       const envio = this.envioAtual;
       this.envios.set(evento.detail.id, envio);
       this.ocupados.set(envio.form, true);
       envio.form.setAttribute('aria-busy', 'true');
-      envio.botoes.forEach((b) => {
-        b.el.disabled = true;
-        b.el.textContent = 'Enviando…';
+      envio.botoes.forEach((item) => {
+        item.el.disabled = true;
+        item.el.textContent = 'Enviando…';
       });
     });
+
     document.addEventListener('dispatch:requisicao-fim', (evento) => {
       const envio = this.envios.get(evento.detail.id);
       if (!envio) return;
       this.envios.delete(evento.detail.id);
-      if (
-        Array.from(this.envios.values()).some((outro) => {
-          return outro.form === envio.form;
-        })
-      )
-        return;
+
+      const aindaEnviando = Array.from(this.envios.values()).some(
+        (outro) => outro.form === envio.form
+      );
+      if (aindaEnviando) return;
+
       this.ocupados.delete(envio.form);
       envio.form.removeAttribute('aria-busy');
-      envio.botoes.forEach((b) => {
-        b.el.disabled = b.desativado;
-        b.el.textContent = b.texto;
+      envio.botoes.forEach((item) => {
+        item.el.disabled = item.desativado;
+        item.el.textContent = item.texto;
       });
     });
   }
@@ -247,6 +261,12 @@ class Navegacao {
   }
 
   prepararAbas(grupo, seletor, painel, rotulo) {
+    const botoes = Array.from(grupo.querySelectorAll(seletor));
+    if (!botoes.length) return;
+
+    grupo.setAttribute('role', 'tablist');
+    grupo.setAttribute('aria-label', rotulo);
+
     const sincronizar = () => {
       grupo.setAttribute(
         'aria-orientation',
@@ -268,26 +288,27 @@ class Navegacao {
         }
       });
     };
-    const botoes = Array.from(grupo.querySelectorAll(seletor));
-    if (!botoes.length) return;
-    grupo.setAttribute('role', 'tablist');
-    grupo.setAttribute('aria-label', rotulo);
+
     grupo.addEventListener('keydown', (evento) => {
       const atual = botoes.indexOf(document.activeElement);
       if (atual < 0) return;
+
       const vertical = getComputedStyle(grupo).flexDirection === 'column';
       const anterior = vertical ? 'ArrowUp' : 'ArrowLeft';
       const proximo = vertical ? 'ArrowDown' : 'ArrowRight';
+
       let destino;
       if (evento.key === anterior) destino = (atual - 1 + botoes.length) % botoes.length;
       if (evento.key === proximo) destino = (atual + 1) % botoes.length;
       if (evento.key === 'Home') destino = 0;
       if (evento.key === 'End') destino = botoes.length - 1;
       if (destino === undefined) return;
+
       evento.preventDefault();
       botoes[destino].click();
       botoes[destino].focus();
     });
+
     const observador = new MutationObserver(sincronizar);
     botoes.forEach((botao) => {
       observador.observe(botao, {
@@ -295,8 +316,10 @@ class Navegacao {
         attributeFilter: ['class']
       });
     });
+
     new ResizeObserver(sincronizar).observe(grupo);
     sincronizar();
   }
 }
+
 new Navegacao();

@@ -1,43 +1,48 @@
 const db = require('../db/conexao');
-const { normalizarData } = require('../regras/datas');
+const datas = require('../regras/datas');
 const configuracao = require('./Configuracao');
-// Calcula os relatórios a partir dos períodos e dos registros do banco.
+
+// Calcula os números de ocupação, uso da frota, movimentações e gargalos dentro de um período escolhido.
 class Relatorios {
   constructor() {
     this.msDia = 86400000;
   }
 
+  // Converte "AAAA-MM-DD HH:MM:SS" para timestamp em milissegundos usando o fuso local.
   paraMs(texto) {
     return new Date(texto.replace(' ', 'T')).getTime();
   }
 
-  doisDigitos(n) {
-    return n < 10 ? '0' + n : String(n);
+  doisDigitos(numero) {
+    return numero < 10 ? '0' + numero : String(numero);
   }
 
   formatar(ms) {
-    const d = new Date(ms);
+    const data = new Date(ms);
     return (
-      d.getFullYear() +
+      data.getFullYear() +
       '-' +
-      this.doisDigitos(d.getMonth() + 1) +
+      this.doisDigitos(data.getMonth() + 1) +
       '-' +
-      this.doisDigitos(d.getDate()) +
+      this.doisDigitos(data.getDate()) +
       ' ' +
-      this.doisDigitos(d.getHours()) +
+      this.doisDigitos(data.getHours()) +
       ':' +
-      this.doisDigitos(d.getMinutes()) +
+      this.doisDigitos(data.getMinutes()) +
       ':' +
-      this.doisDigitos(d.getSeconds())
+      this.doisDigitos(data.getSeconds())
     );
   }
 
+  // Quando o usuário não informa datas, considera os últimos 30 dias até agora.
   lerPeriodo(query) {
     const agora = Date.now();
-    let ate = query.ate ? normalizarData(query.ate) : null;
-    let de = query.de ? normalizarData(query.de) : null;
+    const ate = query.ate ? datas.normalizarData(query.ate) : null;
+    const de = query.de ? datas.normalizarData(query.de) : null;
+    // Se veio só a data final (AAAA-MM-DD), estende até o final daquele dia (23:59:59).
     const ateMs = ate ? this.paraMs(ate) + (query.ate.length <= 10 ? this.msDia - 1000 : 0) : agora;
     const deMs = de ? this.paraMs(de) : ateMs - 30 * this.msDia;
+
     if (isNaN(deMs) || isNaN(ateMs) || deMs >= ateMs) return null;
     return {
       deMs: deMs,
@@ -48,15 +53,16 @@ class Relatorios {
     };
   }
 
-  sobreposicao(ini, fim, periodo) {
-    const a = Math.max(this.paraMs(ini), periodo.deMs);
-    const b = Math.min(fim ? this.paraMs(fim) : Date.now(), periodo.ateMs);
-    return b > a ? b - a : 0;
+  // Calcula quanto tempo (em ms) uma estadia ou viagem ficou dentro do intervalo pedido no filtro.
+  sobreposicao(inicio, fim, periodo) {
+    const inicioRecortado = Math.max(this.paraMs(inicio), periodo.deMs);
+    const fimRecortado = Math.min(fim ? this.paraMs(fim) : Date.now(), periodo.ateMs);
+    return fimRecortado > inicioRecortado ? fimRecortado - inicioRecortado : 0;
   }
 
-  arredondar(n, casas) {
-    const f = Math.pow(10, casas);
-    return Math.round(n * f) / f;
+  arredondar(valor, casas) {
+    const fator = Math.pow(10, casas);
+    return Math.round(valor * fator) / fator;
   }
 
   calcularOcupacao(periodo) {
@@ -68,41 +74,50 @@ class Relatorios {
         'SELECT e.inicio, e.fim, q.alojamento_id FROM estadia e JOIN leito l ON l.id = e.leito_id JOIN quarto q ON q.id = l.quarto_id'
       )
       .all();
-    const linhas = alojamentos.map((a) => {
+
+    const linhas = alojamentos.map((alojamento) => {
       const leitos = db
         .prepare(
           'SELECT COUNT(*) AS n FROM leito l JOIN quarto q ON q.id = l.quarto_id WHERE q.alojamento_id = ?'
         )
-        .get(a.id).n;
+        .get(alojamento.id).n;
       let msOcupado = 0;
       let entradas = 0;
-      estadias.forEach((e) => {
-        if (e.alojamento_id !== a.id) return;
-        const ms = this.sobreposicao(e.inicio, e.fim, periodo);
+
+      estadias.forEach((estadia) => {
+        if (estadia.alojamento_id !== alojamento.id) return;
+        const ms = this.sobreposicao(estadia.inicio, estadia.fim, periodo);
         if (ms > 0) msOcupado += ms;
-        if (this.paraMs(e.inicio) >= periodo.deMs && this.paraMs(e.inicio) <= periodo.ateMs)
+        if (
+          this.paraMs(estadia.inicio) >= periodo.deMs &&
+          this.paraMs(estadia.inicio) <= periodo.ateMs
+        ) {
           entradas++;
+        }
       });
+
       const diasLeitoOcupados = msOcupado / this.msDia;
       const capacidade = leitos * periodo.dias;
-      const agora = db
+      const ocupadosAgora = db
         .prepare(
           'SELECT COUNT(*) AS n FROM estadia e JOIN leito l ON l.id = e.leito_id JOIN quarto q ON q.id = l.quarto_id ' +
             'WHERE q.alojamento_id = ? AND e.fim IS NULL'
         )
-        .get(a.id).n;
+        .get(alojamento.id).n;
+
       return {
-        alojamento_id: a.id,
-        nome: a.nome,
-        cidade: a.cidade,
+        alojamento_id: alojamento.id,
+        nome: alojamento.nome,
+        cidade: alojamento.cidade,
         leitos: leitos,
-        ocupados_agora: agora,
+        ocupados_agora: ocupadosAgora,
         dias_leito_ocupados: this.arredondar(diasLeitoOcupados, 1),
         ocupacao_media_pct:
           capacidade > 0 ? this.arredondar((diasLeitoOcupados / capacidade) * 100, 1) : 0,
         entradas_no_periodo: entradas
       };
     });
+
     return {
       periodo: {
         de: periodo.de,
@@ -119,27 +134,30 @@ class Relatorios {
     const usos = db
       .prepare('SELECT veiculo_id, saida, retorno, km_saida, km_retorno FROM uso_veiculo')
       .all();
-    const linhas = veiculos.map((v) => {
+
+    const linhas = veiculos.map((veiculo) => {
       let msUso = 0;
       let km = 0;
       let viagens = 0;
       let ultimaSaida = null;
-      usos.forEach((u) => {
-        if (u.veiculo_id !== v.id) return;
-        const ms = this.sobreposicao(u.saida, u.retorno, periodo);
+
+      usos.forEach((uso) => {
+        if (uso.veiculo_id !== veiculo.id) return;
+        const ms = this.sobreposicao(uso.saida, uso.retorno, periodo);
         if (ms > 0) {
           msUso += ms;
           viagens++;
-          if (u.km_retorno !== null) km += u.km_retorno - u.km_saida;
+          if (uso.km_retorno !== null) km += uso.km_retorno - uso.km_saida;
         }
-        if (!ultimaSaida || u.saida > ultimaSaida) ultimaSaida = u.saida;
+        if (!ultimaSaida || uso.saida > ultimaSaida) ultimaSaida = uso.saida;
       });
+
       const horasUso = msUso / 3600000;
       const utilizacao = (msUso / (periodo.ateMs - periodo.deMs)) * 100;
       return {
-        veiculo_id: v.id,
-        placa: v.placa,
-        modelo: v.modelo,
+        veiculo_id: veiculo.id,
+        placa: veiculo.placa,
+        modelo: veiculo.modelo,
         viagens: viagens,
         km_rodados: km,
         horas_em_uso: this.arredondar(horasUso, 1),
@@ -150,6 +168,7 @@ class Relatorios {
           : null
       };
     });
+
     return {
       periodo: {
         de: periodo.de,
@@ -160,92 +179,108 @@ class Relatorios {
   }
 
   calcularMovimentacoes(periodo, filtros) {
-    const f = filtros || {};
+    const filtro = filtros || {};
     const eventos = [];
+
     db.prepare(
       'SELECT e.inicio, e.fim, p.nome, a.nome AS alojamento, q.nome AS quarto, l.codigo FROM estadia e ' +
         'JOIN pessoa p ON p.id = e.pessoa_id JOIN leito l ON l.id = e.leito_id JOIN quarto q ON q.id = l.quarto_id ' +
         'JOIN alojamento a ON a.id = q.alojamento_id'
     )
       .all()
-      .forEach((e) => {
-        const recurso = e.alojamento + ' · ' + e.quarto + ' (' + e.codigo + ')';
-        if (this.paraMs(e.inicio) >= periodo.deMs && this.paraMs(e.inicio) <= periodo.ateMs) {
+      .forEach((estadia) => {
+        const recurso = estadia.alojamento + ' · ' + estadia.quarto + ' (' + estadia.codigo + ')';
+        if (
+          this.paraMs(estadia.inicio) >= periodo.deMs &&
+          this.paraMs(estadia.inicio) <= periodo.ateMs
+        ) {
           eventos.push({
-            quando: e.inicio,
+            quando: estadia.inicio,
             categoria: 'alojamento',
             tipo: 'Entrada',
-            colaborador: e.nome,
+            colaborador: estadia.nome,
             recurso: recurso
           });
         }
-        if (e.fim && this.paraMs(e.fim) >= periodo.deMs && this.paraMs(e.fim) <= periodo.ateMs) {
+        if (
+          estadia.fim &&
+          this.paraMs(estadia.fim) >= periodo.deMs &&
+          this.paraMs(estadia.fim) <= periodo.ateMs
+        ) {
           eventos.push({
-            quando: e.fim,
+            quando: estadia.fim,
             categoria: 'alojamento',
             tipo: 'Saída',
-            colaborador: e.nome,
+            colaborador: estadia.nome,
             recurso: recurso
           });
         }
       });
+
     db.prepare(
       'SELECT u.saida, u.retorno, u.destino, u.km_saida, u.km_retorno, p.nome, v.modelo, v.placa FROM uso_veiculo u ' +
         'JOIN pessoa p ON p.id = u.motorista_id JOIN veiculo v ON v.id = u.veiculo_id'
     )
       .all()
-      .forEach((u) => {
-        const recurso = u.modelo + ' · ' + u.placa;
-        if (this.paraMs(u.saida) >= periodo.deMs && this.paraMs(u.saida) <= periodo.ateMs) {
+      .forEach((uso) => {
+        const recurso = uso.modelo + ' · ' + uso.placa;
+        if (this.paraMs(uso.saida) >= periodo.deMs && this.paraMs(uso.saida) <= periodo.ateMs) {
           eventos.push({
-            quando: u.saida,
+            quando: uso.saida,
             categoria: 'frota',
             tipo: 'Retirada',
-            colaborador: u.nome,
-            recurso: recurso + ' → ' + u.destino
+            colaborador: uso.nome,
+            recurso: recurso + ' → ' + uso.destino
           });
         }
         if (
-          u.retorno &&
-          this.paraMs(u.retorno) >= periodo.deMs &&
-          this.paraMs(u.retorno) <= periodo.ateMs
+          uso.retorno &&
+          this.paraMs(uso.retorno) >= periodo.deMs &&
+          this.paraMs(uso.retorno) <= periodo.ateMs
         ) {
           eventos.push({
-            quando: u.retorno,
+            quando: uso.retorno,
             categoria: 'frota',
             tipo: 'Devolução',
-            colaborador: u.nome,
-            recurso: recurso + ' (' + (u.km_retorno - u.km_saida) + ' km)'
+            colaborador: uso.nome,
+            recurso: recurso + ' (' + (uso.km_retorno - uso.km_saida) + ' km)'
           });
         }
       });
-    eventos.sort((a, b) => {
-      return a.quando < b.quando ? 1 : -1;
-    });
-    const busca = String(f.busca || '')
+
+    eventos.sort((a, b) => (a.quando < b.quando ? 1 : -1));
+
+    const busca = String(filtro.busca || '')
       .trim()
       .toLowerCase();
-    const filtrados = eventos.filter((e) => {
-      if (f.categoria && e.categoria !== f.categoria) return false;
-      if (f.tipo && e.tipo !== f.tipo) return false;
-      if (busca !== '' && (e.colaborador + ' ' + e.recurso).toLowerCase().indexOf(busca) === -1)
+    const filtrados = eventos.filter((evento) => {
+      if (filtro.categoria && evento.categoria !== filtro.categoria) return false;
+      if (filtro.tipo && evento.tipo !== filtro.tipo) return false;
+      if (
+        busca !== '' &&
+        !(evento.colaborador + ' ' + evento.recurso).toLowerCase().includes(busca)
+      ) {
         return false;
+      }
       return true;
     });
+
     const porTipo = {
       Entrada: 0,
       Saída: 0,
       Retirada: 0,
       Devolução: 0
     };
-    filtrados.forEach((e) => {
-      porTipo[e.tipo]++;
+    filtrados.forEach((evento) => {
+      porTipo[evento.tipo]++;
     });
-    const brutoLimite = Number(f.limite);
+
+    const brutoLimite = Number(filtro.limite);
     const limite =
       Number.isFinite(brutoLimite) && brutoLimite > 0
         ? Math.min(Math.trunc(brutoLimite), 1000)
         : 300;
+
     return {
       periodo: {
         de: periodo.de,
@@ -257,10 +292,12 @@ class Relatorios {
     };
   }
 
+  // Junta numa lista os principais gargalos operacionais (lotação, atrasos e carros parados/sobrecarregados).
   calcularGargalos(periodo) {
     const cfg = configuracao.lerConfig();
     const agora = Date.now();
     const itens = [];
+
     db.prepare(
       'SELECT a.id, a.nome, ' +
         '(SELECT COUNT(*) FROM leito l JOIN quarto q ON q.id = l.quarto_id WHERE q.alojamento_id = a.id) AS leitos, ' +
@@ -268,93 +305,103 @@ class Relatorios {
         'FROM alojamento a WHERE a.ativo = 1'
     )
       .all()
-      .forEach((a) => {
-        if (a.leitos > 0) {
-          const pct = Math.round((a.ocupados / a.leitos) * 100);
+      .forEach((alojamento) => {
+        if (alojamento.leitos > 0) {
+          const pct = Math.round((alojamento.ocupados / alojamento.leitos) * 100);
           if (pct >= cfg.lotacaoAlertaPct) {
             itens.push({
               tipo: 'lotacao',
               severidade: pct === 100 ? 'critico' : 'atencao',
               mensagem:
-                a.nome +
+                alojamento.nome +
                 ' está com ' +
                 pct +
                 '% de ocupação (' +
-                a.ocupados +
+                alojamento.ocupados +
                 '/' +
-                a.leitos +
+                alojamento.leitos +
                 ' leitos).'
             });
           }
         }
       });
+
     db.prepare(
       'SELECT o.id, o.aberta_em, o.descricao, a.nome FROM ocorrencia o JOIN alojamento a ON a.id = o.alojamento_id WHERE o.resolvida_em IS NULL'
     )
       .all()
-      .forEach((o) => {
-        const dias = Math.floor((agora - this.paraMs(o.aberta_em)) / this.msDia);
+      .forEach((ocorrencia) => {
+        const dias = Math.floor((agora - this.paraMs(ocorrencia.aberta_em)) / this.msDia);
         if (dias >= cfg.diasAlertaPendencia) {
           itens.push({
             tipo: 'ocorrencia_antiga',
             severidade: 'atencao',
-            mensagem: 'Ocorrência aberta há ' + dias + ' dias em ' + o.nome + ': ' + o.descricao
+            mensagem:
+              'Ocorrência aberta há ' +
+              dias +
+              ' dias em ' +
+              ocorrencia.nome +
+              ': ' +
+              ocorrencia.descricao
           });
         }
       });
+
     db.prepare(
       'SELECT u.saida, u.destino, v.modelo, v.placa, p.nome FROM uso_veiculo u JOIN veiculo v ON v.id = u.veiculo_id JOIN pessoa p ON p.id = u.motorista_id WHERE u.retorno IS NULL'
     )
       .all()
-      .forEach((u) => {
-        const horas = Math.floor((agora - this.paraMs(u.saida)) / 3600000);
+      .forEach((uso) => {
+        const horas = Math.floor((agora - this.paraMs(uso.saida)) / 3600000);
         if (horas >= cfg.horasAlertaRetorno) {
           itens.push({
             tipo: 'nao_voltou',
             severidade: 'critico',
             mensagem:
-              u.modelo +
+              uso.modelo +
               ' ' +
-              u.placa +
+              uso.placa +
               ' saiu há ' +
               horas +
               'h com ' +
-              u.nome +
+              uso.nome +
               ' (' +
-              u.destino +
+              uso.destino +
               ') e não voltou.'
           });
         }
       });
+
     db.prepare(
       'SELECT m.inicio, m.descricao, v.modelo, v.placa FROM manutencao m JOIN veiculo v ON v.id = m.veiculo_id WHERE m.fim IS NULL'
     )
       .all()
-      .forEach((m) => {
-        const dias = Math.floor((agora - this.paraMs(m.inicio)) / this.msDia);
+      .forEach((manutencao) => {
+        const dias = Math.floor((agora - this.paraMs(manutencao.inicio)) / this.msDia);
         if (dias >= cfg.diasAlertaPendencia) {
           itens.push({
             tipo: 'oficina_longa',
             severidade: 'atencao',
             mensagem:
-              m.modelo +
+              manutencao.modelo +
               ' ' +
-              m.placa +
+              manutencao.placa +
               ' está na oficina há ' +
               dias +
               ' dias (' +
-              m.descricao +
+              manutencao.descricao +
               ').'
           });
         }
       });
+
     const usos = db.prepare('SELECT veiculo_id, saida, retorno FROM uso_veiculo').all();
     db.prepare('SELECT id, placa, modelo FROM veiculo WHERE ativo = 1')
       .all()
-      .forEach((v) => {
+      .forEach((veiculo) => {
         let ms = 0;
-        usos.forEach((u) => {
-          if (u.veiculo_id === v.id) ms += this.sobreposicao(u.saida, u.retorno, periodo);
+        usos.forEach((uso) => {
+          if (uso.veiculo_id === veiculo.id) ms += this.sobreposicao(uso.saida, uso.retorno, periodo);
         });
         const pct = (ms / (periodo.ateMs - periodo.deMs)) * 100;
         if (pct >= 70) {
@@ -362,9 +409,9 @@ class Relatorios {
             tipo: 'frota_sobrecarregada',
             severidade: 'atencao',
             mensagem:
-              v.modelo +
+              veiculo.modelo +
               ' ' +
-              v.placa +
+              veiculo.placa +
               ' ficou ' +
               this.arredondar(pct, 0) +
               '% do período em uso: pode faltar carro.'
@@ -374,15 +421,16 @@ class Relatorios {
             tipo: 'frota_ociosa',
             severidade: 'atencao',
             mensagem:
-              v.modelo +
+              veiculo.modelo +
               ' ' +
-              v.placa +
+              veiculo.placa +
               ' ficou parado (' +
               this.arredondar(pct, 0) +
               '% de uso no período).'
           });
         }
       });
+
     return {
       periodo: {
         de: periodo.de,
@@ -393,4 +441,5 @@ class Relatorios {
     };
   }
 }
+
 module.exports = new Relatorios();

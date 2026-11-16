@@ -1,4 +1,4 @@
-// Controla a tela de relatorios.
+// Tela de relatórios: ocupação média, uso/ociosidade da frota, gargalos, consulta de condutor (multas) e perguntas à IA.
 class TelaRelatorios {
   constructor() {
     this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
@@ -12,81 +12,91 @@ class TelaRelatorios {
     this.campoDe = document.getElementById('rel-de');
     this.campoAte = document.getElementById('rel-ate');
     this.veiculosCarregados = false;
+
     this.configurarEventos();
     this.iniciar();
   }
 
   configurarEventos() {
-    document.querySelectorAll('[data-fechar]').forEach((b) => {
-      b.addEventListener('click', () => {
-        this.fecharModal(b.dataset.fechar);
+    document.querySelectorAll('[data-fechar]').forEach((botao) => {
+      botao.addEventListener('click', () => {
+        this.fecharModal(botao.dataset.fechar);
       });
     });
-    document.querySelectorAll('.rel-aba').forEach((b) => {
-      b.addEventListener('click', () => {
-        this.mostrarAba(b.dataset.aba);
+
+    document.querySelectorAll('.rel-aba').forEach((botao) => {
+      botao.addEventListener('click', () => {
+        this.mostrarAba(botao.dataset.aba);
       });
     });
+
     document
       .getElementById('botao-atualizar')
       .addEventListener('click', this.carregarTudo.bind(this));
+
     document
       .getElementById('form-dirigindo')
       .addEventListener('submit', this.consultarCondutor.bind(this));
-    document.getElementById('form-ia').addEventListener('submit', (e) => {
-      e.preventDefault();
+
+    document.getElementById('form-ia').addEventListener('submit', (evento) => {
+      evento.preventDefault();
       this.perguntarIa('/api/ia/perguntar', {
         pergunta: document.getElementById('ia-pergunta').value
       });
     });
+
     document.getElementById('botao-resumo-ia').addEventListener('click', () => {
       this.perguntarIa('/api/ia/resumo', {});
     });
+
     this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', {
-        metodo: 'POST'
-      });
+      await chamarApi('/api/auth/sair', { metodo: 'POST' });
       window.location.href = 'index.html';
     });
   }
 
-  async consultarCondutor(e) {
-    e.preventDefault();
+  async consultarCondutor(evento) {
+    evento.preventDefault();
     const caixa = document.getElementById('dir-resultado');
-    const r = await chamarApi(
+    const resposta = await chamarApi(
       '/api/relatorios/quem-dirigia?veiculo_id=' +
         document.getElementById('dir-veiculo').value +
         '&quando=' +
         encodeURIComponent(document.getElementById('dir-quando').value)
     );
+
     caixa.hidden = false;
-    if (!r.ok) {
+    if (!resposta.ok) {
       caixa.className = 'resultado-caixa resultado-erro';
-      caixa.textContent = r.dados.erro || 'Erro na consulta.';
+      caixa.textContent = resposta.dados.erro || 'Erro na consulta.';
       return;
     }
-    const d = r.dados;
-    if (d.encontrado) {
+
+    const dados = resposta.dados;
+    if (dados.encontrado) {
       caixa.className = 'resultado-caixa resultado-ok';
       caixa.innerHTML =
         '<strong>' +
-        this.esc(d.motorista) +
+        this.esc(dados.motorista) +
         '</strong> (matrícula ' +
-        this.esc(d.matricula) +
+        this.esc(dados.matricula) +
         ') dirigia o ' +
-        this.esc(d.veiculo.modelo) +
+        this.esc(dados.veiculo.modelo) +
         ' ' +
-        this.esc(d.veiculo.placa) +
+        this.esc(dados.veiculo.placa) +
         '.<br>' +
         'Destino: ' +
-        this.esc(d.destino) +
+        this.esc(dados.destino) +
         '<br>Saída: ' +
-        this.formatarData(d.saida) +
-        (d.retorno ? ' · Volta: ' + this.formatarData(d.retorno) : ' · ainda em trânsito') +
-        (d.passageiros.length ? '<br>Passageiros: ' + this.esc(d.passageiros.join(', ')) : '');
+        this.formatarData(dados.saida) +
+        (dados.retorno ? ' · Volta: ' + this.formatarData(dados.retorno) : ' · ainda em trânsito') +
+        (dados.passageiros.length
+          ? '<br>Passageiros: ' + this.esc(dados.passageiros.join(', '))
+          : '');
     } else {
-      caixa.className = 'resultado-caixa ' + (d.uso_sem_registro ? 'resultado-erro' : '');
-      caixa.textContent = d.aviso;
+      // Quando houver diferença no hodômetro sem saída registrada no período, destaca como alerta vermelho.
+      caixa.className = 'resultado-caixa ' + (dados.uso_sem_registro ? 'resultado-erro' : '');
+      caixa.textContent = dados.aviso;
     }
   }
 
@@ -128,15 +138,15 @@ class TelaRelatorios {
     return texto ? texto.slice(0, 16) : '';
   }
 
-  paraInputData(d) {
+  paraInputData(data) {
     return (
-      d.getFullYear() +
+      data.getFullYear() +
       '-' +
-      (d.getMonth() + 1 < 10 ? '0' : '') +
-      (d.getMonth() + 1) +
+      (data.getMonth() + 1 < 10 ? '0' : '') +
+      (data.getMonth() + 1) +
       '-' +
-      (d.getDate() < 10 ? '0' : '') +
-      d.getDate()
+      (data.getDate() < 10 ? '0' : '') +
+      data.getDate()
     );
   }
 
@@ -150,17 +160,21 @@ class TelaRelatorios {
   }
 
   mostrarAba(nome) {
-    document.querySelectorAll('.rel-aba').forEach((b) => {
-      b.classList.toggle('ativa', b.dataset.aba === nome);
+    document.querySelectorAll('.rel-aba').forEach((botao) => {
+      botao.classList.toggle('ativa', botao.dataset.aba === nome);
     });
-    document.querySelectorAll('.rel-secao').forEach((s) => {
-      s.hidden = s.id !== 'aba-' + nome;
+    document.querySelectorAll('.rel-secao').forEach((secao) => {
+      secao.hidden = secao.id !== 'aba-' + nome;
     });
     if (nome === 'dirigindo') this.carregarVeiculosSelect();
   }
 
   barra(classeExtra) {
-    return '<div class="aloj-barra"><div class="aloj-barra-preench' + (classeExtra || '') + '"></div></div>';
+    return (
+      '<div class="aloj-barra"><div class="aloj-barra-preench' +
+      (classeExtra || '') +
+      '"></div></div>'
+    );
   }
 
   aplicarLarguraBarra(container, pct) {
@@ -170,107 +184,116 @@ class TelaRelatorios {
   }
 
   async carregarOcupacao() {
-    const r = await chamarApi('/api/relatorios/ocupacao' + this.consulta());
+    const resposta = await chamarApi('/api/relatorios/ocupacao' + this.consulta());
     const caixa = document.getElementById('rel-ocupacao');
-    if (!r.ok) {
+
+    if (!resposta.ok) {
       caixa.innerHTML =
-        '<p class="texto-vazio">' + this.esc(r.dados.erro || 'Erro ao carregar.') + '</p>';
+        '<p class="texto-vazio">' + this.esc(resposta.dados.erro || 'Erro ao carregar.') + '</p>';
       return;
     }
-    if (r.dados.alojamentos.length === 0) {
+
+    if (resposta.dados.alojamentos.length === 0) {
       caixa.innerHTML = '<p class="texto-vazio">Nenhum alojamento ativo.</p>';
       return;
     }
+
     caixa.innerHTML = '';
-    r.dados.alojamentos.forEach((a) => {
-      const div = document.createElement('div');
-      div.className = 'rel-linha';
-      div.innerHTML =
+    resposta.dados.alojamentos.forEach((alojamento) => {
+      const linha = document.createElement('div');
+      linha.className = 'rel-linha';
+      linha.innerHTML =
         '<div class="rel-linha-topo"><strong>' +
-        this.esc(a.nome) +
+        this.esc(alojamento.nome) +
         '</strong><span>' +
-        this.esc(a.cidade) +
+        this.esc(alojamento.cidade) +
         '</span></div>' +
         this.barra() +
         '<div class="aloj-numeros"><span><strong>' +
-        a.ocupacao_media_pct +
+        alojamento.ocupacao_media_pct +
         '%</strong> de ocupação média no período</span>' +
         '<span>' +
-        a.ocupados_agora +
+        alojamento.ocupados_agora +
         '/' +
-        a.leitos +
+        alojamento.leitos +
         ' leitos agora · ' +
-        a.entradas_no_periodo +
+        alojamento.entradas_no_periodo +
         ' entradas</span></div>';
-      this.aplicarLarguraBarra(div, a.ocupacao_media_pct);
-      caixa.appendChild(div);
+      this.aplicarLarguraBarra(linha, alojamento.ocupacao_media_pct);
+      caixa.appendChild(linha);
     });
   }
 
   async carregarFrota() {
-    const r = await chamarApi('/api/relatorios/frota' + this.consulta());
+    const resposta = await chamarApi('/api/relatorios/frota' + this.consulta());
     const corpo = document.getElementById('rel-frota');
     corpo.innerHTML = '';
-    if (!r.ok) {
+
+    if (!resposta.ok) {
       corpo.innerHTML =
         '<tr><td colspan="6" class="texto-vazio">' +
-        this.esc(r.dados.erro || 'Erro ao carregar.') +
+        this.esc(resposta.dados.erro || 'Erro ao carregar.') +
         '</td></tr>';
       return;
     }
-    if (r.dados.veiculos.length === 0) {
+
+    if (resposta.dados.veiculos.length === 0) {
       corpo.innerHTML = '<tr><td colspan="6" class="texto-vazio">Nenhum veículo ativo.</td></tr>';
       return;
     }
-    r.dados.veiculos.forEach((v) => {
+
+    resposta.dados.veiculos.forEach((veiculo) => {
       const tr = document.createElement('tr');
       tr.innerHTML =
         '<td><div class="veic-celula"><span class="veic-modelo">' +
-        this.esc(v.modelo) +
+        this.esc(veiculo.modelo) +
         '</span><span class="veic-placa"><span class="placa">' +
-        this.esc(v.placa) +
+        this.esc(veiculo.placa) +
         '</span></span></div></td>' +
         '<td class="num">' +
-        v.viagens +
+        veiculo.viagens +
         '</td><td class="num">' +
-        v.km_rodados.toLocaleString('pt-BR') +
+        veiculo.km_rodados.toLocaleString('pt-BR') +
         ' km</td><td class="num">' +
-        v.horas_em_uso +
+        veiculo.horas_em_uso +
         ' h</td>' +
         '<td class="celula-barra">' +
         this.barra() +
         '<span class="rel-pct">' +
-        v.utilizacao_pct +
+        veiculo.utilizacao_pct +
         '% em uso · ' +
-        v.ociosidade_pct +
+        veiculo.ociosidade_pct +
         '% ocioso</span></td>' +
         '<td class="num">' +
-        (v.dias_sem_uso === null ? '—' : v.dias_sem_uso + ' dias') +
+        (veiculo.dias_sem_uso === null ? '—' : veiculo.dias_sem_uso + ' dias') +
         '</td>';
-      this.aplicarLarguraBarra(tr, v.utilizacao_pct);
+      this.aplicarLarguraBarra(tr, veiculo.utilizacao_pct);
       corpo.appendChild(tr);
     });
   }
 
   async carregarGargalos() {
-    const r = await chamarApi('/api/relatorios/gargalos' + this.consulta());
+    const resposta = await chamarApi('/api/relatorios/gargalos' + this.consulta());
     const caixa = document.getElementById('rel-gargalos');
     caixa.innerHTML = '';
-    if (!r.ok) {
+
+    if (!resposta.ok) {
       caixa.innerHTML =
-        '<p class="texto-vazio">' + this.esc(r.dados.erro || 'Erro ao carregar.') + '</p>';
+        '<p class="texto-vazio">' + this.esc(resposta.dados.erro || 'Erro ao carregar.') + '</p>';
       return;
     }
-    if (r.dados.gargalos.length === 0) {
+
+    if (resposta.dados.gargalos.length === 0) {
       caixa.innerHTML = '<p class="texto-vazio">Nenhum gargalo identificado no período.</p>';
       return;
     }
-    r.dados.gargalos.forEach((g) => {
-      const div = document.createElement('div');
-      div.className =
-        'alerta-item ' + (g.severidade === 'critico' ? 'alerta-problema' : 'alerta-atencao');
-      div.innerHTML = '<p class="alerta-detalhe">' + this.esc(g.mensagem) + '</p>';
-      caixa.appendChild(div);
+
+    resposta.dados.gargalos.forEach((gargalo) => {
+      const item = document.createElement('div');
+      item.className =
+        'alerta-item ' + (gargalo.severidade === 'critico' ? 'alerta-problema' : 'alerta-atencao');
+      item.innerHTML = '<p class="alerta-detalhe">' + this.esc(gargalo.mensagem) + '</p>';
+      caixa.appendChild(item);
     });
   }
 
@@ -289,15 +312,16 @@ class TelaRelatorios {
 
   async carregarVeiculosSelect() {
     if (this.veiculosCarregados) return;
-    const r = await chamarApi('/api/frota?status=todos');
-    if (!r.ok) return;
-    const sel = document.getElementById('dir-veiculo');
-    sel.innerHTML = '';
-    r.dados.veiculos.forEach((v) => {
-      const o = document.createElement('option');
-      o.value = v.id;
-      o.textContent = v.modelo + ' · ' + v.placa;
-      sel.appendChild(o);
+    const resposta = await chamarApi('/api/frota?status=todos');
+    if (!resposta.ok) return;
+
+    const select = document.getElementById('dir-veiculo');
+    select.innerHTML = '';
+    resposta.dados.veiculos.forEach((veiculo) => {
+      const opcao = document.createElement('option');
+      opcao.value = veiculo.id;
+      opcao.textContent = veiculo.modelo + ' · ' + veiculo.placa;
+      select.appendChild(opcao);
     });
     this.veiculosCarregados = true;
   }
@@ -309,27 +333,31 @@ class TelaRelatorios {
     caixa.textContent = 'Pensando...';
     corpo.de = this.campoDe.value;
     corpo.ate = this.campoAte.value;
-    const r = await chamarApi(url, {
+
+    const resposta = await chamarApi(url, {
       metodo: 'POST',
       corpo: corpo
     });
-    if (!r.ok) {
+    if (!resposta.ok) {
       caixa.className = 'resultado-caixa resultado-erro';
-      caixa.textContent = r.dados.erro || 'Erro ao consultar a IA.';
+      caixa.textContent = resposta.dados.erro || 'Erro ao consultar a IA.';
       return;
     }
     caixa.className = 'resultado-caixa resultado-ok';
-    caixa.textContent = r.dados.resposta;
+    caixa.textContent = resposta.dados.resposta;
   }
 
   aoIniciar() {
+    // Define os últimos 30 dias como intervalo inicial e aceita abrir direto uma aba pelo #hash da URL.
     const hoje = new Date();
     const inicio = new Date(hoje.getTime() - 30 * 86400000);
     this.campoAte.value = this.paraInputData(hoje);
     this.campoDe.value = this.paraInputData(inicio);
+
     const aba = window.location.hash.replace('#', '');
-    if (['ocupacao', 'frota', 'gargalos', 'dirigindo', 'ia'].indexOf(aba) !== -1)
+    if (['ocupacao', 'frota', 'gargalos', 'dirigindo', 'ia'].indexOf(aba) !== -1) {
       this.mostrarAba(aba);
+    }
     this.carregarTudo();
   }
 
@@ -339,15 +367,17 @@ class TelaRelatorios {
       window.location.href = 'index.html';
       return;
     }
-    const user = sessao.dados.usuario;
-    this.perfilNome.textContent = user.nome;
-    this.perfilTipo.textContent = user.perfil;
-    this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
-    if (user.perfil === 'admin') this.blocoMenuAdmin.hidden = false;
+
+    const usuario = sessao.dados.usuario;
+    this.perfilNome.textContent = usuario.nome;
+    this.perfilTipo.textContent = usuario.perfil;
+    this.usuarioIniciais.textContent = this.pegarIniciais(usuario.nome);
+    if (usuario.perfil === 'admin') this.blocoMenuAdmin.hidden = false;
     if (sessao.dados.nomeEmpresa) {
       this.nomeEmpresaMenu.textContent = sessao.dados.nomeEmpresa;
     }
     this.aoIniciar();
   }
 }
+
 new TelaRelatorios();

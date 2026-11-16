@@ -1,4 +1,4 @@
-// Controla a tela de movimentacoes.
+// Tela de movimentações: junta entradas/saídas dos alojamentos e retiradas/devoluções da frota, com exportação em CSV.
 class TelaMovimentacoes {
   constructor() {
     this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
@@ -9,6 +9,7 @@ class TelaMovimentacoes {
     this.blocoMenuAdmin = document.getElementById('bloco-menu-admin');
     this.toast = document.getElementById('toast-mov');
     this.timerToast = null;
+
     this.campoDe = document.getElementById('mov-de');
     this.campoAte = document.getElementById('mov-ate');
     this.campoBusca = document.getElementById('mov-busca');
@@ -16,6 +17,7 @@ class TelaMovimentacoes {
     this.seletorTipo = document.getElementById('mov-tipo');
     this.corpo = document.getElementById('mov-lista');
     this.botaoMais = document.getElementById('botao-mais');
+
     this.PASSO = 30;
     this.limite = this.PASSO;
     this.eventosAtuais = [];
@@ -24,79 +26,81 @@ class TelaMovimentacoes {
       alojamento: ['Entrada', 'Saída'],
       frota: ['Retirada', 'Devolução']
     };
+
     this.configurarEventos();
     this.iniciar();
   }
 
   configurarEventos() {
-    document.querySelectorAll('[data-fechar]').forEach((b) => {
-      b.addEventListener('click', () => {
-        this.fecharModal(b.dataset.fechar);
+    document.querySelectorAll('[data-fechar]').forEach((botao) => {
+      botao.addEventListener('click', () => {
+        this.fecharModal(botao.dataset.fechar);
       });
     });
+
     document
       .getElementById('botao-atualizar')
       .addEventListener('click', this.recarregarDoInicio.bind(this));
+
     this.seletorCategoria.addEventListener('change', () => {
       this.ajustarTipos();
       this.recarregarDoInicio();
     });
+
     this.seletorTipo.addEventListener('change', this.recarregarDoInicio.bind(this));
+
     this.campoBusca.addEventListener('input', () => {
       if (this.timerBusca) clearTimeout(this.timerBusca);
       this.timerBusca = setTimeout(this.recarregarDoInicio.bind(this), 300);
     });
+
     this.botaoMais.addEventListener('click', () => {
       this.limite = Math.min(this.limite + this.PASSO, 1000);
       this.carregar();
     });
+
     document
       .getElementById('botao-exportar')
       .addEventListener('click', this.exportarCsv.bind(this));
+
     this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', {
-        metodo: 'POST'
-      });
+      await chamarApi('/api/auth/sair', { metodo: 'POST' });
       window.location.href = 'index.html';
     });
   }
 
   async exportarCsv() {
-    const celula = (t) => {
-      const bruto = String(t === null || t === undefined ? '' : t);
-      const v = /^[=+\-@\t\r]/.test(bruto) ? "'" + bruto : bruto;
-      return /[;"\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+    const formatarCelula = (valor) => {
+      const bruto = String(valor === null || valor === undefined ? '' : valor);
+      // Se começar com =, +, - ou @, colocamos um apóstrofo antes para o Excel não rodar como fórmula.
+      const seguro = /^[=+\-@\t\r]/.test(bruto) ? "'" + bruto : bruto;
+      return /[;"\r\n]/.test(seguro) ? '"' + seguro.replace(/"/g, '""') + '"' : seguro;
     };
-    const r = await chamarApi('/api/relatorios/movimentacoes' + this.filtrosQuery(1000));
-    const todos = r.ok ? r.dados.eventos : this.eventosAtuais;
+
+    const resposta = await chamarApi('/api/relatorios/movimentacoes' + this.filtrosQuery(1000));
+    const todos = resposta.ok ? resposta.dados.eventos : this.eventosAtuais;
     if (todos.length === 0) {
       this.mostrarToast('Não há movimentações para exportar.', 'erro');
       return;
     }
+
     const linhas = [['Quando', 'Área', 'Tipo', 'Colaborador', 'Recurso']].concat(
-      todos.map((e) => {
-        return [
-          e.quando,
-          e.categoria === 'frota' ? 'Frota' : 'Alojamento',
-          e.tipo,
-          e.colaborador,
-          e.recurso
-        ];
-      })
+      todos.map((evento) => [
+        evento.quando,
+        evento.categoria === 'frota' ? 'Frota' : 'Alojamento',
+        evento.tipo,
+        evento.colaborador,
+        evento.recurso
+      ])
     );
+
+    // O \ufeff no começo avisa o Excel para abrir com acentuação UTF-8 correta, e o ; combina com planilhas em português.
     const csv =
       '\ufeff' +
-      linhas
-        .map((l) => {
-          return l.map(celula).join(';');
-        })
-        .join('\r\n');
+      linhas.map((linha) => linha.map(formatarCelula).join(';')).join('\r\n');
+
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(
-      new Blob([csv], {
-        type: 'text/csv;charset=utf-8'
-      })
-    );
+    link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
     link.download = 'movimentacoes-' + this.campoDe.value + '-a-' + this.campoAte.value + '.csv';
     document.body.appendChild(link);
     link.click();
@@ -142,32 +146,34 @@ class TelaMovimentacoes {
     return texto ? texto.slice(0, 16) : '';
   }
 
-  paraInputData(d) {
+  paraInputData(data) {
     return (
-      d.getFullYear() +
+      data.getFullYear() +
       '-' +
-      (d.getMonth() + 1 < 10 ? '0' : '') +
-      (d.getMonth() + 1) +
+      (data.getMonth() + 1 < 10 ? '0' : '') +
+      (data.getMonth() + 1) +
       '-' +
-      (d.getDate() < 10 ? '0' : '') +
-      d.getDate()
+      (data.getDate() < 10 ? '0' : '') +
+      data.getDate()
     );
   }
 
   ajustarTipos() {
     const area = this.seletorCategoria.value;
-    Array.prototype.forEach.call(this.seletorTipo.options, (o) => {
-      o.hidden = o.value !== '' && area !== '' && this.tiposPorArea[area].indexOf(o.value) === -1;
+    Array.from(this.seletorTipo.options).forEach((opcao) => {
+      opcao.hidden =
+        opcao.value !== '' && area !== '' && this.tiposPorArea[area].indexOf(opcao.value) === -1;
     });
     if (
       this.seletorTipo.value !== '' &&
       area !== '' &&
       this.tiposPorArea[area].indexOf(this.seletorTipo.value) === -1
-    )
+    ) {
       this.seletorTipo.value = '';
+    }
   }
 
-  filtrosQuery(qtd) {
+  filtrosQuery(quantidade) {
     return (
       '?de=' +
       encodeURIComponent(this.campoDe.value) +
@@ -180,7 +186,7 @@ class TelaMovimentacoes {
       '&busca=' +
       encodeURIComponent(this.campoBusca.value) +
       '&limite=' +
-      qtd
+      quantidade
     );
   }
 
@@ -192,45 +198,50 @@ class TelaMovimentacoes {
       );
       return;
     }
-    const r = await chamarApi('/api/relatorios/movimentacoes' + this.filtrosQuery(this.limite));
+
+    const resposta = await chamarApi('/api/relatorios/movimentacoes' + this.filtrosQuery(this.limite));
     this.corpo.innerHTML = '';
-    if (!r.ok) {
+
+    if (!resposta.ok) {
       this.corpo.innerHTML =
         '<tr><td colspan="4" class="texto-vazio">' +
-        this.esc(r.dados.erro || 'Erro ao carregar.') +
+        this.esc(resposta.dados.erro || 'Erro ao carregar.') +
         '</td></tr>';
       this.botaoMais.hidden = true;
       return;
     }
-    const d = r.dados;
-    this.eventosAtuais = d.eventos;
-    document.getElementById('kpi-entradas').textContent = d.por_tipo['Entrada'];
-    document.getElementById('kpi-saidas').textContent = d.por_tipo['Saída'];
-    document.getElementById('kpi-retiradas').textContent = d.por_tipo['Retirada'];
-    document.getElementById('kpi-devolucoes').textContent = d.por_tipo['Devolução'];
+
+    const dados = resposta.dados;
+    this.eventosAtuais = dados.eventos;
+    document.getElementById('kpi-entradas').textContent = dados.por_tipo['Entrada'];
+    document.getElementById('kpi-saidas').textContent = dados.por_tipo['Saída'];
+    document.getElementById('kpi-retiradas').textContent = dados.por_tipo['Retirada'];
+    document.getElementById('kpi-devolucoes').textContent = dados.por_tipo['Devolução'];
     document.getElementById('mov-total').textContent =
-      'Mostrando ' + d.eventos.length + ' de ' + d.total;
-    this.botaoMais.hidden = d.total <= d.eventos.length || this.limite >= 1000;
-    if (d.eventos.length === 0) {
+      'Mostrando ' + dados.eventos.length + ' de ' + dados.total;
+    this.botaoMais.hidden = dados.total <= dados.eventos.length || this.limite >= 1000;
+
+    if (dados.eventos.length === 0) {
       this.corpo.innerHTML =
         '<tr><td colspan="4" class="texto-vazio">Nenhuma movimentação encontrada para os filtros selecionados.</td></tr>';
       return;
     }
-    d.eventos.forEach((e) => {
+
+    dados.eventos.forEach((evento) => {
       const tr = document.createElement('tr');
       tr.innerHTML =
         '<td>' +
-        this.formatarData(e.quando) +
+        this.formatarData(evento.quando) +
         '</td>' +
         '<td><span class="status-tag ' +
-        (e.categoria === 'frota' ? 'status-uso' : 'status-ativo') +
+        (evento.categoria === 'frota' ? 'status-uso' : 'status-ativo') +
         '"><span class="status-ponto"></span>' +
-        this.esc(e.tipo) +
+        this.esc(evento.tipo) +
         '</span></td>' +
         '<td>' +
-        this.esc(e.colaborador) +
+        this.esc(evento.colaborador) +
         '</td><td>' +
-        this.esc(e.recurso) +
+        this.esc(evento.recurso) +
         '</td>';
       this.corpo.appendChild(tr);
     });
@@ -242,6 +253,7 @@ class TelaMovimentacoes {
   }
 
   aoIniciar() {
+    // Abre já mostrando os últimos 30 dias.
     const hoje = new Date();
     this.campoAte.value = this.paraInputData(hoje);
     this.campoDe.value = this.paraInputData(new Date(hoje.getTime() - 30 * 86400000));
@@ -254,15 +266,17 @@ class TelaMovimentacoes {
       window.location.href = 'index.html';
       return;
     }
-    const user = sessao.dados.usuario;
-    this.perfilNome.textContent = user.nome;
-    this.perfilTipo.textContent = user.perfil;
-    this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
-    if (user.perfil === 'admin') this.blocoMenuAdmin.hidden = false;
+
+    const usuario = sessao.dados.usuario;
+    this.perfilNome.textContent = usuario.nome;
+    this.perfilTipo.textContent = usuario.perfil;
+    this.usuarioIniciais.textContent = this.pegarIniciais(usuario.nome);
+    if (usuario.perfil === 'admin') this.blocoMenuAdmin.hidden = false;
     if (sessao.dados.nomeEmpresa) {
       this.nomeEmpresaMenu.textContent = sessao.dados.nomeEmpresa;
     }
     this.aoIniciar();
   }
 }
+
 new TelaMovimentacoes();

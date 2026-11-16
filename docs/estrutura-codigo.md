@@ -1,18 +1,19 @@
 # Organização do código
 
-O projeto usa JavaScript puro no navegador e Node.js com Express no servidor. As classes agrupam os dados e as ações de cada parte do sistema. Não há herança nem uma camada de abstrações para consultas: os controladores e serviços usam SQL diretamente.
+O projeto usa JavaScript puro no navegador e Node.js com Express no servidor. As classes agrupam os dados e as ações de cada parte do sistema. Não há herança entre regras do sistema nem ORM para consultas (a única herança técnica é `SqliteSessionStore`, exigida pelo `express-session`): os controladores e serviços usam SQL diretamente.
 
 ## Pastas
 
 | Pasta | Responsabilidade |
 | --- | --- |
-| `client/js/` | Uma classe por tela e classes para API, tema, navegação, diálogos e ajuda. |
+| `client/js/` | Uma classe por tela (incluindo `TelaApresentacao` e `RedirecionadorAuditoria`) e classes para API, tema, navegação, diálogos e ajuda. |
 | `server/src/routes/` | Define os endereços da API e liga cada endereço ao método do controlador. |
+| `server/src/middlewares/` | Classe `ControleAcesso` para exigir login ou perfil administrador nas rotas. |
 | `server/src/controllers/` | Recebe a requisição, confere os dados, consulta o banco e envia a resposta. |
 | `server/src/models/` | Regras de CNH, cadastro de veículo e capacidade do quarto. |
-| `server/src/services/` | Configurações, cálculos dos relatórios, auditoria, notificações, Groq e Telegram. |
-| `server/src/regras/` | Funções de data compartilhadas. |
-| `server/src/db/` | Conexão, tabelas e comandos para criar e preencher o banco. |
+| `server/src/services/` | Configurações, cálculos dos relatórios, auditoria, sessões no SQLite, notificações, Groq e Telegram. |
+| `server/src/regras/` | Classes `Datas` (datas locais) e `Validador` (IDs, textos, login e senha). |
+| `server/src/db/` | Conexão (`ConexaoBanco`), tabelas e scripts `CriadorBanco` / `CargaExemplos`. |
 | `server/test/` | Testes das regras e dos fluxos da API. |
 
 ## Exemplo: cadastro de veículo
@@ -44,11 +45,11 @@ this.form.addEventListener('submit', this.entrar.bind(this));
 
 `Api` centraliza as requisições. A função `chamarApi()` encaminha as chamadas para essa instância. Os eventos de início e fim permitem bloquear o formulário enquanto a requisição está em andamento.
 
-A página de apresentação mantém seus arquivos próprios.
+A página de apresentação usa a classe `TelaApresentacao` com seus próprios estilos e capturas estáticas, sem depender de login nem de chamadas à API.
 
 ## Comentários
 
-Os nomes explicam as ações comuns. Os comentários explicam regras menos evidentes, como a área mínima dos beliches, a comparação de datas locais, a prevenção de avisos repetidos e a cadeia de hashes da auditoria.
+Os nomes explicam as ações comuns. Os comentários explicam regras menos evidentes, como a área mínima dos beliches, a comparação de datas locais, a prevenção de avisos repetidos, as travas de segurança (CSRF/CSP/sessão) e a cadeia de hashes da auditoria.
 
 ## Testes
 
@@ -58,4 +59,4 @@ Na pasta `server`, execute:
 npm test
 ```
 
-Os testes cobrem CNH, área e capacidade dos quartos, placas, quilometragem, permissões, cadastros, estadias, saídas e retornos, manutenção, relatórios e integridade da auditoria. Usam um banco temporário. As chamadas à Groq são simuladas, sem depender de chave ou de acesso à internet.
+Os testes cobrem CNH, área e capacidade dos quartos, placas, quilometragem, permissões, cadastros, estadias, saídas e retornos, manutenção, relatórios, helper de API no navegador (`api.js`), travas de segurança (CSRF, CSP, CORS em produção, rate limit, backup higienizado) e integridade da auditoria. Usam um banco temporário. As chamadas à Groq são simuladas, sem depender de chave ou de acesso à internet.

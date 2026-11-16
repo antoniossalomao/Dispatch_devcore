@@ -277,7 +277,7 @@
 
             <div class="grade-campos duas-colunas borda-abaixo">
               <div class="campo-grupo">
-                <label for="cfg-km-confirmacao" class="campo-label">Confirmação de quilometragem por uso (Regra F11)</label>
+                <label for="cfg-km-confirmacao" class="campo-label">Confirmação de quilometragem por uso</label>
                 <div class="campo-sufixo">
                   <input type="number" id="cfg-km-confirmacao" min="50" step="50">
                   <span>km</span>
@@ -299,7 +299,7 @@
               <label class="switch-linha">
                 <div class="switch-texto">
                   <span class="switch-titulo">Bloquear saída com CNH ou licenciamento vencido</span>
-                  <span class="switch-desc">Impede registrar retirada quando a carteira do motorista ou o documento do veículo venceu (Regras F4 e F12).</span>
+                  <span class="switch-desc">Impede registrar retirada quando a carteira do motorista ou o documento do veículo venceu.</span>
                 </div>
                 <span class="chave">
                   <input type="checkbox" id="cfg-bloquear-doc">
@@ -310,7 +310,7 @@
               <label class="switch-linha">
                 <div class="switch-texto">
                   <span class="switch-titulo">Exibir aviso quando o seguro estiver vencido</span>
-                  <span class="switch-desc">Não bloqueia a saída do veículo, mas registra alerta operacional na retirada (Regra F12).</span>
+                  <span class="switch-desc">Não bloqueia a saída do veículo, mas registra alerta operacional na retirada.</span>
                 </div>
                 <span class="chave">
                   <input type="checkbox" id="cfg-avisar-seguro">
@@ -330,7 +330,7 @@
 
             <div class="grade-campos tres-colunas borda-abaixo">
               <div class="campo-grupo">
-                <label for="cfg-max-leitos" class="campo-label">Máx. de leitos por quarto (A4)</label>
+                <label for="cfg-max-leitos" class="campo-label">Máx. de leitos por quarto</label>
                 <div class="campo-sufixo">
                   <input type="number" id="cfg-max-leitos" min="1" max="20">
                   <span>leitos</span>
@@ -338,7 +338,7 @@
               </div>
 
               <div class="campo-grupo">
-                <label for="cfg-area-cama" class="campo-label">Área mínima por cama (A5)</label>
+                <label for="cfg-area-cama" class="campo-label">Área mínima por cama</label>
                 <div class="campo-sufixo">
                   <input type="number" id="cfg-area-cama" min="1" step="0.5">
                   <span>m²</span>
@@ -346,7 +346,7 @@
               </div>
 
               <div class="campo-grupo">
-                <label for="cfg-area-beliche" class="campo-label">Área mínima por beliche (A5)</label>
+                <label for="cfg-area-beliche" class="campo-label">Área mínima por beliche</label>
                 <div class="campo-sufixo">
                   <input type="number" id="cfg-area-beliche" min="1" step="0.5">
                   <span>m²</span>
@@ -604,7 +604,7 @@
           <div class="bloco">
             <div class="bloco-cabecalho">
               <div>
-                <h2 class="bloco-titulo">Integridade da cadeia de auditoria (Regra U3)</h2>
+                <h2 class="bloco-titulo">Integridade da cadeia de auditoria</h2>
                 <p class="bloco-subtitulo">Cada alteração gera um hash SHA-256 encadeado com a linha anterior para detectar edição externa</p>
               </div>
               <button type="button" id="botao-verificar-log" class="btn-secundario">Verificar agora</button>

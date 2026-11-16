@@ -1,7 +1,8 @@
-// Ações de resumo.
 const db = require('../db/conexao');
 const configuracao = require('../services/Configuracao');
 const notificacoes = require('../services/Notificacoes');
+
+// Monta o painel principal (Visão Geral) com indicadores de frota, leitos, últimas saídas e alertas.
 class ControladorResumo {
   constructor() {
     this.titulosAviso = {
@@ -23,16 +24,17 @@ class ControladorResumo {
 
   async consultar(req, res) {
     if (!req.session.usuario) {
-      return res.status(401).json({
-        erro: 'Faça login para acessar.'
-      });
+      return res.status(401).json({ erro: 'Faça login para acessar.' });
     }
+
     const totalVeiculos = db
       .prepare('SELECT COUNT(*) AS total FROM veiculo WHERE ativo = 1')
       .get().total;
     const totalAlojamentos = db
       .prepare('SELECT COUNT(*) AS total FROM alojamento WHERE ativo = 1')
       .get().total;
+
+    // Se o banco ainda não tem veículos nem alojamentos cadastrados, exibe um retrato de exemplo para a tela não abrir zerada.
     if (totalVeiculos === 0 && totalAlojamentos === 0) {
       return res.json({
         exemplo: true,
@@ -131,6 +133,7 @@ class ControladorResumo {
         ]
       });
     }
+
     const veiculosEmUso = db
       .prepare(
         'SELECT COUNT(DISTINCT u.veiculo_id) AS total FROM uso_veiculo u ' +
@@ -145,10 +148,8 @@ class ControladorResumo {
           'WHERE v.ativo = 1 AND m.fim IS NULL'
       )
       .get().total;
-    let veiculosDisponiveis = totalVeiculos - veiculosEmUso - veiculosManutencao;
-    if (veiculosDisponiveis < 0) {
-      veiculosDisponiveis = 0;
-    }
+    const veiculosDisponiveis = Math.max(0, totalVeiculos - veiculosEmUso - veiculosManutencao);
+
     const totalLeitos = db
       .prepare(
         'SELECT COUNT(*) AS total FROM leito l ' +
@@ -166,10 +167,9 @@ class ControladorResumo {
           'WHERE a.ativo = 1 AND e.fim IS NULL'
       )
       .get().total;
-    let vagasDisponiveis = totalLeitos - leitosOcupados;
-    if (vagasDisponiveis < 0) {
-      vagasDisponiveis = 0;
-    }
+    const vagasDisponiveis = Math.max(0, totalLeitos - leitosOcupados);
+
+    // Junta os últimos movimentos de alojamentos e frota numa mesma linha do tempo.
     const ultimas = db
       .prepare(
         "SELECT p.nome AS colaborador, p.cargo AS cargo, 'alojamento' AS categoria, " +
@@ -196,6 +196,7 @@ class ControladorResumo {
           'ORDER BY data_ordem DESC LIMIT 6'
       )
       .all();
+
     const listaAlojamentos = db
       .prepare(
         'SELECT a.nome, a.cidade, ' +
@@ -209,9 +210,11 @@ class ControladorResumo {
           'GROUP BY a.id'
       )
       .all();
+
     if (notificacoes.precisaVerificar()) {
       await notificacoes.verificar(configuracao.lerConfig());
     }
+
     const ehAdmin = req.session.usuario && req.session.usuario.perfil === 'admin';
     const filtroAlerta = ehAdmin ? 'WHERE lida = 0' : "WHERE lida = 0 AND tipo != 'log_adulterado'";
     const alertas = db
@@ -221,13 +224,12 @@ class ControladorResumo {
           " ORDER BY CASE severidade WHEN 'critico' THEN 0 ELSE 1 END, id DESC LIMIT 10"
       )
       .all()
-      .map((n) => {
-        return {
-          nivel: n.severidade === 'critico' ? 'problema' : 'atencao',
-          titulo: this.titulosAviso[n.tipo] || 'Aviso',
-          detalhe: n.mensagem
-        };
-      });
+      .map((aviso) => ({
+        nivel: aviso.severidade === 'critico' ? 'problema' : 'atencao',
+        titulo: this.titulosAviso[aviso.tipo] || 'Aviso',
+        detalhe: aviso.mensagem
+      }));
+
     res.json({
       exemplo: false,
       nomeEmpresa: configuracao.lerConfig().nomeEmpresa,
@@ -245,4 +247,5 @@ class ControladorResumo {
     });
   }
 }
+
 module.exports = ControladorResumo;

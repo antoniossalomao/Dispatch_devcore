@@ -1,4 +1,4 @@
-// Endereços da API de autenticacao.
+// Rotas de entrada, saída, conferência da sessão e cadastro por convite.
 const express = require('express');
 const ControladorAutenticacao = require('../controllers/ControladorAutenticacao');
 

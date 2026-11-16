@@ -1,4 +1,5 @@
-// Armazena sessões autenticadas no SQLite para persistência e revogação imediata.
+// Guarda os logins ativos dentro do SQLite para ninguém perder a sessão se o servidor reiniciar
+// e permitir encerrar sessões na hora quando um usuário é bloqueado ou troca a senha.
 const session = require('express-session');
 const db = require('../db/conexao');
 
@@ -7,6 +8,7 @@ class SqliteSessionStore extends session.Store {
     super();
     this.db = conexao;
     this.ttlMs = opcoes.ttlMs || 1000 * 60 * 60 * 8;
+
     this.db.exec(
       'CREATE TABLE IF NOT EXISTS sessao (' +
         'sid TEXT PRIMARY KEY, ' +
@@ -17,10 +19,13 @@ class SqliteSessionStore extends session.Store {
         'CREATE INDEX IF NOT EXISTS idx_sessao_usuario ON sessao (usuario_id);' +
         'CREATE INDEX IF NOT EXISTS idx_sessao_expira ON sessao (expira_em);'
     );
-    this._timerLimpeza = setInterval(() => {
+
+    // Faxina automática a cada 15 minutos para apagar sessões antigas que já venceram.
+    this.timerLimpeza = setInterval(() => {
       this.limparExpiradas();
     }, 15 * 60 * 1000);
-    if (this._timerLimpeza.unref) this._timerLimpeza.unref();
+    // O .unref() avisa o Node para não segurar o processo aberto só por causa desse timer na hora de fechar.
+    if (this.timerLimpeza.unref) this.timerLimpeza.unref();
   }
 
   get(sid, cb) {
@@ -29,6 +34,7 @@ class SqliteSessionStore extends session.Store {
         .prepare('SELECT dados, expira_em FROM sessao WHERE sid = ?')
         .get(sid);
       if (!linha) return cb(null, null);
+
       if (linha.expira_em <= Date.now()) {
         this.db.prepare('DELETE FROM sessao WHERE sid = ?').run(sid);
         return cb(null, null);
@@ -50,6 +56,7 @@ class SqliteSessionStore extends session.Store {
           ? Number(sess.usuario.id)
           : null;
       const dadosJson = JSON.stringify(sess);
+
       this.db
         .prepare(
           'INSERT INTO sessao (sid, usuario_id, dados, expira_em) VALUES (?, ?, ?, ?) ' +
@@ -81,6 +88,7 @@ class SqliteSessionStore extends session.Store {
         sess && sess.usuario && Number.isInteger(Number(sess.usuario.id))
           ? Number(sess.usuario.id)
           : null;
+
       this.db
         .prepare('UPDATE sessao SET expira_em = ?, usuario_id = ? WHERE sid = ?')
         .run(expiraEm, uid, sid);
@@ -94,13 +102,15 @@ class SqliteSessionStore extends session.Store {
     try {
       this.db.prepare('DELETE FROM sessao WHERE expira_em <= ?').run(Date.now());
     } catch (_) {
-      // Banco pode já ter sido fechado durante encerramento de testes.
+      // Se o banco já fechou durante o desligamento ou nos testes, apenas ignora.
     }
   }
 
+  // Derruba todas as sessões de um usuário (opcionalmente mantendo a sessão atual se ele mesmo trocou a senha).
   revogarPorUsuario(usuarioId, excetoSid) {
     const uid = Number(usuarioId);
     if (!Number.isInteger(uid) || uid <= 0) return;
+
     if (excetoSid) {
       this.db.prepare('DELETE FROM sessao WHERE usuario_id = ? AND sid != ?').run(uid, excetoSid);
     } else {

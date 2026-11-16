@@ -1,4 +1,4 @@
-// Serviço de ia.
+// Faz a ponte com a API da Groq para responder perguntas do resumo e melhorar o texto dos alertas.
 class InteligenciaArtificial {
   constructor() {
     this.modelo = process.env.GROQ_MODELO || 'llama-3.3-70b-versatile';
@@ -13,7 +13,7 @@ class InteligenciaArtificial {
     if (!this.configurada()) {
       throw new Error('IA desligada: defina GROQ_API_KEY no server/.env para usar este recurso.');
     }
-    const o = opcoes || {};
+    const config = opcoes || {};
     let resposta;
     try {
       resposta = await fetch(this.urlGroq, {
@@ -25,9 +25,10 @@ class InteligenciaArtificial {
         body: JSON.stringify({
           model: this.modelo,
           messages: mensagens,
-          temperature: o.temperatura === undefined ? 0.2 : o.temperatura,
-          max_tokens: o.maxTokens || 700
+          temperature: config.temperatura === undefined ? 0.2 : config.temperatura,
+          max_tokens: config.maxTokens || 700
         }),
+        // Cancela a chamada se passar de 10 segundos para o sistema não ficar travado esperando resposta externa.
         signal: AbortSignal.timeout(10000)
       });
     } catch (erro) {
@@ -37,25 +38,24 @@ class InteligenciaArtificial {
           : 'Não foi possível falar com a Groq (falha de rede).'
       );
     }
-    const dados = await resposta.json().catch(() => {
-      return {};
-    });
+
+    const dados = await resposta.json().catch(() => ({}));
     if (!resposta.ok) {
       throw new Error(
         'A Groq recusou o pedido: ' + ((dados.error && dados.error.message) || resposta.status)
       );
     }
+
     return String(
       (dados.choices && dados.choices[0] && dados.choices[0].message.content) || ''
     ).trim();
   }
 
-  // Se a Groq falhar, a notificação usa o texto original.
-
+  // Tenta deixar o alerta mais curto e legível antes de mandar no Telegram; se falhar, manda o texto original.
   async redigirAlerta(texto) {
     if (!this.configurada()) return texto;
     try {
-      const r = await this.perguntar(
+      const textoMelhorado = await this.perguntar(
         [
           {
             role: 'system',
@@ -72,10 +72,11 @@ class InteligenciaArtificial {
           temperatura: 0.1
         }
       );
-      return r || texto;
+      return textoMelhorado || texto;
     } catch (erro) {
       return texto;
     }
   }
 }
+
 module.exports = new InteligenciaArtificial();

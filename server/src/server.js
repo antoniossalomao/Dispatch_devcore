@@ -1,4 +1,4 @@
-// servidor principal do Dispatch: entrega as telas do client e responde a API
+// Servidor principal do Dispatch: entrega as páginas do site (pasta client) e responde as rotas da API.
 const crypto = require('crypto');
 const path = require('path');
 const express = require('express');
@@ -19,54 +19,64 @@ const configuracao = require('./services/Configuracao');
 const notificacoes = require('./services/Notificacoes');
 const sessionStore = require('./services/SessionStore');
 
-const ORIGENS_DEV_PERMITIDAS = new Set([
-  'http://localhost:5500',
-  'http://127.0.0.1:5500',
-  'http://[::1]:5500',
-  'http://localhost:5501',
-  'http://127.0.0.1:5501',
-  'http://[::1]:5501'
-]);
-
-const METODOS_MUTACAO = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
-
-function extrairOrigemUrl(valor) {
-  try {
-    const u = new URL(String(valor));
-    return u.origin && u.origin !== 'null' ? u.origin : null;
-  } catch (_) {
-    return null;
-  }
-}
-
-function resolverSegredoSessao() {
-  const configurado = (process.env.SESSION_SECRET || '').trim();
-  if (configurado && configurado !== 'dispatch-devcore-segredo') {
-    return configurado;
-  }
-  console.warn(
-    '[SEGURANÇA] SESSION_SECRET ausente ou padrão. Usando chave temporária aleatória (sessões serão encerradas ao reiniciar).'
-  );
-  return crypto.randomBytes(48).toString('hex');
-}
-
-function criarHandlerLimite(mensagem) {
-  return (req, res) => {
-    res.status(429).json({ erro: mensagem });
-  };
-}
-
 class Servidor {
   constructor() {
     this.app = express();
     this.porta = process.env.PORT || 3001;
-    this.isProd =
+    // No Azure ou quando NODE_ENV está como production, ligamos as regras mais rígidas de publicação.
+    this.emProducao =
       process.env.NODE_ENV === 'production' || Boolean(process.env.WEBSITE_SITE_NAME);
 
+    // Portas locais usadas pela extensão Live Server do VS Code só durante testes no PC.
+    this.origensDev = new Set([
+      'http://localhost:5500',
+      'http://127.0.0.1:5500',
+      'http://[::1]:5500',
+      'http://localhost:5501',
+      'http://127.0.0.1:5501',
+      'http://[::1]:5501'
+    ]);
+    this.metodosQueAlteram = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+
+    // Esconde que o servidor usa Express para não dar dicas de graça sobre qual tecnologia está rodando.
     this.app.disable('x-powered-by');
+    // No Azure, a conexão passa pelo proxy deles; isso faz o Express ler o HTTPS e o IP reais do visitante.
     this.app.set('trust proxy', 1);
 
-    const connectSrc = this.isProd
+    this.configurarCabecalhosSeguranca();
+    this.configurarCors();
+    // Limita o tamanho do JSON recebido para evitar que travem o servidor enviando textos gigantes.
+    this.app.use(express.json({ limit: '100kb' }));
+    this.configurarSessao();
+    this.configurarProtecaoCsrf();
+    this.configurarLimitesRequisicao();
+    this.configurarRotas();
+    this.configurarTratamentoErros();
+  }
+
+  extrairOrigemUrl(valor) {
+    try {
+      const url = new URL(String(valor));
+      return url.origin && url.origin !== 'null' ? url.origin : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  escolherSegredoSessao() {
+    const configurado = (process.env.SESSION_SECRET || '').trim();
+    if (configurado && configurado !== 'dispatch-devcore-segredo') {
+      return configurado;
+    }
+    console.warn(
+      'Aviso: SESSION_SECRET não foi configurado no .env. Gerando uma chave temporária agora (quem estiver logado cai se o servidor reiniciar).'
+    );
+    return crypto.randomBytes(48).toString('hex');
+  }
+
+  // O Helmet coloca regras de proteção no navegador (barra script invasor, proíbe abrir o site dentro de iframe etc.).
+  configurarCabecalhosSeguranca() {
+    const connectSrc = this.emProducao
       ? ["'self'"]
       : [
           "'self'",
@@ -92,21 +102,24 @@ class Servidor {
             baseUri: ["'self'"],
             formAction: ["'self'"],
             frameAncestors: ["'none'"],
-            upgradeInsecureRequests: this.isProd ? [] : null
+            upgradeInsecureRequests: this.emProducao ? [] : null
           }
         },
         frameguard: { action: 'deny' },
-        hsts: this.isProd ? undefined : false,
+        hsts: this.emProducao ? undefined : false,
         referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
       })
     );
+  }
 
-    // Libera CORS apenas para as portas locais do Live Server fora de produção.
+  // O navegador bloqueia por padrão chamadas entre portas/sites diferentes (regra chamada CORS).
+  // Em produção tudo roda no mesmo endereço; fora de produção só liberamos as portas locais do Live Server.
+  configurarCors() {
     this.app.use((req, res, next) => {
       const origem = req.headers.origin;
       if (origem) {
         res.vary('Origin');
-        if (!this.isProd && ORIGENS_DEV_PERMITIDAS.has(origem)) {
+        if (!this.emProducao && this.origensDev.has(origem)) {
           res.setHeader('Access-Control-Allow-Origin', origem);
           res.setHeader('Access-Control-Allow-Credentials', 'true');
           res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -116,7 +129,7 @@ class Servidor {
           }
         } else if (req.method === 'OPTIONS') {
           const hostAtual = req.get('host');
-          const origemExtraida = extrairOrigemUrl(origem);
+          const origemExtraida = this.extrairOrigemUrl(origem);
           const mesmaOrigem =
             Boolean(hostAtual && origemExtraida) &&
             origemExtraida === req.protocol + '://' + hostAtual;
@@ -130,13 +143,15 @@ class Servidor {
       }
       next();
     });
+  }
 
-    this.app.use(express.json({ limit: '100kb' }));
-
+  // Configura o cookie que mantém a pessoa logada:
+  // httpOnly não deixa scripts da tela lerem o cookie e sameSite='lax' ajuda a impedir envio por outros sites.
+  configurarSessao() {
     this.app.use(
       session({
         name: 'dispatch.sid',
-        secret: resolverSegredoSessao(),
+        secret: this.escolherSegredoSessao(),
         store: sessionStore,
         proxy: true,
         resave: false,
@@ -150,28 +165,31 @@ class Servidor {
         }
       })
     );
+  }
 
-    // Proteção CSRF para rotas mutáveis da API usando Origin / Referer / Sec-Fetch-Site.
+  // Proteção contra CSRF (quando outro site tenta enviar uma ação disfarçada usando seu login aberto).
+  // Para qualquer rota da API que cria, edita ou apaga, conferimos de qual site o pedido veio.
+  configurarProtecaoCsrf() {
     this.app.use('/api', (req, res, next) => {
-      if (!METODOS_MUTACAO.has(req.method)) return next();
+      if (!this.metodosQueAlteram.has(req.method)) return next();
 
       const secFetchSite = String(req.headers['sec-fetch-site'] || '').toLowerCase();
       const origemBruta = req.headers.origin;
-      const origem = origemBruta ? extrairOrigemUrl(origemBruta) : null;
+      const origem = origemBruta ? this.extrairOrigemUrl(origemBruta) : null;
       const refererOrigem =
-        !origemBruta && req.headers.referer ? extrairOrigemUrl(req.headers.referer) : null;
-      const origemReq = origem || refererOrigem;
+        !origemBruta && req.headers.referer ? this.extrairOrigemUrl(req.headers.referer) : null;
+      const origemPedido = origem || refererOrigem;
 
       if (origemBruta && !origem) {
         return res.status(403).json({ erro: 'Origem da requisição inválida.' });
       }
 
-      if (origemReq) {
+      if (origemPedido) {
         const hostAtual = req.get('host');
         const origemPropria = hostAtual ? req.protocol + '://' + hostAtual : null;
         const permitida =
-          Boolean(origemPropria && origemReq === origemPropria) ||
-          (!this.isProd && ORIGENS_DEV_PERMITIDAS.has(origemReq));
+          Boolean(origemPropria && origemPedido === origemPropria) ||
+          (!this.emProducao && this.origensDev.has(origemPedido));
         if (!permitida) {
           return res.status(403).json({ erro: 'Origem da requisição não autorizada.' });
         }
@@ -183,54 +201,66 @@ class Servidor {
       }
       next();
     });
+  }
 
-    const limitadorApi = rateLimit({
-      windowMs: 15 * 60 * 1000,
+  criarRespostaLimite(mensagem) {
+    return (req, res) => {
+      res.status(429).json({ erro: mensagem });
+    };
+  }
+
+  // Freio para impedir tentativas seguidas de adivinhar senha ou sobrecarregar a IA/API.
+  configurarLimitesRequisicao() {
+    const janela15Min = 15 * 60 * 1000;
+
+    const limiteGeralApi = rateLimit({
+      windowMs: janela15Min,
       limit: 600,
       standardHeaders: 'draft-8',
       legacyHeaders: false,
-      handler: criarHandlerLimite(
+      handler: this.criarRespostaLimite(
         'Muitas requisições em sequência. Aguarde alguns instantes e tente novamente.'
       )
     });
 
-    const limitadorLogin = rateLimit({
-      windowMs: 15 * 60 * 1000,
+    const limiteLogin = rateLimit({
+      windowMs: janela15Min,
       limit: 10,
       skipSuccessfulRequests: true,
       standardHeaders: 'draft-8',
       legacyHeaders: false,
-      handler: criarHandlerLimite(
+      handler: this.criarRespostaLimite(
         'Muitas tentativas de login. Aguarde alguns minutos e tente novamente.'
       )
     });
 
-    const limitadorCadastro = rateLimit({
-      windowMs: 15 * 60 * 1000,
+    const limiteCadastro = rateLimit({
+      windowMs: janela15Min,
       limit: 10,
       standardHeaders: 'draft-8',
       legacyHeaders: false,
-      handler: criarHandlerLimite(
+      handler: this.criarRespostaLimite(
         'Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.'
       )
     });
 
-    const limitadorIa = rateLimit({
-      windowMs: 15 * 60 * 1000,
+    const limiteIa = rateLimit({
+      windowMs: janela15Min,
       limit: 30,
       standardHeaders: 'draft-8',
       legacyHeaders: false,
-      handler: criarHandlerLimite(
+      handler: this.criarRespostaLimite(
         'Limite de consultas à IA atingido. Aguarde alguns minutos e tente novamente.'
       )
     });
 
-    this.app.use('/api', limitadorApi);
-    this.app.use('/api/auth/login', limitadorLogin);
-    this.app.use('/api/auth/cadastro', limitadorCadastro);
-    this.app.use('/api/ia', limitadorIa);
+    this.app.use('/api', limiteGeralApi);
+    this.app.use('/api/auth/login', limiteLogin);
+    this.app.use('/api/auth/cadastro', limiteCadastro);
+    this.app.use('/api/ia', limiteIa);
+  }
 
-    // rotas da API
+  configurarRotas() {
     this.app.use('/api/auth', rotasAuth);
     this.app.use('/api/resumo', rotasResumo);
     this.app.use('/api/configuracoes', rotasConfiguracoes);
@@ -244,19 +274,22 @@ class Servidor {
     this.app.use('/api/notificacoes', rotasNotificacoes);
 
     this.app.use('/api', (req, res) => {
-      res.status(404).json({ erro: 'Endpoint não encontrado.' });
+      res.status(404).json({ erro: 'Endereço da API não encontrado.' });
     });
 
-    // entrega os arquivos html, css e js da pasta client
+    // Entrega os arquivos HTML, CSS e JS das telas que ficam na pasta client.
     this.pastaClient = path.join(__dirname, '..', '..', 'client');
     this.app.use(express.static(this.pastaClient));
+  }
 
+  // Trata erros inesperados no fim da fila para nunca mostrar detalhes internos do sistema ao usuário.
+  configurarTratamentoErros() {
     this.app.use((err, req, res, next) => {
       if (err && err.type === 'entity.parse.failed') {
-        return res.status(400).json({ erro: 'Corpo JSON inválido.' });
+        return res.status(400).json({ erro: 'Os dados enviados não estão em formato JSON válido.' });
       }
       if (err && err.type === 'entity.too.large') {
-        return res.status(413).json({ erro: 'Payload muito grande.' });
+        return res.status(413).json({ erro: 'Os dados enviados são grandes demais para este pedido.' });
       }
       console.error('Erro não tratado no servidor:', err);
       if (res.headersSent) return next(err);
@@ -267,12 +300,13 @@ class Servidor {
   iniciar() {
     return this.app.listen(this.porta, () => {
       console.log('Servidor rodando em http://localhost:' + this.porta);
-      // confere os avisos assim que o server liga
+      // Confere os avisos pendentes assim que o servidor liga.
       notificacoes.verificar(configuracao.lerConfig()).catch((erro) => {
         console.log('Não foi possível verificar os avisos: ' + erro.message);
       });
     });
   }
 }
+
 module.exports = Servidor;
 if (require.main === module) new Servidor().iniciar();

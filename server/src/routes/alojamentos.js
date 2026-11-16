@@ -1,12 +1,13 @@
-// Endereços da API de alojamentos.
+// Rotas de alojamentos, quartos, hospedagens e ocorrências.
 const express = require('express');
 const ControladorAlojamentos = require('../controllers/ControladorAlojamentos');
-const { exigirLogin } = require('../middlewares/autenticacao');
+const controleAcesso = require('../middlewares/autenticacao');
 
 const controlador = new ControladorAlojamentos();
 const router = express.Router();
 
-router.use(exigirLogin);
+// Todas as rotas abaixo só respondem para quem estiver logado.
+router.use(controleAcesso.exigirLogin);
 router.post('/estadias', controlador.alojar.bind(controlador));
 router.put('/estadias/:id/saida', controlador.registrarSaida.bind(controlador));
 router.put('/ocorrencias/:id/resolver', controlador.resolverOcorrencia.bind(controlador));
