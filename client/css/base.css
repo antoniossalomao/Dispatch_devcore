@@ -24,7 +24,7 @@
   --texto: var(--op-texto);
   --texto-fraco: var(--op-secundario);
   --placeholder: var(--op-mudo);
-  --azul: var(--dc-ouro);
+  --azul: var(--dc-destaque);
   --erro-fundo: #35110f;
   --erro-texto: #ee6f68;
   --sucesso-fundo: #0d2e1e;

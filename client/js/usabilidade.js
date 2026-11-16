@@ -60,15 +60,28 @@ class Navegacao {
       this.mostrarMenu(false);
     });
 
+    this.prepararTela();
+    this.configurarEnvios();
+  }
+
+  // Roda de novo a cada troca de tela na casca (js/app/App.js). Cada elemento leva uma marca
+  // (data-ui-nav) para não ganhar um segundo botão de limpar ou um segundo conjunto de eventos.
+  prepararTela() {
     this.configurarBuscas();
     this.configurarGruposDeAbas();
     this.configurarFiltros();
     this.configurarTabelas();
-    this.configurarEnvios();
+  }
+
+  jaPreparado(elemento) {
+    if (elemento.dataset.uiNav) return true;
+    elemento.dataset.uiNav = '1';
+    return false;
   }
 
   configurarBuscas() {
     document.querySelectorAll('.busca-caixa input[type="text"]').forEach((campo) => {
+      if (this.jaPreparado(campo)) return;
       const limpar = document.createElement('button');
       limpar.type = 'button';
       limpar.className = 'ui-limpar-busca';
@@ -102,6 +115,7 @@ class Navegacao {
     document
       .querySelectorAll('.config-nav, .rel-abas, .gaveta-abas .filtro-abas')
       .forEach((grupo, indice) => {
+        if (this.jaPreparado(grupo)) return;
         grupo.id = grupo.id || 'ui-abas-' + indice;
         if (grupo.matches('.config-nav')) {
           this.prepararAbas(
@@ -130,6 +144,7 @@ class Navegacao {
 
   configurarFiltros() {
     document.querySelectorAll('.filtro-abas:not([role="tablist"])').forEach((grupo) => {
+      if (this.jaPreparado(grupo)) return;
       grupo.setAttribute('role', 'group');
       grupo.setAttribute('aria-label', 'Filtros da lista');
       const botoes = grupo.querySelectorAll('button');
@@ -153,6 +168,7 @@ class Navegacao {
 
   configurarTabelas() {
     document.querySelectorAll('.tabela-area').forEach((area, indice) => {
+      if (this.jaPreparado(area)) return;
       const tabela = area.querySelector('table');
       if (!tabela) return;
 
@@ -322,4 +338,4 @@ class Navegacao {
   }
 }
 
-new Navegacao();
+window.navegacao = new Navegacao();

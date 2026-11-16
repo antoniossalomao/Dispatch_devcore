@@ -1,6 +1,8 @@
 // Tela de alojamentos: cartões por unidade, gaveta com mapa de quartos/leitos, entradas, saídas e ocorrências.
-class TelaAlojamentos {
-  constructor() {
+export default class TelaAlojamentos {
+  // ctx vem da casca (js/app/App.js): sessão em cache, sinal para soltar eventos globais ao sair da tela e navegação sem recarregar.
+  constructor(ctx) {
+    this.ctx = ctx;
     this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
     this.usuarioIniciais = document.getElementById('usuario-iniciais');
     this.perfilNome = document.getElementById('perfil-nome');
@@ -107,10 +109,6 @@ class TelaAlojamentos {
       .getElementById('form-ocorrencia')
       .addEventListener('submit', this.salvarOcorrencia.bind(this));
 
-    this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', { metodo: 'POST' });
-      window.location.href = 'login';
-    });
 
     document.querySelectorAll('.menu-em-breve').forEach((link) => {
       link.addEventListener('click', (evento) => {
@@ -602,7 +600,7 @@ class TelaAlojamentos {
   }
 
   async iniciar() {
-    const sessao = await chamarApi('/api/auth/eu');
+    const sessao = await this.ctx.sessao();
     if (!sessao.ok) {
       window.location.href = 'login';
       return;
@@ -620,5 +618,3 @@ class TelaAlojamentos {
     this.carregarAlojamentos();
   }
 }
-
-new TelaAlojamentos();

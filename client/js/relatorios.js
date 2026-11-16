@@ -1,6 +1,8 @@
 // Tela de relatórios: ocupação média, uso/ociosidade da frota, gargalos, consulta de condutor (multas) e perguntas à IA.
-class TelaRelatorios {
-  constructor() {
+export default class TelaRelatorios {
+  // ctx vem da casca (js/app/App.js): sessão em cache, sinal para soltar eventos globais ao sair da tela e navegação sem recarregar.
+  constructor(ctx) {
+    this.ctx = ctx;
     this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
     this.usuarioIniciais = document.getElementById('usuario-iniciais');
     this.perfilNome = document.getElementById('perfil-nome');
@@ -49,10 +51,6 @@ class TelaRelatorios {
       this.perguntarIa('/api/ia/resumo', {});
     });
 
-    this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', { metodo: 'POST' });
-      window.location.href = 'login';
-    });
   }
 
   async consultarCondutor(evento) {
@@ -177,6 +175,12 @@ class TelaRelatorios {
     );
   }
 
+  // Percentual no formato brasileiro e com uma casa só quando ela existe: "29,4" e "13", nunca "29.4".
+  formatarPct(valor) {
+    const numero = Number(valor) || 0;
+    return numero.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+  }
+
   aplicarLarguraBarra(container, pct) {
     const limitado = Math.max(0, Math.min(100, Number(pct) || 0));
     const preench = container.querySelector('.aloj-barra-preench');
@@ -210,7 +214,7 @@ class TelaRelatorios {
         '</span></div>' +
         this.barra() +
         '<div class="aloj-numeros"><span><strong>' +
-        alojamento.ocupacao_media_pct +
+        this.formatarPct(alojamento.ocupacao_media_pct) +
         '%</strong> de ocupação média no período</span>' +
         '<span>' +
         alojamento.ocupados_agora +
@@ -260,9 +264,9 @@ class TelaRelatorios {
         '<td class="celula-barra">' +
         this.barra() +
         '<span class="rel-pct">' +
-        veiculo.utilizacao_pct +
+        this.formatarPct(veiculo.utilizacao_pct) +
         '% em uso · ' +
-        veiculo.ociosidade_pct +
+        this.formatarPct(veiculo.ociosidade_pct) +
         '% ocioso</span></td>' +
         '<td class="num">' +
         (veiculo.dias_sem_uso === null ? '—' : veiculo.dias_sem_uso + ' dias') +
@@ -362,7 +366,7 @@ class TelaRelatorios {
   }
 
   async iniciar() {
-    const sessao = await chamarApi('/api/auth/eu');
+    const sessao = await this.ctx.sessao();
     if (!sessao.ok) {
       window.location.href = 'login';
       return;
@@ -379,5 +383,3 @@ class TelaRelatorios {
     this.aoIniciar();
   }
 }
-
-new TelaRelatorios();

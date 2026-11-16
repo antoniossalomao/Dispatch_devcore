@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/dispatch-icone.svg">
   <title>Dispatch - Cadastro</title>
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/login.css">
@@ -12,56 +13,61 @@
 
   <div class="login-pagina">
     <div class="login-card cadastro-card">
-
-      <!-- lado esquerdo igual ao do login pra manter a identidade visual -->
       <div class="login-lado">
-        <h1 class="login-logo">Dispatch</h1>
+        <div class="login-marca">
+          <span class="login-marca-icone" aria-hidden="true"></span>
+          <h1 class="login-logo">Dispatch</h1>
+          <p class="login-texto">Pessoas, alojamentos e frota da obra num lugar só</p>
 
-        <div>
-          <p class="login-chamada">Crie seu acesso no sistema</p>
-          <p class="login-texto">Cadastre seu usuário para acompanhar os colaboradores, a ocupação dos alojamentos e a movimentação da frota.</p>
+          <ul class="login-recursos">
+            <li><span class="login-recurso-icone"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20V8M2 16h20v4M22 16v-3a3 3 0 0 0-3-3h-8v6"/><circle cx="6.5" cy="12.5" r="1.5"/></svg></span>Quem está em cada leito</li>
+            <li><span class="login-recurso-icone"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="6" width="14" height="10" rx="1"/><path d="M15 9h4l3 3.5V16h-7V9z"/><circle cx="5.5" cy="17.5" r="2"/><circle cx="18.5" cy="17.5" r="2"/></svg></span>Retiradas, devoluções e quilometragem</li>
+            <li><span class="login-recurso-icone"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg></span>Histórico de cada movimentação</li>
+          </ul>
         </div>
+        <p class="login-assinatura">Desenvolvido pelo DevCore</p>
       </div>
 
       <!-- lado direito com o formulario de cadastro -->
       <div class="login-entrar cadastro-entrar">
-        <h2 class="login-titulo">Criar sua conta</h2>
-        <p class="login-subtitulo cadastro-subtitulo">Preencha os campos abaixo para criar sua conta</p>
+        <div class="login-caixa">
+          <h2 class="login-titulo">Criar conta</h2>
+          <p class="login-subtitulo cadastro-subtitulo">Use o código de convite do administrador</p>
 
-        <div id="cadastro-desativado" class="login-erro" role="status" hidden>
-          Auto-cadastro público desativado. Solicite seu acesso a um administrador.
-        </div>
-
-        <form id="form-cadastro" class="login-form cadastro-form" hidden>
-
-          <label for="codigo">Código de convite</label>
-          <input type="text" id="codigo" aria-describedby="mensagem-erro" autocomplete="one-time-code" placeholder="Código fornecido pelo administrador">
-
-          <label for="nome">Nome completo</label>
-          <input type="text" id="nome" aria-describedby="mensagem-erro" autocomplete="name" placeholder="Digite seu nome">
-
-          <label for="usuario">Usuário</label>
-          <input type="text" id="usuario" aria-describedby="mensagem-erro" autocomplete="username" placeholder="Escolha um nome de usuário">
-
-          <label for="senha">Senha</label>
-          <input type="password" id="senha" aria-describedby="mensagem-erro" autocomplete="new-password" placeholder="Mínimo de 8 caracteres">
-
-          <label for="confirmar-senha">Confirmar senha</label>
-          <input type="password" id="confirmar-senha" aria-describedby="mensagem-erro" autocomplete="new-password" placeholder="Repita a senha">
-
-          <div class="login-mostrar">
-            <input type="checkbox" id="mostrar-senha">
-            <label for="mostrar-senha">Mostrar senhas</label>
+          <div id="cadastro-desativado" class="login-erro" role="status" hidden>
+            Auto-cadastro público desativado. Solicite seu acesso a um administrador.
           </div>
 
-          <p id="mensagem-erro" class="login-erro" role="alert" tabindex="-1" hidden></p>
+          <form id="form-cadastro" class="login-form cadastro-form" hidden>
 
-          <button type="submit" id="botao-cadastrar" class="login-botao">Criar conta</button>
-        </form>
+            <label for="codigo">Código de convite</label>
+            <input type="text" id="codigo" aria-describedby="mensagem-erro" autocomplete="one-time-code" placeholder="Código fornecido pelo administrador">
 
-        <p class="login-ajuda">Já tem uma conta? <a href="login" class="login-link">Entrar</a></p>
+            <label for="nome">Nome completo</label>
+            <input type="text" id="nome" aria-describedby="mensagem-erro" autocomplete="name" placeholder="Digite seu nome">
+
+            <label for="usuario">Usuário</label>
+            <input type="text" id="usuario" aria-describedby="mensagem-erro" autocomplete="username" placeholder="Escolha um nome de usuário">
+
+            <label for="senha">Senha</label>
+            <input type="password" id="senha" aria-describedby="mensagem-erro" autocomplete="new-password" placeholder="Mínimo de 8 caracteres">
+
+            <label for="confirmar-senha">Confirmar senha</label>
+            <input type="password" id="confirmar-senha" aria-describedby="mensagem-erro" autocomplete="new-password" placeholder="Repita a senha">
+
+            <div class="login-mostrar">
+              <input type="checkbox" id="mostrar-senha">
+              <label for="mostrar-senha">Mostrar senhas</label>
+            </div>
+
+            <p id="mensagem-erro" class="login-erro" role="alert" tabindex="-1" hidden></p>
+
+            <button type="submit" id="botao-cadastrar" class="login-botao">Criar conta</button>
+          </form>
+
+          <p class="login-ajuda">Já tem uma conta? <a href="login" class="login-link">Entrar</a></p>
+        </div>
       </div>
-
     </div>
   </div>
 

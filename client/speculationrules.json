@@ -1,8 +1,0 @@
-{
-  "prefetch": [
-    {
-      "where": { "selector_matches": ".menu-item, .menu-lateral a" },
-      "eagerness": "moderate"
-    }
-  ]
-}

@@ -708,6 +708,40 @@ test('CORS em produção, proxy HTTPS do Azure e rate limit funcionam juntos', a
   }
 });
 
+test('telas do sistema abrem a casca única e endereços antigos redirecionam', async () => {
+  const servidor = new Servidor().app.listen(0, '127.0.0.1');
+  await new Promise((ok) => servidor.once('listening', ok));
+  const endereco = 'http://127.0.0.1:' + servidor.address().port;
+  const pegar = (rota) => fetch(endereco + rota, { redirect: 'manual' });
+  try {
+    const telas = ['resumo', 'colaboradores', 'alojamentos', 'frota', 'movimentacoes', 'relatorios', 'configuracoes'];
+    for (const tela of telas) {
+      const resposta = await pegar('/' + tela);
+      assert.equal(resposta.status, 200, tela);
+      const texto = await resposta.text();
+      assert.match(texto, /js\/app\/App\.js/, tela + ' deve entregar a casca');
+      assert.equal(resposta.headers.get('cache-control'), 'no-cache');
+
+      const fragmento = await pegar('/telas/' + tela + '.html');
+      assert.equal(fragmento.status, 200, 'fragmento ' + tela);
+      assert.match(await fragmento.text(), /data-parte="conteudo"/);
+    }
+
+    const antigo = await pegar('/frota.html');
+    assert.equal(antigo.status, 301);
+    assert.equal(antigo.headers.get('location'), '/frota');
+
+    const casca = await pegar('/app');
+    assert.equal(casca.status, 301);
+    assert.equal(casca.headers.get('location'), '/resumo');
+
+    assert.equal((await pegar('/')).status, 200);
+    assert.equal((await pegar('/login')).status, 200);
+  } finally {
+    await new Promise((ok) => servidor.close(ok));
+  }
+});
+
 test.after(() => {
   db.close();
   fs.rmSync(pasta, { recursive: true, force: true });

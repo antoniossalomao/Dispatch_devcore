@@ -1,6 +1,8 @@
 // Tela de colaboradores: listagem, busca, filtros de CNH, cadastro/edição no modal e histórico na gaveta lateral.
-class TelaColaboradores {
-  constructor() {
+export default class TelaColaboradores {
+  // ctx vem da casca (js/app/App.js): sessão em cache, sinal para soltar eventos globais ao sair da tela e navegação sem recarregar.
+  constructor(ctx) {
+    this.ctx = ctx;
     this.subtituloContagem = document.getElementById('subtitulo-contagem');
     this.nomeEmpresaMenu = document.getElementById('nome-empresa-menu');
     this.usuarioIniciais = document.getElementById('usuario-iniciais');
@@ -125,10 +127,6 @@ class TelaColaboradores {
 
     this.gavetaBotaoStatus.addEventListener('click', this.alterarStatusColaborador.bind(this));
 
-    this.botaoSair.addEventListener('click', async () => {
-      await chamarApi('/api/auth/sair', { metodo: 'POST' });
-      window.location.href = 'login';
-    });
   }
 
   async carregarExemplos() {
@@ -611,7 +609,7 @@ class TelaColaboradores {
 
   async iniciar() {
     try {
-      const sessao = await chamarApi('/api/auth/eu');
+      const sessao = await this.ctx.sessao();
       if (!sessao.ok) {
         window.location.href = 'login';
         return;
@@ -634,5 +632,3 @@ class TelaColaboradores {
     }
   }
 }
-
-new TelaColaboradores();

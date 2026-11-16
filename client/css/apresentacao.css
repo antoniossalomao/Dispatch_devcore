@@ -1724,3 +1724,53 @@ body.dialogo-aberto {
   .movimento-ativo .produto-trilha,
   .movimento-ativo .produto-palavra { display: none; }
 }
+
+/* Entrada da página: cabeçalho e hero aparecem em sequência no carregamento.
+   Usa as propriedades translate/scale soltas para não brigar com o transform do parallax. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes entrada-subir {
+    from { opacity: 0; translate: 0 22px; }
+    to { opacity: 1; translate: none; }
+  }
+  @keyframes entrada-descer {
+    from { opacity: 0; translate: 0 -12px; }
+    to { opacity: 1; translate: none; }
+  }
+  @keyframes entrada-universo {
+    from { opacity: 0; scale: 0.92; }
+    to { opacity: 1; scale: 1; }
+  }
+
+  .cabecalho {
+    animation: entrada-descer 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .hero-topo,
+  .hero h1,
+  .hero-texto > p,
+  .hero-acoes,
+  .hero-rodape {
+    animation: entrada-subir 0.9s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+  .hero-topo { animation-delay: 0.1s; }
+  .hero h1 { animation-delay: 0.2s; }
+  .hero-texto > p { animation-delay: 0.35s; }
+  .hero-acoes { animation-delay: 0.48s; }
+  .hero-rodape { animation-delay: 0.7s; }
+  .universo {
+    animation: entrada-universo 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.25s backwards;
+  }
+
+  /* Rolagem: blocos marcados pelo JS sobem quando entram na tela. */
+  .revelar {
+    opacity: 0;
+    translate: 0 28px;
+    transition:
+      opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+      translate 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--atraso, 0s);
+  }
+  .revelar.visivel {
+    opacity: 1;
+    translate: none;
+  }
+}

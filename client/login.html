@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <!-- isso aqui é pra página não ficar minúscula no celular -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/dispatch-icone.svg">
   <title>Dispatch - Login</title>
   <!-- o base.css vem antes pq tem as cores que o login.css usa -->
   <link rel="stylesheet" href="css/base.css">
@@ -14,50 +15,55 @@
   <!-- essa div só serve pra deixar o cartão no meio da tela -->
   <div class="login-pagina">
     <div class="login-card">
-
-      <!-- lado esquerdo, azul-marinho, só pra apresentar o sistema -->
       <div class="login-lado">
-        <h1 class="login-logo">Dispatch</h1>
+        <div class="login-marca">
+          <span class="login-marca-icone" aria-hidden="true"></span>
+          <h1 class="login-logo">Dispatch</h1>
+          <p class="login-texto">Pessoas, alojamentos e frota da obra num lugar só</p>
 
-        <div>
-          <p class="login-chamada">Pessoas, alojamentos e frota num lugar só</p>
-          <p class="login-texto">Saiba quem está em cada leito e com cada veículo. Acompanhe retiradas, devoluções e quilometragem, com o histórico de cada movimentação.</p>
+          <ul class="login-recursos">
+            <li><span class="login-recurso-icone"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20V8M2 16h20v4M22 16v-3a3 3 0 0 0-3-3h-8v6"/><circle cx="6.5" cy="12.5" r="1.5"/></svg></span>Quem está em cada leito</li>
+            <li><span class="login-recurso-icone"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="6" width="14" height="10" rx="1"/><path d="M15 9h4l3 3.5V16h-7V9z"/><circle cx="5.5" cy="17.5" r="2"/><circle cx="18.5" cy="17.5" r="2"/></svg></span>Retiradas, devoluções e quilometragem</li>
+            <li><span class="login-recurso-icone"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg></span>Histórico de cada movimentação</li>
+          </ul>
         </div>
+        <p class="login-assinatura">Desenvolvido pelo DevCore</p>
       </div>
 
       <!-- lado direito, o formulario de login -->
       <div class="login-entrar">
-        <h2 class="login-titulo">Entrar na sua conta</h2>
-        <p class="login-subtitulo">Use o usuário e a senha para acessar o painel</p>
+        <div class="login-caixa">
+          <h2 class="login-titulo">Entrar</h2>
+          <p class="login-subtitulo">Use seu usuário e senha da equipe</p>
 
-        <form id="form-login" class="login-form">
+          <form id="form-login" class="login-form">
 
-          <!-- aparece quando a pessoa acabou de criar a conta -->
-          <p id="mensagem-sucesso" class="login-sucesso" role="status" hidden></p>
+            <!-- aparece quando a pessoa acabou de criar a conta -->
+            <p id="mensagem-sucesso" class="login-sucesso" role="status" hidden></p>
 
-          <!-- o "for" do label tem que ser igual ao id do input, aí clicando no texto já vai pro campo -->
-          <label for="usuario">Usuário</label>
-          <input type="text" id="usuario" aria-describedby="mensagem-erro" autocomplete="username" placeholder="Digite seu usuário">
+            <!-- o "for" do label tem que ser igual ao id do input, aí clicando no texto já vai pro campo -->
+            <label for="usuario">Usuário</label>
+            <input type="text" id="usuario" aria-describedby="mensagem-erro" autocomplete="username" placeholder="Digite seu usuário">
 
-          <label for="senha">Senha</label>
-          <!-- type password = aparece as bolinhas em vez da senha -->
-          <input type="password" id="senha" aria-describedby="mensagem-erro" autocomplete="current-password" placeholder="Digite sua senha">
+            <label for="senha">Senha</label>
+            <!-- type password = aparece as bolinhas em vez da senha -->
+            <input type="password" id="senha" aria-describedby="mensagem-erro" autocomplete="current-password" placeholder="Digite sua senha">
 
-          <div class="login-mostrar">
-            <input type="checkbox" id="mostrar-senha">
-            <label for="mostrar-senha">Mostrar senha</label>
-          </div>
+            <div class="login-mostrar">
+              <input type="checkbox" id="mostrar-senha">
+              <label for="mostrar-senha">Mostrar senha</label>
+            </div>
 
-          <!-- começa escondido (hidden), o js mostra quando der erro -->
-          <p id="mensagem-erro" class="login-erro" role="alert" tabindex="-1" hidden></p>
+            <!-- começa escondido (hidden), o js mostra quando der erro -->
+            <p id="mensagem-erro" class="login-erro" role="alert" tabindex="-1" hidden></p>
 
-          <button type="submit" id="botao-entrar" class="login-botao">Entrar</button>
-        </form>
+            <button type="submit" id="botao-entrar" class="login-botao">Entrar</button>
+          </form>
 
-        <p id="ajuda-cadastro" class="login-ajuda" hidden>Não tem uma conta? <a href="cadastro" class="login-link">Cadastre-se</a></p>
-        <p class="login-ajuda"><a href="/" class="login-link">Conheça o DevCore e o Dispatch</a></p>
+          <p id="ajuda-cadastro" class="login-ajuda" hidden>Não tem uma conta? <a href="cadastro" class="login-link">Cadastre-se</a></p>
+          <p class="login-ajuda"><a href="/" class="login-link">Conheça o DevCore e o Dispatch</a></p>
+        </div>
       </div>
-
     </div>
   </div>
 

@@ -1,0 +1,146 @@
+/* Densidade do painel (passo de polimento, 16/11/2026).
+   O painel estava grande e "perto" demais: linhas de tabela de ~60px, controles de 36px, margens
+   de 32px. Este arquivo reduz a escala em ~10% sem mudar paleta, fonte ou layout, e fica por último
+   na casca (app.html) para valer sobre resumo.css e tema.css. Valores na grade de 4px.
+   Os cards de cima mantêm o mesmo desenho; só acompanham a redução.
+   No celular (até 780px) nada muda aqui: alvos de toque continuam com 44px. */
+
+@media (min-width: 781px) {
+  :root {
+    --controle: 32px;
+    --controle-p: 28px;
+  }
+
+  /* menu lateral: o trecho mais denso do app */
+  .menu-lateral {
+    width: 232px;
+    padding: 20px 12px 12px;
+  }
+  .menu-item {
+    height: 32px;
+    font-size: 13px;
+  }
+  .menu-lateral :is(.menu-item, .config-nav-item) svg {
+    width: 16px;
+    height: 16px;
+  }
+  .menu-logo {
+    font-size: 17px;
+  }
+
+  /* topo */
+  .topo {
+    min-height: 56px;
+    padding: 0 24px;
+  }
+  .topo-titulo {
+    font-size: 16px;
+  }
+  .topo-data {
+    font-size: 12px;
+  }
+  .usuario-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+  .usuario-nome {
+    font-size: 13px;
+  }
+
+  /* conteúdo */
+  .conteudo {
+    padding: 24px 24px 72px;
+  }
+  .indicadores {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  /* cards de cima: mesmo desenho, ~10% menores */
+  .cartao-kpi {
+    padding: 16px 20px;
+  }
+  .kpi-rotulo {
+    font-size: 12px;
+  }
+  .kpi-numero {
+    font-size: 26px;
+  }
+  .kpi-complemento,
+  .kpi-detalhe {
+    font-size: 12px;
+  }
+
+  /* blocos e tabelas */
+  .bloco-cabecalho {
+    padding: 16px;
+  }
+  .bloco-cabecalho-simples {
+    padding: 12px 16px;
+  }
+  .bloco-titulo {
+    font-size: 13px;
+  }
+  .bloco-subtitulo {
+    font-size: 12px;
+  }
+  .tabela th {
+    height: 36px;
+    padding: 0 16px;
+    font-size: 12px;
+  }
+  .tabela td {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  .colab-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  /* controles */
+  .btn-primario,
+  .btn-secundario,
+  .btn-fantasma {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+  .btn-pequeno {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+  .config-input,
+  .config-select,
+  .busca-caixa {
+    height: 32px;
+    font-size: 13px;
+  }
+  .busca-caixa input {
+    height: 30px;
+    font-size: 13px;
+  }
+  .filtro-abas {
+    padding: 2px;
+  }
+  .aba-item {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+  .botao-notif,
+  .botao-tema,
+  .botao-sair {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* configurações */
+  .config-nav-item {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+}

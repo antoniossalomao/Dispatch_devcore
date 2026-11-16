@@ -79,6 +79,61 @@ class TelaApresentacao {
     this.configurarAbas();
     this.configurarCenasRolagem();
     this.configurarDialogoPlanos();
+    this.configurarRevelar();
+  }
+
+  // Faz os blocos das seções subirem suavemente quando entram na tela.
+  // Sem suporte ou com movimento reduzido, nada é escondido.
+  configurarRevelar() {
+    if (this.movimentoReduzido.matches || !('IntersectionObserver' in window)) return;
+
+    const seletores = [
+      '.secao .secao-cabeca',
+      '.secao h2',
+      '.secao .chamada',
+      '.sobre-grade > div',
+      '.pilares > article',
+      '.sistema-intro > *',
+      '.plano',
+      '.equipe-intro',
+      '.integrantes > *',
+      '.faq-grade > *',
+      'footer'
+    ];
+    const alvos = Array.from(document.querySelectorAll(seletores.join(',')));
+    // Evita animar um bloco dentro de outro que já anima (ficaria com deslocamento dobrado).
+    const unicos = alvos.filter(
+      (el, i) =>
+        alvos.indexOf(el) === i &&
+        !el.closest('.hero') &&
+        !alvos.some((outro) => outro !== el && outro.contains(el))
+    );
+
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        entradas.forEach((entrada) => {
+          if (!entrada.isIntersecting) return;
+          const el = entrada.target;
+          observador.unobserve(el);
+          el.classList.add('visivel');
+          // Depois da entrada, devolve as transições originais do elemento (hover etc.).
+          const limpar = () => {
+            el.classList.remove('revelar', 'visivel');
+            el.style.removeProperty('--atraso');
+          };
+          setTimeout(limpar, 1400);
+        });
+      },
+      { rootMargin: '0px 0px -10% 0px', threshold: 0.12 }
+    );
+
+    unicos.forEach((el) => {
+      const irmaos = el.parentElement ? Array.from(el.parentElement.children) : [];
+      const posicao = Math.max(0, irmaos.indexOf(el));
+      el.style.setProperty('--atraso', Math.min(posicao, 4) * 0.08 + 's');
+      el.classList.add('revelar');
+      observador.observe(el);
+    });
   }
 
   limitar(valor, minimo = 0, maximo = 1) {

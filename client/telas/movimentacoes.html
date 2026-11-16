@@ -1,0 +1,76 @@
+<!-- Fragmento da tela "Movimentações": a casca (app.html) encaixa cada parte no lugar certo. -->
+<template data-parte="cabecalho" data-titulo="Movimentações">
+        <h1 class="topo-titulo">Movimentações</h1>
+        <span class="topo-data">Entradas e saídas de alojamento, retiradas e devoluções de veículos</span>
+</template>
+<template data-parte="acoes" data-classe="periodo-filtro"><label class="campo-label" for="mov-de">De</label>
+        <input type="date" id="mov-de" class="config-input campo-data periodo-data">
+        <label class="campo-label" for="mov-ate">Até</label>
+        <input type="date" id="mov-ate" class="config-input campo-data periodo-data">
+        <button type="button" id="botao-atualizar" class="btn-secundario">Atualizar</button>
+</template>
+<template data-parte="conteudo" data-classe="conteudo">
+
+      <section class="indicadores">
+        <div class="cartao-kpi">
+          <div class="kpi-topo"><span class="kpi-rotulo">Entradas</span></div>
+          <div class="kpi-valor-linha"><strong id="kpi-entradas" class="kpi-numero">0</strong><span class="kpi-complemento">em alojamentos</span></div>
+          <p class="kpi-detalhe">Colaboradores alojados no período</p>
+        </div>
+        <div class="cartao-kpi">
+          <div class="kpi-topo"><span class="kpi-rotulo">Saídas</span></div>
+          <div class="kpi-valor-linha"><strong id="kpi-saidas" class="kpi-numero">0</strong><span class="kpi-complemento">de alojamentos</span></div>
+          <p class="kpi-detalhe">Leitos liberados no período</p>
+        </div>
+        <div class="cartao-kpi">
+          <div class="kpi-topo"><span class="kpi-rotulo">Retiradas</span></div>
+          <div class="kpi-valor-linha"><strong id="kpi-retiradas" class="kpi-numero">0</strong><span class="kpi-complemento">de veículos</span></div>
+          <p class="kpi-detalhe">Saídas da garagem</p>
+        </div>
+        <div class="cartao-kpi">
+          <div class="kpi-topo"><span class="kpi-rotulo">Devoluções</span></div>
+          <div class="kpi-valor-linha"><strong id="kpi-devolucoes" class="kpi-numero">0</strong><span class="kpi-complemento">de veículos</span></div>
+          <p class="kpi-detalhe">Voltas registradas</p>
+        </div>
+      </section>
+
+      <section class="bloco">
+        <div class="bloco-cabecalho">
+          <div class="colab-filtros-topo">
+            <div class="busca-caixa busca-larga">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>
+              </svg>
+              <input type="text" id="mov-busca" aria-label="Buscar por colaborador, alojamento ou veículo" placeholder="Buscar movimentações">
+            </div>
+            <select id="mov-categoria" class="config-select select-curto" aria-label="Filtrar por área">
+              <option value="">Alojamentos e frota</option>
+              <option value="alojamento">Só alojamentos</option>
+              <option value="frota">Só frota</option>
+            </select>
+            <select id="mov-tipo" class="config-select select-curto" aria-label="Filtrar por tipo">
+              <option value="">Todos os tipos</option>
+              <option value="Entrada">Entrada</option>
+              <option value="Saída">Saída</option>
+              <option value="Retirada">Retirada</option>
+              <option value="Devolução">Devolução</option>
+            </select>
+          </div>
+          <div class="mov-acoes">
+            <span id="mov-total" class="kpi-complemento"></span>
+            <button type="button" id="botao-exportar" class="btn-secundario btn-pequeno">Exportar CSV</button>
+          </div>
+        </div>
+        <div class="tabela-area">
+          <table class="tabela">
+            <thead><tr><th>Quando</th><th>Tipo</th><th>Colaborador</th><th>Recurso</th></tr></thead>
+            <tbody id="mov-lista"></tbody>
+          </table>
+        </div>
+        <div class="mov-rodape">
+          <button type="button" id="botao-mais" class="btn-secundario" hidden>Mostrar mais</button>
+        </div>
+      </section>
+</template>
+<template data-parte="extras"><div id="toast-mov" class="toast" hidden></div>
+</template>
