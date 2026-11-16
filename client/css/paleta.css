@@ -12,6 +12,8 @@
   --dc-painel: #151513;
   --dc-elevado: #20201d;
   --dc-linha: #34342f;
+  /* destaque do sistema (marca, item ativo, foco): off-white; o ouro fica só na apresentação */
+  --dc-destaque: var(--dc-creme);
 
   /* Superfícies neutras da aplicação; a apresentação usa os tokens --dc-*. */
   --op-fundo: #111315;

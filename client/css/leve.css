@@ -62,11 +62,11 @@ body.painel-corpo {
   bottom: 8px;
   width: 2px;
   border-radius: 2px;
-  background-color: var(--dc-ouro);
+  background-color: var(--dc-destaque);
 }
 
 .menu-item.ativo svg {
-  color: var(--dc-ouro);
+  color: var(--dc-destaque);
 }
 
 /* topo: so o titulo; o subtitulo descritivo sai */
