@@ -273,3 +273,115 @@
   outline: 2px solid var(--azul);
   outline-offset: 2px;
 }
+
+
+/* Mesma identidade da apresentação (paleta --dc-*): fundo noite, painéis quentes, creme e ouro. */
+body:has(.login-pagina) {
+  background: var(--dc-noite);
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
+}
+
+.login-pagina {
+  --fundo: var(--dc-noite);
+  --cartao: var(--dc-painel);
+  --campo: var(--dc-noite);
+  --borda: var(--dc-linha);
+  --texto: var(--dc-creme);
+  --texto-fraco: var(--dc-salvia);
+  --placeholder: #8a867d;
+  --azul: var(--dc-ouro);
+  --op-fundo: var(--dc-noite);
+  --op-borda: #d3c9b424;
+  --op-texto: var(--dc-creme);
+  --op-secundario: var(--dc-salvia);
+  background:
+    radial-gradient(ellipse at 78% 30%, #a18a751c, transparent 55%),
+    radial-gradient(ellipse at 15% 90%, #a18a7512, transparent 50%),
+    var(--dc-noite);
+  color: var(--texto);
+}
+
+.login-card {
+  border-color: #d3c9b424;
+  border-radius: 6px;
+  box-shadow: 0 40px 80px -40px #000000cc;
+}
+
+.login-lado {
+  background: linear-gradient(145deg, #8566221c, #191814);
+}
+
+.login-logo,
+.login-chamada,
+.login-titulo {
+  font-family: inherit;
+  font-weight: 400;
+}
+
+.login-chamada {
+  letter-spacing: -1px;
+}
+
+.login-titulo {
+  letter-spacing: -0.8px;
+}
+
+.login-chamada em {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  color: #c7b8a0;
+}
+
+.login-sobretitulo {
+  display: block;
+  color: var(--dc-ouro);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.8px;
+  margin-bottom: 14px;
+}
+
+.login-form input[type='text'],
+.login-form input[type='password'] {
+  border-radius: 4px;
+}
+
+.login-botao {
+  background-color: var(--dc-creme);
+  color: var(--dc-noite);
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.login-botao:hover {
+  background-color: #d3ddc9;
+}
+
+.login-botao:active {
+  transform: translateY(1px);
+}
+
+/* entrada: o cartão sobe e os blocos aparecem em sequência */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes login-subir {
+    from { opacity: 0; translate: 0 18px; }
+    to { opacity: 1; translate: none; }
+  }
+
+  .login-card {
+    animation: login-subir 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .login-lado > *,
+  .login-entrar > * {
+    animation: login-subir 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: 0.15s;
+  }
+
+  .login-lado > :nth-child(2) { animation-delay: 0.25s; }
+  .login-entrar > :nth-child(2) { animation-delay: 0.22s; }
+  .login-entrar > :nth-child(3) { animation-delay: 0.3s; }
+  .login-entrar > :nth-child(n + 4) { animation-delay: 0.38s; }
+}
