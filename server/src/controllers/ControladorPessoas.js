@@ -3,18 +3,31 @@ const db = require('../db/conexao');
 const auditoria = require('../services/Auditoria');
 const Cnh = require('../models/Cnh');
 const configuracao = require('../services/Configuracao');
-class ControladorPessoas {
-  exigirLogin(req, res, next) {
-    if (!req.session.usuario) {
-      return res.status(401).json({
-        erro: 'Faça login para acessar.'
-      });
-    }
-    next();
-  }
+const { dataIsoValida } = require('../regras/datas');
+const { lerIdPositivo, textoDentroDoLimite } = require('../regras/validacao');
 
+function normalizarCategoriasCnh(valor) {
+  const bruto = String(valor || '').trim().toUpperCase();
+  if (bruto === '') return { erro: null, valor: '' };
+  const partes = bruto.includes(',')
+    ? bruto
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : bruto.split('');
+  if (partes.length === 0 || partes.some((p) => !['A', 'B', 'C', 'D', 'E'].includes(p))) {
+    return {
+      erro: 'Categorias de CNH inválidas (use apenas A, B, C, D ou E).',
+      valor: ''
+    };
+  }
+  const ordem = ['A', 'B', 'C', 'D', 'E'].filter((cat) => partes.includes(cat));
+  return { erro: null, valor: ordem.join(',') };
+}
+
+class ControladorPessoas {
   listar(req, res) {
-    const busca = (req.query.busca || '').trim().toLowerCase();
+    const busca = String(req.query.busca || '').trim().slice(0, 100).toLowerCase();
     const filtroStatus = req.query.status || 'ativos';
     const filtroCnh = req.query.cnh || 'todos';
     const cfg = configuracao.lerConfig();
@@ -129,7 +142,10 @@ class ControladorPessoas {
   }
 
   buscarPorId(req, res) {
-    const id = Number(req.params.id);
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de colaborador inválido.' });
+    }
     const pessoa = db.prepare('SELECT * FROM pessoa WHERE id = ?').get(id);
     if (!pessoa) {
       return res.status(404).json({
@@ -204,17 +220,28 @@ class ControladorPessoas {
   }
 
   cadastrar(req, res) {
-    const nome = (req.body.nome || '').trim();
-    const matricula = (req.body.matricula || '').trim().toUpperCase();
-    const cargo = (req.body.cargo || '').trim();
-    const obra = (req.body.obra || '').trim();
-    const telefone = (req.body.telefone || '').trim();
-    const cnhCategorias = (req.body.cnh_categorias || '').trim().toUpperCase();
-    const cnhValidade = (req.body.cnh_validade || '').trim();
+    const b = req.body || {};
+    const nome = String(b.nome || '').trim();
+    const matricula = String(b.matricula || '').trim().toUpperCase();
+    const cargo = String(b.cargo || '').trim();
+    const obra = String(b.obra || '').trim();
+    const telefone = String(b.telefone || '').trim();
+    const cnh = normalizarCategoriasCnh(b.cnh_categorias);
+    const cnhValidade = String(b.cnh_validade || '').trim();
     if (nome === '' || matricula === '' || cargo === '') {
       return res.status(400).json({
         erro: 'Nome, matrícula e cargo são obrigatórios.'
       });
+    }
+    const erroTexto =
+      textoDentroDoLimite(nome, 120, 'O nome') ||
+      textoDentroDoLimite(matricula, 40, 'A matrícula') ||
+      textoDentroDoLimite(cargo, 80, 'O cargo') ||
+      textoDentroDoLimite(obra, 100, 'A obra') ||
+      textoDentroDoLimite(telefone, 30, 'O telefone') ||
+      cnh.erro;
+    if (erroTexto) {
+      return res.status(400).json({ erro: erroTexto });
     }
     const jaExiste = db.prepare('SELECT id FROM pessoa WHERE matricula = ?').get(matricula);
     if (jaExiste) {
@@ -222,9 +249,14 @@ class ControladorPessoas {
         erro: 'Já existe um colaborador com a matrícula ' + matricula + '.'
       });
     }
-    if (cnhCategorias !== '' && cnhValidade === '') {
+    if (cnh.valor !== '' && cnhValidade === '') {
       return res.status(400).json({
         erro: 'Informe a data de validade da CNH.'
+      });
+    }
+    if (cnhValidade !== '' && !dataIsoValida(cnhValidade)) {
+      return res.status(400).json({
+        erro: 'Data de validade da CNH inválida.'
       });
     }
     const r = db
@@ -238,7 +270,7 @@ class ControladorPessoas {
         cargo,
         obra === '' ? 'Sede' : obra,
         telefone === '' ? null : telefone,
-        cnhCategorias === '' ? null : cnhCategorias,
+        cnh.valor === '' ? null : cnh.valor,
         cnhValidade === '' ? null : cnhValidade
       );
     const novoId = Number(r.lastInsertRowid);
@@ -254,7 +286,7 @@ class ControladorPessoas {
         matricula: matricula,
         cargo: cargo,
         obra: obra,
-        cnh_categorias: cnhCategorias
+        cnh_categorias: cnh.valor
       }
     });
     res.status(201).json({
@@ -264,24 +296,38 @@ class ControladorPessoas {
   }
 
   atualizar(req, res) {
-    const id = Number(req.params.id);
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de colaborador inválido.' });
+    }
     const pessoaAtual = db.prepare('SELECT * FROM pessoa WHERE id = ?').get(id);
     if (!pessoaAtual) {
       return res.status(404).json({
         erro: 'Colaborador não encontrado.'
       });
     }
-    const nome = (req.body.nome || '').trim();
-    const matricula = (req.body.matricula || '').trim().toUpperCase();
-    const cargo = (req.body.cargo || '').trim();
-    const obra = (req.body.obra || '').trim();
-    const telefone = (req.body.telefone || '').trim();
-    const cnhCategorias = (req.body.cnh_categorias || '').trim().toUpperCase();
-    const cnhValidade = (req.body.cnh_validade || '').trim();
+    const b = req.body || {};
+    const nome = String(b.nome || '').trim();
+    const matricula = String(b.matricula || '').trim().toUpperCase();
+    const cargo = String(b.cargo || '').trim();
+    const obra = String(b.obra || '').trim();
+    const telefone = String(b.telefone || '').trim();
+    const cnh = normalizarCategoriasCnh(b.cnh_categorias);
+    const cnhValidade = String(b.cnh_validade || '').trim();
     if (nome === '' || matricula === '' || cargo === '') {
       return res.status(400).json({
         erro: 'Nome, matrícula e cargo são obrigatórios.'
       });
+    }
+    const erroTexto =
+      textoDentroDoLimite(nome, 120, 'O nome') ||
+      textoDentroDoLimite(matricula, 40, 'A matrícula') ||
+      textoDentroDoLimite(cargo, 80, 'O cargo') ||
+      textoDentroDoLimite(obra, 100, 'A obra') ||
+      textoDentroDoLimite(telefone, 30, 'O telefone') ||
+      cnh.erro;
+    if (erroTexto) {
+      return res.status(400).json({ erro: erroTexto });
     }
     const conflito = db
       .prepare('SELECT id FROM pessoa WHERE matricula = ? AND id != ?')
@@ -291,9 +337,14 @@ class ControladorPessoas {
         erro: 'A matrícula ' + matricula + ' já está em uso por outro colaborador.'
       });
     }
-    if (cnhCategorias !== '' && cnhValidade === '') {
+    if (cnh.valor !== '' && cnhValidade === '') {
       return res.status(400).json({
         erro: 'Informe a data de validade da CNH.'
+      });
+    }
+    if (cnhValidade !== '' && !dataIsoValida(cnhValidade)) {
+      return res.status(400).json({
+        erro: 'Data de validade da CNH inválida.'
       });
     }
     db.prepare(
@@ -305,7 +356,7 @@ class ControladorPessoas {
       cargo,
       obra === '' ? 'Sede' : obra,
       telefone === '' ? null : telefone,
-      cnhCategorias === '' ? null : cnhCategorias,
+      cnh.valor === '' ? null : cnh.valor,
       cnhValidade === '' ? null : cnhValidade,
       id
     );
@@ -322,7 +373,7 @@ class ControladorPessoas {
         matricula: matricula,
         cargo: cargo,
         obra: obra,
-        cnh_categorias: cnhCategorias,
+        cnh_categorias: cnh.valor,
         cnh_validade: cnhValidade
       }
     });
@@ -332,8 +383,11 @@ class ControladorPessoas {
   }
 
   alterarStatus(req, res) {
-    const id = Number(req.params.id);
-    const novoAtivo = req.body.ativo ? 1 : 0;
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de colaborador inválido.' });
+    }
+    const novoAtivo = req.body && req.body.ativo ? 1 : 0;
     const pessoa = db.prepare('SELECT * FROM pessoa WHERE id = ?').get(id);
     if (!pessoa) {
       return res.status(404).json({

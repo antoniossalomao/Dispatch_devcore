@@ -310,6 +310,7 @@ class TelaAlojamentos {
       card.type = 'button';
       card.className = 'aloj-cartao' + (a.ativo === 0 ? ' aloj-inativo' : '');
       const cheio = a.total_leitos > 0 && a.leitos_ocupados === a.total_leitos;
+      const pct = Math.max(0, Math.min(100, Number(a.ocupacao_pct) || 0));
       card.innerHTML =
         '<div class="aloj-cartao-topo">' +
         '<div><div class="aloj-nome">' +
@@ -328,9 +329,7 @@ class TelaAlojamentos {
         '</div>' +
         '<div class="aloj-barra"><div class="aloj-barra-preench' +
         (cheio ? ' cheio' : '') +
-        '" style="width:' +
-        a.ocupacao_pct +
-        '%"></div></div>' +
+        '"></div></div>' +
         '<div class="aloj-numeros"><span><strong>' +
         a.leitos_ocupados +
         '/' +
@@ -342,6 +341,7 @@ class TelaAlojamentos {
         '<div class="aloj-resp">Responsável: ' +
         this.esc(a.responsavel_nome || 'não definido') +
         '</div>';
+      card.querySelector('.aloj-barra-preench').style.width = pct + '%';
       card.addEventListener('click', () => {
         this.abrirGaveta(a.id);
       });
@@ -400,7 +400,7 @@ class TelaAlojamentos {
           this.esc(l.codigo) +
           '</span>' +
           '<span class="leito-tipo">' +
-          this.nomesTipoLeito[l.tipo] +
+          this.esc(this.nomesTipoLeito[l.tipo] || l.tipo) +
           '</span>' +
           '<span class="leito-pessoa">' +
           (l.estadia_id ? this.esc(l.pessoa_nome) : 'Livre') +
@@ -425,7 +425,7 @@ class TelaAlojamentos {
       item.className = 'timeline-item' + (!o.resolvida_em ? ' timeline-ativo' : '');
       item.innerHTML =
         '<span class="timeline-titulo">' +
-        this.nomesTipoOcorrencia[o.tipo] +
+        this.esc(this.nomesTipoOcorrencia[o.tipo] || o.tipo) +
         ' · ' +
         this.esc(o.descricao) +
         '</span>' +
@@ -574,9 +574,8 @@ class TelaAlojamentos {
     this.perfilTipo.textContent = user.perfil;
     this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
     if (user.perfil === 'admin') this.blocoMenuAdmin.hidden = false;
-    const cfg = await chamarApi('/api/configuracoes');
-    if (cfg.ok && cfg.dados.parametros && cfg.dados.parametros.nomeEmpresa) {
-      this.nomeEmpresaMenu.textContent = cfg.dados.parametros.nomeEmpresa;
+    if (sessao.dados.nomeEmpresa) {
+      this.nomeEmpresaMenu.textContent = sessao.dados.nomeEmpresa;
     }
     await this.carregarColaboradores();
     this.carregarAlojamentos();

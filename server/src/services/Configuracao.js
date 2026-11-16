@@ -3,7 +3,10 @@ const path = require('path');
 // Lê os parâmetros salvos e usa os padrões para os campos ausentes.
 class Configuracao {
   constructor() {
-    this.caminhoConfig = path.join(__dirname, '..', '..', 'data', 'config.json');
+    const pastaDados = process.env.DB_CAMINHO
+      ? path.dirname(process.env.DB_CAMINHO)
+      : path.join(__dirname, '..', '..', 'data');
+    this.caminhoConfig = process.env.CONFIG_CAMINHO || path.join(pastaDados, 'config.json');
     this.configPadrao = {
       nomeEmpresa: 'Construtora Aguapeí',
       cidadeBase: 'Marília/SP',

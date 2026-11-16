@@ -1,30 +1,29 @@
-// Ações de notificacoes.
+// Ações de notificações.
 const db = require('../db/conexao');
 const notificacoes = require('../services/Notificacoes');
 const configuracao = require('../services/Configuracao');
-class ControladorNotificacoes {
-  exigirLogin(req, res, next) {
-    if (!req.session.usuario) {
-      return res.status(401).json({
-        erro: 'Faça login para acessar.'
-      });
-    }
-    next();
-  }
+const { lerIdPositivo } = require('../regras/validacao');
 
+class ControladorNotificacoes {
   async listar(req, res) {
     if (notificacoes.precisaVerificar()) {
       await notificacoes.verificar(configuracao.lerConfig());
     }
     const todas = req.query.todas === '1';
+    const ehAdmin = req.session.usuario.perfil === 'admin';
+    const condicoes = [];
+    if (!todas) condicoes.push('lida = 0');
+    if (!ehAdmin) condicoes.push("tipo != 'log_adulterado'");
+    const whereSql = condicoes.length > 0 ? 'WHERE ' + condicoes.join(' AND ') + ' ' : '';
     const linhas = db
       .prepare(
         'SELECT id, tipo, severidade, mensagem, tabela, registro_id, criada_em, lida, enviada_telegram FROM notificacao ' +
-          (todas ? '' : 'WHERE lida = 0 ') +
+          whereSql +
           "ORDER BY lida ASC, CASE severidade WHEN 'critico' THEN 0 ELSE 1 END, id DESC LIMIT 100"
       )
       .all();
-    const naoLidas = db.prepare('SELECT COUNT(*) AS n FROM notificacao WHERE lida = 0').get().n;
+    const whereNaoLidas = ehAdmin ? 'WHERE lida = 0' : "WHERE lida = 0 AND tipo != 'log_adulterado'";
+    const naoLidas = db.prepare('SELECT COUNT(*) AS n FROM notificacao ' + whereNaoLidas).get().n;
     res.json({
       nao_lidas: naoLidas,
       notificacoes: linhas
@@ -32,18 +31,33 @@ class ControladorNotificacoes {
   }
 
   marcarTodasComoLidas(req, res) {
-    db.prepare('UPDATE notificacao SET lida = 1 WHERE lida = 0').run();
+    if (req.session.usuario.perfil === 'admin') {
+      db.prepare('UPDATE notificacao SET lida = 1 WHERE lida = 0').run();
+    } else {
+      db.prepare("UPDATE notificacao SET lida = 1 WHERE lida = 0 AND tipo != 'log_adulterado'").run();
+    }
     res.json({
       mensagem: 'Todos os avisos foram marcados como lidos.'
     });
   }
 
   marcarComoLida(req, res) {
-    const r = db.prepare('UPDATE notificacao SET lida = 1 WHERE id = ?').run(Number(req.params.id));
-    if (Number(r.changes) === 0)
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de aviso inválido.' });
+    }
+    const aviso = db.prepare('SELECT id, tipo FROM notificacao WHERE id = ?').get(id);
+    if (!aviso) {
       return res.status(404).json({
         erro: 'Aviso não encontrado.'
       });
+    }
+    if (aviso.tipo === 'log_adulterado' && req.session.usuario.perfil !== 'admin') {
+      return res.status(403).json({
+        erro: 'Apenas administradores podem dispensar alertas de adulteração.'
+      });
+    }
+    db.prepare('UPDATE notificacao SET lida = 1 WHERE id = ?').run(id);
     res.json({
       mensagem: 'Aviso marcado como lido.'
     });

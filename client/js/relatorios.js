@@ -159,15 +159,14 @@ class TelaRelatorios {
     if (nome === 'dirigindo') this.carregarVeiculosSelect();
   }
 
-  barra(pct, classeExtra) {
-    const limitado = Math.max(0, Math.min(100, pct));
-    return (
-      '<div class="aloj-barra"><div class="aloj-barra-preench' +
-      (classeExtra || '') +
-      '" style="width:' +
-      limitado +
-      '%"></div></div>'
-    );
+  barra(classeExtra) {
+    return '<div class="aloj-barra"><div class="aloj-barra-preench' + (classeExtra || '') + '"></div></div>';
+  }
+
+  aplicarLarguraBarra(container, pct) {
+    const limitado = Math.max(0, Math.min(100, Number(pct) || 0));
+    const preench = container.querySelector('.aloj-barra-preench');
+    if (preench) preench.style.width = limitado + '%';
   }
 
   async carregarOcupacao() {
@@ -192,7 +191,7 @@ class TelaRelatorios {
         '</strong><span>' +
         this.esc(a.cidade) +
         '</span></div>' +
-        this.barra(a.ocupacao_media_pct) +
+        this.barra() +
         '<div class="aloj-numeros"><span><strong>' +
         a.ocupacao_media_pct +
         '%</strong> de ocupação média no período</span>' +
@@ -203,6 +202,7 @@ class TelaRelatorios {
         ' leitos agora · ' +
         a.entradas_no_periodo +
         ' entradas</span></div>';
+      this.aplicarLarguraBarra(div, a.ocupacao_media_pct);
       caixa.appendChild(div);
     });
   }
@@ -238,7 +238,7 @@ class TelaRelatorios {
         v.horas_em_uso +
         ' h</td>' +
         '<td class="celula-barra">' +
-        this.barra(v.utilizacao_pct) +
+        this.barra() +
         '<span class="rel-pct">' +
         v.utilizacao_pct +
         '% em uso · ' +
@@ -247,6 +247,7 @@ class TelaRelatorios {
         '<td class="num">' +
         (v.dias_sem_uso === null ? '—' : v.dias_sem_uso + ' dias') +
         '</td>';
+      this.aplicarLarguraBarra(tr, v.utilizacao_pct);
       corpo.appendChild(tr);
     });
   }
@@ -343,9 +344,8 @@ class TelaRelatorios {
     this.perfilTipo.textContent = user.perfil;
     this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
     if (user.perfil === 'admin') this.blocoMenuAdmin.hidden = false;
-    const cfg = await chamarApi('/api/configuracoes');
-    if (cfg.ok && cfg.dados.parametros && cfg.dados.parametros.nomeEmpresa) {
-      this.nomeEmpresaMenu.textContent = cfg.dados.parametros.nomeEmpresa;
+    if (sessao.dados.nomeEmpresa) {
+      this.nomeEmpresaMenu.textContent = sessao.dados.nomeEmpresa;
     }
     this.aoIniciar();
   }

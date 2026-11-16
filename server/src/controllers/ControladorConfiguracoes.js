@@ -1,11 +1,23 @@
-const configuracao = require('../services/Configuracao');
-// Ações de configuracoes.
+// Ações de configurações.
+const crypto = require('crypto');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const { DatabaseSync } = require('node:sqlite');
 const bcrypt = require('bcryptjs');
 const db = require('../db/conexao');
 const auditoria = require('../services/Auditoria');
+const configuracao = require('../services/Configuracao');
+const sessionStore = require('../services/SessionStore');
 const telegram = require('../services/Telegram');
+const {
+  lerIdPositivo,
+  validarLogin,
+  validarSenha,
+  validarTelegramChatId,
+  textoDentroDoLimite
+} = require('../regras/validacao');
+
 class ControladorConfiguracoes {
   constructor() {
     this.caminhoBanco =
@@ -39,27 +51,13 @@ class ControladorConfiguracoes {
       )
       .all();
     return {
-      arquivo: 'server/data/dispatch.db',
+      arquivo: path.basename(this.caminhoBanco),
       tamanhoKb: tamanhoKb,
       totalTabelas: totalTabelas,
       contagens: contagens,
       integridade: auditoria.verificarIntegridadeLog(),
       ultimosLogs: ultimosLogs
     };
-  }
-
-  exigirAdmin(req, res, next) {
-    if (!req.session.usuario) {
-      return res.status(401).json({
-        erro: 'Faça login para acessar.'
-      });
-    }
-    if (req.session.usuario.perfil !== 'admin') {
-      return res.status(403).json({
-        erro: 'Acesso restrito a administradores.'
-      });
-    }
-    next();
   }
 
   consultar(req, res) {
@@ -87,9 +85,9 @@ class ControladorConfiguracoes {
   salvarParametros(req, res) {
     const b = req.body || {};
     const antes = configuracao.lerConfig();
-    const nomeEmpresa = (b.nomeEmpresa || '').trim();
-    const cidadeBase = (b.cidadeBase || '').trim();
-    const documentoEmpresa = (b.documentoEmpresa || '').trim();
+    const nomeEmpresa = String(b.nomeEmpresa || '').trim();
+    const cidadeBase = String(b.cidadeBase || '').trim();
+    const documentoEmpresa = String(b.documentoEmpresa || '').trim();
     const diasAviso = Number(b.diasAvisoVencimento);
     const horasRetorno = Number(b.horasAlertaRetorno);
     const kmConfirmacao = Number(b.kmConfirmacaoViagem);
@@ -103,37 +101,51 @@ class ControladorConfiguracoes {
         erro: 'Informe o nome da empresa ou operação.'
       });
     }
-    if (!diasAviso || diasAviso < 1 || diasAviso > 180) {
+    const erroTexto =
+      textoDentroDoLimite(nomeEmpresa, 120, 'O nome da empresa') ||
+      textoDentroDoLimite(cidadeBase, 100, 'A base operacional') ||
+      textoDentroDoLimite(documentoEmpresa, 40, 'O CNPJ / identificador');
+    if (erroTexto) {
+      return res.status(400).json({ erro: erroTexto });
+    }
+    if (!Number.isFinite(diasAviso) || diasAviso < 1 || diasAviso > 180) {
       return res.status(400).json({
         erro: 'A antecedência de vencimento deve ficar entre 1 e 180 dias.'
       });
     }
-    if (!horasRetorno || horasRetorno < 1 || horasRetorno > 168) {
+    if (!Number.isFinite(horasRetorno) || horasRetorno < 1 || horasRetorno > 168) {
       return res.status(400).json({
         erro: 'O limite de retorno do veículo deve ficar entre 1 e 168 horas.'
       });
     }
-    if (!kmConfirmacao || kmConfirmacao < 50) {
+    if (!Number.isFinite(kmConfirmacao) || kmConfirmacao < 50 || kmConfirmacao > 100000) {
       return res.status(400).json({
-        erro: 'O limite de km para confirmação deve ser de pelo menos 50 km.'
+        erro: 'O limite de km para confirmação deve ficar entre 50 e 100.000 km.'
       });
     }
-    if (!diasPendencia || diasPendencia < 1 || diasPendencia > 90) {
+    if (!Number.isFinite(diasPendencia) || diasPendencia < 1 || diasPendencia > 90) {
       return res.status(400).json({
         erro: 'O prazo de pendências deve ficar entre 1 e 90 dias.'
       });
     }
-    if (!maxLeitos || maxLeitos < 1 || maxLeitos > 20) {
+    if (!Number.isFinite(maxLeitos) || maxLeitos < 1 || maxLeitos > 20) {
       return res.status(400).json({
         erro: 'O limite de leitos por quarto deve ficar entre 1 e 20.'
       });
     }
-    if (!areaCama || areaCama < 1 || !areaBeliche || areaBeliche < 1) {
+    if (
+      !Number.isFinite(areaCama) ||
+      areaCama < 1 ||
+      areaCama > 1000 ||
+      !Number.isFinite(areaBeliche) ||
+      areaBeliche < 1 ||
+      areaBeliche > 1000
+    ) {
       return res.status(400).json({
         erro: 'Informe metragens válidas para cama e beliche.'
       });
     }
-    if (!lotacaoPct || lotacaoPct < 50 || lotacaoPct > 100) {
+    if (!Number.isFinite(lotacaoPct) || lotacaoPct < 50 || lotacaoPct > 100) {
       return res.status(400).json({
         erro: 'O percentual de alerta de lotação deve ficar entre 50% e 100%.'
       });
@@ -220,26 +232,68 @@ class ControladorConfiguracoes {
     });
   }
 
-  baixarBackup(req, res) {
+  baixarBackup(req, res, next) {
     if (!fs.existsSync(this.caminhoBanco)) {
       return res.status(404).json({
         erro: 'Arquivo do banco não encontrado.'
       });
     }
     const hoje = new Date().toISOString().slice(0, 10);
-    const conteudo = fs.readFileSync(this.caminhoBanco);
-    res.setHeader('Content-Type', 'application/octet-stream');
-    res.setHeader('Content-Disposition', 'attachment; filename="dispatch-backup-' + hoje + '.db"');
-    res.send(conteudo);
+    const caminhoTemp = path.join(
+      os.tmpdir(),
+      'dispatch-backup-' + crypto.randomUUID() + '.db'
+    );
+    try {
+      auditoria.registrarLog({
+        usuarioId: req.session.usuario.id,
+        acao: 'criou',
+        tabela: 'backup',
+        registroId: 1,
+        resumo: 'Gerou cópia de segurança do banco (.db)'
+      });
+      db.exec("VACUUM INTO '" + caminhoTemp.replace(/'/g, "''") + "'");
+      const bancoTemp = new DatabaseSync(caminhoTemp);
+      try {
+        bancoTemp.exec('DELETE FROM sessao');
+      } finally {
+        bancoTemp.close();
+      }
+      const conteudo = fs.readFileSync(caminhoTemp);
+      res.setHeader('Content-Type', 'application/octet-stream');
+      res.setHeader(
+        'Content-Disposition',
+        'attachment; filename="dispatch-backup-' + hoje + '.db"'
+      );
+      res.setHeader('Cache-Control', 'no-store');
+      res.send(conteudo);
+    } catch (erro) {
+      next(erro);
+    } finally {
+      [caminhoTemp, caminhoTemp + '-wal', caminhoTemp + '-shm'].forEach((arq) => {
+        if (fs.existsSync(arq)) {
+          try {
+            fs.unlinkSync(arq);
+          } catch (_) {}
+        }
+      });
+    }
   }
 
   atualizarConta(req, res) {
-    const nome = (req.body.nome || '').trim();
-    const telegram_chat_id = (req.body.telegram_chat_id || '').trim();
+    const nome = String((req.body && req.body.nome) || '').trim();
+    const telegram_chat_id = String((req.body && req.body.telegram_chat_id) || '').trim();
     if (nome === '') {
       return res.status(400).json({
         erro: 'O nome não pode ficar vazio.'
       });
+    }
+    const erroNome = textoDentroDoLimite(nome, 120, 'O nome');
+    if (erroNome) {
+      return res.status(400).json({ erro: erroNome });
+    }
+    const erroTel = validarTelegramChatId(telegram_chat_id);
+    if (erroTel) {
+      return res.status(400).json({ erro: erroTel });
     }
     const antes = db
       .prepare('SELECT id, nome, telegram_chat_id FROM usuario WHERE id = ?')
@@ -270,102 +324,124 @@ class ControladorConfiguracoes {
     });
   }
 
-  atualizarSenha(req, res) {
-    const senhaAtual = req.body.senhaAtual || '';
-    const novaSenha = req.body.novaSenha || '';
-    if (senhaAtual === '' || novaSenha === '') {
-      return res.status(400).json({
-        erro: 'Preencha a senha atual e a nova senha.'
+  async atualizarSenha(req, res, next) {
+    try {
+      const senhaAtual = typeof (req.body && req.body.senhaAtual) === 'string' ? req.body.senhaAtual : '';
+      const novaSenha = typeof (req.body && req.body.novaSenha) === 'string' ? req.body.novaSenha : '';
+      if (senhaAtual === '' || novaSenha === '') {
+        return res.status(400).json({
+          erro: 'Preencha a senha atual e a nova senha.'
+        });
+      }
+      const erroSenha = validarSenha(novaSenha, req.session.usuario.login);
+      if (erroSenha) {
+        return res.status(400).json({ erro: erroSenha });
+      }
+      const atual = db
+        .prepare('SELECT senha_hash FROM usuario WHERE id = ?')
+        .get(req.session.usuario.id);
+      if (
+        !atual ||
+        senhaAtual.length > 72 ||
+        !(await bcrypt.compare(senhaAtual, atual.senha_hash))
+      ) {
+        return res.status(400).json({
+          erro: 'A senha atual está incorreta.'
+        });
+      }
+      const novoHash = await bcrypt.hash(novaSenha, 10);
+      db.prepare('UPDATE usuario SET senha_hash = ? WHERE id = ?').run(
+        novoHash,
+        req.session.usuario.id
+      );
+      sessionStore.revogarPorUsuario(req.session.usuario.id, req.sessionID);
+      auditoria.registrarLog({
+        usuarioId: req.session.usuario.id,
+        acao: 'alterou',
+        tabela: 'usuario',
+        registroId: req.session.usuario.id,
+        resumo: 'Alterou a própria senha (@' + req.session.usuario.login + ')'
       });
-    }
-    if (novaSenha.length < 4) {
-      return res.status(400).json({
-        erro: 'A nova senha precisa ter pelo menos 4 caracteres.'
+      const usuarioAtualizado = Object.assign({}, req.session.usuario);
+      req.session.regenerate((erroRegen) => {
+        if (erroRegen) return next(erroRegen);
+        req.session.usuario = usuarioAtualizado;
+        req.session.save((erroSalvar) => {
+          if (erroSalvar) return next(erroSalvar);
+          res.json({
+            mensagem: 'Senha alterada com sucesso.'
+          });
+        });
       });
+    } catch (erro) {
+      next(erro);
     }
-    const atual = db
-      .prepare('SELECT senha_hash FROM usuario WHERE id = ?')
-      .get(req.session.usuario.id);
-    if (!atual || !bcrypt.compareSync(senhaAtual, atual.senha_hash)) {
-      return res.status(400).json({
-        erro: 'A senha atual está incorreta.'
-      });
-    }
-    const novoHash = bcrypt.hashSync(novaSenha, 10);
-    db.prepare('UPDATE usuario SET senha_hash = ? WHERE id = ?').run(
-      novoHash,
-      req.session.usuario.id
-    );
-    auditoria.registrarLog({
-      usuarioId: req.session.usuario.id,
-      acao: 'alterou',
-      tabela: 'usuario',
-      registroId: req.session.usuario.id,
-      resumo: 'Alterou a própria senha (@' + req.session.usuario.login + ')'
-    });
-    res.json({
-      mensagem: 'Senha alterada com sucesso.'
-    });
   }
 
-  cadastrarUsuario(req, res) {
-    const nome = (req.body.nome || '').trim();
-    const login = (req.body.login || '').trim();
-    const senha = req.body.senha || '';
-    const perfil = req.body.perfil === 'admin' ? 'admin' : 'operador';
-    const telegram_chat_id = (req.body.telegram_chat_id || '').trim();
-    if (nome === '' || login === '' || senha === '') {
-      return res.status(400).json({
-        erro: 'Preencha nome, login e senha inicial.'
-      });
-    }
-    if (login.indexOf(' ') !== -1) {
-      return res.status(400).json({
-        erro: 'O login não pode conter espaços.'
-      });
-    }
-    if (senha.length < 4) {
-      return res.status(400).json({
-        erro: 'A senha inicial precisa ter pelo menos 4 caracteres.'
-      });
-    }
-    const repetido = db.prepare('SELECT id FROM usuario WHERE login = ?').get(login);
-    if (repetido) {
-      return res.status(400).json({
-        erro: 'Já existe um usuário com esse login.'
-      });
-    }
-    const hash = bcrypt.hashSync(senha, 10);
-    const telFinal = telegram_chat_id === '' ? null : telegram_chat_id;
-    const resultado = db
-      .prepare(
-        'INSERT INTO usuario (nome, login, senha_hash, perfil, telegram_chat_id, ativo) VALUES (?, ?, ?, ?, ?, 1)'
-      )
-      .run(nome, login, hash, perfil, telFinal);
-    const novoId = Number(resultado.lastInsertRowid);
-    auditoria.registrarLog({
-      usuarioId: req.session.usuario.id,
-      acao: 'criou',
-      tabela: 'usuario',
-      registroId: novoId,
-      resumo: 'Cadastrou o usuário @' + login + ' (' + perfil + ')',
-      depois: {
-        id: novoId,
-        nome: nome,
-        login: login,
-        perfil: perfil,
-        telegram_chat_id: telFinal,
-        ativo: 1
+  async cadastrarUsuario(req, res, next) {
+    try {
+      const nome = String((req.body && req.body.nome) || '').trim();
+      const login = String((req.body && req.body.login) || '').trim();
+      const senha = (req.body && req.body.senha) || '';
+      const perfil = req.body && req.body.perfil === 'admin' ? 'admin' : 'operador';
+      const telegram_chat_id = String((req.body && req.body.telegram_chat_id) || '').trim();
+      if (nome === '' || login === '' || senha === '') {
+        return res.status(400).json({
+          erro: 'Preencha nome, login e senha inicial.'
+        });
       }
-    });
-    res.status(201).json({
-      mensagem: 'Usuário @' + login + ' criado com sucesso.'
-    });
+      const erroCampo =
+        textoDentroDoLimite(nome, 120, 'O nome') ||
+        validarLogin(login) ||
+        validarSenha(senha, login) ||
+        validarTelegramChatId(telegram_chat_id);
+      if (erroCampo) {
+        return res.status(400).json({ erro: erroCampo });
+      }
+      const repetido = db.prepare('SELECT id FROM usuario WHERE login = ?').get(login);
+      if (repetido) {
+        return res.status(400).json({
+          erro: 'Já existe um usuário com esse login.'
+        });
+      }
+      const hash = await bcrypt.hash(senha, 10);
+      const telFinal = telegram_chat_id === '' ? null : telegram_chat_id;
+      const resultado = db
+        .prepare(
+          'INSERT INTO usuario (nome, login, senha_hash, perfil, telegram_chat_id, ativo) VALUES (?, ?, ?, ?, ?, 1)'
+        )
+        .run(nome, login, hash, perfil, telFinal);
+      const novoId = Number(resultado.lastInsertRowid);
+      auditoria.registrarLog({
+        usuarioId: req.session.usuario.id,
+        acao: 'criou',
+        tabela: 'usuario',
+        registroId: novoId,
+        resumo: 'Cadastrou o usuário @' + login + ' (' + perfil + ')',
+        depois: {
+          id: novoId,
+          nome: nome,
+          login: login,
+          perfil: perfil,
+          telegram_chat_id: telFinal,
+          ativo: 1
+        }
+      });
+      res.status(201).json({
+        mensagem: 'Usuário @' + login + ' criado com sucesso.',
+        id: novoId
+      });
+    } catch (erro) {
+      next(erro);
+    }
   }
 
   alterarPerfil(req, res) {
-    const idAlvo = Number(req.params.id);
-    const novoPerfil = req.body.perfil;
+    const idAlvo = lerIdPositivo(req.params.id);
+    if (!idAlvo) {
+      return res.status(400).json({ erro: 'ID de usuário inválido.' });
+    }
+    const novoPerfil = req.body && req.body.perfil;
     if (novoPerfil !== 'admin' && novoPerfil !== 'operador') {
       return res.status(400).json({
         erro: 'Perfil inválido.'
@@ -383,6 +459,7 @@ class ControladorConfiguracoes {
       });
     }
     db.prepare('UPDATE usuario SET perfil = ? WHERE id = ?').run(novoPerfil, idAlvo);
+    sessionStore.revogarPorUsuario(idAlvo);
     auditoria.registrarLog({
       usuarioId: req.session.usuario.id,
       acao: 'alterou',
@@ -402,8 +479,11 @@ class ControladorConfiguracoes {
   }
 
   alterarStatus(req, res) {
-    const idAlvo = Number(req.params.id);
-    const novoAtivo = req.body.ativo ? 1 : 0;
+    const idAlvo = lerIdPositivo(req.params.id);
+    if (!idAlvo) {
+      return res.status(400).json({ erro: 'ID de usuário inválido.' });
+    }
+    const novoAtivo = req.body && req.body.ativo ? 1 : 0;
     if (idAlvo === req.session.usuario.id) {
       return res.status(400).json({
         erro: 'Você não pode desativar a própria conta em uso.'
@@ -416,6 +496,9 @@ class ControladorConfiguracoes {
       });
     }
     db.prepare('UPDATE usuario SET ativo = ? WHERE id = ?').run(novoAtivo, idAlvo);
+    if (novoAtivo === 0) {
+      sessionStore.revogarPorUsuario(idAlvo);
+    }
     auditoria.registrarLog({
       usuarioId: req.session.usuario.id,
       acao: novoAtivo === 0 ? 'arquivou' : 'alterou',
@@ -434,32 +517,39 @@ class ControladorConfiguracoes {
     });
   }
 
-  redefinirSenha(req, res) {
-    const idAlvo = Number(req.params.id);
-    const novaSenha = req.body.novaSenha || '';
-    if (novaSenha.length < 4) {
-      return res.status(400).json({
-        erro: 'A nova senha precisa ter pelo menos 4 caracteres.'
+  async redefinirSenha(req, res, next) {
+    try {
+      const idAlvo = lerIdPositivo(req.params.id);
+      if (!idAlvo) {
+        return res.status(400).json({ erro: 'ID de usuário inválido.' });
+      }
+      const alvo = db.prepare('SELECT id, login FROM usuario WHERE id = ?').get(idAlvo);
+      if (!alvo) {
+        return res.status(404).json({
+          erro: 'Usuário não encontrado.'
+        });
+      }
+      const novaSenha = (req.body && req.body.novaSenha) || '';
+      const erroSenha = validarSenha(novaSenha, alvo.login);
+      if (erroSenha) {
+        return res.status(400).json({ erro: erroSenha });
+      }
+      const hash = await bcrypt.hash(novaSenha, 10);
+      db.prepare('UPDATE usuario SET senha_hash = ? WHERE id = ?').run(hash, idAlvo);
+      sessionStore.revogarPorUsuario(idAlvo);
+      auditoria.registrarLog({
+        usuarioId: req.session.usuario.id,
+        acao: 'alterou',
+        tabela: 'usuario',
+        registroId: idAlvo,
+        resumo: 'Redefiniu a senha de @' + alvo.login
       });
-    }
-    const alvo = db.prepare('SELECT id, login FROM usuario WHERE id = ?').get(idAlvo);
-    if (!alvo) {
-      return res.status(404).json({
-        erro: 'Usuário não encontrado.'
+      res.json({
+        mensagem: 'Senha de @' + alvo.login + ' redefinida.'
       });
+    } catch (erro) {
+      next(erro);
     }
-    const hash = bcrypt.hashSync(novaSenha, 10);
-    db.prepare('UPDATE usuario SET senha_hash = ? WHERE id = ?').run(hash, idAlvo);
-    auditoria.registrarLog({
-      usuarioId: req.session.usuario.id,
-      acao: 'alterou',
-      tabela: 'usuario',
-      registroId: idAlvo,
-      resumo: 'Redefiniu a senha de @' + alvo.login
-    });
-    res.json({
-      mensagem: 'Senha de @' + alvo.login + ' redefinida.'
-    });
   }
 }
 module.exports = ControladorConfiguracoes;

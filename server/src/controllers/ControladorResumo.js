@@ -212,9 +212,13 @@ class ControladorResumo {
     if (notificacoes.precisaVerificar()) {
       await notificacoes.verificar(configuracao.lerConfig());
     }
+    const ehAdmin = req.session.usuario && req.session.usuario.perfil === 'admin';
+    const filtroAlerta = ehAdmin ? 'WHERE lida = 0' : "WHERE lida = 0 AND tipo != 'log_adulterado'";
     const alertas = db
       .prepare(
-        "SELECT tipo, severidade, mensagem FROM notificacao WHERE lida = 0 ORDER BY CASE severidade WHEN 'critico' THEN 0 ELSE 1 END, id DESC LIMIT 10"
+        'SELECT tipo, severidade, mensagem FROM notificacao ' +
+          filtroAlerta +
+          " ORDER BY CASE severidade WHEN 'critico' THEN 0 ELSE 1 END, id DESC LIMIT 10"
       )
       .all()
       .map((n) => {

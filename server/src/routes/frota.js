@@ -1,11 +1,12 @@
 // Endereços da API de frota.
 const express = require('express');
 const ControladorFrota = require('../controllers/ControladorFrota');
+const { exigirLogin } = require('../middlewares/autenticacao');
 
 const controlador = new ControladorFrota();
 const router = express.Router();
 
-router.use(controlador.exigirLogin.bind(controlador));
+router.use(exigirLogin);
 router.post('/usos', controlador.registrarSaida.bind(controlador));
 router.put('/usos/:id/retorno', controlador.registrarRetorno.bind(controlador));
 router.put('/manutencoes/:id/concluir', controlador.concluirManutencao.bind(controlador));

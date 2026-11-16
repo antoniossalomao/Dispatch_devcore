@@ -27,10 +27,15 @@ class InteligenciaArtificial {
           messages: mensagens,
           temperature: o.temperatura === undefined ? 0.2 : o.temperatura,
           max_tokens: o.maxTokens || 700
-        })
+        }),
+        signal: AbortSignal.timeout(10000)
       });
     } catch (erro) {
-      throw new Error('Não foi possível falar com a Groq (falha de rede).');
+      throw new Error(
+        erro && (erro.name === 'TimeoutError' || erro.name === 'AbortError')
+          ? 'Não foi possível falar com a Groq (falha de rede — tempo esgotado).'
+          : 'Não foi possível falar com a Groq (falha de rede).'
+      );
     }
     const dados = await resposta.json().catch(() => {
       return {};

@@ -241,7 +241,11 @@ class Relatorios {
     filtrados.forEach((e) => {
       porTipo[e.tipo]++;
     });
-    const limite = Math.min(Math.max(Number(f.limite) || 300, 1), 1000);
+    const brutoLimite = Number(f.limite);
+    const limite =
+      Number.isFinite(brutoLimite) && brutoLimite > 0
+        ? Math.min(Math.trunc(brutoLimite), 1000)
+        : 300;
     return {
       periodo: {
         de: periodo.de,

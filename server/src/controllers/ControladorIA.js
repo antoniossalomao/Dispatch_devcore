@@ -59,17 +59,9 @@ class ControladorIA {
     return relatorios.lerPeriodo(query || {});
   }
 
-  exigirLogin(req, res, next) {
-    if (!req.session.usuario) {
-      return res.status(401).json({
-        erro: 'Faça login para acessar.'
-      });
-    }
-    next();
-  }
-
   async perguntar(req, res) {
-    const pergunta = (req.body.pergunta || '').trim();
+    const b = req.body || {};
+    const pergunta = String(b.pergunta || '').trim();
     if (pergunta === '')
       return res.status(400).json({
         erro: 'Escreva a pergunta.'
@@ -80,9 +72,9 @@ class ControladorIA {
       });
     if (!ia.configurada())
       return res.status(503).json({
-        erro: 'IA desligada: defina GROQ_API_KEY no server/.env.'
+        erro: 'O assistente de IA não está habilitado no servidor.'
       });
-    const periodo = this.periodoOuPadrao(req.body);
+    const periodo = this.periodoOuPadrao(b);
     if (!periodo)
       return res.status(400).json({
         erro: 'Período inválido.'
@@ -105,8 +97,9 @@ class ControladorIA {
         resposta: resposta
       });
     } catch (erro) {
+      console.error('Erro na consulta de IA:', erro);
       res.status(502).json({
-        erro: erro.message
+        erro: 'Serviço de IA temporariamente indisponível.'
       });
     }
   }
@@ -114,9 +107,9 @@ class ControladorIA {
   async resumir(req, res) {
     if (!ia.configurada())
       return res.status(503).json({
-        erro: 'IA desligada: defina GROQ_API_KEY no server/.env.'
+        erro: 'O assistente de IA não está habilitado no servidor.'
       });
-    const periodo = this.periodoOuPadrao(req.body);
+    const periodo = this.periodoOuPadrao(req.body || {});
     if (!periodo)
       return res.status(400).json({
         erro: 'Período inválido.'
@@ -143,14 +136,16 @@ class ControladorIA {
         resposta: resposta
       });
     } catch (erro) {
+      console.error('Erro no resumo de IA:', erro);
       res.status(502).json({
-        erro: erro.message
+        erro: 'Serviço de IA temporariamente indisponível.'
       });
     }
   }
 
   async responderSuporte(req, res) {
-    const mensagem = (req.body.mensagem || '').trim();
+    const b = req.body || {};
+    const mensagem = String(b.mensagem || '').trim();
     if (mensagem === '')
       return res.status(400).json({
         erro: 'Escreva a mensagem.'
@@ -161,7 +156,7 @@ class ControladorIA {
       });
     if (!ia.configurada())
       return res.status(503).json({
-        erro: 'IA desligada: defina GROQ_API_KEY no server/.env.'
+        erro: 'O assistente de IA não está habilitado no servidor.'
       });
     const ajuda =
       'Telas: Visão Geral (indicadores e alertas), Colaboradores (cadastro, CNH e histórico), Alojamentos (mapa de leitos, entrada/saída, ocorrências), ' +
@@ -191,8 +186,9 @@ class ControladorIA {
         resposta: resposta
       });
     } catch (erro) {
+      console.error('Erro no suporte de IA:', erro);
       res.status(502).json({
-        erro: erro.message
+        erro: 'Serviço de IA temporariamente indisponível.'
       });
     }
   }

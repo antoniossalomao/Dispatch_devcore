@@ -66,6 +66,7 @@ class TelaColaboradores {
     this.colaboradoresCache = [];
     this.filtroCnhAtual = 'todos';
     this.colaboradorSelecionado = null;
+    this.ehAdmin = false;
     this.timerToast = null;
     this.configurarEventos();
     this.iniciar();
@@ -215,29 +216,46 @@ class TelaColaboradores {
     }, 3200);
   }
 
-  tagCnh(info) {
-    if (info.status === 'valida') {
-      return (
-        '<span class="status-tag status-ativo"><span class="status-ponto"></span>' +
-        info.rotulo +
-        '</span>'
-      );
+  infoCnhVisual(info) {
+    if (info && info.status === 'valida') {
+      return { classe: 'status-ativo', texto: info.rotulo || 'Válida' };
     }
-    if (info.status === 'vencendo') {
-      return (
-        '<span class="status-tag status-atencao"><span class="status-ponto"></span>' +
-        info.rotulo +
-        '</span>'
-      );
+    if (info && info.status === 'vencendo') {
+      return { classe: 'status-atencao', texto: info.rotulo || 'Vencendo' };
     }
-    if (info.status === 'vencida') {
-      return (
-        '<span class="status-tag status-problema"><span class="status-ponto"></span>' +
-        info.rotulo +
-        '</span>'
-      );
+    if (info && info.status === 'vencida') {
+      return { classe: 'status-problema', texto: info.rotulo || 'Vencida' };
     }
-    return '<span class="status-tag status-concluido"><span class="status-ponto"></span>Sem CNH</span>';
+    return { classe: 'status-concluido', texto: 'Sem CNH' };
+  }
+
+  criarTagCnh(info) {
+    const visual = this.infoCnhVisual(info);
+    const tag = document.createElement('span');
+    tag.className = 'status-tag ' + visual.classe;
+    const ponto = document.createElement('span');
+    ponto.className = 'status-ponto';
+    tag.appendChild(ponto);
+    tag.appendChild(document.createTextNode(visual.texto));
+    return tag;
+  }
+
+  criarItemTimeline(titulo, detalhe, data, ativo) {
+    const item = document.createElement('div');
+    item.className = 'timeline-item' + (ativo ? ' timeline-ativo' : '');
+    const sTitulo = document.createElement('span');
+    sTitulo.className = 'timeline-titulo';
+    sTitulo.textContent = titulo;
+    const sDetalhe = document.createElement('span');
+    sDetalhe.className = 'timeline-detalhe';
+    sDetalhe.textContent = detalhe;
+    const sData = document.createElement('span');
+    sData.className = 'timeline-data';
+    sData.textContent = data;
+    item.appendChild(sTitulo);
+    item.appendChild(sDetalhe);
+    item.appendChild(sData);
+    return item;
   }
 
   desenharTabela(lista) {
@@ -296,7 +314,7 @@ class TelaColaboradores {
       boxCnh.appendChild(cat);
       if (c.cnh_info.status === 'vencendo' || c.cnh_info.status === 'vencida') {
         const spanTag = document.createElement('div');
-        spanTag.innerHTML = this.tagCnh(c.cnh_info);
+        spanTag.appendChild(this.criarTagCnh(c.cnh_info));
         boxCnh.appendChild(spanTag);
       }
       tdCnh.appendChild(boxCnh);
@@ -380,7 +398,7 @@ class TelaColaboradores {
       this.kpiCnhAlerta.textContent = totais.cnhAlerta;
       this.kpiAlojados.textContent = totais.alojados;
       this.kpiEmTransito.textContent = totais.emTransito + ' com veículo da frota';
-      if (totais.total === 0) {
+      if (this.ehAdmin && totais.total === 0) {
         this.botaoSeed.hidden = false;
       } else {
         this.botaoSeed.hidden = true;
@@ -448,7 +466,13 @@ class TelaColaboradores {
       this.gavetaCnhVal.textContent = c.cnh_validade
         ? c.cnh_validade.split('-').reverse().join('/')
         : '—';
-      this.gavetaCnhTag.innerHTML = this.tagCnh(c.cnh_info);
+      const visualCnh = this.infoCnhVisual(c.cnh_info);
+      this.gavetaCnhTag.className = 'status-tag ' + visualCnh.classe;
+      this.gavetaCnhTag.textContent = '';
+      const pontoCnh = document.createElement('span');
+      pontoCnh.className = 'status-ponto';
+      this.gavetaCnhTag.appendChild(pontoCnh);
+      this.gavetaCnhTag.appendChild(document.createTextNode(visualCnh.texto));
       const estadias = res.dados.estadias || [];
       const estadiaAtual = estadias.find((e) => {
         return !e.fim;
@@ -484,24 +508,16 @@ class TelaColaboradores {
           '<p class="texto-vazio">Nenhuma estadia registrada no histórico deste colaborador.</p>';
       } else {
         estadias.forEach((e) => {
-          const item = document.createElement('div');
-          item.className = 'timeline-item' + (!e.fim ? ' timeline-ativo' : '');
-          item.innerHTML =
-            '<span class="timeline-titulo">' +
-            e.alojamento +
-            ' · Quarto ' +
-            e.quarto +
-            ' (Leito ' +
-            e.leito +
-            ')</span>' +
-            '<span class="timeline-detalhe">' +
-            (!e.fim ? 'Estadia atual (em andamento)' : 'Saída registrada') +
-            '</span>' +
-            '<span class="timeline-data">Entrada: ' +
-            e.inicio.slice(0, 16) +
-            (e.fim ? ' | Saída: ' + e.fim.slice(0, 16) : '') +
-            '</span>';
-          this.gavetaListaEstadias.appendChild(item);
+          this.gavetaListaEstadias.appendChild(
+            this.criarItemTimeline(
+              e.alojamento + ' · Quarto ' + e.quarto + ' (Leito ' + e.leito + ')',
+              !e.fim ? 'Estadia atual (em andamento)' : 'Saída registrada',
+              'Entrada: ' +
+                e.inicio.slice(0, 16) +
+                (e.fim ? ' | Saída: ' + e.fim.slice(0, 16) : ''),
+              !e.fim
+            )
+          );
         });
       }
 
@@ -514,23 +530,18 @@ class TelaColaboradores {
           '<p class="texto-vazio">Nenhum registro de condução como motorista.</p>';
       } else {
         viagensMotorista.forEach((u) => {
-          const item = document.createElement('div');
-          item.className = 'timeline-item' + (!u.retorno ? ' timeline-ativo' : '');
-          item.innerHTML =
-            '<span class="timeline-titulo">' +
-            u.modelo +
-            ' · Placa ' +
-            u.placa +
-            '</span>' +
-            '<span class="timeline-detalhe">Destino: ' +
-            u.destino +
-            (u.km_rodados !== null ? ' (' + u.km_rodados + ' km percorridos)' : ' (Em trânsito)') +
-            '</span>' +
-            '<span class="timeline-data">Saída: ' +
-            u.saida.slice(0, 16) +
-            (u.retorno ? ' | Volta: ' + u.retorno.slice(0, 16) : '') +
-            '</span>';
-          this.gavetaListaMotorista.appendChild(item);
+          this.gavetaListaMotorista.appendChild(
+            this.criarItemTimeline(
+              u.modelo + ' · Placa ' + u.placa,
+              'Destino: ' +
+                u.destino +
+                (u.km_rodados !== null
+                  ? ' (' + u.km_rodados + ' km percorridos)'
+                  : ' (Em trânsito)'),
+              'Saída: ' + u.saida.slice(0, 16) + (u.retorno ? ' | Volta: ' + u.retorno.slice(0, 16) : ''),
+              !u.retorno
+            )
+          );
         });
       }
       this.gavetaListaPassageiro.innerHTML = '';
@@ -539,23 +550,14 @@ class TelaColaboradores {
           '<p class="texto-vazio">Nenhuma viagem como passageiro registrada.</p>';
       } else {
         viagensPassageiro.forEach((up) => {
-          const item = document.createElement('div');
-          item.className = 'timeline-item';
-          item.innerHTML =
-            '<span class="timeline-titulo">' +
-            up.modelo +
-            ' (' +
-            up.placa +
-            ')</span>' +
-            '<span class="timeline-detalhe">Motorista: ' +
-            up.motorista +
-            ' · Destino: ' +
-            up.destino +
-            '</span>' +
-            '<span class="timeline-data">Data: ' +
-            up.saida.slice(0, 16) +
-            '</span>';
-          this.gavetaListaPassageiro.appendChild(item);
+          this.gavetaListaPassageiro.appendChild(
+            this.criarItemTimeline(
+              up.modelo + ' (' + up.placa + ')',
+              'Motorista: ' + up.motorista + ' · Destino: ' + up.destino,
+              'Data: ' + up.saida.slice(0, 16),
+              false
+            )
+          );
         });
       }
       this.gavetaBotaoStatus.textContent =
@@ -577,12 +579,12 @@ class TelaColaboradores {
       this.perfilNome.textContent = user.nome;
       this.perfilTipo.textContent = user.perfil;
       this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
-      if (user.perfil === 'admin') {
+      this.ehAdmin = user.perfil === 'admin';
+      if (this.ehAdmin) {
         this.blocoMenuAdmin.hidden = false;
       }
-      const resCfg = await chamarApi('/api/configuracoes');
-      if (resCfg.ok && resCfg.dados.parametros && resCfg.dados.parametros.nomeEmpresa) {
-        this.nomeEmpresaMenu.textContent = resCfg.dados.parametros.nomeEmpresa;
+      if (sessao.dados.nomeEmpresa) {
+        this.nomeEmpresaMenu.textContent = sessao.dados.nomeEmpresa;
       }
       this.carregarColaboradores();
     } catch (e) {

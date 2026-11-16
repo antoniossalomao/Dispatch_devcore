@@ -168,6 +168,14 @@ CREATE TABLE IF NOT EXISTS notificacao (
 );
 
 
+-- sessões autenticadas persistidas no banco
+CREATE TABLE IF NOT EXISTS sessao (
+    sid         TEXT PRIMARY KEY,
+    usuario_id  INTEGER REFERENCES usuario(id) ON DELETE CASCADE,
+    dados       TEXT NOT NULL,
+    expira_em   INTEGER NOT NULL
+);
+
 -- ===== índices =====
 -- deixam as buscas mais rápidas. principalmente a de "esse leito/carro já ta ocupado nesse horário?"
 CREATE INDEX IF NOT EXISTS idx_estadia_pessoa ON estadia (pessoa_id, inicio);
@@ -177,3 +185,5 @@ CREATE INDEX IF NOT EXISTS idx_uso_motorista ON uso_veiculo (motorista_id, saida
 CREATE INDEX IF NOT EXISTS idx_manutencao_veiculo ON manutencao (veiculo_id, inicio);
 CREATE INDEX IF NOT EXISTS idx_ocorrencia_alojamento ON ocorrencia (alojamento_id, aberta_em);
 CREATE INDEX IF NOT EXISTS idx_log_quando ON log_auditoria (quando);
+CREATE INDEX IF NOT EXISTS idx_sessao_usuario ON sessao (usuario_id);
+CREATE INDEX IF NOT EXISTS idx_sessao_expira ON sessao (expira_em);

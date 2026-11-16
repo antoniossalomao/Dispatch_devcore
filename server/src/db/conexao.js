@@ -16,5 +16,6 @@ const db = new DatabaseSync(caminhoBanco)
 
 // no sqlite a checagem das chaves estrangeiras (REFERENCES) vem desligada por padrão
 db.exec('PRAGMA foreign_keys = ON')
+db.exec('PRAGMA busy_timeout = 5000')
 
 module.exports = db

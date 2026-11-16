@@ -22,38 +22,46 @@ class Auditoria {
   }
 
   registrarLog(info) {
-    const ultimo = db.prepare('SELECT hash FROM log_auditoria ORDER BY id DESC LIMIT 1').get();
-    const hashAnterior = ultimo ? ultimo.hash : 'INICIO';
-    const quando = agoraLocal();
-    const antesJson = info.antes ? JSON.stringify(info.antes) : null;
-    const depoisJson = info.depois ? JSON.stringify(info.depois) : null;
-    const hash = this.gerarHash({
-      hashAnterior: hashAnterior,
-      quando: quando,
-      usuarioId: info.usuarioId,
-      acao: info.acao,
-      tabela: info.tabela,
-      registroId: info.registroId,
-      resumo: info.resumo,
-      antesJson: antesJson,
-      depoisJson: depoisJson
-    });
-    db.prepare(
-      'INSERT INTO log_auditoria ' +
-        '(quando, usuario_id, acao, tabela, registro_id, resumo, antes_json, depois_json, hash_anterior, hash) ' +
-        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-    ).run(
-      quando,
-      info.usuarioId,
-      info.acao,
-      info.tabela,
-      info.registroId,
-      info.resumo,
-      antesJson,
-      depoisJson,
-      hashAnterior,
-      hash
-    );
+    db.exec('SAVEPOINT auditoria_sp');
+    try {
+      const ultimo = db.prepare('SELECT hash FROM log_auditoria ORDER BY id DESC LIMIT 1').get();
+      const hashAnterior = ultimo ? ultimo.hash : 'INICIO';
+      const quando = agoraLocal();
+      const antesJson = info.antes ? JSON.stringify(info.antes) : null;
+      const depoisJson = info.depois ? JSON.stringify(info.depois) : null;
+      const hash = this.gerarHash({
+        hashAnterior: hashAnterior,
+        quando: quando,
+        usuarioId: info.usuarioId,
+        acao: info.acao,
+        tabela: info.tabela,
+        registroId: info.registroId,
+        resumo: info.resumo,
+        antesJson: antesJson,
+        depoisJson: depoisJson
+      });
+      db.prepare(
+        'INSERT INTO log_auditoria ' +
+          '(quando, usuario_id, acao, tabela, registro_id, resumo, antes_json, depois_json, hash_anterior, hash) ' +
+          'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+      ).run(
+        quando,
+        info.usuarioId,
+        info.acao,
+        info.tabela,
+        info.registroId,
+        info.resumo,
+        antesJson,
+        depoisJson,
+        hashAnterior,
+        hash
+      );
+      db.exec('RELEASE SAVEPOINT auditoria_sp');
+    } catch (erro) {
+      db.exec('ROLLBACK TO SAVEPOINT auditoria_sp');
+      db.exec('RELEASE SAVEPOINT auditoria_sp');
+      throw erro;
+    }
   }
 
   verificarIntegridadeLog() {

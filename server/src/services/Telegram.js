@@ -26,7 +26,8 @@ class Telegram {
           body: JSON.stringify({
             chat_id: destino,
             text: texto
-          })
+          }),
+          signal: AbortSignal.timeout(10000)
         }
       );
       if (!resposta.ok) {

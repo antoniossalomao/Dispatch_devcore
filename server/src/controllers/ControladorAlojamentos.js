@@ -3,19 +3,13 @@ const Quarto = require('../models/Quarto');
 const db = require('../db/conexao');
 const auditoria = require('../services/Auditoria');
 const { agoraLocal, normalizarData } = require('../regras/datas');
+const { lerIdPositivo, textoDentroDoLimite } = require('../regras/validacao');
+
 class ControladorAlojamentos {
   constructor() {
     this.tiposOcorrencia = ['manutencao', 'conflito', 'reclamacao', 'regra', 'outro'];
   }
 
-  exigirLogin(req, res, next) {
-    if (!req.session.usuario) {
-      return res.status(401).json({
-        erro: 'Faça login para acessar.'
-      });
-    }
-    next();
-  }
   // A6: o responsavel tem que ser um colaborador ativo
 
   conferirResponsavel(responsavelId) {
@@ -28,31 +22,45 @@ class ControladorAlojamentos {
   // A4 e A5: no maximo 8 leitos e a area precisa caber os leitos
 
   lerEndereco(corpo) {
+    const b = corpo || {};
     return {
-      nome: (corpo.nome || '').trim(),
-      cidade: (corpo.cidade || '').trim(),
-      cep: (corpo.cep || '').trim() || null,
-      rua: (corpo.rua || '').trim() || null,
-      numero: (corpo.numero || '').trim() || null,
-      bairro: (corpo.bairro || '').trim() || null,
-      observacoes: (corpo.observacoes || '').trim() || null
+      nome: String(b.nome || '').trim(),
+      cidade: String(b.cidade || '').trim(),
+      cep: String(b.cep || '').trim() || null,
+      rua: String(b.rua || '').trim() || null,
+      numero: String(b.numero || '').trim() || null,
+      bairro: String(b.bairro || '').trim() || null,
+      observacoes: String(b.observacoes || '').trim() || null
     };
   }
 
+  validarEndereco(dados) {
+    return (
+      textoDentroDoLimite(dados.nome, 120, 'O nome') ||
+      textoDentroDoLimite(dados.cidade, 100, 'A cidade') ||
+      textoDentroDoLimite(dados.cep, 20, 'O CEP') ||
+      textoDentroDoLimite(dados.rua, 120, 'A rua') ||
+      textoDentroDoLimite(dados.numero, 20, 'O número') ||
+      textoDentroDoLimite(dados.bairro, 100, 'O bairro') ||
+      textoDentroDoLimite(dados.observacoes, 500, 'As observações')
+    );
+  }
+
   lerResponsavelId(corpo) {
-    if (
-      corpo.responsavel_id === undefined ||
-      corpo.responsavel_id === null ||
-      corpo.responsavel_id === ''
-    )
-      return null;
-    return Number(corpo.responsavel_id);
+    const valor = corpo && corpo.responsavel_id;
+    if (valor === undefined || valor === null || String(valor).trim() === '') {
+      return { id: null, invalido: false };
+    }
+    const id = lerIdPositivo(valor);
+    if (!id) return { id: null, invalido: true };
+    return { id: id, invalido: false };
   }
 
   alojar(req, res) {
-    const pessoaId = Number(req.body.pessoa_id);
-    const leitoId = Number(req.body.leito_id);
-    const inicio = req.body.inicio ? normalizarData(req.body.inicio) : agoraLocal();
+    const b = req.body || {};
+    const pessoaId = lerIdPositivo(b.pessoa_id);
+    const leitoId = lerIdPositivo(b.leito_id);
+    const inicio = b.inicio ? normalizarData(b.inicio) : agoraLocal();
     if (!pessoaId || !leitoId) {
       return res.status(400).json({
         erro: 'Informe o colaborador e o leito.'
@@ -130,7 +138,10 @@ class ControladorAlojamentos {
   }
 
   registrarSaida(req, res) {
-    const id = Number(req.params.id);
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de estadia inválido.' });
+    }
     const estadia = db.prepare('SELECT * FROM estadia WHERE id = ?').get(id);
     if (!estadia)
       return res.status(404).json({
@@ -140,7 +151,8 @@ class ControladorAlojamentos {
       return res.status(400).json({
         erro: 'Essa estadia já foi encerrada.'
       });
-    const fim = req.body.fim ? normalizarData(req.body.fim) : agoraLocal();
+    const b = req.body || {};
+    const fim = b.fim ? normalizarData(b.fim) : agoraLocal();
     if (!fim)
       return res.status(400).json({
         erro: 'Data de saída inválida.'
@@ -157,7 +169,7 @@ class ControladorAlojamentos {
       acao: 'alterou',
       tabela: 'estadia',
       registroId: id,
-      resumo: 'Registrou a saída de ' + pessoa.nome + ' do leito',
+      resumo: 'Registrou a saída de ' + (pessoa ? pessoa.nome : 'colaborador') + ' do leito',
       antes: {
         fim: null
       },
@@ -171,7 +183,10 @@ class ControladorAlojamentos {
   }
 
   resolverOcorrencia(req, res) {
-    const id = Number(req.params.id);
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de ocorrência inválido.' });
+    }
     const ocorrencia = db.prepare('SELECT * FROM ocorrencia WHERE id = ?').get(id);
     if (!ocorrencia)
       return res.status(404).json({
@@ -181,14 +196,17 @@ class ControladorAlojamentos {
       return res.status(400).json({
         erro: 'Essa ocorrência já foi resolvida.'
       });
-    const solucao = (req.body.solucao || '').trim();
+    const b = req.body || {};
+    const solucao = String(b.solucao || '').trim();
     if (solucao === '')
       return res.status(400).json({
         erro: 'Descreva a solução.'
       });
-    const resolvidaEm = req.body.resolvida_em
-      ? normalizarData(req.body.resolvida_em)
-      : agoraLocal();
+    const erroSolucao = textoDentroDoLimite(solucao, 500, 'A solução');
+    if (erroSolucao) {
+      return res.status(400).json({ erro: erroSolucao });
+    }
+    const resolvidaEm = b.resolvida_em ? normalizarData(b.resolvida_em) : agoraLocal();
     if (!resolvidaEm)
       return res.status(400).json({
         erro: 'Data de resolução inválida.'
@@ -265,7 +283,10 @@ class ControladorAlojamentos {
   }
 
   buscarPorId(req, res) {
-    const id = Number(req.params.id);
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de alojamento inválido.' });
+    }
     const alojamento = db
       .prepare(
         'SELECT a.*, p.nome AS responsavel_nome FROM alojamento a LEFT JOIN pessoa p ON p.id = a.responsavel_id WHERE a.id = ?'
@@ -301,13 +322,20 @@ class ControladorAlojamentos {
 
   cadastrar(req, res) {
     const dados = this.lerEndereco(req.body);
-    const responsavelId = this.lerResponsavelId(req.body);
+    const resp = this.lerResponsavelId(req.body);
     if (dados.nome === '' || dados.cidade === '') {
       return res.status(400).json({
         erro: 'Nome e cidade são obrigatórios.'
       });
     }
-    const erroResp = this.conferirResponsavel(responsavelId);
+    const erroEnd = this.validarEndereco(dados);
+    if (erroEnd) {
+      return res.status(400).json({ erro: erroEnd });
+    }
+    if (resp.invalido) {
+      return res.status(400).json({ erro: 'Responsável inválido.' });
+    }
+    const erroResp = this.conferirResponsavel(resp.id);
     if (erroResp)
       return res.status(400).json({
         erro: erroResp
@@ -318,7 +346,7 @@ class ControladorAlojamentos {
       )
       .run(
         dados.nome,
-        responsavelId,
+        resp.id,
         dados.cidade,
         dados.cep,
         dados.rua,
@@ -336,7 +364,7 @@ class ControladorAlojamentos {
       depois: Object.assign(
         {
           id: id,
-          responsavel_id: responsavelId
+          responsavel_id: resp.id
         },
         dados
       )
@@ -348,21 +376,31 @@ class ControladorAlojamentos {
   }
 
   atualizar(req, res) {
-    const id = Number(req.params.id);
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de alojamento inválido.' });
+    }
     const atual = db.prepare('SELECT * FROM alojamento WHERE id = ?').get(id);
     if (!atual)
       return res.status(404).json({
         erro: 'Alojamento não encontrado.'
       });
     const dados = this.lerEndereco(req.body);
-    const responsavelId = this.lerResponsavelId(req.body);
+    const resp = this.lerResponsavelId(req.body);
     if (dados.nome === '' || dados.cidade === '') {
       return res.status(400).json({
         erro: 'Nome e cidade são obrigatórios.'
       });
     }
-    if (responsavelId !== atual.responsavel_id) {
-      const erroResp = this.conferirResponsavel(responsavelId);
+    const erroEnd = this.validarEndereco(dados);
+    if (erroEnd) {
+      return res.status(400).json({ erro: erroEnd });
+    }
+    if (resp.invalido) {
+      return res.status(400).json({ erro: 'Responsável inválido.' });
+    }
+    if (resp.id !== atual.responsavel_id) {
+      const erroResp = this.conferirResponsavel(resp.id);
       if (erroResp)
         return res.status(400).json({
           erro: erroResp
@@ -372,7 +410,7 @@ class ControladorAlojamentos {
       'UPDATE alojamento SET nome = ?, responsavel_id = ?, cidade = ?, cep = ?, rua = ?, numero = ?, bairro = ?, observacoes = ? WHERE id = ?'
     ).run(
       dados.nome,
-      responsavelId,
+      resp.id,
       dados.cidade,
       dados.cep,
       dados.rua,
@@ -391,7 +429,7 @@ class ControladorAlojamentos {
       depois: Object.assign(
         {
           id: id,
-          responsavel_id: responsavelId
+          responsavel_id: resp.id
         },
         dados
       )
@@ -402,8 +440,11 @@ class ControladorAlojamentos {
   }
 
   alterarStatus(req, res) {
-    const id = Number(req.params.id);
-    const novoAtivo = req.body.ativo ? 1 : 0;
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de alojamento inválido.' });
+    }
+    const novoAtivo = req.body && req.body.ativo ? 1 : 0;
     const alojamento = db.prepare('SELECT * FROM alojamento WHERE id = ?').get(id);
     if (!alojamento)
       return res.status(404).json({
@@ -442,19 +483,23 @@ class ControladorAlojamentos {
   }
 
   cadastrarQuarto(req, res) {
-    const alojamentoId = Number(req.params.id);
+    const alojamentoId = lerIdPositivo(req.params.id);
+    if (!alojamentoId) {
+      return res.status(400).json({ erro: 'ID de alojamento inválido.' });
+    }
     const alojamento = db.prepare('SELECT id, nome FROM alojamento WHERE id = ?').get(alojamentoId);
     if (!alojamento)
       return res.status(404).json({
         erro: 'Alojamento não encontrado.'
       });
-    const nome = (req.body.nome || '').trim();
-    const areaM2 = Number(req.body.area_m2);
-    const leitos = Array.isArray(req.body.leitos)
-      ? req.body.leitos.map((l) => {
+    const b = req.body || {};
+    const nome = String(b.nome || '').trim();
+    const areaM2 = Number(b.area_m2);
+    const leitos = Array.isArray(b.leitos)
+      ? b.leitos.map((l) => {
           return {
-            codigo: String(l.codigo || '').trim(),
-            tipo: l.tipo
+            codigo: String((l && l.codigo) || '').trim(),
+            tipo: l && l.tipo
           };
         })
       : [];
@@ -462,9 +507,17 @@ class ControladorAlojamentos {
       return res.status(400).json({
         erro: 'Informe o nome do quarto.'
       });
-    if (!(areaM2 > 0))
+    const erroNome = textoDentroDoLimite(nome, 80, 'O nome do quarto');
+    if (erroNome) {
+      return res.status(400).json({ erro: erroNome });
+    }
+    for (let i = 0; i < leitos.length; i++) {
+      const erroCod = textoDentroDoLimite(leitos[i].codigo, 30, 'O código do leito');
+      if (erroCod) return res.status(400).json({ erro: erroCod });
+    }
+    if (!Number.isFinite(areaM2) || areaM2 <= 0 || areaM2 > 10000)
       return res.status(400).json({
-        erro: 'Informe a área do quarto em m².'
+        erro: 'Informe uma área válida para o quarto em m².'
       });
     const erro = new Quarto(areaM2, leitos).validar();
     if (erro)
@@ -487,8 +540,9 @@ class ControladorAlojamentos {
       db.exec('COMMIT');
     } catch (e) {
       db.exec('ROLLBACK');
+      console.error('Erro ao salvar quarto:', e);
       return res.status(500).json({
-        erro: 'Não foi possível salvar o quarto: ' + e.message
+        erro: 'Não foi possível salvar o quarto.'
       });
     }
     auditoria.registrarLog({
@@ -518,15 +572,23 @@ class ControladorAlojamentos {
   }
 
   registrarOcorrencia(req, res) {
-    const alojamentoId = Number(req.params.id);
+    const alojamentoId = lerIdPositivo(req.params.id);
+    if (!alojamentoId) {
+      return res.status(400).json({ erro: 'ID de alojamento inválido.' });
+    }
     const alojamento = db.prepare('SELECT id, nome FROM alojamento WHERE id = ?').get(alojamentoId);
     if (!alojamento)
       return res.status(404).json({
         erro: 'Alojamento não encontrado.'
       });
-    const tipo = req.body.tipo;
-    const descricao = (req.body.descricao || '').trim();
-    const pessoaId = req.body.pessoa_id ? Number(req.body.pessoa_id) : null;
+    const b = req.body || {};
+    const tipo = b.tipo;
+    const descricao = String(b.descricao || '').trim();
+    const temPessoa = b.pessoa_id !== undefined && b.pessoa_id !== null && String(b.pessoa_id).trim() !== '';
+    const pessoaId = temPessoa ? lerIdPositivo(b.pessoa_id) : null;
+    if (temPessoa && !pessoaId) {
+      return res.status(400).json({ erro: 'Colaborador inválido.' });
+    }
     if (this.tiposOcorrencia.indexOf(tipo) === -1)
       return res.status(400).json({
         erro: 'Tipo de ocorrência inválido.'
@@ -535,6 +597,10 @@ class ControladorAlojamentos {
       return res.status(400).json({
         erro: 'Descreva a ocorrência.'
       });
+    const erroDesc = textoDentroDoLimite(descricao, 500, 'A descrição');
+    if (erroDesc) {
+      return res.status(400).json({ erro: erroDesc });
+    }
     if (pessoaId && !db.prepare('SELECT id FROM pessoa WHERE id = ?').get(pessoaId)) {
       return res.status(404).json({
         erro: 'Colaborador não encontrado.'

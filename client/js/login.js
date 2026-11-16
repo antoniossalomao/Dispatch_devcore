@@ -8,7 +8,21 @@ class TelaLogin {
     this.msgErro = document.getElementById('mensagem-erro');
     this.msgSucesso = document.getElementById('mensagem-sucesso');
     this.botaoEntrar = document.getElementById('botao-entrar');
+    this.ajudaCadastro = document.getElementById('ajuda-cadastro');
     this.configurarEventos();
+    this.verificarCadastro();
+  }
+
+  async verificarCadastro() {
+    if (!this.ajudaCadastro) return;
+    try {
+      const res = await chamarApi('/api/auth/cadastro-status');
+      if (res.ok && res.dados && res.dados.ativo) {
+        this.ajudaCadastro.hidden = false;
+      }
+    } catch (_) {
+      // Se o servidor estiver indisponível, mantém oculto.
+    }
   }
 
   configurarEventos() {

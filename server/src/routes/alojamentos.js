@@ -1,11 +1,12 @@
 // Endereços da API de alojamentos.
 const express = require('express');
 const ControladorAlojamentos = require('../controllers/ControladorAlojamentos');
+const { exigirLogin } = require('../middlewares/autenticacao');
 
 const controlador = new ControladorAlojamentos();
 const router = express.Router();
 
-router.use(controlador.exigirLogin.bind(controlador));
+router.use(exigirLogin);
 router.post('/estadias', controlador.alojar.bind(controlador));
 router.put('/estadias/:id/saida', controlador.registrarSaida.bind(controlador));
 router.put('/ocorrencias/:id/resolver', controlador.resolverOcorrencia.bind(controlador));

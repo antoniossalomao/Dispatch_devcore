@@ -2,6 +2,8 @@
 class TelaCadastro {
   constructor() {
     this.form = document.getElementById('form-cadastro');
+    this.avisoDesativado = document.getElementById('cadastro-desativado');
+    this.inputCodigo = document.getElementById('codigo');
     this.inputNome = document.getElementById('nome');
     this.inputUsuario = document.getElementById('usuario');
     this.inputSenha = document.getElementById('senha');
@@ -10,6 +12,27 @@ class TelaCadastro {
     this.msgErro = document.getElementById('mensagem-erro');
     this.botaoCadastrar = document.getElementById('botao-cadastrar');
     this.configurarEventos();
+    this.verificarDisponibilidade();
+  }
+
+  async verificarDisponibilidade() {
+    try {
+      const res = await chamarApi('/api/auth/cadastro-status');
+      if (res.ok && res.dados && res.dados.ativo) {
+        this.form.hidden = false;
+        if (this.avisoDesativado) this.avisoDesativado.hidden = true;
+      } else {
+        this.form.hidden = true;
+        if (this.avisoDesativado) this.avisoDesativado.hidden = false;
+      }
+    } catch (_) {
+      this.form.hidden = true;
+      if (this.avisoDesativado) {
+        this.avisoDesativado.textContent =
+          'Não foi possível verificar a disponibilidade do cadastro no servidor.';
+        this.avisoDesativado.hidden = false;
+      }
+    }
   }
 
   configurarEventos() {
@@ -24,16 +47,19 @@ class TelaCadastro {
   async cadastrar(e) {
     e.preventDefault();
     this.esconderErro();
+    const codigo = this.inputCodigo ? this.inputCodigo.value.trim() : '';
     const nome = this.inputNome.value.trim();
     const usuario = this.inputUsuario.value.trim();
     const senha = this.inputSenha.value;
     const confirmar = this.inputConfirmar.value;
-    if (nome === '' || usuario === '' || senha === '' || confirmar === '') {
+    if (codigo === '' || nome === '' || usuario === '' || senha === '' || confirmar === '') {
       this.mostrarErro(
         'Preencha todos os campos.',
-        [this.inputNome, this.inputUsuario, this.inputSenha, this.inputConfirmar].find((campo) => {
-          return campo.value.trim() === '';
-        })
+        [this.inputCodigo, this.inputNome, this.inputUsuario, this.inputSenha, this.inputConfirmar].find(
+          (campo) => {
+            return campo && campo.value.trim() === '';
+          }
+        )
       );
       return;
     }
@@ -41,8 +67,8 @@ class TelaCadastro {
       this.mostrarErro('O nome de usuário não pode ter espaços.', this.inputUsuario);
       return;
     }
-    if (senha.length < 4) {
-      this.mostrarErro('A senha precisa ter pelo menos 4 caracteres.', this.inputSenha);
+    if (senha.length < 8) {
+      this.mostrarErro('A senha precisa ter pelo menos 8 caracteres.', this.inputSenha);
       return;
     }
     if (senha !== confirmar) {
@@ -56,6 +82,7 @@ class TelaCadastro {
       const res = await chamarApi('/api/auth/cadastro', {
         metodo: 'POST',
         corpo: {
+          codigo: codigo,
           nome: nome,
           usuario: usuario,
           senha: senha
@@ -87,9 +114,15 @@ class TelaCadastro {
   esconderErro() {
     this.msgErro.textContent = '';
     this.msgErro.hidden = true;
-    const campos = [this.inputNome, this.inputUsuario, this.inputSenha, this.inputConfirmar];
+    const campos = [
+      this.inputCodigo,
+      this.inputNome,
+      this.inputUsuario,
+      this.inputSenha,
+      this.inputConfirmar
+    ];
     campos.forEach((campo) => {
-      campo.removeAttribute('aria-invalid');
+      if (campo) campo.removeAttribute('aria-invalid');
     });
   }
 }

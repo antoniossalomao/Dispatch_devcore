@@ -63,8 +63,9 @@ class TelaMovimentacoes {
 
   async exportarCsv() {
     const celula = (t) => {
-      const v = String(t === null || t === undefined ? '' : t);
-      return /[;"\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+      const bruto = String(t === null || t === undefined ? '' : t);
+      const v = /^[=+\-@\t\r]/.test(bruto) ? "'" + bruto : bruto;
+      return /[;"\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
     };
     const r = await chamarApi('/api/relatorios/movimentacoes' + this.filtrosQuery(1000));
     const todos = r.ok ? r.dados.eventos : this.eventosAtuais;
@@ -258,9 +259,8 @@ class TelaMovimentacoes {
     this.perfilTipo.textContent = user.perfil;
     this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
     if (user.perfil === 'admin') this.blocoMenuAdmin.hidden = false;
-    const cfg = await chamarApi('/api/configuracoes');
-    if (cfg.ok && cfg.dados.parametros && cfg.dados.parametros.nomeEmpresa) {
-      this.nomeEmpresaMenu.textContent = cfg.dados.parametros.nomeEmpresa;
+    if (sessao.dados.nomeEmpresa) {
+      this.nomeEmpresaMenu.textContent = sessao.dados.nomeEmpresa;
     }
     this.aoIniciar();
   }

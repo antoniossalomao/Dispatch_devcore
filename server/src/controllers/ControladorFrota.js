@@ -4,16 +4,9 @@ const db = require('../db/conexao');
 const auditoria = require('../services/Auditoria');
 const Cnh = require('../models/Cnh');
 const { agoraLocal, normalizarData, diasAte } = require('../regras/datas');
+const { lerIdPositivo, textoDentroDoLimite } = require('../regras/validacao');
 const configuracao = require('../services/Configuracao');
 class ControladorFrota {
-  exigirLogin(req, res, next) {
-    if (!req.session.usuario) {
-      return res.status(401).json({
-        erro: 'Faça login para acessar.'
-      });
-    }
-    next();
-  }
 
   kmAtual(veiculo) {
     const ultimo = db
@@ -63,28 +56,45 @@ class ControladorFrota {
 
   registrarSaida(req, res) {
     const cfg = configuracao.lerConfig();
-    const veiculoId = Number(req.body.veiculo_id);
-    const motoristaId = Number(req.body.motorista_id);
-    const destino = (req.body.destino || '').trim();
-    const kmSaida = Number(req.body.km_saida);
-    const saida = req.body.saida ? normalizarData(req.body.saida) : agoraLocal();
-    const passageiros = Array.isArray(req.body.passageiros)
-      ? req.body.passageiros.map(Number).filter((n) => {
-          return n > 0;
-        })
-      : [];
+    const b = req.body || {};
+    const veiculoId = lerIdPositivo(b.veiculo_id);
+    const motoristaId = lerIdPositivo(b.motorista_id);
+    const destino = String(b.destino || '').trim();
+    const kmSaida = Number(b.km_saida);
+    const saida = b.saida ? normalizarData(b.saida) : agoraLocal();
+    const passageiros = [];
+    if (b.passageiros !== undefined && b.passageiros !== null) {
+      if (!Array.isArray(b.passageiros)) {
+        return res.status(400).json({
+          erro: 'Lista de passageiros inválida.'
+        });
+      }
+      for (let i = 0; i < b.passageiros.length; i++) {
+        const pid = lerIdPositivo(b.passageiros[i]);
+        if (!pid) {
+          return res.status(400).json({
+            erro: 'Passageiro inválido informado.'
+          });
+        }
+        passageiros.push(pid);
+      }
+    }
     if (!veiculoId || !motoristaId || destino === '') {
       return res.status(400).json({
         erro: 'Informe veículo, motorista e destino.'
       });
     }
+    const erroDestino = textoDentroDoLimite(destino, 200, 'O destino');
+    if (erroDestino) {
+      return res.status(400).json({ erro: erroDestino });
+    }
     if (!saida)
       return res.status(400).json({
         erro: 'Data de saída inválida.'
       });
-    if (!Number.isInteger(kmSaida) || kmSaida < 0) {
+    if (!Number.isInteger(kmSaida) || kmSaida < 0 || kmSaida > 10000000) {
       return res.status(400).json({
-        erro: 'Informe o km de saída (número inteiro).'
+        erro: 'Informe o km de saída (número inteiro válido).'
       });
     }
     const veiculo = db.prepare('SELECT * FROM veiculo WHERE id = ?').get(veiculoId);
@@ -252,8 +262,9 @@ class ControladorFrota {
       db.exec('COMMIT');
     } catch (e) {
       db.exec('ROLLBACK');
+      console.error('Erro ao registrar saída de veículo:', e);
       return res.status(500).json({
-        erro: 'Não foi possível registrar a saída: ' + e.message
+        erro: 'Não foi possível registrar a saída.'
       });
     }
     auditoria.registrarLog({
@@ -290,7 +301,11 @@ class ControladorFrota {
 
   registrarRetorno(req, res) {
     const cfg = configuracao.lerConfig();
-    const id = Number(req.params.id);
+    const b = req.body || {};
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de uso inválido.' });
+    }
     const uso = db.prepare('SELECT * FROM uso_veiculo WHERE id = ?').get(id);
     if (!uso)
       return res.status(404).json({
@@ -300,8 +315,8 @@ class ControladorFrota {
       return res.status(400).json({
         erro: 'Esse uso já foi encerrado.'
       });
-    const retorno = req.body.retorno ? normalizarData(req.body.retorno) : agoraLocal();
-    const kmRetorno = Number(req.body.km_retorno);
+    const retorno = b.retorno ? normalizarData(b.retorno) : agoraLocal();
+    const kmRetorno = Number(b.km_retorno);
     if (!retorno)
       return res.status(400).json({
         erro: 'Data de volta inválida.'
@@ -312,9 +327,9 @@ class ControladorFrota {
         erro: 'A volta precisa ser depois da saída (' + uso.saida + ').'
       });
     }
-    if (!Number.isInteger(kmRetorno))
+    if (!Number.isInteger(kmRetorno) || kmRetorno < 0 || kmRetorno > 10000000)
       return res.status(400).json({
-        erro: 'Informe o km de volta (número inteiro).'
+        erro: 'Informe o km de volta (número inteiro válido).'
       });
     // F9
     if (kmRetorno < uso.km_saida) {
@@ -324,7 +339,7 @@ class ControladorFrota {
     }
     // F11: viagem muito longa pede confirmacao
     const rodados = kmRetorno - uso.km_saida;
-    if (rodados > cfg.kmConfirmacaoViagem && !req.body.confirmar) {
+    if (rodados > cfg.kmConfirmacaoViagem && !b.confirmar) {
       return res.status(409).json({
         confirmar: true,
         erro:
@@ -372,7 +387,11 @@ class ControladorFrota {
   }
 
   concluirManutencao(req, res) {
-    const id = Number(req.params.id);
+    const b = req.body || {};
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de manutenção inválido.' });
+    }
     const m = db.prepare('SELECT * FROM manutencao WHERE id = ?').get(id);
     if (!m)
       return res.status(404).json({
@@ -382,7 +401,7 @@ class ControladorFrota {
       return res.status(400).json({
         erro: 'Essa manutenção já foi concluída.'
       });
-    const fim = req.body.fim ? normalizarData(req.body.fim) : agoraLocal();
+    const fim = b.fim ? normalizarData(b.fim) : agoraLocal();
     if (!fim)
       return res.status(400).json({
         erro: 'Data de conclusão inválida.'
@@ -477,7 +496,10 @@ class ControladorFrota {
   }
 
   buscarPorId(req, res) {
-    const id = Number(req.params.id);
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de veículo inválido.' });
+    }
     const v = db.prepare('SELECT * FROM veiculo WHERE id = ?').get(id);
     if (!v)
       return res.status(404).json({
@@ -512,7 +534,7 @@ class ControladorFrota {
   }
 
   cadastrar(req, res) {
-    const d = new Veiculo(req.body);
+    const d = new Veiculo(req.body || {});
     const erro = d.validar();
     if (erro)
       return res.status(400).json({
@@ -554,13 +576,16 @@ class ControladorFrota {
   }
 
   atualizar(req, res) {
-    const id = Number(req.params.id);
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de veículo inválido.' });
+    }
     const atual = db.prepare('SELECT * FROM veiculo WHERE id = ?').get(id);
     if (!atual)
       return res.status(404).json({
         erro: 'Veículo não encontrado.'
       });
-    const d = new Veiculo(req.body);
+    const d = new Veiculo(req.body || {});
     const erro = d.validar();
     if (erro)
       return res.status(400).json({
@@ -598,8 +623,12 @@ class ControladorFrota {
   }
 
   alterarStatus(req, res) {
-    const id = Number(req.params.id);
-    const novoAtivo = req.body.ativo ? 1 : 0;
+    const b = req.body || {};
+    const id = lerIdPositivo(req.params.id);
+    if (!id) {
+      return res.status(400).json({ erro: 'ID de veículo inválido.' });
+    }
+    const novoAtivo = b.ativo ? 1 : 0;
     const v = db.prepare('SELECT * FROM veiculo WHERE id = ?').get(id);
     if (!v)
       return res.status(404).json({
@@ -631,19 +660,23 @@ class ControladorFrota {
   }
 
   registrarManutencao(req, res) {
-    const veiculoId = Number(req.params.id);
+    const b = req.body || {};
+    const veiculoId = lerIdPositivo(req.params.id);
+    if (!veiculoId) {
+      return res.status(400).json({ erro: 'ID de veículo inválido.' });
+    }
     const v = db.prepare('SELECT * FROM veiculo WHERE id = ?').get(veiculoId);
     if (!v)
       return res.status(404).json({
         erro: 'Veículo não encontrado.'
       });
-    const tipo = req.body.tipo;
-    const descricao = (req.body.descricao || '').trim();
-    const inicio = req.body.inicio ? normalizarData(req.body.inicio) : agoraLocal();
+    const tipo = b.tipo;
+    const descricao = String(b.descricao || '').trim();
+    const inicio = b.inicio ? normalizarData(b.inicio) : agoraLocal();
     const km =
-      req.body.km === undefined || req.body.km === '' || req.body.km === null
+      b.km === undefined || b.km === '' || b.km === null
         ? null
-        : Number(req.body.km);
+        : Number(b.km);
     if (tipo !== 'preventiva' && tipo !== 'corretiva')
       return res.status(400).json({
         erro: 'Tipo de manutenção inválido.'
@@ -652,11 +685,16 @@ class ControladorFrota {
       return res.status(400).json({
         erro: 'Descreva a manutenção.'
       });
+    const erroDescricao = textoDentroDoLimite(descricao, 500, 'A descrição da manutenção');
+    if (erroDescricao)
+      return res.status(400).json({
+        erro: erroDescricao
+      });
     if (!inicio)
       return res.status(400).json({
         erro: 'Data de início inválida.'
       });
-    if (km !== null && (!Number.isInteger(km) || km < 0))
+    if (km !== null && (!Number.isInteger(km) || km < 0 || km > 10000000))
       return res.status(400).json({
         erro: 'Km inválido.'
       });

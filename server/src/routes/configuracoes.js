@@ -1,11 +1,12 @@
 // Endereços da API de configuracoes.
 const express = require('express');
 const ControladorConfiguracoes = require('../controllers/ControladorConfiguracoes');
+const { exigirAdmin } = require('../middlewares/autenticacao');
 
 const controlador = new ControladorConfiguracoes();
 const router = express.Router();
 
-router.use(controlador.exigirAdmin.bind(controlador));
+router.use(exigirAdmin);
 router.get('/', controlador.consultar.bind(controlador));
 router.put('/parametros', controlador.salvarParametros.bind(controlador));
 router.post('/restaurar-padrao', controlador.restaurarPadrao.bind(controlador));

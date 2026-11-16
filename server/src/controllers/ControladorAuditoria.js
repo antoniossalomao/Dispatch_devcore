@@ -1,26 +1,17 @@
 // Ações de auditoria.
 const db = require('../db/conexao');
 const auditoria = require('../services/Auditoria');
-class ControladorAuditoria {
-  exigirLogin(req, res, next) {
-    if (!req.session.usuario) {
-      return res.status(401).json({
-        erro: 'Faça login para acessar.'
-      });
-    }
-    if (req.session.usuario.perfil !== 'admin') {
-      return res.status(403).json({
-        erro: 'Só administradores acessam a auditoria.'
-      });
-    }
-    next();
-  }
 
+class ControladorAuditoria {
   listar(req, res) {
-    const busca = (req.query.busca || '').trim().toLowerCase();
-    const tabela = (req.query.tabela || '').trim();
-    const acao = (req.query.acao || '').trim();
-    const limite = Math.min(Number(req.query.limite) || 100, 500);
+    const busca = String(req.query.busca || '').trim().toLowerCase().slice(0, 200);
+    const tabela = String(req.query.tabela || '').trim().slice(0, 60);
+    const acao = String(req.query.acao || '').trim().slice(0, 30);
+    const brutoLimite = Number(req.query.limite);
+    const limite =
+      Number.isFinite(brutoLimite) && brutoLimite > 0
+        ? Math.min(Math.trunc(brutoLimite), 500)
+        : 100;
     let sql =
       'SELECT l.id, l.quando, l.acao, l.tabela, l.registro_id, l.resumo, l.antes_json, l.depois_json, l.hash, u.nome AS usuario ' +
       'FROM log_auditoria l JOIN usuario u ON u.id = l.usuario_id WHERE 1=1 ';
@@ -37,7 +28,8 @@ class ControladorAuditoria {
       sql += 'AND (LOWER(l.resumo) LIKE ? OR LOWER(u.nome) LIKE ?) ';
       params.push('%' + busca + '%', '%' + busca + '%');
     }
-    sql += 'ORDER BY l.id DESC LIMIT ' + limite;
+    sql += 'ORDER BY l.id DESC LIMIT ?';
+    params.push(limite);
     const linhas = db.prepare(sql).all(...params);
     const tabelas = db
       .prepare('SELECT DISTINCT tabela FROM log_auditoria ORDER BY tabela')

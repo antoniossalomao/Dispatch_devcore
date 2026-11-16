@@ -1,17 +1,9 @@
 const relatorios = require('../services/Relatorios');
 // Ações de relatorios.
 const db = require('../db/conexao');
-const { agoraLocal, normalizarData } = require('../regras/datas');
+const { normalizarData } = require('../regras/datas');
+const { lerIdPositivo } = require('../regras/validacao');
 class ControladorRelatorios {
-  exigirLogin(req, res, next) {
-    if (!req.session.usuario) {
-      return res.status(401).json({
-        erro: 'Faça login para acessar.'
-      });
-    }
-    next();
-  }
-
   consultarOcupacao(req, res) {
     const periodo = relatorios.lerPeriodo(req.query);
     if (!periodo)
@@ -49,7 +41,7 @@ class ControladorRelatorios {
   }
 
   consultarCondutor(req, res) {
-    const veiculoId = Number(req.query.veiculo_id);
+    const veiculoId = lerIdPositivo(req.query.veiculo_id);
     const quando = normalizarData(req.query.quando);
     if (!veiculoId || !quando)
       return res.status(400).json({

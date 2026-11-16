@@ -378,6 +378,10 @@
   padding: 20px;
 }
 
+.gaveta-card-espacado {
+  margin-top: 14px;
+}
+
 .gaveta-grade-status {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -106,35 +106,49 @@ class TelaAuditoria {
       return;
     }
     r.dados.linhas.forEach((l) => {
-      const a = this.acoes[l.acao] || ['status-concluido', l.acao];
+      const a = this.acoes[l.acao] || ['status-concluido', l.acao || ''];
       const tr = document.createElement('tr');
-      tr.innerHTML =
-        '<td>' +
-        this.formatarData(l.quando) +
-        '</td><td>' +
-        this.esc(l.usuario) +
-        '</td>' +
-        '<td><span class="status-tag ' +
-        a[0] +
-        '"><span class="status-ponto"></span>' +
-        a[1] +
-        '</span></td>' +
-        '<td>' +
-        this.esc(l.resumo) +
-        '<span class="aud-tabela">' +
-        this.esc(l.tabela) +
-        ' #' +
-        l.registro_id +
-        '</span></td>' +
-        '<td class="aud-diff">' +
-        (l.antes_json || l.depois_json
-          ? '<span>' +
-            this.esc(this.resumirJson(l.antes_json)) +
-            '</span><span>→ ' +
-            this.esc(this.resumirJson(l.depois_json)) +
-            '</span>'
-          : '—') +
-        '</td>';
+
+      const tdQuando = document.createElement('td');
+      tdQuando.textContent = this.formatarData(l.quando);
+
+      const tdUsuario = document.createElement('td');
+      tdUsuario.textContent = l.usuario || '';
+
+      const tdAcao = document.createElement('td');
+      const tagAcao = document.createElement('span');
+      tagAcao.className = 'status-tag ' + a[0];
+      const ponto = document.createElement('span');
+      ponto.className = 'status-ponto';
+      tagAcao.appendChild(ponto);
+      tagAcao.appendChild(document.createTextNode(a[1]));
+      tdAcao.appendChild(tagAcao);
+
+      const tdResumo = document.createElement('td');
+      tdResumo.appendChild(document.createTextNode(l.resumo || ''));
+      const spanTabela = document.createElement('span');
+      spanTabela.className = 'aud-tabela';
+      spanTabela.textContent = (l.tabela || '') + ' #' + (l.registro_id ?? '');
+      tdResumo.appendChild(spanTabela);
+
+      const tdDiff = document.createElement('td');
+      tdDiff.className = 'aud-diff';
+      if (l.antes_json || l.depois_json) {
+        const spanAntes = document.createElement('span');
+        spanAntes.textContent = this.resumirJson(l.antes_json);
+        const spanDepois = document.createElement('span');
+        spanDepois.textContent = '→ ' + this.resumirJson(l.depois_json);
+        tdDiff.appendChild(spanAntes);
+        tdDiff.appendChild(spanDepois);
+      } else {
+        tdDiff.textContent = '—';
+      }
+
+      tr.appendChild(tdQuando);
+      tr.appendChild(tdUsuario);
+      tr.appendChild(tdAcao);
+      tr.appendChild(tdResumo);
+      tr.appendChild(tdDiff);
       this.corpo.appendChild(tr);
     });
   }

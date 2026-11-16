@@ -566,9 +566,8 @@ class TelaFrota {
     this.perfilTipo.textContent = user.perfil;
     this.usuarioIniciais.textContent = this.pegarIniciais(user.nome);
     if (user.perfil === 'admin') this.blocoMenuAdmin.hidden = false;
-    const cfg = await chamarApi('/api/configuracoes');
-    if (cfg.ok && cfg.dados.parametros && cfg.dados.parametros.nomeEmpresa) {
-      this.nomeEmpresaMenu.textContent = cfg.dados.parametros.nomeEmpresa;
+    if (sessao.dados.nomeEmpresa) {
+      this.nomeEmpresaMenu.textContent = sessao.dados.nomeEmpresa;
     }
     await this.carregarColaboradores();
     this.carregarVeiculos();
