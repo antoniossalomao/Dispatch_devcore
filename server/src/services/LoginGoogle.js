@@ -11,7 +11,8 @@
 //   GOOGLE_REDIRECT_URI   opcional; padrão https://<domínio>/api/auth/google/retorno
 // Sem as duas primeiras, o botão "Entrar com Google" simplesmente não aparece.
 const crypto = require('crypto');
-const db = require('../db/conexao');
+// Garante as colunas email/documento/telefone em bancos antigos.
+const db = require('../db/colunasUsuario');
 
 const URL_AUTORIZACAO = 'https://accounts.google.com/o/oauth2/v2/auth';
 const URL_TOKEN = 'https://oauth2.googleapis.com/token';
@@ -20,22 +21,6 @@ const EMISSORES = new Set(['https://accounts.google.com', 'accounts.google.com']
 const VALIDADE_ESTADO_MS = 10 * 60 * 1000;
 
 class LoginGoogle {
-  constructor() {
-    this.garantirColunaEmail();
-  }
-
-  // Bancos criados antes do login com Google não têm a coluna email. Adiciona sem perder dados,
-  // e o índice único impede que um mesmo e-mail fique ligado a dois usuários.
-  garantirColunaEmail() {
-    const colunas = db.prepare('PRAGMA table_info(usuario)').all();
-    if (!colunas.some((coluna) => coluna.name === 'email')) {
-      db.exec('ALTER TABLE usuario ADD COLUMN email TEXT');
-    }
-    db.exec(
-      'CREATE UNIQUE INDEX IF NOT EXISTS idx_usuario_email ON usuario (email) WHERE email IS NOT NULL'
-    );
-  }
-
   configuracao() {
     const clientId = (process.env.GOOGLE_CLIENT_ID || '').trim();
     const segredo = (process.env.GOOGLE_CLIENT_SECRET || '').trim();

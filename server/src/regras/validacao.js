@@ -1,4 +1,4 @@
-// Validações compartilhadas pelos controladores (IDs, textos, logins e senhas).
+// Validações compartilhadas pelos controladores (IDs, textos, logins, senhas, documentos e contatos).
 class Validador {
   constructor() {
     this.senhasFracas = new Set([
@@ -88,6 +88,49 @@ class Validador {
     if (texto.length > max) {
       return rotulo + ' deve ter no máximo ' + max + ' caracteres.';
     }
+    return null;
+  }
+
+  somenteDigitos(valor) {
+    return String(valor || '').replace(/\D/g, '');
+  }
+
+  // Confere os dígitos verificadores de CPF (11) ou CNPJ (14). Devolve só os números, ou null se inválido.
+  lerCpfCnpj(valor) {
+    const d = this.somenteDigitos(valor);
+    if (/^(\d)\1+$/.test(d)) return null; // 000.000.000-00, 111... passam na conta mas não existem
+    const digito = (base, pesos) => {
+      const soma = base.split('').reduce((t, n, i) => t + Number(n) * pesos[i], 0);
+      const resto = soma % 11;
+      return resto < 2 ? 0 : 11 - resto;
+    };
+    if (d.length === 11) {
+      const p1 = [10, 9, 8, 7, 6, 5, 4, 3, 2];
+      const p2 = [11, 10, 9, 8, 7, 6, 5, 4, 3, 2];
+      const ok = digito(d.slice(0, 9), p1) === Number(d[9]) && digito(d.slice(0, 10), p2) === Number(d[10]);
+      return ok ? d : null;
+    }
+    if (d.length === 14) {
+      const p1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+      const p2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+      const ok = digito(d.slice(0, 12), p1) === Number(d[12]) && digito(d.slice(0, 13), p2) === Number(d[13]);
+      return ok ? d : null;
+    }
+    return null;
+  }
+
+  // E-mail em minúsculas, ou null se não tiver cara de e-mail.
+  lerEmail(valor) {
+    const email = String(valor || '').trim().toLowerCase();
+    if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return null;
+    return email;
+  }
+
+  // Telefone brasileiro com DDD: 10 dígitos (fixo) ou 11 (celular, começando com 9).
+  lerTelefone(valor) {
+    let d = this.somenteDigitos(valor);
+    if (d.length > 11 && d.startsWith('55')) d = d.slice(2);
+    if (d.length === 10 || (d.length === 11 && d[2] === '9')) return d;
     return null;
   }
 }

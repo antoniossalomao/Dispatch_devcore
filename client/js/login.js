@@ -77,7 +77,7 @@ class TelaLogin {
     const senha = this.inputSenha.value;
     if (usuario === '' || senha === '') {
       this.mostrarErro(
-        'Preencha o usuário e a senha.',
+        'Preencha o e-mail e a senha.',
         usuario === '' ? this.inputUsuario : this.inputSenha
       );
       return;

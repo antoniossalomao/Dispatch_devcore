@@ -5,7 +5,9 @@ class TelaCadastro {
     this.avisoDesativado = document.getElementById('cadastro-desativado');
     this.inputCodigo = document.getElementById('codigo');
     this.inputNome = document.getElementById('nome');
-    this.inputUsuario = document.getElementById('usuario');
+    this.inputDocumento = document.getElementById('documento');
+    this.inputEmail = document.getElementById('email');
+    this.inputTelefone = document.getElementById('telefone');
     this.inputSenha = document.getElementById('senha');
     this.inputConfirmar = document.getElementById('confirmar-senha');
     this.checkMostrar = document.getElementById('mostrar-senha');
@@ -36,11 +38,17 @@ class TelaCadastro {
       this.mostrarErro('Preencha o código de convite para criar a conta com Google.', this.inputCodigo);
       return;
     }
+    if (!this.conferirDocumentoTelefone()) return;
     this.botaoGoogle.disabled = true;
     try {
       const resposta = await chamarApi('/api/auth/google/cadastro', {
         metodo: 'POST',
-        corpo: { codigo: codigo }
+        corpo: {
+          codigo: codigo,
+          nome: this.inputNome.value.trim(),
+          documento: this.inputDocumento.value,
+          telefone: this.inputTelefone.value
+        }
       });
       if (!resposta.ok || !resposta.dados.url) {
         this.mostrarErro(resposta.dados.erro || 'Não foi possível seguir para o Google.');
@@ -82,45 +90,91 @@ class TelaCadastro {
       this.inputSenha.type = tipo;
       this.inputConfirmar.type = tipo;
     });
+    this.inputDocumento.addEventListener('input', () => {
+      this.inputDocumento.value = this.mascararDocumento(this.inputDocumento.value);
+    });
+    this.inputTelefone.addEventListener('input', () => {
+      this.inputTelefone.value = this.mascararTelefone(this.inputTelefone.value);
+    });
     this.form.addEventListener('submit', this.cadastrar.bind(this));
     if (this.botaoGoogle) {
       this.botaoGoogle.addEventListener('click', this.cadastrarComGoogle.bind(this));
     }
   }
 
+  digitos(texto) {
+    return String(texto || '').replace(/\D/g, '');
+  }
+
+  // Até 11 dígitos formata como CPF; a partir do 12º, como CNPJ.
+  mascararDocumento(texto) {
+    const d = this.digitos(texto).slice(0, 14);
+    if (d.length <= 11) {
+      return d
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+    }
+    return d
+      .replace(/(\d{2})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1/$2')
+      .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+  }
+
+  mascararTelefone(texto) {
+    const d = this.digitos(texto).slice(0, 11);
+    if (d.length <= 2) return d.length ? '(' + d : '';
+    if (d.length <= 6) return '(' + d.slice(0, 2) + ') ' + d.slice(2);
+    if (d.length <= 10) return '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6);
+    return '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
+  }
+
+  // Confere o que dá para conferir antes de enviar; o servidor valida tudo de novo (dígitos do CPF/CNPJ inclusive).
+  conferirDocumentoTelefone() {
+    const doc = this.digitos(this.inputDocumento.value);
+    if (doc.length !== 11 && doc.length !== 14) {
+      this.mostrarErro('Informe um CPF (11 números) ou CNPJ (14 números).', this.inputDocumento);
+      return false;
+    }
+    const tel = this.digitos(this.inputTelefone.value);
+    if (tel.length !== 10 && tel.length !== 11) {
+      this.mostrarErro('Informe o telefone com DDD.', this.inputTelefone);
+      return false;
+    }
+    return true;
+  }
+
   async cadastrar(evento) {
     evento.preventDefault();
     this.esconderErro();
 
-    const codigo = this.inputCodigo ? this.inputCodigo.value.trim() : '';
-    const nome = this.inputNome.value.trim();
-    const usuario = this.inputUsuario.value.trim();
-    const senha = this.inputSenha.value;
-    const confirmar = this.inputConfirmar.value;
-
-    if (codigo === '' || nome === '' || usuario === '' || senha === '' || confirmar === '') {
-      const primeiroVazio = [
-        this.inputCodigo,
-        this.inputNome,
-        this.inputUsuario,
-        this.inputSenha,
-        this.inputConfirmar
-      ].find((campo) => {
-        return campo && campo.value.trim() === '';
-      });
+    const campos = [
+      this.inputCodigo,
+      this.inputNome,
+      this.inputDocumento,
+      this.inputEmail,
+      this.inputTelefone,
+      this.inputSenha,
+      this.inputConfirmar
+    ];
+    const primeiroVazio = campos.find((campo) => campo && campo.value.trim() === '');
+    if (primeiroVazio) {
       this.mostrarErro('Preencha todos os campos.', primeiroVazio);
       return;
     }
-
-    if (usuario.indexOf(' ') !== -1) {
-      this.mostrarErro('O nome de usuário não pode ter espaços.', this.inputUsuario);
+    if (!this.conferirDocumentoTelefone()) return;
+    const email = this.inputEmail.value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      this.mostrarErro('Informe um e-mail válido.', this.inputEmail);
       return;
     }
+    const senha = this.inputSenha.value;
     if (senha.length < 8) {
       this.mostrarErro('A senha precisa ter pelo menos 8 caracteres.', this.inputSenha);
       return;
     }
-    if (senha !== confirmar) {
+    if (senha !== this.inputConfirmar.value) {
       this.mostrarErro('As senhas digitadas não conferem.', this.inputConfirmar);
       return;
     }
@@ -132,9 +186,11 @@ class TelaCadastro {
       const resposta = await chamarApi('/api/auth/cadastro', {
         metodo: 'POST',
         corpo: {
-          codigo: codigo,
-          nome: nome,
-          usuario: usuario,
+          codigo: this.inputCodigo.value.trim(),
+          nome: this.inputNome.value.trim(),
+          documento: this.inputDocumento.value,
+          email: email,
+          telefone: this.inputTelefone.value,
           senha: senha
         }
       });
@@ -171,7 +227,9 @@ class TelaCadastro {
     [
       this.inputCodigo,
       this.inputNome,
-      this.inputUsuario,
+      this.inputDocumento,
+      this.inputEmail,
+      this.inputTelefone,
       this.inputSenha,
       this.inputConfirmar
     ].forEach((campo) => {

@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const db = require('../db/conexao');
+// colunasUsuario garante email, documento e telefone em bancos antigos.
+const db = require('../db/colunasUsuario');
 const auditoria = require('../services/Auditoria');
 const configuracao = require('../services/Configuracao');
 const controleAcesso = require('../middlewares/autenticacao');
@@ -26,21 +27,24 @@ class ControladorAutenticacao {
       if (login === '' || senha === '') {
         return res.status(400).json({ erro: 'Preencha o usuário e a senha.' });
       }
-      if (login.length > 60 || senha.length > 72) {
+      if (login.length > 254 || senha.length > 72) {
         await bcrypt.compare('invalido', this.hashFicticio);
-        return res.status(401).json({ erro: 'Usuário ou senha incorretos.' });
+        return res.status(401).json({ erro: 'E-mail ou senha incorretos.' });
       }
 
+      // Aceita o usuário antigo ou o e-mail do cadastro.
       const usuarioBanco = db
-        .prepare('SELECT id, nome, login, senha_hash, perfil, ativo FROM usuario WHERE login = ?')
-        .get(login);
+        .prepare(
+          'SELECT id, nome, login, senha_hash, perfil, ativo FROM usuario WHERE login = ? OR lower(email) = lower(?)'
+        )
+        .get(login, login);
 
       // Mesmo sem usuário cadastrado, executamos bcrypt.compare para não vazar quais logins existem pelo tempo da resposta.
       const hashAlvo = usuarioBanco ? usuarioBanco.senha_hash : this.hashFicticio;
       const senhaBate = await bcrypt.compare(senha, hashAlvo);
 
       if (!usuarioBanco || usuarioBanco.ativo !== 1 || !senhaBate) {
-        return res.status(401).json({ erro: 'Usuário ou senha incorretos.' });
+        return res.status(401).json({ erro: 'E-mail ou senha incorretos.' });
       }
 
       this.abrirSessao(req, usuarioBanco, (erro) => {
@@ -75,49 +79,30 @@ class ControladorAutenticacao {
         return res.status(403).json({ erro: 'Código de convite inválido.' });
       }
 
-      const nome = validador.lerTexto(req.body && req.body.nome);
-      const login = validador.lerTexto(req.body && req.body.usuario);
+      const dadosConta = this.lerDadosConta(req.body);
+      if (dadosConta.erro) return res.status(400).json({ erro: dadosConta.erro });
+
       const senha = typeof (req.body && req.body.senha) === 'string' ? req.body.senha : '';
+      if (senha === '') return res.status(400).json({ erro: 'Preencha a senha.' });
+      const email = validador.lerEmail(req.body && req.body.email);
+      if (!email) return res.status(400).json({ erro: 'Informe um e-mail válido.' });
 
-      if (nome === '' || login === '' || senha === '') {
-        return res.status(400).json({ erro: 'Preencha todos os campos.' });
-      }
+      const conflito = this.conflitoConta(email, dadosConta.documento);
+      if (conflito) return res.status(400).json({ erro: conflito });
 
-      const erroNome = validador.textoDentroDoLimite(nome, 120, 'O nome');
-      if (erroNome) return res.status(400).json({ erro: erroNome });
-
-      const erroLogin = validador.validarLogin(login);
-      if (erroLogin) return res.status(400).json({ erro: erroLogin });
-
-      const erroSenha = validador.validarSenha(senha, login);
+      const login = this.loginLivre(email);
+      const erroSenha = validador.validarSenha(senha, email.split('@')[0]);
       if (erroSenha) return res.status(400).json({ erro: erroSenha });
 
-      const jaExiste = db.prepare('SELECT id FROM usuario WHERE login = ?').get(login);
-      if (jaExiste) {
-        return res.status(400).json({ erro: 'Esse nome de usuário já está em uso.' });
-      }
-
       const senhaHash = await bcrypt.hash(senha, 10);
-      const resultado = db
-        .prepare(
-          'INSERT INTO usuario (nome, login, senha_hash, perfil, ativo) VALUES (?, ?, ?, ?, 1)'
-        )
-        .run(nome, login, senhaHash, 'operador');
-      const novoId = Number(resultado.lastInsertRowid);
-
-      auditoria.registrarLog({
-        usuarioId: novoId,
-        acao: 'criou',
-        tabela: 'usuario',
-        registroId: novoId,
-        resumo: 'Auto-cadastro com convite do usuário @' + login + ' (operador)',
-        depois: {
-          id: novoId,
-          nome: nome,
-          login: login,
-          perfil: 'operador',
-          ativo: 1
-        }
+      this.inserirUsuario({
+        nome: dadosConta.nome,
+        login: login,
+        senhaHash: senhaHash,
+        email: email,
+        documento: dadosConta.documento,
+        telefone: dadosConta.telefone,
+        origem: 'Auto-cadastro com convite'
       });
 
       res.status(201).json({ mensagem: 'Conta criada com sucesso!' });
@@ -175,8 +160,14 @@ class ControladorAutenticacao {
     ) {
       return res.status(403).json({ erro: 'Código de convite inválido.' });
     }
+    const dadosConta = this.lerDadosConta(req.body, true);
+    if (dadosConta.erro) return res.status(400).json({ erro: dadosConta.erro });
+    if (this.conflitoConta(null, dadosConta.documento)) {
+      return res.status(400).json({ erro: 'Já existe uma conta com esse CPF/CNPJ.' });
+    }
     const { url, guardar } = loginGoogle.iniciar(req);
-    guardar.cadastro = true;
+    // O e-mail vem do Google; o resto do formulário espera na sessão até a volta.
+    guardar.cadastro = dadosConta;
     req.session.google = guardar;
     req.session.save((erro) => {
       if (erro) return next(erro);
@@ -202,27 +193,64 @@ class ControladorAutenticacao {
     return candidato;
   }
 
-  criarUsuarioGoogle(identidade) {
-    const nome = (identidade.nome || identidade.email.split('@')[0]).slice(0, 120);
-    const login = this.loginLivre(identidade.email);
-    // Conta criada pelo Google não tem senha conhecida: o hash é de um segredo aleatório descartado.
-    // Se a pessoa quiser senha depois, o admin define em Configurações.
-    const hashInutilizavel = bcrypt.hashSync(crypto.randomBytes(32).toString('hex'), 10);
+  // Nome, CPF/CNPJ e telefone, comuns ao cadastro por senha e ao cadastro pelo Google.
+  // nomeOpcional: no Google o nome pode vir da própria conta.
+  lerDadosConta(corpo, nomeOpcional) {
+    const nome = validador.lerTexto(corpo && corpo.nome);
+    if (nome === '' && !nomeOpcional) return { erro: 'Preencha o nome.' };
+    const erroNome = nome ? validador.textoDentroDoLimite(nome, 120, 'O nome') : null;
+    if (erroNome) return { erro: erroNome };
+    const documento = validador.lerCpfCnpj(corpo && corpo.documento);
+    if (!documento) return { erro: 'Informe um CPF ou CNPJ válido.' };
+    const telefone = validador.lerTelefone(corpo && corpo.telefone);
+    if (!telefone) return { erro: 'Informe um telefone com DDD.' };
+    return { nome: nome, documento: documento, telefone: telefone };
+  }
+
+  conflitoConta(email, documento) {
+    if (email && db.prepare('SELECT 1 FROM usuario WHERE lower(email) = ?').get(email)) {
+      return 'Já existe uma conta com esse e-mail.';
+    }
+    if (documento && db.prepare('SELECT 1 FROM usuario WHERE documento = ?').get(documento)) {
+      return 'Já existe uma conta com esse CPF/CNPJ.';
+    }
+    return null;
+  }
+
+  inserirUsuario(dados) {
     const resultado = db
       .prepare(
-        'INSERT INTO usuario (nome, login, senha_hash, perfil, ativo, email) VALUES (?, ?, ?, ?, 1, ?)'
+        'INSERT INTO usuario (nome, login, senha_hash, perfil, ativo, email, documento, telefone) VALUES (?, ?, ?, ?, 1, ?, ?, ?)'
       )
-      .run(nome, login, hashInutilizavel, 'operador', identidade.email);
+      .run(dados.nome, dados.login, dados.senhaHash, 'operador', dados.email, dados.documento, dados.telefone);
     const novoId = Number(resultado.lastInsertRowid);
     auditoria.registrarLog({
       usuarioId: novoId,
       acao: 'criou',
       tabela: 'usuario',
       registroId: novoId,
-      resumo: 'Cadastro com convite pelo Google de @' + login + ' (operador)',
-      depois: { id: novoId, nome: nome, login: login, perfil: 'operador', ativo: 1, email: identidade.email }
+      resumo: dados.origem + ' de ' + dados.email + ' (operador)',
+      // CPF/CNPJ e telefone ficam fora do log de auditoria: o log é lido por todos os admins.
+      depois: { id: novoId, nome: dados.nome, login: dados.login, perfil: 'operador', ativo: 1, email: dados.email }
     });
-    return { id: novoId, nome: nome, login: login, perfil: 'operador', ativo: 1 };
+    return { id: novoId, nome: dados.nome, login: dados.login, perfil: 'operador', ativo: 1 };
+  }
+
+  criarUsuarioGoogle(identidade, dadosConta) {
+    if (dadosConta.documento && db.prepare('SELECT 1 FROM usuario WHERE documento = ?').get(dadosConta.documento)) {
+      return null;
+    }
+    // Conta criada pelo Google não tem senha conhecida: o hash é de um segredo aleatório descartado.
+    // Se a pessoa quiser senha depois, o admin define em Configurações.
+    return this.inserirUsuario({
+      nome: (dadosConta.nome || identidade.nome || identidade.email.split('@')[0]).slice(0, 120),
+      login: this.loginLivre(identidade.email),
+      senhaHash: bcrypt.hashSync(crypto.randomBytes(32).toString('hex'), 10),
+      email: identidade.email,
+      documento: dadosConta.documento,
+      telefone: dadosConta.telefone,
+      origem: 'Cadastro com convite pelo Google'
+    });
   }
 
   async googleRetorno(req, res) {
@@ -242,7 +270,8 @@ class ControladorAutenticacao {
         // E-mail ligado a um usuário desativado não ganha conta nova: o admin decide.
         const bloqueado = db.prepare('SELECT 1 FROM usuario WHERE lower(email) = ?').get(identidade.email);
         if (bloqueado) return voltar('sem-acesso');
-        usuarioBanco = this.criarUsuarioGoogle(identidade);
+        usuarioBanco = this.criarUsuarioGoogle(identidade, guardado.cadastro);
+        if (!usuarioBanco) return voltar('documento-em-uso');
       }
       if (!usuarioBanco) return voltar('sem-acesso');
 

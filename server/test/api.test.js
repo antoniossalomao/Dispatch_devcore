@@ -355,7 +355,9 @@ test('cadastros, movimentações, permissões e segurança continuam funcionando
           (
             await novo('/auth/cadastro', 'POST', {
               nome: 'Convidado',
-              usuario: 'convidado1',
+              documento: '529.982.247-25',
+              email: 'convidado1@obra.com.br',
+              telefone: '(14) 99123-4567',
               senha: 'Senha@2026',
               codigo: 'errado'
             })
@@ -366,7 +368,9 @@ test('cadastros, movimentações, permissões e segurança continuam funcionando
           (
             await novo('/auth/cadastro', 'POST', {
               nome: 'Convidado',
-              usuario: 'convidado1',
+              documento: '529.982.247-25',
+              email: 'convidado1@obra.com.br',
+              telefone: '(14) 99123-4567',
               senha: '12345678',
               codigo: 'Convite@2026'
             })
@@ -377,7 +381,37 @@ test('cadastros, movimentações, permissões e segurança continuam funcionando
           (
             await novo('/auth/cadastro', 'POST', {
               nome: 'Convidado',
-              usuario: 'convidado1',
+              documento: '111.111.111-11',
+              email: 'convidado1@obra.com.br',
+              telefone: '(14) 99123-4567',
+              senha: 'Senha@2026',
+              codigo: 'Convite@2026'
+            })
+          ).status,
+          400,
+          'CPF com dígitos repetidos é recusado'
+        );
+        assert.equal(
+          (
+            await novo('/auth/cadastro', 'POST', {
+              nome: 'Convidado',
+              documento: '529.982.247-25',
+              email: 'convidado1@obra.com.br',
+              telefone: '123',
+              senha: 'Senha@2026',
+              codigo: 'Convite@2026'
+            })
+          ).status,
+          400,
+          'telefone sem DDD é recusado'
+        );
+        assert.equal(
+          (
+            await novo('/auth/cadastro', 'POST', {
+              nome: 'Convidado',
+              documento: '529.982.247-25',
+              email: 'Convidado1@Obra.com.br',
+              telefone: '(14) 99123-4567',
               senha: 'Senha@2026',
               perfil: 'admin',
               codigo: 'Convite@2026'
@@ -385,13 +419,47 @@ test('cadastros, movimentações, permissões e segurança continuam funcionando
           ).status,
           201
         );
+        // Mesmo CPF ou mesmo e-mail não abrem segunda conta.
+        assert.equal(
+          (
+            await novo('/auth/cadastro', 'POST', {
+              nome: 'Outro',
+              documento: '52998224725',
+              email: 'outro@obra.com.br',
+              telefone: '14991234567',
+              senha: 'Senha@2026',
+              codigo: 'Convite@2026'
+            })
+          ).status,
+          400
+        );
+        assert.equal(
+          (
+            await novo('/auth/cadastro', 'POST', {
+              nome: 'Outro',
+              documento: '11.222.333/0001-81',
+              email: 'convidado1@obra.com.br',
+              telefone: '14991234567',
+              senha: 'Senha@2026',
+              codigo: 'Convite@2026'
+            })
+          ).status,
+          400
+        );
+        const guardado = db
+          .prepare('SELECT login, email, documento, telefone FROM usuario WHERE email = ?')
+          .get('convidado1@obra.com.br');
+        assert.deepEqual(
+          { ...guardado },
+          { login: 'convidado1', email: 'convidado1@obra.com.br', documento: '52998224725', telefone: '14991234567' }
+        );
         const convidadoBanco = db
           .prepare('SELECT id, perfil FROM usuario WHERE login = ?')
           .get('convidado1');
         assert.equal(convidadoBanco.perfil, 'operador');
 
         assert.equal(
-          (await novo('/auth/login', 'POST', { usuario: 'convidado1', senha: 'Senha@2026' }))
+          (await novo('/auth/login', 'POST', { usuario: 'Convidado1@obra.com.br', senha: 'Senha@2026' }))
             .status,
           200
         );
@@ -845,7 +913,15 @@ test('login com Google só entra em usuário ativo com o e-mail ligado pelo admi
     assert.equal((await visitante('/auth/google/cadastro', 'POST', { codigo: 'x' })).status, 403);
     process.env.CADASTRO_CODIGO = 'convite-teste';
     assert.equal((await visitante('/auth/google/cadastro', 'POST', { codigo: 'errado' })).status, 403);
-    const idaCadastro = await visitante('/auth/google/cadastro', 'POST', { codigo: 'convite-teste' });
+    assert.equal(
+      (await visitante('/auth/google/cadastro', 'POST', { codigo: 'convite-teste', documento: '123', telefone: '14991234567' })).status,
+      400
+    );
+    const idaCadastro = await visitante('/auth/google/cadastro', 'POST', {
+      codigo: 'convite-teste',
+      documento: '11.222.333/0001-81',
+      telefone: '(14) 3433-4444'
+    });
     assert.equal(idaCadastro.status, 200);
     const destinoCadastro = new URL(idaCadastro.dados.url);
     cargaGoogle = {
@@ -867,6 +943,8 @@ test('login com Google só entra em usuário ativo com o e-mail ligado pelo admi
     assert.equal(criado.login, 'nova.pessoa');
     assert.equal(criado.perfil, 'operador');
     assert.equal(criado.nome, 'Nova Pessoa');
+    const extras = db.prepare('SELECT documento, telefone FROM usuario WHERE id = ?').get(criado.id);
+    assert.deepEqual({ ...extras }, { documento: '11222333000181', telefone: '1434334444' });
     // A mesma conta Google depois entra pelo login normal com Google.
     assert.equal((await tentar({ email: 'nova.pessoa@gmail.com' })).local, '/resumo');
     delete process.env.CADASTRO_CODIGO;

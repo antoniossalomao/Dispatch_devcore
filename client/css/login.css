@@ -279,6 +279,34 @@ body:has(.login-pagina) {
   outline-offset: 2px;
 }
 
+/* campos lado a lado (CPF/CNPJ e telefone, senha e confirmação) */
+.campo-duplo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.campo-duplo .campo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.login-dica {
+  margin: 0;
+  color: var(--texto-mudo);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .campo-duplo {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
 /* login com Google */
 .login-google {
   display: grid;

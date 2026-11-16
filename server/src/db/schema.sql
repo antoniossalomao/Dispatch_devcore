@@ -16,7 +16,9 @@ CREATE TABLE IF NOT EXISTS usuario (
     senha_hash  TEXT NOT NULL, -- a senha nunca é salva pura, só o hash (bcrypt)
     perfil      TEXT NOT NULL CHECK (perfil IN ('admin', 'operador')), -- admin ve tudo, operador não ve auditoria nem configurações
     telegram_chat_id  TEXT, -- id do chat no Telegram, pra receber os alertas críticos
-    email       TEXT, -- e-mail da conta Google que pode entrar como este usuário (opcional)
+    email       TEXT, -- e-mail de login (e da conta Google, se a pessoa usar o Google)
+    documento   TEXT, -- CPF ou CNPJ, só os números
+    telefone    TEXT, -- telefone com DDD, só os números
     ativo       INTEGER NOT NULL DEFAULT 1
 );
 
