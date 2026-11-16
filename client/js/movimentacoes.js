@@ -65,7 +65,7 @@ class TelaMovimentacoes {
 
     this.botaoSair.addEventListener('click', async () => {
       await chamarApi('/api/auth/sair', { metodo: 'POST' });
-      window.location.href = 'index.html';
+      window.location.href = 'login';
     });
   }
 
@@ -263,7 +263,7 @@ class TelaMovimentacoes {
   async iniciar() {
     const sessao = await chamarApi('/api/auth/eu');
     if (!sessao.ok) {
-      window.location.href = 'index.html';
+      window.location.href = 'login';
       return;
     }
 

@@ -199,7 +199,7 @@ class TelaConfiguracoes {
 
     this.botaoSair.addEventListener('click', async () => {
       await chamarApi('/api/auth/sair', { metodo: 'POST' });
-      window.location.href = 'index.html';
+      window.location.href = 'login';
     });
   }
 
@@ -725,14 +725,14 @@ class TelaConfiguracoes {
     try {
       const sessao = await chamarApi('/api/auth/eu');
       if (!sessao.ok) {
-        window.location.href = 'index.html';
+        window.location.href = 'login';
         return;
       }
 
       const usuario = sessao.dados.usuario;
       // Quem não é administrador volta para o resumo caso tente abrir esta página pela URL.
       if (usuario.perfil !== 'admin') {
-        window.location.href = 'resumo.html';
+        window.location.href = 'resumo';
         return;
       }
 

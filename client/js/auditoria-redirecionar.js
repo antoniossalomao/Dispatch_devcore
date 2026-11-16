@@ -2,7 +2,7 @@
 // Fica neste arquivo separado porque a proteção CSP bloqueia <script> escrito direto no HTML.
 class RedirecionadorAuditoria {
   constructor() {
-    this.destino = 'configuracoes.html#auditoria';
+    this.destino = 'configuracoes#auditoria';
   }
 
   iniciar() {

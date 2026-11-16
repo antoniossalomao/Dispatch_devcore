@@ -70,7 +70,7 @@ class TelaLogin {
         return;
       }
 
-      window.location.href = 'resumo.html';
+      window.location.href = 'resumo';
     } catch (erro) {
       this.mostrarErro('Não consegui falar com o servidor. Confira se ele está ligado.');
       this.botaoEntrar.disabled = false;

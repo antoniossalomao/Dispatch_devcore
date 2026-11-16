@@ -279,7 +279,40 @@ class Servidor {
 
     // Entrega os arquivos HTML, CSS e JS das telas que ficam na pasta client.
     this.pastaClient = path.join(__dirname, '..', '..', 'client');
-    this.app.use(express.static(this.pastaClient));
+    // URLs limpas: /resumo.html vira /resumo (301) e /index.html vira /. O express.static acha o .html sozinho.
+    this.app.use((req, res, next) => {
+      if ((req.method === 'GET' || req.method === 'HEAD') && req.path.endsWith('.html')) {
+        const limpo = ['/index.html', '/apresentacao.html'].includes(req.path) ? '/' : req.path.slice(0, -'.html'.length);
+        // A página de login era o index.html; links antigos para ela continuam caindo no login.
+        if (req.path === '/index.html' && req.query.cadastro) {
+          return res.redirect(301, '/login' + req.originalUrl.slice(req.originalUrl.indexOf('?')));
+        }
+        const consulta = req.originalUrl.slice(req.originalUrl.indexOf(req.path) + req.path.length);
+        return res.redirect(301, limpo + consulta);
+      }
+      // A apresentação agora é a página inicial.
+      if (req.path === '/apresentacao') {
+        return res.redirect(301, '/');
+      }
+      next();
+    });
+    // Speculation Rules: o navegador pré-carrega a tela quando o mouse para em cima do link do menu.
+    this.app.use((req, res, next) => {
+      if (req.method === 'GET' && !path.extname(req.path)) {
+        res.setHeader('Speculation-Rules', '"/speculationrules.json"');
+      }
+      next();
+    });
+    this.app.use(
+      express.static(this.pastaClient, {
+        extensions: ['html'],
+        setHeaders: (res, arquivo) => {
+          if (arquivo.endsWith('speculationrules.json')) {
+            res.setHeader('Content-Type', 'application/speculationrules+json');
+          }
+        }
+      })
+    );
   }
 
   // Trata erros inesperados no fim da fila para nunca mostrar detalhes internos do sistema ao usuário.

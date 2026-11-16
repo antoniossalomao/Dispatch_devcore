@@ -435,3 +435,25 @@ button {
     max-width: none;
   }
 }
+
+/* Navegação entre telas: o navegador faz um crossfade em vez de piscar a página inteira.
+   O menu lateral e o topo têm nome próprio, então ficam parados enquanto só o conteúdo troca. */
+@view-transition {
+  navigation: auto;
+}
+.menu-lateral {
+  view-transition-name: menu-lateral;
+}
+.topo {
+  view-transition-name: topo;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.22s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}

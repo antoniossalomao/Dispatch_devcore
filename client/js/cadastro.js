@@ -103,7 +103,7 @@ class TelaCadastro {
         return;
       }
 
-      window.location.href = 'index.html?cadastro=ok';
+      window.location.href = 'login?cadastro=ok';
     } catch (erro) {
       this.mostrarErro('Não consegui falar com o servidor. Confira se ele está ligado.');
       this.botaoCadastrar.disabled = false;
