@@ -14,5 +14,6 @@ router.post('/sair', controlador.sair.bind(controlador));
 router.get('/google/status', controlador.googleStatus.bind(controlador));
 router.get('/google', controlador.googleIniciar.bind(controlador));
 router.get('/google/retorno', controlador.googleRetorno.bind(controlador));
+router.post('/google/cadastro', controlador.googleCadastro.bind(controlador));
 
 module.exports = router;

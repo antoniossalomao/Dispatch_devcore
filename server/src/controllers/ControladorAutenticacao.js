@@ -156,6 +156,75 @@ class ControladorAutenticacao {
     });
   }
 
+  // Cadastro com Google: confere o código de convite ANTES de mandar ao Google e marca a ida como
+  // cadastro. O código não vai na URL (ficaria no histórico e nos logs); vai no corpo deste POST.
+  googleCadastro(req, res, next) {
+    const codigoEsperado = (process.env.CADASTRO_CODIGO || '').trim();
+    if (!codigoEsperado) {
+      return res.status(403).json({
+        erro: 'Cadastro público desativado. Solicite seu acesso a um administrador.'
+      });
+    }
+    if (!loginGoogle.configuracao().ativo) {
+      return res.status(503).json({ erro: 'O login com Google não está configurado.' });
+    }
+    const codigo = validador.lerTexto(req.body && req.body.codigo);
+    if (
+      !codigo ||
+      !crypto.timingSafeEqual(this.resumirTexto(codigo), this.resumirTexto(codigoEsperado))
+    ) {
+      return res.status(403).json({ erro: 'Código de convite inválido.' });
+    }
+    const { url, guardar } = loginGoogle.iniciar(req);
+    guardar.cadastro = true;
+    req.session.google = guardar;
+    req.session.save((erro) => {
+      if (erro) return next(erro);
+      res.json({ url: url });
+    });
+  }
+
+  // Login a partir do e-mail ("maria.souza@gmail.com" vira "maria.souza", "maria.souza2"...).
+  loginLivre(email) {
+    const base =
+      email
+        .split('@')[0]
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]/g, '')
+        .slice(0, 36) || 'usuario';
+    let candidato = base.length >= 3 ? base : base + 'usr';
+    let n = 2;
+    while (db.prepare('SELECT 1 FROM usuario WHERE login = ?').get(candidato)) {
+      candidato = base + n++;
+    }
+    return candidato;
+  }
+
+  criarUsuarioGoogle(identidade) {
+    const nome = (identidade.nome || identidade.email.split('@')[0]).slice(0, 120);
+    const login = this.loginLivre(identidade.email);
+    // Conta criada pelo Google não tem senha conhecida: o hash é de um segredo aleatório descartado.
+    // Se a pessoa quiser senha depois, o admin define em Configurações.
+    const hashInutilizavel = bcrypt.hashSync(crypto.randomBytes(32).toString('hex'), 10);
+    const resultado = db
+      .prepare(
+        'INSERT INTO usuario (nome, login, senha_hash, perfil, ativo, email) VALUES (?, ?, ?, ?, 1, ?)'
+      )
+      .run(nome, login, hashInutilizavel, 'operador', identidade.email);
+    const novoId = Number(resultado.lastInsertRowid);
+    auditoria.registrarLog({
+      usuarioId: novoId,
+      acao: 'criou',
+      tabela: 'usuario',
+      registroId: novoId,
+      resumo: 'Cadastro com convite pelo Google de @' + login + ' (operador)',
+      depois: { id: novoId, nome: nome, login: login, perfil: 'operador', ativo: 1, email: identidade.email }
+    });
+    return { id: novoId, nome: nome, login: login, perfil: 'operador', ativo: 1 };
+  }
+
   async googleRetorno(req, res) {
     const guardado = req.session.google;
     delete req.session.google;
@@ -168,7 +237,13 @@ class ControladorAutenticacao {
       if (!codigo || !loginGoogle.estadoValido(guardado, req.query.state)) return voltar('expirado');
 
       const identidade = await loginGoogle.confirmarIdentidade(codigo, guardado);
-      const usuarioBanco = loginGoogle.buscarUsuarioPorEmail(identidade.email);
+      let usuarioBanco = loginGoogle.buscarUsuarioPorEmail(identidade.email);
+      if (!usuarioBanco && guardado.cadastro) {
+        // E-mail ligado a um usuário desativado não ganha conta nova: o admin decide.
+        const bloqueado = db.prepare('SELECT 1 FROM usuario WHERE lower(email) = ?').get(identidade.email);
+        if (bloqueado) return voltar('sem-acesso');
+        usuarioBanco = this.criarUsuarioGoogle(identidade);
+      }
       if (!usuarioBanco) return voltar('sem-acesso');
 
       this.abrirSessao(req, usuarioBanco, (erro) => {

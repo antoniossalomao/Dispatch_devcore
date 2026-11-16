@@ -838,6 +838,38 @@ test('login com Google só entra em usuário ativo com o e-mail ligado pelo admi
     // Remover o e-mail tira o acesso pelo Google.
     assert.equal((await admin('/configuracoes/usuarios/' + idAdmin + '/email', 'PUT', { email: '' })).status, 200);
     assert.equal((await tentar({})).local, '/login?google=sem-acesso');
+
+    // Cadastro com Google: sem convite aberto, recusa; convite errado, recusa; certo, cria operador ligado ao e-mail.
+    const visitante = cliente(endereco);
+    delete process.env.CADASTRO_CODIGO;
+    assert.equal((await visitante('/auth/google/cadastro', 'POST', { codigo: 'x' })).status, 403);
+    process.env.CADASTRO_CODIGO = 'convite-teste';
+    assert.equal((await visitante('/auth/google/cadastro', 'POST', { codigo: 'errado' })).status, 403);
+    const idaCadastro = await visitante('/auth/google/cadastro', 'POST', { codigo: 'convite-teste' });
+    assert.equal(idaCadastro.status, 200);
+    const destinoCadastro = new URL(idaCadastro.dados.url);
+    cargaGoogle = {
+      iss: 'https://accounts.google.com',
+      aud: 'cliente-teste',
+      exp: Math.floor(Date.now() / 1000) + 300,
+      nonce: destinoCadastro.searchParams.get('nonce'),
+      email: 'Nova.Pessoa@gmail.com',
+      email_verified: true,
+      name: 'Nova Pessoa'
+    };
+    const volta = await pegar(
+      '/api/auth/google/retorno?code=codigo-teste&state=' + encodeURIComponent(destinoCadastro.searchParams.get('state')),
+      visitante.cookie()
+    );
+    assert.equal(volta.r.headers.get('location'), '/resumo');
+    const criado = (await admin('/configuracoes')).dados.usuarios.find((u) => u.email === 'nova.pessoa@gmail.com');
+    assert.ok(criado, 'usuário criado pelo Google');
+    assert.equal(criado.login, 'nova.pessoa');
+    assert.equal(criado.perfil, 'operador');
+    assert.equal(criado.nome, 'Nova Pessoa');
+    // A mesma conta Google depois entra pelo login normal com Google.
+    assert.equal((await tentar({ email: 'nova.pessoa@gmail.com' })).local, '/resumo');
+    delete process.env.CADASTRO_CODIGO;
   } finally {
     globalThis.fetch = fetchOriginal;
     if (envAntes.id === undefined) delete process.env.GOOGLE_CLIENT_ID;

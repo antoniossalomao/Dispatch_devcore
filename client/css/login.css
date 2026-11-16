@@ -318,6 +318,19 @@ body:has(.login-pagina) {
   transition: border-color 0.16s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.16s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+button.login-botao-google {
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button.login-botao-google:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
 .login-botao-google:hover {
   border-color: rgba(237, 236, 230, 0.3);
   background: #1b1b19;

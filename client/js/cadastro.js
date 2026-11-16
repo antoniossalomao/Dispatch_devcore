@@ -11,8 +11,47 @@ class TelaCadastro {
     this.checkMostrar = document.getElementById('mostrar-senha');
     this.msgErro = document.getElementById('mensagem-erro');
     this.botaoCadastrar = document.getElementById('botao-cadastrar');
+    this.blocoGoogle = document.getElementById('bloco-google');
+    this.botaoGoogle = document.getElementById('botao-google');
     this.configurarEventos();
     this.verificarDisponibilidade();
+  }
+
+  // O Google só aparece com o cadastro aberto e as chaves do Google configuradas no servidor.
+  async verificarGoogle() {
+    if (!this.blocoGoogle) return;
+    try {
+      const resposta = await chamarApi('/api/auth/google/status');
+      this.blocoGoogle.hidden = !(resposta.ok && resposta.dados && resposta.dados.ativo);
+    } catch (erro) {
+      this.blocoGoogle.hidden = true;
+    }
+  }
+
+  // Confere o convite no servidor e só então segue para o Google. Nome, usuário e senha vêm da conta Google.
+  async cadastrarComGoogle() {
+    this.esconderErro();
+    const codigo = this.inputCodigo ? this.inputCodigo.value.trim() : '';
+    if (codigo === '') {
+      this.mostrarErro('Preencha o código de convite para criar a conta com Google.', this.inputCodigo);
+      return;
+    }
+    this.botaoGoogle.disabled = true;
+    try {
+      const resposta = await chamarApi('/api/auth/google/cadastro', {
+        metodo: 'POST',
+        corpo: { codigo: codigo }
+      });
+      if (!resposta.ok || !resposta.dados.url) {
+        this.mostrarErro(resposta.dados.erro || 'Não foi possível seguir para o Google.');
+        this.botaoGoogle.disabled = false;
+        return;
+      }
+      window.location.href = resposta.dados.url;
+    } catch (erro) {
+      this.mostrarErro('Não consegui falar com o servidor. Confira se ele está ligado.');
+      this.botaoGoogle.disabled = false;
+    }
   }
 
   // Sem código de convite configurado no servidor, o cadastro público fica fechado.
@@ -22,6 +61,7 @@ class TelaCadastro {
       if (resposta.ok && resposta.dados && resposta.dados.ativo) {
         this.form.hidden = false;
         if (this.avisoDesativado) this.avisoDesativado.hidden = true;
+        this.verificarGoogle();
       } else {
         this.form.hidden = true;
         if (this.avisoDesativado) this.avisoDesativado.hidden = false;
@@ -43,6 +83,9 @@ class TelaCadastro {
       this.inputConfirmar.type = tipo;
     });
     this.form.addEventListener('submit', this.cadastrar.bind(this));
+    if (this.botaoGoogle) {
+      this.botaoGoogle.addEventListener('click', this.cadastrarComGoogle.bind(this));
+    }
   }
 
   async cadastrar(evento) {
