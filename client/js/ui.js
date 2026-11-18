@@ -124,17 +124,38 @@ class Janelas {
   aoAbrir(elemento) {
     if (this.abertos.some((registro) => registro.el === elemento)) return;
 
-    this.abertos.push({
+    const registro = {
       el: elemento,
-      abriuPor: document.activeElement
-    });
+      abriuPor: document.activeElement,
+      foto: null
+    };
+    this.abertos.push(registro);
     this.atualizarRolagem();
+
+    // guarda como o formulário estava ao abrir, pra saber depois se a pessoa mexeu em algo
+    setTimeout(() => {
+      registro.foto = this.fotoDoFormulario(elemento);
+    }, 50);
 
     setTimeout(() => {
       const campos = this.focaveis(elemento).filter((item) => !item.classList.contains('modal-fechar'));
       const alvo = campos[0] || this.focaveis(elemento)[0];
       if (alvo) alvo.focus();
     }, 0);
+  }
+
+  // Junta o valor de todos os campos do modal num texto só, pra comparar "antes" e "agora".
+  fotoDoFormulario(elemento) {
+    const valores = Array.from(elemento.querySelectorAll('input, select, textarea')).map((campo) => {
+      if (campo.type === 'checkbox' || campo.type === 'radio') return campo.checked ? '1' : '0';
+      return campo.value;
+    });
+    return JSON.stringify(valores);
+  }
+
+  temAlteracao(elemento) {
+    const registro = this.abertos.find((item) => item.el === elemento);
+    return Boolean(registro && registro.foto !== null && this.fotoDoFormulario(elemento) !== registro.foto);
   }
 
   aoFechar(elemento) {
@@ -166,6 +187,33 @@ class Janelas {
       if (!botao.getAttribute('aria-label')) botao.setAttribute('aria-label', 'Fechar');
     });
 
+    // Se a pessoa mexeu no formulário e clicou em ×, Cancelar ou apertou Esc, pergunta antes de jogar fora.
+    // Roda na fase de captura (true) pra conseguir segurar o clique antes do código da tela fechar o modal.
+    if (elemento.classList.contains('modal-overlay') && !elemento.dataset.dialogo) {
+      elemento.addEventListener(
+        'click',
+        (evento) => {
+          const botao = evento.target.closest('.modal-fechar, .modal-rodape .btn-secundario');
+          if (!botao || !this.temAlteracao(elemento)) return;
+          evento.preventDefault();
+          evento.stopImmediatePropagation();
+          window
+            .confirmar('O que você digitou neste formulário vai ser perdido.', {
+              titulo: 'Descartar alterações?',
+              confirmar: 'Descartar',
+              cancelar: 'Continuar editando'
+            })
+            .then((descartar) => {
+              if (!descartar) return;
+              const registro = this.abertos.find((item) => item.el === elemento);
+              if (registro) registro.foto = null;
+              botao.click();
+            });
+        },
+        true
+      );
+    }
+
     // Observa quando o atributo hidden muda para saber a hora exata em que uma tela abre ou fecha a janela.
     new MutationObserver(() => {
       if (elemento.hidden) this.aoFechar(elemento);
@@ -193,6 +241,8 @@ class Janelas {
       const overlay = document.createElement('div');
       overlay.className = 'modal-overlay';
       overlay.hidden = true;
+      // as janelinhas de confirmação não perguntam "descartar alterações?" (senão perguntaria sobre ela mesma)
+      overlay.dataset.dialogo = '1';
 
       const terminar = (valor) => {
         if (resolvido) return;

@@ -104,7 +104,10 @@ export default class TelaMovimentacoes {
     document.body.appendChild(link);
     link.click();
     link.remove();
-    URL.revokeObjectURL(link.href);
+    // espera um pouco antes de liberar o arquivo da memória: em alguns navegadores liberar na hora cancela o download
+    setTimeout(() => {
+      URL.revokeObjectURL(link.href);
+    }, 1000);
   }
 
   esc(texto) {

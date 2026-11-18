@@ -1,4 +1,5 @@
 const db = require('../db/conexao');
+const datas = require('../regras/datas');
 const configuracao = require('../services/Configuracao');
 const notificacoes = require('../services/Notificacoes');
 
@@ -148,7 +149,20 @@ class ControladorResumo {
           'WHERE v.ativo = 1 AND m.fim IS NULL'
       )
       .get().total;
-    const veiculosDisponiveis = Math.max(0, totalVeiculos - veiculosEmUso - veiculosManutencao);
+    // Carro parado com licenciamento vencido não pode sair (F12), então não conta como pronto pra saída.
+    const veiculosBloqueados = db
+      .prepare(
+        'SELECT COUNT(*) AS total FROM veiculo v ' +
+          'WHERE v.ativo = 1 AND v.licenciamento_validade IS NOT NULL AND v.licenciamento_validade < date(\'now\', \'localtime\') ' +
+          'AND NOT EXISTS (SELECT 1 FROM uso_veiculo u WHERE u.veiculo_id = v.id AND u.retorno IS NULL) ' +
+          'AND NOT EXISTS (SELECT 1 FROM manutencao m WHERE m.veiculo_id = v.id AND m.fim IS NULL)'
+      )
+      .get().total;
+    const bloqueiaDoc = configuracao.lerConfig().bloquearDocVencido;
+    const veiculosDisponiveis = Math.max(
+      0,
+      totalVeiculos - veiculosEmUso - veiculosManutencao - (bloqueiaDoc ? veiculosBloqueados : 0)
+    );
 
     const totalLeitos = db
       .prepare(
@@ -196,6 +210,15 @@ class ControladorResumo {
           'ORDER BY data_ordem DESC LIMIT 6'
       )
       .all();
+
+    // Só a hora confunde quando o movimento foi em outro dia: aí mostra "dd/mm hh:mm".
+    const hoje = datas.agoraLocal().slice(0, 10);
+    ultimas.forEach((item) => {
+      const dia = item.data_ordem.slice(0, 10);
+      if (dia !== hoje) {
+        item.horario = dia.slice(8, 10) + '/' + dia.slice(5, 7) + ' ' + item.horario;
+      }
+    });
 
     const listaAlojamentos = db
       .prepare(

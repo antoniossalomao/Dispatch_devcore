@@ -427,9 +427,10 @@ export default class TelaColaboradores {
         totais.emTransito +
         ' em trânsito';
       this.kpiTotalAtivos.textContent = totais.ativos;
-      this.kpiComCnh.textContent = totais.comCnh;
+      // o card mostra só quem pode dirigir hoje (CNH válida); quem está com a CNH vencida fica de fora
+      this.kpiComCnh.textContent = totais.aptos;
       this.kpiPctCnh.textContent =
-        totais.total > 0 ? Math.round((totais.comCnh / totais.total) * 100) + '% da equipe' : '0%';
+        totais.total > 0 ? Math.round((totais.aptos / totais.total) * 100) + '% da equipe' : '0%';
       this.kpiCnhAlerta.textContent = totais.cnhAlerta;
       this.kpiAlojados.textContent = totais.alojados;
       this.kpiEmTransito.textContent = totais.emTransito + ' com veículo da frota';

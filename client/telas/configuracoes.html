@@ -93,28 +93,28 @@
               <span id="saude-banco-ponto" class="saude-ponto saude-ok" aria-hidden="true"></span>
               <div>
                 <span class="saude-titulo">Banco de dados</span>
-                <span id="saude-banco" class="saude-detalhe">Carregando...</span>
+                <span id="saude-banco" class="saude-detalhe">Carregando…</span>
               </div>
             </div>
             <div class="saude-item">
               <span id="saude-log-ponto" class="saude-ponto saude-ok" aria-hidden="true"></span>
               <div>
                 <span class="saude-titulo">Log de auditoria</span>
-                <span id="saude-log" class="saude-detalhe">Carregando...</span>
+                <span id="saude-log" class="saude-detalhe">Carregando…</span>
               </div>
             </div>
             <div class="saude-item">
               <span id="saude-ia-ponto" class="saude-ponto saude-off" aria-hidden="true"></span>
               <div>
                 <span class="saude-titulo">Inteligência artificial</span>
-                <span id="saude-ia" class="saude-detalhe">Carregando...</span>
+                <span id="saude-ia" class="saude-detalhe">Carregando…</span>
               </div>
             </div>
             <div class="saude-item">
               <span id="saude-telegram-ponto" class="saude-ponto saude-off" aria-hidden="true"></span>
               <div>
                 <span class="saude-titulo">Telegram</span>
-                <span id="saude-telegram" class="saude-detalhe">Carregando...</span>
+                <span id="saude-telegram" class="saude-detalhe">Carregando…</span>
               </div>
             </div>
           </section>
@@ -176,8 +176,8 @@
             <div class="lista-switches">
               <label class="switch-linha">
                 <div class="switch-texto">
-                  <span class="switch-titulo">Bloquear saída com CNH ou licenciamento vencido</span>
-                  <span class="switch-desc">Impede registrar retirada quando a carteira do motorista ou o documento do veículo venceu.</span>
+                  <span class="switch-titulo">Bloquear saída com licenciamento vencido</span>
+                  <span class="switch-desc">Impede registrar retirada quando o documento do veículo venceu. CNH vencida sempre bloqueia, porque é exigência do CTB.</span>
                 </div>
                 <span class="chave">
                   <input type="checkbox" id="cfg-bloquear-doc">
@@ -202,15 +202,15 @@
             <div class="bloco-cabecalho">
               <div>
                 <h2 class="bloco-titulo">Alojamentos e norma NR-24</h2>
-                <p class="bloco-subtitulo">Limites legais de capacidade e metragem mínima por dormitório</p>
+                <p class="bloco-subtitulo">Valores fixos da NR-24: o sistema sempre confere esses limites ao cadastrar quartos</p>
               </div>
             </div>
 
-            <div class="grade-campos tres-colunas borda-abaixo">
+            <div class="grade-campos tres-colunas">
               <div class="campo-grupo">
                 <label for="cfg-max-leitos" class="campo-label">Máx. de leitos por quarto</label>
                 <div class="campo-sufixo">
-                  <input type="number" id="cfg-max-leitos" min="1" max="20">
+                  <input type="number" id="cfg-max-leitos" readonly>
                   <span>leitos</span>
                 </div>
               </div>
@@ -218,7 +218,7 @@
               <div class="campo-grupo">
                 <label for="cfg-area-cama" class="campo-label">Área mínima por cama</label>
                 <div class="campo-sufixo">
-                  <input type="number" id="cfg-area-cama" min="1" step="0.5">
+                  <input type="number" id="cfg-area-cama" readonly>
                   <span>m²</span>
                 </div>
               </div>
@@ -226,23 +226,10 @@
               <div class="campo-grupo">
                 <label for="cfg-area-beliche" class="campo-label">Área mínima por beliche</label>
                 <div class="campo-sufixo">
-                  <input type="number" id="cfg-area-beliche" min="1" step="0.5">
+                  <input type="number" id="cfg-area-beliche" readonly>
                   <span>m²</span>
                 </div>
               </div>
-            </div>
-
-            <div class="lista-switches">
-              <label class="switch-linha">
-                <div class="switch-texto">
-                  <span class="switch-titulo">Exigir conformidade com a NR-24 no cadastro de quartos</span>
-                  <span class="switch-desc">Bloqueia adicionar leitos acima da metragem do dormitório para evitar autuação trabalhista.</span>
-                </div>
-                <span class="chave">
-                  <input type="checkbox" id="cfg-validar-nr24">
-                  <span class="chave-trilho"></span>
-                </span>
-              </label>
             </div>
           </div>
 
@@ -489,7 +476,7 @@
             </div>
 
             <div id="caixa-integridade" class="integridade-status integridade-ok">
-              <strong id="integridade-titulo">Verificando cadeia de hashes...</strong>
+              <strong id="integridade-titulo">Verificando cadeia de hashes…</strong>
               <p id="integridade-motivo"></p>
             </div>
 

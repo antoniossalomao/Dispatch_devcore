@@ -132,6 +132,11 @@
 
 /* chat */
 
+/* espaço no fim da tela pra o botão "?" (que fica fixo no canto) não cobrir a última linha de conteúdo */
+.conteudo {
+  padding-bottom: 88px;
+}
+
 .chat-caixa {
   position: fixed;
   right: 24px;

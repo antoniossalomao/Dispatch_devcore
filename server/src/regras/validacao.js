@@ -126,6 +126,16 @@ class Validador {
     return email;
   }
 
+  // Deixa o texto pronto pra comparar na busca: minúsculo e sem acento ("José" vira "jose").
+  // Assim quem digita sem acento acha o nome do mesmo jeito.
+  paraBusca(valor) {
+    return String(valor || '')
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .trim();
+  }
+
   // Telefone brasileiro com DDD: 10 dígitos (fixo) ou 11 (celular, começando com 9).
   lerTelefone(valor) {
     let d = this.somenteDigitos(valor);

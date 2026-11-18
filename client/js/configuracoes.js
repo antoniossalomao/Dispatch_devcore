@@ -37,7 +37,6 @@ export default class TelaConfiguracoes {
     this.cfgMaxLeitos = document.getElementById('cfg-max-leitos');
     this.cfgAreaCama = document.getElementById('cfg-area-cama');
     this.cfgAreaBeliche = document.getElementById('cfg-area-beliche');
-    this.cfgValidarNr24 = document.getElementById('cfg-validar-nr24');
     this.cfgDiasVencimento = document.getElementById('cfg-dias-vencimento');
     this.cfgDiasPendencia = document.getElementById('cfg-dias-pendencia');
     this.cfgLotacaoPct = document.getElementById('cfg-lotacao-pct');
@@ -110,10 +109,6 @@ export default class TelaConfiguracoes {
       this.cfgHorasRetorno,
       this.cfgBloquearDoc,
       this.cfgAvisarSeguro,
-      this.cfgMaxLeitos,
-      this.cfgAreaCama,
-      this.cfgAreaBeliche,
-      this.cfgValidarNr24,
       this.cfgDiasVencimento,
       this.cfgDiasPendencia,
       this.cfgLotacaoPct,
@@ -389,8 +384,13 @@ export default class TelaConfiguracoes {
     this.botoesNav.forEach((botao) => {
       const ativa = botao.dataset.aba === alvo;
       botao.classList.toggle('ativa', ativa);
-      if (ativa) botao.setAttribute('aria-current', 'true');
-      else botao.removeAttribute('aria-current');
+      if (ativa) {
+        botao.setAttribute('aria-current', 'true');
+        // em tela estreita a faixa de abas rola pro lado; isso traz a aba aberta pra parte visível
+        botao.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      } else {
+        botao.removeAttribute('aria-current');
+      }
     });
 
     Object.keys(this.paineis).forEach((chave) => {
@@ -424,13 +424,9 @@ export default class TelaConfiguracoes {
       horasAlertaRetorno: this.cfgHorasRetorno.value,
       kmConfirmacaoViagem: this.cfgKmConfirmacao.value,
       diasAlertaPendencia: this.cfgDiasPendencia.value,
-      maxLeitosQuarto: this.cfgMaxLeitos.value,
-      areaMinimaCama: this.cfgAreaCama.value,
-      areaMinimaBeliche: this.cfgAreaBeliche.value,
       lotacaoAlertaPct: this.cfgLotacaoPct.value,
       bloquearDocVencido: this.cfgBloquearDoc.checked,
       avisarSeguroVencido: this.cfgAvisarSeguro.checked,
-      validarNr24: this.cfgValidarNr24.checked,
       telegramCriticos: this.cfgTelegram.checked
     };
   }
@@ -450,7 +446,6 @@ export default class TelaConfiguracoes {
     this.cfgLotacaoPct.value = parametros.lotacaoAlertaPct;
     this.cfgBloquearDoc.checked = Boolean(parametros.bloquearDocVencido);
     this.cfgAvisarSeguro.checked = Boolean(parametros.avisarSeguroVencido);
-    this.cfgValidarNr24.checked = Boolean(parametros.validarNr24);
     this.cfgTelegram.checked = Boolean(parametros.telegramCriticos);
 
     this.parametrosSalvos = JSON.stringify(this.lerFormularioParametros());

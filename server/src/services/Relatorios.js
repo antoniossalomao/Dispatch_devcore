@@ -1,5 +1,6 @@
 const db = require('../db/conexao');
 const datas = require('../regras/datas');
+const validador = require('../regras/validacao');
 const configuracao = require('./Configuracao');
 
 // Calcula os números de ocupação, uso da frota, movimentações e gargalos dentro de um período escolhido.
@@ -250,15 +251,13 @@ class Relatorios {
 
     eventos.sort((a, b) => (a.quando < b.quando ? 1 : -1));
 
-    const busca = String(filtro.busca || '')
-      .trim()
-      .toLowerCase();
+    const busca = validador.paraBusca(filtro.busca);
     const filtrados = eventos.filter((evento) => {
       if (filtro.categoria && evento.categoria !== filtro.categoria) return false;
       if (filtro.tipo && evento.tipo !== filtro.tipo) return false;
       if (
         busca !== '' &&
-        !(evento.colaborador + ' ' + evento.recurso).toLowerCase().includes(busca)
+        !validador.paraBusca(evento.colaborador + ' ' + evento.recurso).includes(busca)
       ) {
         return false;
       }

@@ -32,7 +32,7 @@ class ControladorPessoas {
   }
 
   listar(req, res) {
-    const busca = String(req.query.busca || '').trim().slice(0, 100).toLowerCase();
+    const busca = validador.paraBusca(String(req.query.busca || '').slice(0, 100));
     const filtroStatus = req.query.status || 'ativos';
     const filtroCnh = req.query.cnh || 'todos';
     const cfg = configuracao.lerConfig();
@@ -59,8 +59,16 @@ class ControladorPessoas {
       .all();
     const usosAtivos = db
       .prepare(
+        // Pega quem está dirigindo e também quem foi de passageiro: os dois estão na rua
+        // e não podem entrar em outra viagem (regra F2).
         'SELECT u.motorista_id AS pessoa_id, v.modelo, v.placa, u.destino, u.saida ' +
           'FROM uso_veiculo u ' +
+          'JOIN veiculo v ON v.id = u.veiculo_id ' +
+          'WHERE u.retorno IS NULL ' +
+          'UNION ' +
+          'SELECT up.pessoa_id, v.modelo, v.placa, u.destino, u.saida ' +
+          'FROM uso_passageiro up ' +
+          'JOIN uso_veiculo u ON u.id = up.uso_veiculo_id ' +
           'JOIN veiculo v ON v.id = u.veiculo_id ' +
           'WHERE u.retorno IS NULL'
       )
@@ -113,11 +121,10 @@ class ControladorPessoas {
     // Aplica os filtros de busca por texto e situação de CNH depois de calcular os indicadores de cada pessoa.
     const resultado = listaCompleta.filter((pessoa) => {
       if (busca !== '') {
-        const bateuBusca =
-          pessoa.nome.toLowerCase().includes(busca) ||
-          pessoa.matricula.toLowerCase().includes(busca) ||
-          pessoa.cargo.toLowerCase().includes(busca) ||
-          pessoa.obra.toLowerCase().includes(busca);
+        const textoPessoa = validador.paraBusca(
+          pessoa.nome + ' ' + pessoa.matricula + ' ' + pessoa.cargo + ' ' + pessoa.obra
+        );
+        const bateuBusca = textoPessoa.includes(busca);
         if (!bateuBusca) return false;
       }
       if (filtroCnh === 'com_cnh') return pessoa.cnh_info.status !== 'sem_cnh';
@@ -132,6 +139,10 @@ class ControladorPessoas {
       total: pessoas.length,
       ativos: pessoas.filter((item) => item.ativo === 1).length,
       comCnh: listaCompleta.filter((item) => item.cnh_info.status !== 'sem_cnh').length,
+      // "apto" é quem pode dirigir hoje: tem CNH e ela não está vencida (regra F4)
+      aptos: listaCompleta.filter(
+        (item) => item.cnh_info.status === 'valida' || item.cnh_info.status === 'vencendo'
+      ).length,
       cnhAlerta: listaCompleta.filter(
         (item) => item.cnh_info.status === 'vencendo' || item.cnh_info.status === 'vencida'
       ).length,
@@ -240,7 +251,10 @@ class ControladorPessoas {
       validador.textoDentroDoLimite(matricula, 40, 'A matrícula') ||
       validador.textoDentroDoLimite(cargo, 80, 'O cargo') ||
       validador.textoDentroDoLimite(obra, 100, 'A obra') ||
-      validador.textoDentroDoLimite(telefone, 30, 'O telefone') ||
+      // telefone é opcional, mas se vier tem que ter DDD + número (10 ou 11 dígitos)
+      (telefone !== '' && !validador.lerTelefone(telefone)
+        ? 'Telefone inválido: use DDD + número, ex.: (14) 99123-4567.'
+        : null) ||
       cnh.erro;
     if (erroTexto) {
       return res.status(400).json({ erro: erroTexto });
@@ -325,7 +339,10 @@ class ControladorPessoas {
       validador.textoDentroDoLimite(matricula, 40, 'A matrícula') ||
       validador.textoDentroDoLimite(cargo, 80, 'O cargo') ||
       validador.textoDentroDoLimite(obra, 100, 'A obra') ||
-      validador.textoDentroDoLimite(telefone, 30, 'O telefone') ||
+      // telefone é opcional, mas se vier tem que ter DDD + número (10 ou 11 dígitos)
+      (telefone !== '' && !validador.lerTelefone(telefone)
+        ? 'Telefone inválido: use DDD + número, ex.: (14) 99123-4567.'
+        : null) ||
       cnh.erro;
     if (erroTexto) {
       return res.status(400).json({ erro: erroTexto });

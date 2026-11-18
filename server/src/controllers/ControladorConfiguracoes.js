@@ -10,6 +10,7 @@ const configuracao = require('../services/Configuracao');
 const sessionStore = require('../services/SessionStore');
 const telegram = require('../services/Telegram');
 const validador = require('../regras/validacao');
+const datas = require('../regras/datas');
 // Carregar o serviço garante a coluna usuario.email em bancos criados antes do login com Google.
 const loginGoogle = require('../services/LoginGoogle');
 
@@ -92,9 +93,6 @@ class ControladorConfiguracoes {
     const horasRetorno = Number(dados.horasAlertaRetorno);
     const kmConfirmacao = Number(dados.kmConfirmacaoViagem);
     const diasPendencia = Number(dados.diasAlertaPendencia);
-    const maxLeitos = Number(dados.maxLeitosQuarto);
-    const areaCama = Number(dados.areaMinimaCama);
-    const areaBeliche = Number(dados.areaMinimaBeliche);
     const lotacaoPct = Number(dados.lotacaoAlertaPct);
 
     if (nomeEmpresa === '') {
@@ -127,23 +125,6 @@ class ControladorConfiguracoes {
         erro: 'O prazo de pendências deve ficar entre 1 e 90 dias.'
       });
     }
-    if (!Number.isFinite(maxLeitos) || maxLeitos < 1 || maxLeitos > 20) {
-      return res.status(400).json({
-        erro: 'O limite de leitos por quarto deve ficar entre 1 e 20.'
-      });
-    }
-    if (
-      !Number.isFinite(areaCama) ||
-      areaCama < 1 ||
-      areaCama > 1000 ||
-      !Number.isFinite(areaBeliche) ||
-      areaBeliche < 1 ||
-      areaBeliche > 1000
-    ) {
-      return res.status(400).json({
-        erro: 'Informe metragens válidas para cama e beliche.'
-      });
-    }
     if (!Number.isFinite(lotacaoPct) || lotacaoPct < 50 || lotacaoPct > 100) {
       return res.status(400).json({
         erro: 'O percentual de alerta de lotação deve ficar entre 50% e 100%.'
@@ -158,13 +139,10 @@ class ControladorConfiguracoes {
       horasAlertaRetorno: horasRetorno,
       kmConfirmacaoViagem: kmConfirmacao,
       diasAlertaPendencia: diasPendencia,
-      maxLeitosQuarto: maxLeitos,
-      areaMinimaCama: areaCama,
-      areaMinimaBeliche: areaBeliche,
+      // Os limites da NR-24 não entram aqui: são fixos (ver services/Configuracao.js).
       lotacaoAlertaPct: lotacaoPct,
       bloquearDocVencido: Boolean(dados.bloquearDocVencido),
       avisarSeguroVencido: Boolean(dados.avisarSeguroVencido),
-      validarNr24: Boolean(dados.validarNr24),
       telegramCriticos: Boolean(dados.telegramCriticos)
     };
 
@@ -181,7 +159,7 @@ class ControladorConfiguracoes {
 
     res.json({
       mensagem: 'Configurações salvas.',
-      parametros: novo
+      parametros: configuracao.lerConfig()
     });
   }
 
@@ -215,7 +193,7 @@ class ControladorConfiguracoes {
       '[DISPATCH · ' +
       cfg.nomeEmpresa +
       '] Alerta de teste: ' +
-      'Veículo Saveiro MNO-7890 registrou diferença de +38 km sem saída vinculada. ' +
+      'se você recebeu esta mensagem, os alertas do Dispatch estão chegando. ' +
       'Destinatário: ' +
       admin.nome;
 
@@ -244,7 +222,8 @@ class ControladorConfiguracoes {
       return res.status(404).json({ erro: 'Arquivo do banco não encontrado.' });
     }
 
-    const hoje = new Date().toISOString().slice(0, 10);
+    // toISOString usa o horário de Londres (UTC): depois das 21h aqui já seria o dia seguinte no nome do arquivo.
+    const hoje = datas.agoraLocal().slice(0, 10);
     const caminhoTemp = path.join(
       os.tmpdir(),
       'dispatch-backup-' + crypto.randomUUID() + '.db'
@@ -360,6 +339,9 @@ class ControladorConfiguracoes {
         !(await bcrypt.compare(senhaAtual, atual.senha_hash))
       ) {
         return res.status(400).json({ erro: 'A senha atual está incorreta.' });
+      }
+      if (novaSenha === senhaAtual) {
+        return res.status(400).json({ erro: 'A nova senha precisa ser diferente da atual.' });
       }
 
       const novoHash = await bcrypt.hash(novaSenha, 10);

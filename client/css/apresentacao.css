@@ -100,7 +100,8 @@ header.solido .acesso { background: var(--fg); color: var(--bg); border-color: v
 .t1 .nm { display: block; line-height: 0; }
 .t1 .nm img { width: clamp(260px, 32vw, 480px); height: auto; }
 .t1 .sb { padding-left: 0.34em; font-family: 'Josefin Sans', var(--f); font-size: 14px; font-weight: 400; letter-spacing: 0.34em; text-transform: uppercase; color: var(--fg); }
-.t2 { bottom: max(13vh, 96px); pointer-events: none; }
+/* 140px no mínimo: o link "Conheça o DevCore" (.t3) ocupa uns 116px de baixo; com menos, a frase encostava nele em tela baixa */
+.t2 { bottom: max(13vh, 140px); pointer-events: none; }
 .t2 .in { max-width: 1320px; margin: 0 auto; padding-inline: var(--gl) var(--gr); }
 .t2 p { max-width: 11em; margin: 0; font-family: var(--serif); font-size: clamp(30px, 4vw, 60px); line-height: 1.04; }
 .t3 { bottom: max(3.5vh, 28px); display: flex; flex-direction: column; align-items: center; gap: 16px; font-size: 14px; letter-spacing: 0.04em; color: var(--muted); }

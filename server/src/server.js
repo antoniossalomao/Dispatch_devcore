@@ -41,7 +41,11 @@ class Servidor {
     // Esconde que o servidor usa Express para não dar dicas de graça sobre qual tecnologia está rodando.
     this.app.disable('x-powered-by');
     // No Azure, a conexão passa pelo proxy deles; isso faz o Express ler o HTTPS e o IP reais do visitante.
-    this.app.set('trust proxy', 1);
+    // Fora de produção não tem proxy na frente, então não dá pra confiar no cabeçalho X-Forwarded-For:
+    // qualquer um poderia trocar o IP nele e escapar do limite de tentativas de login.
+    if (this.emProducao) {
+      this.app.set('trust proxy', 1);
+    }
 
     this.configurarCabecalhosSeguranca();
     this.configurarCors();

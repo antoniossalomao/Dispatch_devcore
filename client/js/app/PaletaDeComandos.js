@@ -50,8 +50,9 @@ export class PaletaDeComandos {
     if (tudo.includes(termo)) return 400 + bonusRecente;
 
     // letras na ordem, mesmo com outras no meio: "nvc" acha "NoVo Colaborador"
+    // só olha o título: no texto todo (subtítulo + grupo) quase qualquer palavra acabava batendo
     let posicao = 0;
-    for (const letra of tudo) {
+    for (const letra of titulo) {
       if (letra === termo[posicao]) posicao++;
       if (posicao === termo.length) return 150 + bonusRecente;
     }

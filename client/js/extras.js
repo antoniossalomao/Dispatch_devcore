@@ -220,7 +220,7 @@ class RecursosCompartilhados {
 
     this.entrada.value = '';
     this.adicionarMensagem(texto, 'chat-eu');
-    const aguarde = this.adicionarMensagem('Pensando...', 'chat-bot');
+    const aguarde = this.adicionarMensagem('Pensando…', 'chat-bot');
 
     const resposta = await chamarApi('/api/ia/suporte', {
       metodo: 'POST',

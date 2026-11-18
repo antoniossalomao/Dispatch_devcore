@@ -9,10 +9,14 @@ const datas = require('../regras/datas');
 class Notificacoes {
   constructor() {
     this.ultimaVerificacao = 0;
+    this.aindaValendo = new Set();
   }
 
   // Só grava um alerta novo se ainda não existir outro igual sem leitura ou criado nas últimas 24h.
   criar(lista, tipo, severidade, mensagem, tabela, registroId) {
+    // anota que esse problema ainda existe nessa varredura (usado no limparResolvidas)
+    this.aindaValendo.add(this.chave(tipo, tabela, registroId));
+
     const existe = db
       .prepare(
         "SELECT id FROM notificacao WHERE tipo = ? AND IFNULL(tabela, '') = ? AND IFNULL(registro_id, 0) = ? " +
@@ -34,8 +38,27 @@ class Notificacoes {
     });
   }
 
+  chave(tipo, tabela, registroId) {
+    return tipo + '|' + (tabela || '') + '|' + (registroId || 0);
+  }
+
+  // Quando o problema some (o carro voltou, a manutenção acabou, a CNH foi renovada...),
+  // o alerta antigo não faz mais sentido. Marca como lido pra ele sair do sino sozinho.
+  limparResolvidas() {
+    const abertas = db
+      .prepare('SELECT id, tipo, tabela, registro_id FROM notificacao WHERE lida = 0')
+      .all();
+    const marcarLida = db.prepare('UPDATE notificacao SET lida = 1 WHERE id = ?');
+    abertas.forEach((aviso) => {
+      if (!this.aindaValendo.has(this.chave(aviso.tipo, aviso.tabela, aviso.registro_id))) {
+        marcarLida.run(aviso.id);
+      }
+    });
+  }
+
   gerarAvisos(cfg) {
     const novos = [];
+    this.aindaValendo = new Set();
     const diasAlerta = cfg.diasAvisoVencimento;
     const agora = Date.now();
     const horaEmMs = 3600000;
@@ -269,6 +292,7 @@ class Notificacoes {
       );
     }
 
+    this.limparResolvidas();
     return novos;
   }
 

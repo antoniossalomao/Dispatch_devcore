@@ -74,6 +74,9 @@ class ControladorFrota {
     if (!saida) {
       return res.status(400).json({ erro: 'Data de saída inválida.' });
     }
+    if (datas.noFuturo(saida)) {
+      return res.status(400).json({ erro: 'A saída não pode ser numa data futura.' });
+    }
     if (!Number.isInteger(kmSaida) || kmSaida < 0 || kmSaida > 10000000) {
       return res.status(400).json({ erro: 'Informe o km de saída (número inteiro válido).' });
     }
@@ -284,6 +287,9 @@ class ControladorFrota {
     if (!retorno) {
       return res.status(400).json({ erro: 'Data de volta inválida.' });
     }
+    if (datas.noFuturo(retorno)) {
+      return res.status(400).json({ erro: 'A volta não pode ser numa data futura.' });
+    }
     if (retorno <= uso.saida) {
       return res.status(400).json({
         erro: 'A volta precisa ser depois da saída (' + uso.saida + ').'
@@ -363,6 +369,9 @@ class ControladorFrota {
     if (!fim) {
       return res.status(400).json({ erro: 'Data de conclusão inválida.' });
     }
+    if (datas.noFuturo(fim)) {
+      return res.status(400).json({ erro: 'A conclusão não pode ser numa data futura.' });
+    }
     if (fim <= manutencao.inicio) {
       return res.status(400).json({
         erro: 'A conclusão precisa ser depois do início (' + manutencao.inicio + ').'
@@ -409,6 +418,16 @@ class ControladorFrota {
                 )
                 .get(veiculo.id)
             : null;
+        const licenciamento = this.situacaoDocumento(
+          veiculo.licenciamento_validade,
+          cfg.diasAvisoVencimento
+        );
+        // O carro parado na garagem pode estar impedido de sair (regra F12).
+        // A tela usa isso pra não mostrar como "pronto pra sair" um carro que o back vai barrar.
+        let bloqueio = null;
+        if (status === 'disponivel' && licenciamento.status === 'vencido' && cfg.bloquearDocVencido) {
+          bloqueio = 'Licenciamento vencido';
+        }
         return {
           id: veiculo.id,
           placa: veiculo.placa,
@@ -419,20 +438,18 @@ class ControladorFrota {
           km_atual: this.kmAtual(veiculo),
           licenciamento_validade: veiculo.licenciamento_validade,
           seguro_validade: veiculo.seguro_validade,
-          licenciamento: this.situacaoDocumento(
-            veiculo.licenciamento_validade,
-            cfg.diasAvisoVencimento
-          ),
+          licenciamento: licenciamento,
           seguro: this.situacaoDocumento(veiculo.seguro_validade, cfg.diasAvisoVencimento),
           ativo: veiculo.ativo,
           status: status,
+          bloqueio: bloqueio,
           uso_atual: uso
         };
       });
 
     const totais = {
       total: veiculos.length,
-      disponiveis: veiculos.filter((item) => item.status === 'disponivel').length,
+      disponiveis: veiculos.filter((item) => item.status === 'disponivel' && !item.bloqueio).length,
       emUso: veiculos.filter((item) => item.status === 'em_uso').length,
       manutencao: veiculos.filter((item) => item.status === 'manutencao').length,
       docsAtencao: veiculos.filter(
@@ -674,6 +691,9 @@ class ControladorFrota {
     }
     if (!inicio) {
       return res.status(400).json({ erro: 'Data de início inválida.' });
+    }
+    if (datas.noFuturo(inicio)) {
+      return res.status(400).json({ erro: 'O início não pode ser numa data futura.' });
     }
     if (km !== null && (!Number.isInteger(km) || km < 0 || km > 10000000)) {
       return res.status(400).json({ erro: 'Km inválido.' });

@@ -74,7 +74,8 @@ class Cnh {
       );
     }
     if (exigida === 'C') {
-      return letras.includes('C') || letras.includes('E');
+      // Pelo CTB as categorias somam: quem tem D também pode dirigir caminhão (C).
+      return letras.includes('C') || letras.includes('D') || letras.includes('E');
     }
     if (exigida === 'D') {
       return letras.includes('D') || letras.includes('E');
