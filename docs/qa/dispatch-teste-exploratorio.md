@@ -8,7 +8,8 @@ Objetivo: QA exploratório de todos os módulos do Dispatch (front `client/` + A
 - Usar só o banco local (`server/data/dispatch.db` ou um `DB_CAMINHO` de teste). Nunca apontar para banco ou conta reais.
 - Login admin de desenvolvimento (`admin` / `admin123`) só no banco local. Trocar a senha no primeiro teste de "Minha conta" e registrar isso.
 - Credenciais de Google, Groq e Telegram: não usar tokens reais. Testar com valores falsos e com campos vazios. Sem `GROQ_API_KEY` e sem `TELEGRAM_*`, registrar o comportamento de "desligado".
-- Browser: Playwright (Chromium já instalado). Print antes e depois de cada ação relevante em `relatorio/prints/NN-tela-acao.png`.
+- Método de automação: computer use (controle de mouse, teclado e captura de tela no desktop, via app Claude com Computer use ligado). Usar o navegador já aberto na máquina; não usar Playwright nem outra automação de browser. Registrar o método no relatório.
+- Print antes e depois de cada ação relevante em `relatorio/prints/NN-tela-acao.png`.
 - Itens: OK / FALHOU / PARCIAL / NÃO APLICÁVEL. Só marcar OK com resultado visto na tela ou na resposta da API.
 - Bug: parar, anotar passos exatos, esperado x obtido, print, log do servidor, e reproduzir uma segunda vez.
 - Não pular itens. Se um bloquear outros, registrar e seguir.
