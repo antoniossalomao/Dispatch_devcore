@@ -4,6 +4,7 @@ class Datas {
     this.agoraLocal = this.agoraLocal.bind(this);
     this.normalizarData = this.normalizarData.bind(this);
     this.diasAte = this.diasAte.bind(this);
+    this.noFuturo = this.noFuturo.bind(this);
     this.dataIsoValida = this.dataIsoValida.bind(this);
   }
 
@@ -75,6 +76,13 @@ class Datas {
       ':' +
       this.doisDigitos(seg)
     );
+  }
+
+  // Registro de saída, volta, entrada etc. só pode ser de algo que já aconteceu.
+  // Se aceitar data no futuro, o carro ou o leito aparece "em uso" hoje sem estar.
+  // Dá pra comparar como texto porque as duas datas estão no formato AAAA-MM-DD HH:MM:SS.
+  noFuturo(data) {
+    return data > this.agoraLocal();
   }
 
   // Calcula quantos dias faltam de hoje até uma data AAAA-MM-DD (se der negativo, já venceu).

@@ -337,8 +337,13 @@ export default class TelaFrota {
 
     this.veiculosCache.forEach((veiculo) => {
       const tr = document.createElement('tr');
+      // a paleta Ctrl+K usa esse id pra achar a linha e abrir os detalhes do veículo escolhido
+      tr.dataset.veiculoId = veiculo.id;
       if (veiculo.ativo === 0) tr.className = 'colab-inativo';
-      const estado = this.rotulosStatus[veiculo.status];
+      // Se o back disse que o carro está bloqueado (ex: licenciamento vencido), mostra isso no lugar de "Disponível".
+      const estado = veiculo.bloqueio
+        ? ['status-problema', 'Bloqueado']
+        : this.rotulosStatus[veiculo.status];
 
       tr.innerHTML =
         '<td><div class="veic-celula"><span class="veic-modelo">' +
@@ -371,7 +376,7 @@ export default class TelaFrota {
       const box = document.createElement('div');
       box.className = 'botoes-acoes';
 
-      if (veiculo.status === 'disponivel' && veiculo.ativo === 1) {
+      if (veiculo.status === 'disponivel' && veiculo.ativo === 1 && !veiculo.bloqueio) {
         box.appendChild(
           this.botao('Saída', () => {
             this.abrirSaida(veiculo.id);
@@ -524,7 +529,7 @@ export default class TelaFrota {
 
   abrirSaida(veiculoId) {
     const disponiveis = this.veiculosCache.filter(
-      (veiculo) => veiculo.status === 'disponivel' && veiculo.ativo === 1
+      (veiculo) => veiculo.status === 'disponivel' && veiculo.ativo === 1 && !veiculo.bloqueio
     );
     if (disponiveis.length === 0) {
       this.mostrarToast('Nenhum veículo disponível no momento.', 'erro');

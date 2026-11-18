@@ -77,6 +77,22 @@ class App {
     if (this.telaAtual === rota) acao();
   }
 
+  // A lista da tela chega da API um pouco depois de a tela abrir.
+  // Fica conferindo a cada 100 ms (por até 3 s) se o elemento já apareceu e aí clica nele.
+  clicarQuandoAparecer(seletor) {
+    let tentativas = 0;
+    const timer = setInterval(() => {
+      const elemento = document.querySelector(seletor);
+      tentativas++;
+      if (elemento) {
+        clearInterval(timer);
+        elemento.click();
+      } else if (tentativas >= 30) {
+        clearInterval(timer);
+      }
+    }, 100);
+  }
+
   configurarPaleta() {
     const base = () => {
       const telas = Object.keys(TELAS).map((rota) => ({
@@ -154,7 +170,10 @@ class App {
           grupo: 'Veículos',
           icone: 'veiculo',
           soComBusca: true,
-          executar: () => this.roteador.ir('frota')
+          executar: () =>
+            this.naTela('frota', () => {
+              this.clicarQuandoAparecer('tr[data-veiculo-id="' + v.id + '"] .botoes-acoes button:last-child');
+            })
         });
       });
       ((alojamentos.ok && alojamentos.dados.alojamentos) || []).forEach((a) => {
@@ -165,7 +184,10 @@ class App {
           grupo: 'Alojamentos',
           icone: 'alojamento',
           soComBusca: true,
-          executar: () => this.roteador.ir('alojamentos')
+          executar: () =>
+            this.naTela('alojamentos', () => {
+              this.clicarQuandoAparecer('[data-alojamento-id="' + a.id + '"]');
+            })
         });
       });
       return lista;

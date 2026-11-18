@@ -126,7 +126,7 @@ Essas são as validações que o back-end faz antes de salvar. O front pode avis
 - F2. Uma pessoa não pode estar em dois carros ao mesmo tempo.
 - F3. O motorista precisa ter CNH cadastrada.
 - F4. A CNH tem que estar válida no dia da saída.
-- F5. A categoria da CNH tem que servir pro veículo. Quem tem C ou D também dirige B, e quem tem E dirige tudo, mas quem só tem B não dirige van de passageiro (D).
+- F5. A categoria da CNH tem que servir pro veículo. As categorias de carro somam, como no CTB: quem tem C dirige B, quem tem D dirige B e C, e quem tem E dirige B, C e D. Quem só tem B não dirige caminhão (C) nem van de passageiro (D). Moto (A) é à parte.
 - F6. O motorista não pode estar na lista de passageiros.
 - F7. Não pode ter mais passageiros que lugares (tirando o motorista).
 - F8. A volta tem que ser depois da saída (o banco já bloqueia).

@@ -23,22 +23,31 @@ class Configuracao {
       lotacaoAlertaPct: 90,
       bloquearDocVencido: true,
       avisarSeguroVencido: true,
-      validarNr24: true,
       telegramCriticos: false
     };
+  }
+
+  // Os limites da NR-24 são lei, não preferência da empresa: a tela só mostra, e a conta de verdade
+  // fica no models/Quarto.js. Mesmo que um config.json antigo tenha outro número, aqui volta pro da norma.
+  aplicarNr24(config) {
+    config.maxLeitosQuarto = 8;
+    config.areaMinimaCama = 3;
+    config.areaMinimaBeliche = 4.5;
+    delete config.validarNr24;
+    return config;
   }
 
   // Junta o que foi salvo no arquivo com o padrão, para nunca faltar nenhum campo novo.
   lerConfig() {
     if (!fs.existsSync(this.caminhoConfig)) {
-      return Object.assign({}, this.configPadrao);
+      return this.aplicarNr24(Object.assign({}, this.configPadrao));
     }
     try {
       const texto = fs.readFileSync(this.caminhoConfig, 'utf-8');
       const salvo = JSON.parse(texto);
-      return Object.assign({}, this.configPadrao, salvo);
+      return this.aplicarNr24(Object.assign({}, this.configPadrao, salvo));
     } catch (erro) {
-      return Object.assign({}, this.configPadrao);
+      return this.aplicarNr24(Object.assign({}, this.configPadrao));
     }
   }
 

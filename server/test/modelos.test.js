@@ -3,6 +3,8 @@ const assert = require('node:assert/strict');
 const Cnh = require('../src/models/Cnh');
 const Quarto = require('../src/models/Quarto');
 const Veiculo = require('../src/models/Veiculo');
+const validador = require('../src/regras/validacao');
+const datas = require('../src/regras/datas');
 
 function dataEm(dias) {
   const data = new Date();
@@ -28,7 +30,8 @@ test('CNH distingue ausência, vencimento e prazo de aviso', () => {
 
 test('categorias de carga e passageiros respeitam a habilitação exigida', () => {
   assert.equal(new Cnh('C').podeDirigir('B'), true);
-  assert.equal(new Cnh('D').podeDirigir('C'), false);
+  assert.equal(new Cnh('D').podeDirigir('C'), true);
+  assert.equal(new Cnh('B').podeDirigir('C'), false);
   assert.equal(new Cnh('C').podeDirigir('D'), false);
   assert.equal(new Cnh('E').podeDirigir('D'), true);
   assert.equal(new Cnh('E').podeDirigir('A'), false);
@@ -76,4 +79,16 @@ test('veículo normaliza placas antigas e Mercosul e valida lugares e km', () =>
   assert.match(new Veiculo({ ...dados, lugares: 0 }).validar(), /lugares/);
   assert.match(new Veiculo({ ...dados, km_inicial: -1 }).validar(), /km inicial/);
   assert.match(new Veiculo({ ...dados, km_inicial: 1.5 }).validar(), /inteiro/);
+});
+
+test('busca ignora acento e maiúscula', () => {
+  assert.equal(validador.paraBusca('José Aparecido'), 'jose aparecido');
+  assert.equal(validador.paraBusca('  MÁRCIO  '), 'marcio');
+  assert.ok(validador.paraBusca('Alojamento Pompéia').includes(validador.paraBusca('pompeia')));
+});
+
+test('registro com data futura é recusado', () => {
+  assert.equal(datas.noFuturo('2099-01-01 10:00:00'), true);
+  assert.equal(datas.noFuturo('2020-01-01 10:00:00'), false);
+  assert.equal(datas.noFuturo(datas.agoraLocal()), false);
 });

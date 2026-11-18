@@ -66,6 +66,9 @@ class ControladorAlojamentos {
     if (!inicio) {
       return res.status(400).json({ erro: 'Data de entrada inválida.' });
     }
+    if (datas.noFuturo(inicio)) {
+      return res.status(400).json({ erro: 'A entrada não pode ser numa data futura.' });
+    }
 
     const pessoa = db.prepare('SELECT id, nome, ativo FROM pessoa WHERE id = ?').get(pessoaId);
     if (!pessoa) {
@@ -152,6 +155,9 @@ class ControladorAlojamentos {
     if (!fim) {
       return res.status(400).json({ erro: 'Data de saída inválida.' });
     }
+    if (datas.noFuturo(fim)) {
+      return res.status(400).json({ erro: 'A saída não pode ser numa data futura.' });
+    }
     if (fim <= estadia.inicio) {
       return res.status(400).json({
         erro: 'A saída precisa ser depois da entrada (' + estadia.inicio + ').'
@@ -201,6 +207,9 @@ class ControladorAlojamentos {
     const resolvidaEm = corpo.resolvida_em ? datas.normalizarData(corpo.resolvida_em) : datas.agoraLocal();
     if (!resolvidaEm) {
       return res.status(400).json({ erro: 'Data de resolução inválida.' });
+    }
+    if (datas.noFuturo(resolvidaEm)) {
+      return res.status(400).json({ erro: 'A resolução não pode ser numa data futura.' });
     }
     if (resolvidaEm <= ocorrencia.aberta_em) {
       return res.status(400).json({

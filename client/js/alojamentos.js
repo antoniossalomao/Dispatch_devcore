@@ -363,6 +363,8 @@ export default class TelaAlojamentos {
         '</div>';
 
       card.querySelector('.aloj-barra-preench').style.width = pct + '%';
+      // a paleta Ctrl+K usa esse id pra achar o card e abrir o alojamento escolhido
+      card.dataset.alojamentoId = alojamento.id;
       card.addEventListener('click', () => {
         this.abrirGaveta(alojamento.id);
       });
