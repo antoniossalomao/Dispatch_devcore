@@ -160,7 +160,13 @@ class TelaCadastro {
     ];
     const primeiroVazio = campos.find((campo) => campo && campo.value.trim() === '');
     if (primeiroVazio) {
-      this.mostrarErro('Preencha todos os campos.', primeiroVazio);
+      // fala qual campo faltou, usando o texto do próprio rótulo (ex: "Preencha o campo Telefone.")
+      const rotulo = document.querySelector('label[for="' + primeiroVazio.id + '"]');
+      const nomeCampo = rotulo ? rotulo.textContent.trim() : '';
+      this.mostrarErro(
+        nomeCampo ? 'Preencha o campo ' + nomeCampo + '.' : 'Preencha todos os campos.',
+        primeiroVazio
+      );
       return;
     }
     if (!this.conferirDocumentoTelefone()) return;
@@ -180,7 +186,7 @@ class TelaCadastro {
     }
 
     this.botaoCadastrar.disabled = true;
-    this.botaoCadastrar.textContent = 'Cadastrando...';
+    this.botaoCadastrar.textContent = 'Cadastrando…';
 
     try {
       const resposta = await chamarApi('/api/auth/cadastro', {

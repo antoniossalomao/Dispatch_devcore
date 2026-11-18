@@ -384,8 +384,13 @@ export default class TelaConfiguracoes {
     this.botoesNav.forEach((botao) => {
       const ativa = botao.dataset.aba === alvo;
       botao.classList.toggle('ativa', ativa);
-      if (ativa) botao.setAttribute('aria-current', 'true');
-      else botao.removeAttribute('aria-current');
+      if (ativa) {
+        botao.setAttribute('aria-current', 'true');
+        // em tela estreita a faixa de abas rola pro lado; isso traz a aba aberta pra parte visível
+        botao.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      } else {
+        botao.removeAttribute('aria-current');
+      }
     });
 
     Object.keys(this.paineis).forEach((chave) => {

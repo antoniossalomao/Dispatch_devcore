@@ -139,6 +139,10 @@ class ControladorPessoas {
       total: pessoas.length,
       ativos: pessoas.filter((item) => item.ativo === 1).length,
       comCnh: listaCompleta.filter((item) => item.cnh_info.status !== 'sem_cnh').length,
+      // "apto" é quem pode dirigir hoje: tem CNH e ela não está vencida (regra F4)
+      aptos: listaCompleta.filter(
+        (item) => item.cnh_info.status === 'valida' || item.cnh_info.status === 'vencendo'
+      ).length,
       cnhAlerta: listaCompleta.filter(
         (item) => item.cnh_info.status === 'vencendo' || item.cnh_info.status === 'vencida'
       ).length,
@@ -247,7 +251,10 @@ class ControladorPessoas {
       validador.textoDentroDoLimite(matricula, 40, 'A matrícula') ||
       validador.textoDentroDoLimite(cargo, 80, 'O cargo') ||
       validador.textoDentroDoLimite(obra, 100, 'A obra') ||
-      validador.textoDentroDoLimite(telefone, 30, 'O telefone') ||
+      // telefone é opcional, mas se vier tem que ter DDD + número (10 ou 11 dígitos)
+      (telefone !== '' && !validador.lerTelefone(telefone)
+        ? 'Telefone inválido: use DDD + número, ex.: (14) 99123-4567.'
+        : null) ||
       cnh.erro;
     if (erroTexto) {
       return res.status(400).json({ erro: erroTexto });
@@ -332,7 +339,10 @@ class ControladorPessoas {
       validador.textoDentroDoLimite(matricula, 40, 'A matrícula') ||
       validador.textoDentroDoLimite(cargo, 80, 'O cargo') ||
       validador.textoDentroDoLimite(obra, 100, 'A obra') ||
-      validador.textoDentroDoLimite(telefone, 30, 'O telefone') ||
+      // telefone é opcional, mas se vier tem que ter DDD + número (10 ou 11 dígitos)
+      (telefone !== '' && !validador.lerTelefone(telefone)
+        ? 'Telefone inválido: use DDD + número, ex.: (14) 99123-4567.'
+        : null) ||
       cnh.erro;
     if (erroTexto) {
       return res.status(400).json({ erro: erroTexto });

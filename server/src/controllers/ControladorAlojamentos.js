@@ -69,6 +69,12 @@ class ControladorAlojamentos {
     if (datas.noFuturo(inicio)) {
       return res.status(400).json({ erro: 'A entrada não pode ser numa data futura.' });
     }
+    // A saída é registrada depois, em PUT /estadias/:id/saida. Antes a data vinha e era ignorada calada.
+    if (corpo.fim) {
+      return res.status(400).json({
+        erro: 'A entrada não recebe data de saída. Registre a saída depois, quando a pessoa deixar o leito.'
+      });
+    }
 
     const pessoa = db.prepare('SELECT id, nome, ativo FROM pessoa WHERE id = ?').get(pessoaId);
     if (!pessoa) {

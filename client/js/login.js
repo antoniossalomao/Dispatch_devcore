@@ -70,7 +70,7 @@ class TelaLogin {
 
     this.msgSucesso.hidden = true;
     this.botaoEntrar.disabled = true;
-    this.botaoEntrar.textContent = 'Entrando...';
+    this.botaoEntrar.textContent = 'Entrando…';
 
     try {
       const resposta = await chamarApi('/api/auth/login', {

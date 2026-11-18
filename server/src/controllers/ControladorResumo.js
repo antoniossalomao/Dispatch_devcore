@@ -1,4 +1,5 @@
 const db = require('../db/conexao');
+const datas = require('../regras/datas');
 const configuracao = require('../services/Configuracao');
 const notificacoes = require('../services/Notificacoes');
 
@@ -209,6 +210,15 @@ class ControladorResumo {
           'ORDER BY data_ordem DESC LIMIT 6'
       )
       .all();
+
+    // Só a hora confunde quando o movimento foi em outro dia: aí mostra "dd/mm hh:mm".
+    const hoje = datas.agoraLocal().slice(0, 10);
+    ultimas.forEach((item) => {
+      const dia = item.data_ordem.slice(0, 10);
+      if (dia !== hoje) {
+        item.horario = dia.slice(8, 10) + '/' + dia.slice(5, 7) + ' ' + item.horario;
+      }
+    });
 
     const listaAlojamentos = db
       .prepare(

@@ -41,9 +41,12 @@ class InteligenciaArtificial {
 
     const dados = await resposta.json().catch(() => ({}));
     if (!resposta.ok) {
-      throw new Error(
+      const erro = new Error(
         'A Groq recusou o pedido: ' + ((dados.error && dados.error.message) || resposta.status)
       );
+      // 401 = a chave do .env está errada ou foi apagada lá na Groq; o controlador avisa isso na tela.
+      erro.chaveInvalida = resposta.status === 401;
+      throw erro;
     }
 
     return String(

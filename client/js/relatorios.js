@@ -260,7 +260,8 @@ export default class TelaRelatorios {
         '</td><td class="num">' +
         veiculo.km_rodados.toLocaleString('pt-BR') +
         ' km</td><td class="num">' +
-        veiculo.horas_em_uso +
+        // toLocaleString usa vírgula decimal, igual às porcentagens da mesma tabela
+        Number(veiculo.horas_em_uso).toLocaleString('pt-BR') +
         ' h</td>' +
         '<td class="celula-barra">' +
         this.barra() +
@@ -335,7 +336,7 @@ export default class TelaRelatorios {
     const caixa = document.getElementById('ia-resultado');
     caixa.hidden = false;
     caixa.className = 'resultado-caixa';
-    caixa.textContent = 'Pensando...';
+    caixa.textContent = 'Pensando…';
     corpo.de = this.campoDe.value;
     corpo.ate = this.campoAte.value;
 

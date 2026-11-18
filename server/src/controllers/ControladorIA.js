@@ -55,6 +55,14 @@ class ControladorIA {
     };
   }
 
+  // Se a Groq recusou a chave, avisa o admin que o problema é a GROQ_API_KEY e não uma queda do serviço.
+  mensagemErro(erro) {
+    if (erro && erro.chaveInvalida) {
+      return 'A chave da IA foi recusada pela Groq. Confira a GROQ_API_KEY no .env do servidor.';
+    }
+    return 'Serviço de IA temporariamente indisponível.';
+  }
+
   periodoOuPadrao(query) {
     return relatorios.lerPeriodo(query || {});
   }
@@ -94,7 +102,7 @@ class ControladorIA {
       res.json({ resposta: resposta });
     } catch (erro) {
       console.error('Erro na consulta de IA:', erro);
-      res.status(502).json({ erro: 'Serviço de IA temporariamente indisponível.' });
+      res.status(502).json({ erro: this.mensagemErro(erro) });
     }
   }
 
@@ -126,7 +134,7 @@ class ControladorIA {
       res.json({ resposta: resposta });
     } catch (erro) {
       console.error('Erro no resumo de IA:', erro);
-      res.status(502).json({ erro: 'Serviço de IA temporariamente indisponível.' });
+      res.status(502).json({ erro: this.mensagemErro(erro) });
     }
   }
 
@@ -169,7 +177,7 @@ class ControladorIA {
       res.json({ resposta: resposta });
     } catch (erro) {
       console.error('Erro no suporte de IA:', erro);
-      res.status(502).json({ erro: 'Serviço de IA temporariamente indisponível.' });
+      res.status(502).json({ erro: this.mensagemErro(erro) });
     }
   }
 }

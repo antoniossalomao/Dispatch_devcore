@@ -295,7 +295,12 @@ class App {
       !this.movimentoReduzido.matches;
 
     if (animar) {
-      await document.startViewTransition(trocar).updateCallbackDone;
+      const transicao = document.startViewTransition(trocar);
+      // Se o navegador cancelar a animação (aba escondida, outra transição em andamento), a tela troca
+      // do mesmo jeito; só não deixamos o "erro" do cancelamento aparecer no console.
+      transicao.ready.catch(() => {});
+      transicao.finished.catch(() => {});
+      await transicao.updateCallbackDone.catch(() => {});
     } else {
       trocar();
     }

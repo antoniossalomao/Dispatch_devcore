@@ -343,7 +343,8 @@ export default class TelaAlojamentos {
         (alojamento.ocorrencias_abertas > 0
           ? '<span class="status-tag status-atencao"><span class="status-ponto"></span>' +
             alojamento.ocorrencias_abertas +
-            (alojamento.ocorrencias_abertas === 1 ? ' ocorrência' : ' ocorrências') +
+            // "aberta(s)" pra não confundir com a aba da gaveta, que conta todas (abertas e resolvidas)
+            (alojamento.ocorrencias_abertas === 1 ? ' ocorrência aberta' : ' ocorrências abertas') +
             '</span>'
           : '') +
         '</div>' +
