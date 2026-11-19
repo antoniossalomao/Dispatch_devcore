@@ -45,7 +45,7 @@
       <section class="bloco">
         <div class="bloco-cabecalho">
           <h2 class="bloco-titulo">Alojamentos</h2>
-          <select id="seletor-status" class="config-select select-curto">
+          <select id="seletor-status" class="config-select select-curto" aria-label="Filtrar alojamentos por situação" name="seletor-status">
             <option value="ativos">Apenas ativos</option>
             <option value="inativos">Apenas inativos</option>
             <option value="todos">Todos</option>
@@ -65,48 +65,48 @@
         <button type="button" class="modal-fechar" data-fechar="modal-alojamento">&times;</button>
       </div>
       <form id="form-alojamento">
-        <input type="hidden" id="aloj-id">
+        <input type="hidden" id="aloj-id" name="aloj-id" autocomplete="off">
         <div class="modal-corpo">
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="aloj-nome" class="campo-label">Nome *</label>
-              <input type="text" id="aloj-nome" class="config-input" placeholder="Ex: República Centro" required>
+              <input type="text" id="aloj-nome" class="config-input" placeholder="Ex: República Centro" required name="aloj-nome" autocomplete="off">
             </div>
             <div class="campo-grupo">
               <label for="aloj-cidade" class="campo-label">Cidade *</label>
-              <input type="text" id="aloj-cidade" class="config-input" placeholder="Ex: Marília" required>
+              <input type="text" id="aloj-cidade" class="config-input" placeholder="Ex: Marília" required name="aloj-cidade" autocomplete="off">
             </div>
           </div>
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="aloj-rua" class="campo-label">Rua</label>
-              <input type="text" id="aloj-rua" class="config-input">
+              <input type="text" id="aloj-rua" class="config-input" name="aloj-rua" autocomplete="off">
             </div>
             <div class="campo-grupo">
               <label for="aloj-numero" class="campo-label">Número</label>
-              <input type="text" id="aloj-numero" class="config-input">
+              <input type="text" id="aloj-numero" class="config-input" name="aloj-numero" autocomplete="off">
             </div>
           </div>
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="aloj-bairro" class="campo-label">Bairro</label>
-              <input type="text" id="aloj-bairro" class="config-input">
+              <input type="text" id="aloj-bairro" class="config-input" name="aloj-bairro" autocomplete="off">
             </div>
             <div class="campo-grupo">
               <label for="aloj-cep" class="campo-label">CEP</label>
-              <input type="text" id="aloj-cep" class="config-input">
+              <input type="text" id="aloj-cep" class="config-input" name="aloj-cep" autocomplete="off">
             </div>
           </div>
           <div class="grade-campos">
             <div class="campo-grupo">
               <label for="aloj-responsavel" class="campo-label">Responsável</label>
-              <select id="aloj-responsavel" class="config-select"></select>
+              <select id="aloj-responsavel" class="config-select" name="aloj-responsavel"></select>
             </div>
           </div>
           <div class="grade-campos">
             <div class="campo-grupo">
               <label for="aloj-obs" class="campo-label">Observações</label>
-              <input type="text" id="aloj-obs" class="config-input">
+              <input type="text" id="aloj-obs" class="config-input" name="aloj-obs" autocomplete="off">
             </div>
           </div>
         </div>
@@ -133,21 +133,21 @@
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="quarto-nome" class="campo-label">Nome do quarto *</label>
-              <input type="text" id="quarto-nome" class="config-input" placeholder="Ex: Q1" required>
+              <input type="text" id="quarto-nome" class="config-input" placeholder="Ex: Q1" required name="quarto-nome" autocomplete="off">
             </div>
             <div class="campo-grupo">
               <label for="quarto-area" class="campo-label">Área (m²) *</label>
-              <input type="number" id="quarto-area" class="config-input" min="1" step="0.1" required>
+              <input type="number" id="quarto-area" class="config-input" min="1" step="0.1" required name="quarto-area" autocomplete="off" inputmode="decimal">
             </div>
           </div>
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="quarto-camas" class="campo-label">Camas simples</label>
-              <input type="number" id="quarto-camas" class="config-input" min="0" max="8" value="0">
+              <input type="number" id="quarto-camas" class="config-input" min="0" max="8" value="0" name="quarto-camas" autocomplete="off" inputmode="numeric">
             </div>
             <div class="campo-grupo">
               <label for="quarto-beliches" class="campo-label">Beliches (2 leitos cada)</label>
-              <input type="number" id="quarto-beliches" class="config-input" min="0" max="4" value="0">
+              <input type="number" id="quarto-beliches" class="config-input" min="0" max="4" value="0" name="quarto-beliches" autocomplete="off" inputmode="numeric">
             </div>
           </div>
           <p id="quarto-resumo" class="campo-dica"></p>
@@ -171,11 +171,11 @@
         <button type="button" class="modal-fechar" data-fechar="modal-alojar">&times;</button>
       </div>
       <form id="form-alojar">
-        <input type="hidden" id="alojar-leito-id">
+        <input type="hidden" id="alojar-leito-id" name="alojar-leito-id" autocomplete="off">
         <div class="modal-corpo">
           <div class="campo-grupo">
             <label for="alojar-pessoa" class="campo-label">Colaborador *</label>
-            <select id="alojar-pessoa" class="config-select" required></select>
+            <select id="alojar-pessoa" class="config-select" required name="alojar-pessoa"></select>
           </div>
         </div>
         <div class="modal-rodape">
@@ -201,7 +201,7 @@
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="ocor-tipo" class="campo-label">Tipo *</label>
-              <select id="ocor-tipo" class="config-select">
+              <select id="ocor-tipo" class="config-select" name="ocor-tipo">
                 <option value="manutencao">Manutenção</option>
                 <option value="conflito">Conflito</option>
                 <option value="reclamacao">Reclamação</option>
@@ -211,12 +211,12 @@
             </div>
             <div class="campo-grupo">
               <label for="ocor-pessoa" class="campo-label">Pessoa envolvida</label>
-              <select id="ocor-pessoa" class="config-select"></select>
+              <select id="ocor-pessoa" class="config-select" name="ocor-pessoa"></select>
             </div>
           </div>
           <div class="campo-grupo">
             <label for="ocor-descricao" class="campo-label">Descrição *</label>
-            <input type="text" id="ocor-descricao" class="config-input" placeholder="Ex: Chuveiro do banheiro 2 quebrado" required>
+            <input type="text" id="ocor-descricao" class="config-input" placeholder="Ex: Chuveiro do banheiro 2 quebrado" required name="ocor-descricao" autocomplete="off">
           </div>
         </div>
         <div class="modal-rodape">

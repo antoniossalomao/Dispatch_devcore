@@ -67,6 +67,8 @@ class Navegacao {
   // Roda de novo a cada troca de tela na casca (js/app/App.js). Cada elemento leva uma marca
   // (data-ui-nav) para não ganhar um segundo botão de limpar ou um segundo conjunto de eventos.
   prepararTela() {
+    (this.observadores || []).forEach((observador) => observador.disconnect());
+    this.observadores = [];
     this.configurarBuscas();
     this.configurarGruposDeAbas();
     this.configurarFiltros();
@@ -156,6 +158,7 @@ class Navegacao {
       };
 
       const observador = new MutationObserver(sincronizar);
+      this.observadores.push(observador);
       botoes.forEach((botao) => {
         observador.observe(botao, {
           attributes: true,
@@ -174,6 +177,10 @@ class Navegacao {
 
       const titulo =
         area.closest('.bloco')?.querySelector('.bloco-titulo')?.textContent.trim() || 'Registros';
+      if (!tabela.hasAttribute('aria-label') && !tabela.querySelector('caption')) {
+        tabela.setAttribute('aria-label', titulo);
+      }
+      tabela.querySelectorAll('thead th').forEach((coluna) => { coluna.scope = 'col'; });
 
       const dica = document.createElement('p');
       dica.id = 'ui-rolagem-' + indice;
@@ -200,6 +207,7 @@ class Navegacao {
       };
 
       const observador = new ResizeObserver(atualizar);
+      this.observadores.push(observador);
       observador.observe(area);
       observador.observe(tabela);
     });
@@ -326,6 +334,7 @@ class Navegacao {
     });
 
     const observador = new MutationObserver(sincronizar);
+    this.observadores.push(observador);
     botoes.forEach((botao) => {
       observador.observe(botao, {
         attributes: true,
@@ -333,7 +342,9 @@ class Navegacao {
       });
     });
 
-    new ResizeObserver(sincronizar).observe(grupo);
+    const tamanho = new ResizeObserver(sincronizar);
+    this.observadores.push(tamanho);
+    tamanho.observe(grupo);
     sincronizar();
   }
 }

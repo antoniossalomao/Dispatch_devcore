@@ -11,7 +11,7 @@
       <!-- submenu lateral das configurações -->
       <nav class="config-nav">
         <button type="button" class="config-nav-item ativa" data-aba="regras">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
             <line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/>
             <line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/>
             <line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/>
@@ -24,7 +24,7 @@
         </button>
 
         <button type="button" class="config-nav-item" data-aba="alertas">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
             <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
@@ -35,7 +35,7 @@
         </button>
 
         <button type="button" class="config-nav-item" data-aba="usuarios">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
             <circle cx="9" cy="7" r="4"/>
             <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
@@ -48,7 +48,7 @@
         </button>
 
         <button type="button" class="config-nav-item" data-aba="banco">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
             <ellipse cx="12" cy="5" rx="9" ry="3"/>
             <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
             <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
@@ -60,7 +60,7 @@
         </button>
 
         <button type="button" class="config-nav-item" data-aba="auditoria">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             <polyline points="9 12 11 14 15 10"/>
           </svg>
@@ -71,7 +71,7 @@
         </button>
 
         <button type="button" class="config-nav-item" data-aba="conta">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
           </svg>
@@ -86,7 +86,8 @@
       <div class="config-paineis">
 
         <!-- 1. OPERAÇÃO E REGRAS -->
-        <form id="painel-regras" class="config-secao">
+        <div id="painel-regras" class="config-secao">
+        <form id="form-regras">
 
           <section class="saude-sistema" aria-label="Estado do sistema">
             <div class="saude-item">
@@ -130,17 +131,17 @@
             <div class="grade-campos tres-colunas">
               <div class="campo-grupo">
                 <label for="cfg-empresa" class="campo-label">Nome da empresa / operação</label>
-                <input type="text" id="cfg-empresa" class="config-input" placeholder="Ex: Construtora Aguapeí">
+                <input type="text" id="cfg-empresa" class="config-input" placeholder="Ex: Construtora Aguapeí" name="cfg-empresa" autocomplete="off">
               </div>
 
               <div class="campo-grupo">
                 <label for="cfg-cidade" class="campo-label">Base operacional</label>
-                <input type="text" id="cfg-cidade" class="config-input" placeholder="Ex: Marília/SP">
+                <input type="text" id="cfg-cidade" class="config-input" placeholder="Ex: Marília/SP" name="cfg-cidade" autocomplete="off">
               </div>
 
               <div class="campo-grupo">
                 <label for="cfg-documento" class="campo-label">CNPJ / Identificador</label>
-                <input type="text" id="cfg-documento" class="config-input" placeholder="00.000.000/0001-00">
+                <input type="text" id="cfg-documento" class="config-input" placeholder="00.000.000/0001-00" name="cfg-documento" autocomplete="off">
               </div>
             </div>
           </div>
@@ -157,7 +158,7 @@
               <div class="campo-grupo">
                 <label for="cfg-km-confirmacao" class="campo-label">Confirmação de quilometragem por uso</label>
                 <div class="campo-sufixo">
-                  <input type="number" id="cfg-km-confirmacao" min="50" step="50">
+                  <input type="number" id="cfg-km-confirmacao" min="50" step="50" name="cfg-km-confirmacao" autocomplete="off" inputmode="decimal">
                   <span>km</span>
                 </div>
                 <p class="campo-dica">Pede confirmação caso a diferença entre saída e volta passe desse valor.</p>
@@ -166,7 +167,7 @@
               <div class="campo-grupo">
                 <label for="cfg-horas-retorno" class="campo-label">Tempo máximo na rua sem devolução</label>
                 <div class="campo-sufixo">
-                  <input type="number" id="cfg-horas-retorno" min="1" max="168">
+                  <input type="number" id="cfg-horas-retorno" min="1" max="168" name="cfg-horas-retorno" autocomplete="off" inputmode="numeric">
                   <span>horas</span>
                 </div>
                 <p class="campo-dica">Destaca veículos que saíram e ainda não tiveram retorno registrado.</p>
@@ -180,7 +181,7 @@
                   <span class="switch-desc">Impede registrar retirada quando o documento do veículo venceu. CNH vencida sempre bloqueia, porque é exigência do CTB.</span>
                 </div>
                 <span class="chave">
-                  <input type="checkbox" id="cfg-bloquear-doc">
+                  <input type="checkbox" id="cfg-bloquear-doc" name="cfg-bloquear-doc" autocomplete="off">
                   <span class="chave-trilho"></span>
                 </span>
               </label>
@@ -191,7 +192,7 @@
                   <span class="switch-desc">Não bloqueia a saída do veículo, mas registra alerta operacional na retirada.</span>
                 </div>
                 <span class="chave">
-                  <input type="checkbox" id="cfg-avisar-seguro">
+                  <input type="checkbox" id="cfg-avisar-seguro" name="cfg-avisar-seguro" autocomplete="off">
                   <span class="chave-trilho"></span>
                 </span>
               </label>
@@ -210,7 +211,7 @@
               <div class="campo-grupo">
                 <label for="cfg-max-leitos" class="campo-label">Máx. de leitos por quarto</label>
                 <div class="campo-sufixo">
-                  <input type="number" id="cfg-max-leitos" readonly>
+                  <input type="number" id="cfg-max-leitos" readonly name="cfg-max-leitos" autocomplete="off" inputmode="numeric">
                   <span>leitos</span>
                 </div>
               </div>
@@ -218,7 +219,7 @@
               <div class="campo-grupo">
                 <label for="cfg-area-cama" class="campo-label">Área mínima por cama</label>
                 <div class="campo-sufixo">
-                  <input type="number" id="cfg-area-cama" readonly>
+                  <input type="number" id="cfg-area-cama" readonly name="cfg-area-cama" autocomplete="off" inputmode="numeric">
                   <span>m²</span>
                 </div>
               </div>
@@ -226,7 +227,7 @@
               <div class="campo-grupo">
                 <label for="cfg-area-beliche" class="campo-label">Área mínima por beliche</label>
                 <div class="campo-sufixo">
-                  <input type="number" id="cfg-area-beliche" readonly>
+                  <input type="number" id="cfg-area-beliche" readonly name="cfg-area-beliche" autocomplete="off" inputmode="numeric">
                   <span>m²</span>
                 </div>
               </div>
@@ -239,6 +240,7 @@
           </div>
 
         </form>
+        </div>
 
         <!-- 2. ALERTAS E INTEGRAÇÕES -->
         <div id="painel-alertas" class="config-secao" hidden>
@@ -255,7 +257,7 @@
               <div class="campo-grupo">
                 <label for="cfg-dias-vencimento" class="campo-label">Aviso prévio de documentos</label>
                 <div class="campo-sufixo">
-                  <input type="number" id="cfg-dias-vencimento" min="1" max="180">
+                  <input type="number" id="cfg-dias-vencimento" min="1" max="180" name="cfg-dias-vencimento" autocomplete="off" inputmode="numeric">
                   <span>dias</span>
                 </div>
                 <p class="campo-dica">CNH, licenciamento e apólice de seguro.</p>
@@ -264,7 +266,7 @@
               <div class="campo-grupo">
                 <label for="cfg-dias-pendencia" class="campo-label">Oficina ou ocorrência aberta</label>
                 <div class="campo-sufixo">
-                  <input type="number" id="cfg-dias-pendencia" min="1" max="90">
+                  <input type="number" id="cfg-dias-pendencia" min="1" max="90" name="cfg-dias-pendencia" autocomplete="off" inputmode="numeric">
                   <span>dias</span>
                 </div>
                 <p class="campo-dica">Destaca reparos demorados no painel.</p>
@@ -273,7 +275,7 @@
               <div class="campo-grupo">
                 <label for="cfg-lotacao-pct" class="campo-label">Alerta de alojamento cheio</label>
                 <div class="campo-sufixo">
-                  <input type="number" id="cfg-lotacao-pct" min="50" max="100">
+                  <input type="number" id="cfg-lotacao-pct" min="50" max="100" name="cfg-lotacao-pct" autocomplete="off" inputmode="numeric">
                   <span>%</span>
                 </div>
                 <p class="campo-dica">Sinaliza gargalo de vagas por unidade.</p>
@@ -287,7 +289,7 @@
                   <span class="switch-desc">Dispara mensagem quando houver uso sem registro de km, veículo não devolvido ou adulteração no log.</span>
                 </div>
                 <span class="chave">
-                  <input type="checkbox" id="cfg-telegram">
+                  <input type="checkbox" id="cfg-telegram" name="cfg-telegram" autocomplete="off">
                   <span class="chave-trilho"></span>
                 </span>
               </label>
@@ -365,22 +367,22 @@
             <div class="grade-campos duas-colunas">
               <div class="campo-grupo">
                 <label for="novo-nome" class="campo-label">Nome completo</label>
-                <input type="text" id="novo-nome" class="config-input" placeholder="Ex: João Vitor">
+                <input type="text" id="novo-nome" class="config-input" placeholder="Ex: João Vitor" name="novo-nome" autocomplete="off">
               </div>
 
               <div class="campo-grupo">
                 <label for="novo-login" class="campo-label">Login de acesso</label>
-                <input type="text" id="novo-login" class="config-input" placeholder="Ex: joao">
+                <input type="text" id="novo-login" class="config-input" placeholder="Ex: joao" name="novo-login" autocomplete="off" spellcheck="false" autocapitalize="none">
               </div>
 
               <div class="campo-grupo">
                 <label for="novo-telefone" class="campo-label">Telegram (ID do chat, opcional)</label>
-                <input type="text" id="novo-telefone" class="config-input" placeholder="Ex: 123456789">
+                <input type="text" id="novo-telefone" class="config-input" placeholder="Ex: 123456789" name="novo-telefone" autocomplete="off">
               </div>
 
               <div class="campo-grupo">
                 <label for="novo-perfil" class="campo-label">Perfil de permissão</label>
-                <select id="novo-perfil" class="config-select">
+                <select id="novo-perfil" class="config-select" name="novo-perfil">
                   <option value="operador">Operador — cadastros e rotina diária</option>
                   <option value="admin">Administrador — acesso total, auditoria e configs</option>
                 </select>
@@ -388,7 +390,7 @@
 
               <div class="campo-grupo">
                 <label for="novo-senha" class="campo-label">Senha inicial</label>
-                <input type="password" id="novo-senha" class="config-input" placeholder="Mínimo de 8 caracteres">
+                <input type="password" id="novo-senha" class="config-input" placeholder="Mínimo de 8 caracteres" name="novo-senha" autocomplete="off">
               </div>
             </div>
 
@@ -400,10 +402,10 @@
           <div class="bloco">
             <div class="bloco-cabecalho">
               <div class="busca-caixa busca-usuarios">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                   <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>
                 </svg>
-                <input type="text" id="busca-usuario" placeholder="Buscar usuários" aria-label="Buscar por nome ou login">
+                <input type="text" id="busca-usuario" placeholder="Buscar usuários" aria-label="Buscar por nome ou login" name="busca-usuario" autocomplete="off" spellcheck="false" autocapitalize="none">
               </div>
 
               <button type="button" id="abrir-novo-usuario" class="btn-primario">+ Novo usuário</button>
@@ -411,7 +413,7 @@
 
             <div id="caixa-redefinir" class="redefinir-barra" hidden>
               <span id="redefinir-rotulo" class="redefinir-texto">Nova senha:</span>
-              <input type="password" id="redefinir-input" class="config-input redefinir-campo" placeholder="Mínimo 8 caracteres">
+              <input type="password" id="redefinir-input" class="config-input redefinir-campo" placeholder="Mínimo 8 caracteres" name="redefinir-input" autocomplete="off">
               <button type="button" id="redefinir-salvar" class="btn-primario btn-pequeno">Confirmar</button>
               <button type="button" id="redefinir-cancelar" class="btn-secundario btn-pequeno">Cancelar</button>
             </div>
@@ -513,10 +515,10 @@
         <div class="bloco-cabecalho">
           <div class="colab-filtros-topo">
             <div class="busca-caixa busca-larga">
-              <input type="text" id="aud-busca" placeholder="Buscar no histórico" aria-label="Buscar por descrição ou usuário">
+              <input type="text" id="aud-busca" placeholder="Buscar no histórico" aria-label="Buscar por descrição ou usuário" name="aud-busca" autocomplete="off">
             </div>
-            <select id="aud-tabela" class="config-select select-curto"><option value="">Todas as tabelas</option></select>
-            <select id="aud-acao" class="config-select select-curto">
+            <select id="aud-tabela" class="config-select select-curto" name="aud-tabela"><option value="">Todas as tabelas</option></select>
+            <select id="aud-acao" class="config-select select-curto" name="aud-acao">
               <option value="">Todas as ações</option>
               <option value="criou">Criou</option>
               <option value="alterou">Alterou</option>
@@ -553,12 +555,12 @@
             <div class="grade-campos duas-colunas">
               <div class="campo-grupo">
                 <label for="conta-nome" class="campo-label">Nome de exibição</label>
-                <input type="text" id="conta-nome" class="config-input">
+                <input type="text" id="conta-nome" class="config-input" name="conta-nome" autocomplete="off">
               </div>
 
               <div class="campo-grupo">
                 <label for="conta-telefone" class="campo-label">Telegram (ID do chat) para receber alertas</label>
-                <input type="text" id="conta-telefone" class="config-input" placeholder="Ex: 123456789">
+                <input type="text" id="conta-telefone" class="config-input" placeholder="Ex: 123456789" name="conta-telefone" autocomplete="off">
               </div>
             </div>
 
@@ -578,23 +580,23 @@
             <div class="grade-campos tres-colunas">
               <div class="campo-grupo">
                 <label for="senha-atual" class="campo-label">Senha atual</label>
-                <input type="password" id="senha-atual" class="config-input" autocomplete="current-password">
+                <input type="password" id="senha-atual" class="config-input" autocomplete="current-password" name="senha-atual">
               </div>
 
               <div class="campo-grupo">
                 <label for="senha-nova" class="campo-label">Nova senha</label>
-                <input type="password" id="senha-nova" class="config-input" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+                <input type="password" id="senha-nova" class="config-input" autocomplete="new-password" placeholder="Mínimo 8 caracteres" name="senha-nova">
               </div>
 
               <div class="campo-grupo">
                 <label for="senha-confirmar" class="campo-label">Confirmar nova senha</label>
-                <input type="password" id="senha-confirmar" class="config-input" autocomplete="new-password">
+                <input type="password" id="senha-confirmar" class="config-input" autocomplete="new-password" name="senha-confirmar">
               </div>
             </div>
 
             <div class="config-rodape-form rodape-entre">
               <label class="mostrar-senha-conta">
-                <input type="checkbox" id="mostrar-senhas-conta">
+                <input type="checkbox" id="mostrar-senhas-conta" name="mostrar-senhas-conta" autocomplete="off">
                 <span>Mostrar senhas digitadas</span>
               </label>
               <button type="submit" class="btn-primario">Alterar senha</button>

@@ -11,6 +11,7 @@ export class Roteador {
     this.padrao = padrao;
     this.aoMudar = aoMudar;
     this.rotaAtual = null;
+    this.pedido = 0;
 
     window.addEventListener('popstate', () => this.aoVoltar());
     document.addEventListener('click', (evento) => this.aoClicar(evento));
@@ -39,11 +40,15 @@ export class Roteador {
     if (!this.rotas.has(rota)) return;
     const destino = '/' + rota + (hash || '');
     const anterior = this.rotaAtual;
+    const pedido = ++this.pedido;
     if (rota === anterior) {
+      await this.aoMudar(rota, 'link');
+      if (pedido !== this.pedido) return;
       if (hash !== undefined && window.location.hash !== hash) history.pushState(null, '', destino);
       return;
     }
     const aceitou = await this.aoMudar(rota, 'link');
+    if (pedido !== this.pedido) return;
     if (!aceitou) return;
     history.pushState(null, '', destino);
     this.rotaAtual = rota;
@@ -51,8 +56,9 @@ export class Roteador {
 
   async aoVoltar() {
     const rota = this.atual();
-    if (rota === this.rotaAtual) return;
+    const pedido = ++this.pedido;
     const aceitou = await this.aoMudar(rota, 'historico');
+    if (pedido !== this.pedido) return;
     if (!aceitou) {
       // A tela recusou sair: devolve a URL para onde a pessoa estava.
       history.pushState(null, '', '/' + this.rotaAtual);

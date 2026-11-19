@@ -26,6 +26,7 @@ class Api {
         headers: { 'Content-Type': 'application/json' },
         // include envia o cookie de sessão mesmo quando o front roda no Live Server local.
         credentials: 'include',
+        signal: config.sinal,
         body: config.corpo ? JSON.stringify(config.corpo) : undefined
       });
       const dados = await resposta.json().catch(() => ({}));

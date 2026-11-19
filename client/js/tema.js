@@ -60,6 +60,13 @@ class Tema {
   aplicar(tema) {
     // O CSS troca as cores da página olhando este atributo data-tema no <html>.
     document.documentElement.setAttribute('data-tema', tema);
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'theme-color';
+      document.head.appendChild(meta);
+    }
+    meta.content = tema === 'escuro' ? '#111315' : '#f4f5f6';
   }
 }
 

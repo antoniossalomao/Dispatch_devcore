@@ -41,7 +41,7 @@
   .usuario-avatar {
     width: 28px;
     height: 28px;
-    font-size: 11px;
+    font-size: 12px;
   }
   .usuario-nome {
     font-size: 13px;
@@ -96,7 +96,7 @@
   .colab-avatar {
     width: 28px;
     height: 28px;
-    font-size: 11px;
+    font-size: 12px;
   }
 
   /* controles */

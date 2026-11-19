@@ -8,6 +8,7 @@
     "criar-banco": "node --env-file-if-exists=.env src/db/criar-banco.js",
     "seed": "node --env-file-if-exists=.env src/db/seed.js",
     "test": "node --test",
+    "test:ui": "node test-ui/fluxos.cjs",
     "banco:apresentacao": "node src/db/bancoApresentacao.js"
   },
   "dependencies": {
@@ -16,5 +17,9 @@
     "express-rate-limit": "^8.7.4",
     "express-session": "^1.18.1",
     "helmet": "^8.3.0"
+  },
+  "devDependencies": {
+    "@accesslint/core": "^0.21.0",
+    "playwright": "^1.65.1"
   }
 }

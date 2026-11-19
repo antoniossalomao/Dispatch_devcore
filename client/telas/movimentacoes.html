@@ -4,9 +4,9 @@
         <span class="topo-data">Entradas e saídas de alojamento, retiradas e devoluções de veículos</span>
 </template>
 <template data-parte="acoes" data-classe="periodo-filtro"><label class="campo-label" for="mov-de">De</label>
-        <input type="date" id="mov-de" class="config-input campo-data periodo-data">
+        <input type="date" id="mov-de" class="config-input campo-data periodo-data" name="mov-de" autocomplete="off">
         <label class="campo-label" for="mov-ate">Até</label>
-        <input type="date" id="mov-ate" class="config-input campo-data periodo-data">
+        <input type="date" id="mov-ate" class="config-input campo-data periodo-data" name="mov-ate" autocomplete="off">
         <button type="button" id="botao-atualizar" class="btn-secundario">Atualizar</button>
 </template>
 <template data-parte="conteudo" data-classe="conteudo">
@@ -41,14 +41,14 @@
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
                 <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>
               </svg>
-              <input type="text" id="mov-busca" aria-label="Buscar por colaborador, alojamento ou veículo" placeholder="Buscar movimentações">
+              <input type="text" id="mov-busca" aria-label="Buscar por colaborador, alojamento ou veículo" placeholder="Buscar movimentações" name="mov-busca" autocomplete="off">
             </div>
-            <select id="mov-categoria" class="config-select select-curto" aria-label="Filtrar por área">
+            <select id="mov-categoria" class="config-select select-curto" aria-label="Filtrar por área" name="mov-categoria">
               <option value="">Alojamentos e frota</option>
               <option value="alojamento">Só alojamentos</option>
               <option value="frota">Só frota</option>
             </select>
-            <select id="mov-tipo" class="config-select select-curto" aria-label="Filtrar por tipo">
+            <select id="mov-tipo" class="config-select select-curto" aria-label="Filtrar por tipo" name="mov-tipo">
               <option value="">Todos os tipos</option>
               <option value="Entrada">Entrada</option>
               <option value="Saída">Saída</option>

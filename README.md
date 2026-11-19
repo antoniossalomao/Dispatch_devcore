@@ -93,6 +93,19 @@ npm test
 
 Os testes (`server/test/`) usam um banco temporário e simulam as chamadas à Groq, cobrindo modelos, helper de API do navegador (`client/js/api.js`), permissões, segurança (CSRF, CSP, CORS em produção, rate limit, backup higienizado) e cadeia de hashes da auditoria.
 
+Para verificar a interface no Chromium com Playwright e AccessLint:
+
+```bash
+cd server
+npm ci
+npx playwright install chromium
+npm run test:ui
+```
+
+A suíte cria e remove um banco temporário com dados fictícios. Verifica as sete telas em dois temas e duas larguras, teclado, janelas, buscas, recuperação de falhas e navegação rápida. Relatório JSON e capturas ficam em `server/test-ui/artifacts/`. Para usar um Chromium já instalado, defina `CHROMIUM_PATH` com o caminho do executável.
+
+As sete skills usadas na revisão podem ser instaladas localmente, a partir da raiz do repositório, com `node scripts/instalar-skills.cjs`. O instalador usa as versões fixadas em `docs/design-skills.lock.json`, preserva destinos existentes e não executa código das fontes baixadas. As instruções ficam em `.agents/skills/` e as fontes completas em `.design-skills/`, fora do versionamento.
+
 ## Documentação
 
 - [docs/estrutura-codigo.md](docs/estrutura-codigo.md) — classes, responsabilidades, fluxo das telas e testes.
@@ -100,6 +113,7 @@ Os testes (`server/test/`) usam um banco temporário e simulam as chamadas à Gr
 - [docs/identidade-visual.md](docs/identidade-visual.md) — paleta compartilhada, apresentação pública, tema escuro/claro e navegação.
 - [docs/ui-ux.md](docs/ui-ux.md) — princípios de usabilidade, acessibilidade por teclado e comportamento no celular.
 - [docs/unslop-dispatch.md](docs/unslop-dispatch.md) — revisão visual aplicada às telas operacionais.
+- [docs/relatorio-skills-dispatch.md](docs/relatorio-skills-dispatch.md) — aplicação das sete skills, correções e evidências da revisão atual.
 
 ## Roadmap
 

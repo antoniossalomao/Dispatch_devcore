@@ -61,10 +61,10 @@
         <div class="bloco-cabecalho">
           <div class="colab-filtros-topo">
             <div class="busca-caixa busca-larga">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                 <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>
               </svg>
-              <input type="text" id="campo-busca" placeholder="Buscar colaboradores" aria-label="Buscar por nome, matrícula, cargo ou obra">
+              <input type="text" id="campo-busca" placeholder="Buscar colaboradores" aria-label="Buscar por nome, matrícula, cargo ou obra" name="campo-busca" autocomplete="off">
             </div>
 
             <div class="filtro-abas">
@@ -76,7 +76,7 @@
           </div>
 
           <div class="seletor-status">
-            <select id="seletor-status-ativo" class="config-select select-curto">
+            <select id="seletor-status-ativo" class="config-select select-curto" aria-label="Filtrar colaboradores por situação" name="seletor-status-ativo">
               <option value="ativos">Apenas ativos</option>
               <option value="inativos">Apenas inativos</option>
               <option value="todos">Todos os cadastros</option>
@@ -112,18 +112,18 @@
       </div>
 
       <form id="form-colaborador">
-        <input type="hidden" id="colab-id">
+        <input type="hidden" id="colab-id" name="colab-id" autocomplete="off">
 
         <div class="modal-corpo">
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="colab-nome" class="campo-label">Nome completo *</label>
-              <input type="text" id="colab-nome" class="config-input" placeholder="Ex: Carlos Eduardo Ramos" required>
+              <input type="text" id="colab-nome" class="config-input" placeholder="Ex: Carlos Eduardo Ramos" required name="colab-nome" autocomplete="off">
             </div>
 
             <div class="campo-grupo">
               <label for="colab-matricula" class="campo-label">Matrícula funcional *</label>
-              <input type="text" id="colab-matricula" class="config-input" placeholder="Ex: AG-116" required>
+              <input type="text" id="colab-matricula" class="config-input" placeholder="Ex: AG-116" required name="colab-matricula" autocomplete="off" spellcheck="false" autocapitalize="none">
               <span class="campo-dica">Código único da construtora.</span>
             </div>
           </div>
@@ -131,19 +131,19 @@
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="colab-cargo" class="campo-label">Cargo / Função *</label>
-              <input type="text" id="colab-cargo" class="config-input" placeholder="Ex: Motorista de Van" required>
+              <input type="text" id="colab-cargo" class="config-input" placeholder="Ex: Motorista de Van" required name="colab-cargo" autocomplete="off">
             </div>
 
             <div class="campo-grupo">
               <label for="colab-obra" class="campo-label">Obra / Lotação principal</label>
-              <input type="text" id="colab-obra" class="config-input" placeholder="Ex: Marília Norte ou Sede">
+              <input type="text" id="colab-obra" class="config-input" placeholder="Ex: Marília Norte ou Sede" name="colab-obra" autocomplete="off">
             </div>
           </div>
 
           <div class="grade-campos">
             <div class="campo-grupo">
               <label for="colab-telefone" class="campo-label">Telefone</label>
-              <input type="text" id="colab-telefone" class="config-input" inputmode="tel" maxlength="15" placeholder="Ex: (14) 99123-4567">
+              <input type="text" id="colab-telefone" class="config-input" inputmode="tel" maxlength="15" placeholder="Ex: (14) 99123-4567" name="colab-telefone" autocomplete="off">
             </div>
           </div>
 
@@ -155,7 +155,7 @@
                 <span class="switch-desc">Habilita a pessoa para dirigir veículos da frota respeitando a categoria e a validade da carteira.</span>
               </div>
               <span class="chave">
-                <input type="checkbox" id="colab-tem-cnh">
+                <input type="checkbox" id="colab-tem-cnh" name="colab-tem-cnh" autocomplete="off">
                 <span class="chave-trilho"></span>
               </span>
             </label>
@@ -174,7 +174,7 @@
 
               <div class="campo-grupo">
                 <label for="colab-cnh-validade" class="campo-label">Data de validade da CNH *</label>
-                <input type="date" id="colab-cnh-validade" class="config-input campo-data">
+                <input type="date" id="colab-cnh-validade" class="config-input campo-data" name="colab-cnh-validade" autocomplete="off">
               </div>
             </div>
           </div>
