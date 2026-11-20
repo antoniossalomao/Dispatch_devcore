@@ -5,14 +5,18 @@
         <span id="aviso-tela" class="topo-aviso" hidden></span>
 </template>
 <template data-parte="acoes" data-classe=""><div class="busca-caixa">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <circle cx="11" cy="11" r="7"/>
             <line x1="16.5" y1="16.5" x2="21" y2="21"/>
           </svg>
-          <input type="text" id="campo-busca" placeholder="Buscar na operação" aria-label="Buscar por colaborador, placa ou alojamento">
+          <input type="text" id="campo-busca" placeholder="Buscar na operação" aria-label="Buscar por colaborador, placa ou alojamento" name="campo-busca" autocomplete="off">
         </div>
 </template>
 <template data-parte="conteudo" data-classe="conteudo">
+      <div id="resumo-falha" class="recurso-falha" role="alert" hidden>
+        <div><strong>Não foi possível atualizar o resumo</strong><p>Confira a conexão e tente novamente</p></div>
+        <button type="button" class="btn-secundario" id="resumo-tentar">Tentar novamente</button>
+      </div>
 
       <!-- linha de indicadores -->
       <section class="indicadores">
@@ -23,9 +27,9 @@
           </div>
           <div class="kpi-valor-linha">
             <strong id="num-veiculos-uso" class="kpi-numero">—</strong>
-            <span id="sub-veiculos-uso" class="kpi-complemento">Carregando</span>
+            <span id="sub-veiculos-uso" class="kpi-complemento">Carregando…</span>
           </div>
-          <p id="detalhe-veiculos-uso" class="kpi-detalhe">Carregando dados</p>
+          <p id="detalhe-veiculos-uso" class="kpi-detalhe">Carregando dados…</p>
         </div>
 
         <div class="cartao-kpi">
@@ -36,7 +40,7 @@
             <strong id="num-veiculos-disp" class="kpi-numero">—</strong>
             <span class="kpi-complemento">prontos para saída</span>
           </div>
-          <p id="detalhe-veiculos-disp" class="kpi-detalhe">Carregando dados</p>
+          <p id="detalhe-veiculos-disp" class="kpi-detalhe">Carregando dados…</p>
         </div>
 
         <div class="cartao-kpi">
@@ -45,9 +49,9 @@
           </div>
           <div class="kpi-valor-linha">
             <strong id="num-alojamentos" class="kpi-numero">—</strong>
-            <span id="sub-alojamentos" class="kpi-complemento">Carregando</span>
+            <span id="sub-alojamentos" class="kpi-complemento">Carregando…</span>
           </div>
-          <p id="detalhe-alojamentos" class="kpi-detalhe">Carregando dados</p>
+          <p id="detalhe-alojamentos" class="kpi-detalhe">Carregando dados…</p>
         </div>
 
         <div class="cartao-kpi">
@@ -91,18 +95,20 @@
                   <th>Status</th>
                 </tr>
               </thead>
-              <tbody id="lista-movimentacoes"></tbody>
+              <tbody id="lista-movimentacoes"><tr><td colspan="5" class="texto-vazio">Carregando movimentações…</td></tr></tbody>
             </table>
           </div>
+          <div class="bloco-rodape"><span id="resumo-contagem" role="status">Carregando registros…</span><a href="movimentacoes">Ver movimentações</a></div>
         </section>
 
         <div class="coluna-lateral">
 
           <section class="bloco">
             <div class="bloco-cabecalho bloco-cabecalho-simples">
-              <h2 class="bloco-titulo">Ocupação por unidade</h2>
+              <div><h2 class="bloco-titulo">Ocupação por unidade</h2><p id="resumo-ocupacao" class="bloco-subtitulo">Carregando leitos…</p></div>
             </div>
-            <div id="lista-alojamentos" class="lista-unidades"></div>
+            <div id="lista-alojamentos" class="lista-unidades"><p class="texto-vazio">Carregando unidades…</p></div>
+            <div class="bloco-rodape"><a href="alojamentos">Gerenciar alojamentos</a></div>
           </section>
 
 

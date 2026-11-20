@@ -60,6 +60,7 @@ class App {
     this.acoesAtuais = [];
     this.pedido = 0;
     this.movimentoReduzido = window.matchMedia('(prefers-reduced-motion: reduce)');
+    this.sessao = this.criarSessao();
 
     this.roteador = new Roteador(Object.keys(TELAS), 'resumo', (rota, origem) =>
       this.abrir(rota, origem)
@@ -95,7 +96,9 @@ class App {
 
   configurarPaleta() {
     const base = () => {
-      const telas = Object.keys(TELAS).map((rota) => ({
+      const telas = Object.keys(TELAS)
+        .filter((rota) => rota !== 'configuracoes' || this.usuario?.perfil === 'admin')
+        .map((rota) => ({
         id: 'tela:' + rota,
         titulo: TELAS[rota].titulo,
         subtitulo: TELAS[rota].descricao,
@@ -139,11 +142,15 @@ class App {
 
     // Pessoas, veículos e alojamentos só aparecem quando a pessoa digita alguma coisa.
     const extras = async () => {
+      await this.sessao();
       const [pessoas, frota, alojamentos] = await Promise.all([
         chamarApi('/api/pessoas'),
         chamarApi('/api/frota'),
         chamarApi('/api/alojamentos')
       ]);
+      if (![pessoas, frota, alojamentos].every((resposta) => resposta.ok)) {
+        throw new Error('Cadastros indisponíveis');
+      }
       const lista = [];
       ((pessoas.ok && pessoas.dados.colaboradores) || []).forEach((p) => {
         lista.push({
@@ -204,7 +211,18 @@ class App {
   criarSessao() {
     let pedido = null;
     return () => {
-      if (!pedido) pedido = chamarApi('/api/auth/eu');
+      if (!pedido) {
+        pedido = chamarApi('/api/auth/eu')
+          .then((resposta) => {
+            if (resposta.ok) this.usuario = resposta.dados.usuario;
+            else pedido = null;
+            return resposta;
+          })
+          .catch((erro) => {
+            pedido = null;
+            throw erro;
+          });
+      }
       return pedido;
     };
   }
@@ -271,10 +289,13 @@ class App {
 
   // origem: 'inicio' (abriu o site), 'link' (clicou no menu) ou 'historico' (voltar/avançar do navegador).
   async abrir(rota, origem) {
-    if (rota === this.telaAtual && origem !== 'inicio') return true;
-    if (this.telaAtual && !(await this.podeSair())) return false;
-
     const numero = ++this.pedido;
+    if (rota === this.telaAtual && origem !== 'inicio') {
+      this.principal.setAttribute('aria-busy', 'false');
+      return true;
+    }
+    if (this.telaAtual && !(await this.podeSair())) return false;
+    if (numero !== this.pedido) return true;
     this.principal.setAttribute('aria-busy', 'true');
 
     let carregada;
@@ -288,7 +309,7 @@ class App {
     // Se a pessoa clicou em outra tela enquanto esta baixava, fica valendo só o último clique.
     if (numero !== this.pedido) return true;
 
-    const trocar = () => this.montar(rota, carregada);
+    const trocar = () => { if (numero === this.pedido) this.montar(rota, carregada); };
     const animar =
       origem !== 'inicio' &&
       typeof document.startViewTransition === 'function' &&
@@ -305,7 +326,7 @@ class App {
       trocar();
     }
 
-    if (origem !== 'inicio') {
+    if (origem !== 'inicio' && numero === this.pedido) {
       window.scrollTo(0, 0);
       // Coloca o foco no conteúdo novo (ajuda quem usa teclado ou leitor de tela).
       this.principal.focus({ preventScroll: true });
@@ -350,9 +371,11 @@ class App {
     this.telaAtual = rota;
 
     this.controlador = new AbortController();
+    // Compartilha entre módulos da visita atual, mas renova após alterações de perfil em outra tela.
+    this.sessao = this.criarSessao();
     const contexto = {
       sinal: this.controlador.signal,
-      sessao: this.criarSessao(),
+      sessao: this.sessao,
       ir: (destino) => this.roteador.ir(destino)
     };
     this.instancias = classes.map((Classe) => new Classe(contexto));
@@ -362,7 +385,10 @@ class App {
       window.navegacao.prepararTela();
       if (typeof window.navegacao.mostrarMenu === 'function') window.navegacao.mostrarMenu(false);
     }
-    this.principal.setAttribute('aria-busy', 'false');
+    const sinal = this.controlador.signal;
+    Promise.allSettled(this.instancias.map((tela) => tela.pronto)).then(() => {
+      if (!sinal.aborted) this.principal.setAttribute('aria-busy', 'false');
+    });
   }
 
   marcarMenu(rota) {
@@ -378,6 +404,11 @@ class App {
     this.desmontarAtual();
     this.telaAtual = null;
     this.marcarMenu(rota);
+    const titulo = document.createElement('h1');
+    titulo.className = 'topo-titulo';
+    titulo.textContent = TELAS[rota].titulo;
+    this.esquerda.replaceChildren(titulo);
+    document.title = 'Dispatch — ' + TELAS[rota].titulo;
     this.principal.className = 'conteudo';
     const caixa = document.createElement('div');
     caixa.className = 'estado-vazio estado-falha';

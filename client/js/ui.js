@@ -5,6 +5,14 @@ class Janelas {
       'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
     this.abertos = [];
     this.contador = 0;
+    this.observadores = new Map();
+    this.fundos = new Map();
+    this.ultimoFoco = document.activeElement;
+    document.addEventListener('focusin', (evento) => {
+      const janela = evento.target.closest('[role="dialog"]');
+      if (janela && this.observadores.has(janela) && !janela.hidden) this.aoAbrir(janela);
+      this.ultimoFoco = evento.target;
+    });
 
     document.addEventListener('keydown', (evento) => {
       if (this.abertos.length === 0) return;
@@ -17,13 +25,20 @@ class Janelas {
       // Prende a tecla Tab dentro da janela aberta no momento para ninguém sair navegando no fundo escondido.
       if (evento.key === 'Tab') {
         const itens = this.focaveis(this.abertos[this.abertos.length - 1].el);
-        if (itens.length === 0) return;
+        if (itens.length === 0) {
+          evento.preventDefault();
+          this.abertos.at(-1).el.focus();
+          return;
+        }
         const primeiro = itens[0];
         const ultimo = itens[itens.length - 1];
         if (evento.shiftKey && document.activeElement === primeiro) {
           evento.preventDefault();
           ultimo.focus();
         } else if (!evento.shiftKey && document.activeElement === ultimo) {
+          evento.preventDefault();
+          primeiro.focus();
+        } else if (!this.abertos.at(-1).el.contains(document.activeElement)) {
           evento.preventDefault();
           primeiro.focus();
         }
@@ -107,6 +122,12 @@ class Janelas {
 
   // Ao sair de uma tela, as janelas dela somem do DOM sem passar pelo "fechar"; zera a pilha para o Tab e o Esc não apontarem para elas.
   limparTela() {
+    this.observadores.forEach((observador, elemento) => {
+      if (elemento.closest('#camada-tela') || !elemento.isConnected) {
+        observador.disconnect();
+        this.observadores.delete(elemento);
+      }
+    });
     this.abertos = [];
     this.atualizarRolagem();
   }
@@ -119,6 +140,19 @@ class Janelas {
 
   atualizarRolagem() {
     document.body.classList.toggle('sem-rolagem', this.abertos.length > 0);
+    // O fundo também fica indisponível para mouse e tecnologias assistivas.
+    // Restauramos os valores originais antes de calcular a camada ativa, inclusive em diálogos aninhados.
+    this.fundos.forEach((valor, elemento) => { elemento.inert = valor; });
+    this.fundos.clear();
+    let ramo = this.abertos.at(-1)?.el;
+    while (ramo && ramo !== document.body) {
+      Array.from(ramo.parentElement.children).forEach((irmao) => {
+        if (irmao === ramo || irmao.matches('script, style, link')) return;
+        this.fundos.set(irmao, irmao.inert);
+        irmao.inert = true;
+      });
+      ramo = ramo.parentElement;
+    }
   }
 
   aoAbrir(elemento) {
@@ -126,7 +160,7 @@ class Janelas {
 
     const registro = {
       el: elemento,
-      abriuPor: document.activeElement,
+      abriuPor: elemento.contains(document.activeElement) ? this.ultimoFoco : document.activeElement,
       foto: null
     };
     this.abertos.push(registro);
@@ -134,10 +168,12 @@ class Janelas {
 
     // guarda como o formulário estava ao abrir, pra saber depois se a pessoa mexeu em algo
     setTimeout(() => {
+      if (!elemento.isConnected || elemento.hidden) return;
       registro.foto = this.fotoDoFormulario(elemento);
     }, 50);
 
     setTimeout(() => {
+      if (this.abertos.at(-1) !== registro || !elemento.isConnected || elemento.hidden) return;
       const campos = this.focaveis(elemento).filter((item) => !item.classList.contains('modal-fechar'));
       const alvo = campos[0] || this.focaveis(elemento)[0];
       if (alvo) alvo.focus();
@@ -166,6 +202,10 @@ class Janelas {
     const origem = this.abertos[indice].abriuPor;
     this.abertos.splice(indice, 1);
     this.atualizarRolagem();
+    if (elemento.dataset.dialogo || elemento.classList.contains('cmdk-overlay')) {
+      this.observadores.get(elemento)?.disconnect();
+      this.observadores.delete(elemento);
+    }
     if (origem && document.body.contains(origem) && typeof origem.focus === 'function') {
       origem.focus();
     }
@@ -176,6 +216,7 @@ class Janelas {
     elemento.dataset.uiPronto = '1';
     elemento.setAttribute('role', 'dialog');
     elemento.setAttribute('aria-modal', 'true');
+    elemento.tabIndex = -1;
 
     const titulo = elemento.querySelector('.modal-titulo, .gaveta-titulo');
     if (titulo) {
@@ -215,13 +256,15 @@ class Janelas {
     }
 
     // Observa quando o atributo hidden muda para saber a hora exata em que uma tela abre ou fecha a janela.
-    new MutationObserver(() => {
+    const observador = new MutationObserver(() => {
       if (elemento.hidden) this.aoFechar(elemento);
       else this.aoAbrir(elemento);
-    }).observe(elemento, {
+    });
+    observador.observe(elemento, {
       attributes: true,
       attributeFilter: ['hidden']
     });
+    this.observadores.set(elemento, observador);
 
     if (!elemento.hidden) this.aoAbrir(elemento);
   }

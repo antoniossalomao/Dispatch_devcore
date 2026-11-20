@@ -181,15 +181,7 @@ body.painel-corpo {
   color: var(--claro-texto-fraco);
 }
 
-/* conteudo: uma entrada suave por pagina */
-@keyframes tema-entrar {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: none; }
-}
-
-.area-conteudo .conteudo {
-  animation: tema-entrar 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
+/* A troca de tela usa a View Transition da casca; o conteúdo fica legível desde o primeiro quadro. */
 
 /* indicadores: uma faixa unica em vez de quatro cartoes iguais */
 .indicadores {

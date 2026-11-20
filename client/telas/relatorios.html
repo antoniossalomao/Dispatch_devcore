@@ -4,9 +4,9 @@
         <span class="topo-data">Ocupação, uso da frota, gargalos e quem estava dirigindo</span>
 </template>
 <template data-parte="acoes" data-classe="periodo-filtro"><label class="campo-label" for="rel-de">De</label>
-        <input type="date" id="rel-de" class="config-input campo-data periodo-data">
+        <input type="date" id="rel-de" class="config-input campo-data periodo-data" name="rel-de" autocomplete="off">
         <label class="campo-label" for="rel-ate">Até</label>
-        <input type="date" id="rel-ate" class="config-input campo-data periodo-data">
+        <input type="date" id="rel-ate" class="config-input campo-data periodo-data" name="rel-ate" autocomplete="off">
         <button type="button" id="botao-atualizar" class="btn-secundario">Atualizar</button>
 </template>
 <template data-parte="conteudo" data-classe="conteudo">
@@ -46,11 +46,11 @@
           <form id="form-dirigindo" class="form-linha">
             <div class="campo-grupo">
               <label for="dir-veiculo" class="campo-label">Veículo</label>
-              <select id="dir-veiculo" class="config-select" required></select>
+              <select id="dir-veiculo" class="config-select" required name="dir-veiculo"></select>
             </div>
             <div class="campo-grupo">
               <label for="dir-quando" class="campo-label">Data e hora da infração</label>
-              <input type="datetime-local" id="dir-quando" class="config-input campo-data" required>
+              <input type="datetime-local" id="dir-quando" class="config-input campo-data" required name="dir-quando" autocomplete="off">
             </div>
             <button type="submit" class="btn-primario">Consultar</button>
           </form>
@@ -65,7 +65,7 @@
           <form id="form-ia" class="form-linha">
             <div class="campo-grupo campo-grande">
               <label for="ia-pergunta" class="campo-label">Pergunta</label>
-              <input type="text" id="ia-pergunta" class="config-input" maxlength="500" placeholder="Ex: Qual veículo ficou mais ocioso no período?" required>
+              <input type="text" id="ia-pergunta" class="config-input" maxlength="500" placeholder="Ex: Qual veículo ficou mais ocioso no período?" required name="ia-pergunta" autocomplete="off">
             </div>
             <button type="submit" class="btn-primario">Perguntar</button>
             <button type="button" id="botao-resumo-ia" class="btn-secundario">Resumir o período</button>

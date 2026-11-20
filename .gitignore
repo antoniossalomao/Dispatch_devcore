@@ -25,3 +25,8 @@ server/data/
 .DS_Store
 Thumbs.db
 video/audio/mix.wav
+
+# Skills locais; versões e instalação estão em docs/design-skills.lock.json e scripts/.
+.design-skills/
+.agents/skills/
+server/test-ui/artifacts/

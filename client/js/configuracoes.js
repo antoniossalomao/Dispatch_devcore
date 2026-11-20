@@ -23,7 +23,7 @@ export default class TelaConfiguracoes {
       conta: document.getElementById('painel-conta')
     };
 
-    this.formRegras = document.getElementById('painel-regras');
+    this.formRegras = document.getElementById('form-regras');
     this.formAlertas = document.getElementById('form-alertas');
     this.botaoRestaurar = document.getElementById('botao-restaurar');
 

@@ -76,13 +76,18 @@ export default class TelaColaboradores {
     this.colaboradorSelecionado = null;
     this.ehAdmin = false;
     this.timerToast = null;
+    this.pedidoBusca = 0;
 
     this.configurarEventos();
     this.iniciar();
   }
 
   configurarEventos() {
-    this.campoBusca.addEventListener('input', this.carregarColaboradores.bind(this));
+    this.campoBusca.addEventListener('input', () => {
+      clearTimeout(this.timerBusca);
+      ++this.pedidoBusca;
+      this.timerBusca = setTimeout(() => this.carregarColaboradores(), 200);
+    });
     this.seletorStatusAtivo.addEventListener('change', this.carregarColaboradores.bind(this));
 
     this.abasFiltroCnh.forEach((aba) => {
@@ -403,6 +408,8 @@ export default class TelaColaboradores {
   }
 
   async carregarColaboradores() {
+    clearTimeout(this.timerBusca);
+    const pedido = ++this.pedidoBusca;
     const status = this.seletorStatusAtivo.value;
     const busca = encodeURIComponent(this.campoBusca.value.trim());
     const cnh = this.filtroCnhAtual;
@@ -411,6 +418,7 @@ export default class TelaColaboradores {
       const resposta = await chamarApi(
         '/api/pessoas?status=' + status + '&cnh=' + cnh + '&busca=' + busca
       );
+      if (pedido !== this.pedidoBusca || this.ctx.sinal.aborted) return;
       if (!resposta.ok) {
         this.mostrarToast(resposta.dados.erro || 'Erro ao carregar colaboradores.', 'erro');
         return;
@@ -440,8 +448,18 @@ export default class TelaColaboradores {
 
       this.desenharTabela(this.colaboradoresCache);
     } catch (erro) {
-      this.mostrarToast('Sem conexão com o servidor.', 'erro');
+      if (pedido === this.pedidoBusca && !this.ctx.sinal.aborted) this.mostrarToast('Sem conexão com o servidor.', 'erro');
     }
+  }
+
+  desmontar() {
+    clearTimeout(this.timerBusca);
+    clearTimeout(this.timerToast);
+  }
+
+  formatarDataCivil(valor) {
+    const data = new Date(String(valor).slice(0, 10) + 'T00:00:00Z');
+    return Number.isNaN(data.getTime()) ? '—' : new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(data);
   }
 
   fecharModalColab() {
@@ -502,7 +520,7 @@ export default class TelaColaboradores {
         ? 'Categoria(s) ' + colab.cnh_categorias
         : 'Sem CNH cadastrada';
       this.gavetaCnhVal.textContent = colab.cnh_validade
-        ? colab.cnh_validade.split('-').reverse().join('/')
+        ? this.formatarDataCivil(colab.cnh_validade)
         : '—';
 
       const visualCnh = this.infoCnhVisual(colab.cnh_info);
@@ -522,7 +540,7 @@ export default class TelaColaboradores {
           'Leito ' +
           estadiaAtual.leito +
           ' desde ' +
-          estadiaAtual.inicio.slice(0, 10).split('-').reverse().join('/');
+          this.formatarDataCivil(estadiaAtual.inicio);
       } else {
         this.gavetaAtualAlojamento.textContent = 'Não alojado no momento';
         this.gavetaAtualDesde.textContent = 'Sem estadia em aberto';

@@ -76,6 +76,11 @@
   flex-direction: column;
   gap: 24px;
 }
+#form-regras {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
 
 .auditoria-cabecalho {
   padding: 0;

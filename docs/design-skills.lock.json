@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "name": "anthropic",
+      "repository": "https://github.com/anthropics/skills.git",
+      "commit": "e4bb5d960d87126ff3b3a8af1a104b7db67560ba",
+      "skills": [
+        {
+          "name": "frontend-design",
+          "path": "skills/frontend-design"
+        }
+      ]
+    },
+    {
+      "name": "vercel",
+      "repository": "https://github.com/vercel-labs/agent-skills.git",
+      "commit": "1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62",
+      "skills": [
+        {
+          "name": "web-design-guidelines",
+          "path": "skills/web-design-guidelines"
+        },
+        {
+          "name": "vercel-composition-patterns",
+          "path": "skills/composition-patterns"
+        }
+      ]
+    },
+    {
+      "name": "ui-ux-pro-max",
+      "repository": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
+      "commit": "ed766d3bf62f32c8d27762ad49abdc3a4744c84f",
+      "skills": [
+        {
+          "name": "ui-ux-pro-max",
+          "path": ".claude/skills/ui-ux-pro-max"
+        }
+      ]
+    },
+    {
+      "name": "bencium",
+      "repository": "https://github.com/bencium/bencium-claude-code-design-skill.git",
+      "commit": "5de46a39b4640fa419560cd0b67e4c4b50dac802",
+      "skills": [
+        {
+          "name": "bencium-controlled-ux-designer",
+          "path": "bencium-controlled-ux-designer/skills/bencium-controlled-ux-designer"
+        }
+      ]
+    },
+    {
+      "name": "accesslint",
+      "repository": "https://github.com/accesslint/claude-marketplace.git",
+      "commit": "2e9d7336678302d0bc08848e92542560295b34d3",
+      "skills": [
+        {
+          "name": "accessibility-diff",
+          "path": "plugins/accesslint/skills/accessibility-diff"
+        },
+        {
+          "name": "accessibility-inspect",
+          "path": "plugins/accesslint/skills/accessibility-inspect"
+        },
+        {
+          "name": "accessibility-scan",
+          "path": "plugins/accesslint/skills/accessibility-scan"
+        },
+        {
+          "name": "accessibility-fix",
+          "path": "plugins/accesslint/skills/accessibility-fix"
+        },
+        {
+          "name": "shared",
+          "path": "plugins/accesslint/skills/shared"
+        },
+        {
+          "name": "accessibility-audit",
+          "path": "plugins/accesslint/skills/accessibility-audit"
+        }
+      ]
+    },
+    {
+      "name": "unslop",
+      "repository": "https://github.com/heydamir/unslop.git",
+      "commit": "620163eedb3529d9cd23a3994ed8d287d06f760d",
+      "skills": [
+        {
+          "name": "unslop",
+          "path": "skills/unslop"
+        }
+      ]
+    }
+  ]
+}

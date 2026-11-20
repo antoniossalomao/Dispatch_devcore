@@ -24,6 +24,13 @@ export default class TelaResumo {
     this.avisoTela = document.getElementById('aviso-tela');
     this.dataHoje = document.getElementById('data-hoje');
     this.abasFiltro = document.querySelectorAll('.aba-item');
+    this.principal = document.getElementById('conteudo');
+    this.falha = document.getElementById('resumo-falha');
+    this.contagem = document.getElementById('resumo-contagem');
+    this.ocupacao = document.getElementById('resumo-ocupacao');
+    this.detalheVeiculosDisp = document.getElementById('detalhe-veiculos-disp');
+    this.botaoTentar = document.getElementById('resumo-tentar');
+    this.botaoTentar.addEventListener('click', () => this.carregarPainel());
 
     this.movimentacoesAtuais = [];
     this.filtroCategoria = 'todos';
@@ -36,7 +43,7 @@ export default class TelaResumo {
     this.linksEmBreve = document.querySelectorAll('.menu-em-breve');
 
     this.configurarEventos();
-    this.carregarPainel();
+    this.pronto = this.carregarPainel();
   }
 
   configurarEventos() {
@@ -112,6 +119,7 @@ export default class TelaResumo {
       );
     });
     this.desenharTabela(filtradas);
+    this.contagem.textContent = filtradas.length + (filtradas.length === 1 ? ' movimentação' : ' movimentações') + ' de ' + this.movimentacoesAtuais.length + ' recentes';
   }
 
   desenharTabela(lista) {
@@ -121,7 +129,9 @@ export default class TelaResumo {
       const td = document.createElement('td');
       td.colSpan = 5;
       td.className = 'texto-vazio';
-      td.textContent = 'Nenhuma movimentação encontrada para esse filtro.';
+      td.textContent = this.movimentacoesAtuais.length
+        ? 'Nenhuma movimentação neste filtro. Limpe a busca ou selecione Todas'
+        : 'Nenhuma movimentação registrada. Registre uma saída na Frota ou uma estadia em Alojamentos';
       tr.appendChild(td);
       this.listaMov.appendChild(tr);
       return;
@@ -184,6 +194,7 @@ export default class TelaResumo {
     lista.forEach((alojamento) => {
       const porcentagem = this.porcentagem(alojamento.ocupados, alojamento.total);
       const caixa = document.createElement('div');
+      caixa.className = 'unidade-resumo';
 
       const topo = document.createElement('div');
       topo.className = 'unidade-topo';
@@ -195,7 +206,7 @@ export default class TelaResumo {
       if (alojamento.cidade) {
         const cidade = document.createElement('span');
         cidade.className = 'unidade-cidade';
-        cidade.textContent = '· ' + alojamento.cidade;
+        cidade.textContent = alojamento.cidade;
         nome.appendChild(cidade);
       }
 
@@ -208,6 +219,12 @@ export default class TelaResumo {
 
       const fundoBarra = document.createElement('div');
       fundoBarra.className = 'barra-fundo';
+      fundoBarra.setAttribute('role', 'progressbar');
+      fundoBarra.setAttribute('aria-label', 'Ocupação de ' + alojamento.nome);
+      fundoBarra.setAttribute('aria-valuemin', '0');
+      fundoBarra.setAttribute('aria-valuemax', String(Math.max(1, alojamento.total)));
+      fundoBarra.setAttribute('aria-valuenow', String(alojamento.ocupados));
+      fundoBarra.setAttribute('aria-valuetext', alojamento.ocupados + ' de ' + alojamento.total + ' leitos ocupados');
 
       const preenchimento = document.createElement('div');
       preenchimento.className =
@@ -217,14 +234,26 @@ export default class TelaResumo {
 
       caixa.appendChild(topo);
       caixa.appendChild(fundoBarra);
+      const disponibilidade = document.createElement('p');
+      disponibilidade.className = 'unidade-disponibilidade';
+      const vagas = Math.max(0, alojamento.total - alojamento.ocupados);
+      disponibilidade.textContent = vagas === 0 ? 'Sem vagas disponíveis' : vagas + (vagas === 1 ? ' leito disponível' : ' leitos disponíveis');
+      if (vagas === 0) disponibilidade.classList.add('unidade-lotada');
+      caixa.appendChild(disponibilidade);
       this.listaAloj.appendChild(caixa);
     });
   }
 
   async carregarPainel() {
+    if (this.carregando) return;
+    this.carregando = true;
+    this.principal.setAttribute('aria-busy', 'true');
+    this.falha.hidden = true;
+    this.botaoTentar.disabled = true;
     try {
       // Confere primeiro se existe sessão aberta; sem login, volta para a tela inicial.
       const sessao = await this.ctx.sessao();
+      if (this.ctx.sinal.aborted) return;
       if (!sessao.ok) {
         window.location.href = 'login';
         return;
@@ -238,9 +267,10 @@ export default class TelaResumo {
         this.blocoMenuAdmin.hidden = false;
       }
 
-      const resposta = await chamarApi('/api/resumo');
+      const resposta = await chamarApi('/api/resumo', { sinal: this.ctx.sinal });
+      if (this.ctx.sinal.aborted) return;
       if (!resposta.ok) {
-        return;
+        throw new Error('Resumo indisponível');
       }
 
       const dados = resposta.dados;
@@ -257,7 +287,7 @@ export default class TelaResumo {
           : 'Nenhum veículo na oficina';
 
       this.numVeiculosDisp.textContent = dados.veiculosDisponiveis;
-      document.getElementById('detalhe-veiculos-disp').textContent =
+      this.detalheVeiculosDisp.textContent =
         'Documentação e CNH validadas na saída';
 
       this.numAlojamentos.textContent = dados.totalAlojamentos;
@@ -266,11 +296,24 @@ export default class TelaResumo {
         dados.leitosOcupados + ' leitos ocupados hoje (' + pctOcupacao + '%)';
 
       this.numVagas.textContent = dados.vagasDisponiveis;
+      this.ocupacao.textContent = dados.leitosOcupados + ' de ' + dados.totalLeitos + ' leitos ocupados (' + pctOcupacao + '%)';
       this.movimentacoesAtuais = dados.movimentacoes || [];
       this.aplicarFiltros();
       this.desenharAlojamentos(dados.alojamentos);
     } catch (erro) {
-      this.mostrarAviso('Sem conexão com o servidor.');
+      if (this.ctx.sinal.aborted) return;
+      this.falha.hidden = false;
+      this.contagem.textContent = 'Dados indisponíveis';
+      this.listaMov.innerHTML = '<tr><td colspan="5" class="texto-vazio">Os registros não foram carregados</td></tr>';
+      this.listaAloj.textContent = 'Os alojamentos não foram carregados';
+      this.ocupacao.textContent = 'Dados indisponíveis';
+      [this.subVeiculosUso, this.detalheVeiculosUso, this.detalheVeiculosDisp, this.subAlojamentos, this.detalheAlojamentos].forEach((campo) => { campo.textContent = 'Dados indisponíveis'; });
+    } finally {
+      this.carregando = false;
+      if (!this.ctx.sinal.aborted) {
+        this.principal.setAttribute('aria-busy', 'false');
+        this.botaoTentar.disabled = false;
+      }
     }
   }
 }

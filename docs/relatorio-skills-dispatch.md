@@ -1,102 +1,102 @@
-# Relatório — 7 skills de design/UX/a11y contra o Dispatch
+# Revisão do Dispatch com sete skills
 
-Data: 2026-11-17 · Alvo: `client/` (HTML/CSS/JS puro, 8 telas + login/cadastro/apresentação) · commit base `c91a28b`.
-Método: skills clonadas, app rodando local (Node 22, seed de demonstração), Chromium headless em 1440 e 390 px, tema escuro (padrão). `npm test` do servidor: 26/26 passando.
+Revisão de 18/11/2026 sobre `688ea6d`, após `git pull --ff-only origin main`. Alvo: aplicativo operacional em HTML, CSS e JavaScript, login e cadastro.
 
-## Resumo executivo
+## Direção visual
 
-Nenhuma falha crítica de produto. Base sólida: sem `user-scalable=no`, sem `transition: all`, sem bloqueio de paste, sem `div onclick`, `lang="pt-BR"`, skip link, `:focus-visible` global, `prefers-reduced-motion` tratado, sem overflow horizontal em nenhuma tela (1440/390), nenhum botão sem nome, 1 `h1` por tela.
+- **Produto:** acompanhar pessoas, alojamentos e frota de uma construtora.
+- **Caráter:** preciso, sóbrio e prático.
+- **Universo:** registros de campo e disponibilidade de recursos nas obras.
+- **Momentos:** movimentações reais da API e disponibilidade de leitos por unidade.
+- **Assinatura:** duplo chevron da marca Dispatch.
 
-Problemas reais, em ordem de prioridade:
+A base já apresentava identidade consistente. A revisão preserva IBM Plex Sans/Mono, superfícies grafite, temas claro/escuro e densidade compacta no desktop. O acento existente sinaliza a marca e situações de atenção. No celular, os indicadores passam a duas colunas entre 360 e 560 px, mantendo a ordem de leitura e os alvos de toque.
 
-| # | Sev. | Achado | Skill |
-|---|---|---|---|
-| 1 | Crítico (a11y) | 3 `<select>` de filtro sem rótulo acessível (WCAG 1.3.1/4.1.2) | AccessLint, Vercel |
-| 2 | Moderado | `login.html` e `cadastro.html` sem landmark `<main>` | AccessLint |
-| 3 | Moderado | Chat de ajuda (`.chat-caixa`, criado em `js/extras.js:190`) fora de qualquer landmark, em todas as telas | AccessLint |
-| 4 | Menor | `<form role="tabpanel">` não permitido (`js/usabilidade.js:301` aplica o role em qualquer elemento; afeta `#painel-regras` em Configurações) | AccessLint |
-| 5 | Alto | Alvos de toque < 44 px: 25 em Colaboradores e 11 em Configurações no celular; menu lateral com itens de 32 px no desktop | UI/UX Pro Max |
-| 6 | Médio | Texto < 12 px (10–11 px): atalho "Ctrl K", iniciais do avatar, contador do sino | UI/UX Pro Max, Vercel |
-| 7 | Médio | Contraste transitório durante carga (3,43:1 e 2,42:1 no texto secundário/"Carregando...") | AccessLint |
-| 8 | Baixo | Datas formatadas à mão em `js/colaboradores.js:504` e `:524` (`split('-').reverse()`), em vez de `Intl.DateTimeFormat` | Vercel |
-| 9 | Baixo | Tipografia: `...` em vez de `…` (5 ocorrências em `telas/configuracoes.html:96,103,110,117,492`); placeholders "Ex: …" sem reticências | Vercel |
-| 10 | Baixo | Falta `touch-action: manipulation`, `overscroll-behavior: contain` em modais/gavetas, `translate="no"` em marca/placas/IDs | Vercel |
-| 11 | Baixo | `outline: none` em 7 pontos: 5 têm substituto (anel via `box-shadow`/`focus-within`); conferir `css/app.css:99` (`.cmdk-input:focus`) e `css/configuracoes.css:134` | Vercel |
+## Skills aplicadas
 
-## 1. AccessLint (WCAG 2.2 AA, engine 0.21.0, 94 regras)
+As fontes completas estão em `.design-skills/`; as instruções estão disponíveis em `.agents/skills/`. Os commits estão fixados em [design-skills.lock.json](design-skills.lock.json).
 
-Escopo: 9 páginas (login, cadastro, resumo, colaboradores, alojamentos, frota, movimentações, relatórios, configurações). Escaneadas duas vezes: no carregamento e depois de a tela terminar de renderizar (`--wait-for`).
+| Skill | Aplicação |
+|---|---|
+| [Anthropic Frontend Design](https://github.com/anthropics/skills/tree/main/skills/frontend-design) | Revisão visual a partir da operação da construtora; hierarquia e textos específicos; destaque para os registros e leitos, preservando a identidade |
+| [Vercel Web Design Guidelines](https://github.com/vercel-labs/agent-skills/tree/main/skills/web-design-guidelines) | Regras atuais baixadas de `web-interface-guidelines/main/command.md`; rótulos, nomes de campos, semântica, foco, toque, overscroll, tema e datas |
+| [Vercel Composition Patterns](https://github.com/vercel-labs/agent-skills/tree/main/skills/composition-patterns) | Princípios aplicáveis ao JavaScript puro: controle de janelas compartilhado, sessão fornecida pelo contexto da visita e separação entre roteamento e renderização. As APIs específicas de React não se aplicam a esta stack |
+| [UI/UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | Busca local executada; recomendações pertinentes de foco e toque aplicadas. O sistema visual existente prevalece sobre sugestões genéricas de landing page e fontes que não se ajustavam ao aplicativo |
+| [Bencium UX Designer](https://github.com/bencium/bencium-claude-code-design-skill) | Revisão de clareza, hierarquia, consistência, formulários e feedback, dentro da autorização para aprimorar o Dispatch |
+| [AccessLint](https://github.com/accesslint/claude-marketplace) | Varredura do DOM real com `@accesslint/core` 0.21.0, correções e verificação automatizada. Fluxos de teclado verificados separadamente com Playwright |
+| [Unslop](https://github.com/heydamir/unslop) | Polimento em nove passes; mantidas a identidade e as seções existentes, com correções de legibilidade e detalhes |
 
-Resultado estável (após renderizar):
+Unslop foi criado por **Damir Sokolovsky ([@heydamir](https://x.com/heydamir))**, sob [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
-- ● `labels-and-names/form-label` — `select#seletor-status` em `telas/alojamentos.html:48` e `telas/frota.html:37`; `select#seletor-status-ativo` em `telas/colaboradores.html:79`. Correção: `aria-label="Filtrar por situação"` (ou `<label>` visível).
-- ● `landmarks/landmark-main` — `login.html` e `cadastro.html` (`<body>` sem `<main>`).
-- ● `landmarks/region` — chat de ajuda fora de landmark, todas as telas. Correção: `role="complementary"` + `aria-label="Ajuda do Dispatch"` no `.chat-caixa`.
-- ● `aria/aria-allowed-role` — `form#painel-regras[role=tabpanel]`. Correção: envolver o form num `div role="tabpanel"`.
+## Correções implementadas
 
-Só no carregamento (desaparecem depois): 12–46 falhas de `color-contrast` por tela (texto secundário `--op-secundario #a8afb8` medido a 3,43:1 e "Carregando..." a 2,42:1) e `th-has-data-cells` nas tabelas ainda vazias. Computado depois: `#a8afb8` sobre `#191c20` ≈ 7,6:1, passa. Causa provável: transição de cor/opacidade na entrada da tela (`tema.css:745`), então o leitor de tela e o scan automático pegam o estado intermediário. Sugestão: não animar `color` na entrada, e manter `aria-busy` até o conteúdo estar pronto.
+| Local | Problema confirmado | Comportamento resultante |
+|---|---|---|
+| Login e cadastro | Ausência de landmark principal | Conteúdo dentro de `main`; nomes de campos e preenchimento automático preservados |
+| Filtros | Três seletores sem nome acessível | Rótulos específicos para colaboradores, alojamentos e veículos |
+| Configurações | `role="tabpanel"` aplicado sobre um `form` | Painel e formulário separados; abas por teclado e proteção de alterações mantidas |
+| Ajuda | Conteúdo fora dos landmarks e fechamento sem devolver foco | Região complementar nomeada, histórico anunciado, estado expandido e Escape com retorno do foco |
+| Busca global | Campo identificado apenas pelo placeholder; gatilho escondido no celular | Nome acessível, botão de fechar, acesso por toque e teclado e feedback de carregamento/falha |
+| Busca global | Resultado de uma abertura anterior podia afetar uma nova abertura | Cada abertura descarta respostas de pedidos anteriores |
+| Janelas | Fundo continuava interativo; foco podia escapar ou voltar para um campo já oculto | Uma pilha compartilhada controla foco, `inert`, rolagem, diálogos aninhados e restauração do fundo |
+| Resumo | Falha HTTP deixava mensagens de carregamento permanentes | Estado de falha persistente e ação de tentar novamente; números aguardam os dados da API |
+| Resumo | Barras de ocupação sem valor programático e pouca indicação de vagas | Progresso nomeado, ocupados/total, vagas por unidade e indicação textual de lotação |
+| Resumo | Busca sem contagem de resultados ou caminhos próximos para as listas | Contagem anunciada e links para movimentações e alojamentos |
+| Navegação | Pedidos simultâneos podiam atualizar histórico/URL depois de uma navegação mais recente | URL, título, foco e conteúdo respeitam o último pedido, inclusive ao voltar para a tela atual |
+| Colaboradores | Busca disparava por tecla e respostas antigas podiam substituir o filtro atual | Espera de 200 ms, descarte de respostas antigas e limpeza do timer ao sair da tela |
+| Sessão | Composição dos módulos e da busca precisava compartilhar o perfil sem manter dados indefinidamente | Uma resposta por visita; nova visita renova o perfil e a busca respeita o acesso de administrador |
+| Camadas compartilhadas | Observadores permaneciam ligados aos elementos de telas removidas | Observadores de janelas, filtros, abas e tabelas são desconectados na troca de tela |
 
-Não verificado nesta rodada (precisa de sessão deslogada): contraste de `/login` e `/cadastro` (o scan inicial acusou 2,33:1 no `h1` "Dispatch" e nos ícones do cadastro, mas foi capturado em carga, então precisa ser confirmado). Camada manual (teclado, leitor de tela, zoom 400%, WCAG-EM completo) fica como pendência humana (○).
+### Nove passes do Unslop
 
-## 2. Vercel Web Interface Guidelines
+1. **Espaçamento:** agrupamento da busca, rodapés e disponibilidade de leitos na escala existente; resumo móvel com dois indicadores por linha.
+2. **Cor:** paleta operacional preservada e browser chrome acompanhando o tema; estados de atenção mantêm texto além da cor.
+3. **Ícones:** SVGs decorativos ocultos de tecnologias assistivas; busca e ajuda têm nomes acessíveis.
+4. **Texto:** estados de erro com próximo passo, resultados contados e mensagens de carregamento explícitas.
+5. **Tipografia:** fonte operacional também no login; textos de apoio revistos e campos móveis a 16 px nos componentes compartilhados.
+6. **Layout:** mesmas seções e ordem; busca global acessível no celular; tabelas com rolagem local e cabeçalhos identificados.
+7. **Detalhes:** foco, Escape, retorno do foco, bloqueio do fundo, alvos de toque e ocupação programática.
+8. **Visual:** os dados reais da API são o destaque; sem imagens geradas para as telas de operação.
+9. **Movimento:** removida a entrada por opacidade do conteúdo e do login, evitando contraste transitório; preferência de movimento reduzido preservada.
 
-Aplicadas as regras da versão atual do `command.md` (acessibilidade, foco, formulários, animação, tipografia, imagens, navegação, toque, tema, i18n). Passa: sem `transition: all`, sem `user-scalable=no`, sem `onPaste` bloqueado, sem imagem sem `alt`, `color-scheme` e `theme-color` definidos, `tabular-nums` nos números principais, `text-wrap: balance` na apresentação, ações destrutivas via modal próprio (`ui.js`, substitui `confirm()`).
+## Verificação
 
-Falhas:
+- `npm test`: **28 testes aprovados**.
+- `CHROMIUM_PATH=/usr/bin/chromium npm run test:ui`: suíte com banco temporário, seed fictício e servidor isolado.
+- AccessLint: **31 estados sem violações automatizadas** — sete telas × dois temas × duas larguras (1440 e 390 px), mais login, cadastro e busca global.
+- Sem transbordamento horizontal nas páginas verificadas; um `h1` por tela e uma indicação de página atual.
+- Fluxos: validação do login, seleção de comando por teclado/toque, foco em janelas aninhadas, cancelamento de descarte, falha HTTP 503 e recuperação, filtro vazio e limpeza, navegação rápida, Escape na ajuda, abas de Configurações e proteção de alterações, respostas de busca fora de ordem.
+- Sem erros de JavaScript nos fluxos concluídos.
+- Instalador de skills executado duas vezes; a segunda execução preservou a instalação existente.
+- `git diff --check`: aprovado.
 
-- Rótulos de formulário: ver item 1 (AccessLint).
-- `client/index.html:64,65,90,97` — `<img>` sem `width`/`height` (CLS); as 3 primeiras são decorativas (`alt=""`, corretas).
-- Formulários sem `autocomplete`/`name`/`inputmode`: `telas/frota.html:76,80,86,102,150,154,185,218,223` e `telas/configuracoes.html:133,138`. Placa: `spellcheck="false"` + `autocomplete="off"`.
-- `telas/configuracoes.html:96,103,110,117,492` — `...` → `…`.
-- Datas manuais: `js/colaboradores.js:504,524`.
-- Sem `touch-action: manipulation` e sem `overscroll-behavior: contain` nos modais/gavetas.
-- Sem `translate="no"` em marca "Dispatch", placas, IDs de leito.
-- Reduced motion: guardas globais em `base.css:455` e `tema.css:745`; os arquivos por tela dependem delas (ok), mas `login.css` e `app.css` só animam sob `no-preference` (bom).
+A varredura automática e os testes de teclado não representam uma certificação WCAG. Uso com leitor de tela real (NVDA/Firefox e VoiceOver/Safari), zoom de 400% e avaliação humana de leitura e compreensão continuam fora desta amostra. OAuth do Google, Groq, Telegram e produção não foram acionados nesta revisão.
 
-## 3. Vercel Composition Patterns
+## Evidências
 
-Skill é para React; o Dispatch é JS puro com classes por tela, então as regras de props booleanas/Context/`forwardRef` não se aplicam literalmente. Transposição para classes:
+- [Resumo antes da revisão](qa/skills-2026-11-18/resumo-antes.png)
+- [Resumo depois, desktop escuro](qa/skills-2026-11-18/resumo-desktop.png)
+- [Resumo depois, desktop claro](qa/skills-2026-11-18/resumo-claro.png)
+- [Resumo depois, celular](qa/skills-2026-11-18/resumo-celular.png)
+- [Resultado automatizado](qa/skills-2026-11-18/resultado.json)
 
-- Classes de tela grandes: `configuracoes.js` 814 linhas, `colaboradores.js` 635, `frota.js` 630, `alojamentos.js` 621; cada uma monta modal, gaveta, tabela e filtros dentro da mesma classe (equivalente a "boolean prop proliferation").
-- Padrão repetido por tela (cartão KPI, tabela com estado vazio, gaveta de cadastro, seletor de filtro): extrair componentes pequenos em `js/ui.js` (ou `js/componentes/`) com variantes explícitas em vez de flags.
-- CSS: 18 arquivos / 6,0 mil linhas, `densidade.css`, `leve.css`, `usabilidade.css`, `extras.css` e `paleta.css` sobrepõem a base; 4 `!important`. Consolidar tokens em um único lugar (`tema.css`/`paleta.css`).
+## Reproduzir
 
-## 4. UI/UX Pro Max (checklist por prioridade)
+Na raiz do repositório:
 
-1. Acessibilidade: contraste ok depois da carga; foco visível; itens 1–4 acima.
-2. Toque (CRÍTICO na skill): 44×44 px. Medido: desktop 13–102 alvos menores por tela (menu lateral 207×32, ações de linha de tabela); celular: Colaboradores 25, Configurações 11, demais 0–1. `docs/unslop-dispatch.md` registra alvos de 44 px no celular nos controles principais; confirmado em 5 das 7 telas.
-3. Performance: imagens da apresentação com `loading="lazy"` e `decoding="async"` (bom); falta dimensão.
-4. Estilo: coerente (grafite, ícones lineares únicos, sem emoji nas telas operacionais).
-5. Layout: sem overflow horizontal em 14 combinações tela × viewport.
-6. Tipografia: texto < 12 px: "Ctrl K" 10 px (`app.css:49`), avatar/contador 11 px (`base.css:401`, `densidade.css:44,99`, `configuracoes.css:233`).
-7. Animação: sem animação de largura/altura (corrigido no unslop anterior).
-8. Formulários: rótulos visíveis na maioria; placeholders só como exemplo; erros inline.
-9. Navegação: deep links por rota (`/frota` etc.), paleta Ctrl+K.
-10. Dados: barras de ocupação dependem de cor (ouro vs. cinza) além do texto "6/8 leitos" (ok, texto presente).
+```bash
+node scripts/instalar-skills.cjs
+```
 
-## 5. Bencium UX Designer (design-audit, modo auditoria sem implementar)
+O instalador baixa os commits fixados, cria os atalhos locais, preserva destinos existentes e não executa código das fontes. Para reaproveitar clones na versão exata do lock, passe o diretório como argumento. As fontes e os atalhos são ignorados pelo Git; o lock e o instalador ficam versionados.
 
-Fase 1 — Crítico: rótulos dos `select` (item 1); alvos de toque no celular em Colaboradores/Configurações.
-Fase 2 — Refinamento: raios de borda com 7 valores (2/3/6/8/10/12/16 px, mais 999 px) e 43 sombras decorativas além dos anéis de foco; texto de 10–11 px; tamanho do menu lateral (32 px de altura).
-Fase 3 — Polish: estados de carregamento ("Carregando..." deve virar esqueleto ou `…`), estado vazio com próxima ação, atalho do sino com contador legível, landmark do chat.
-Redução: o painel "Ocupação por unidade" no resumo deixa a coluna direita vazia abaixo (a tela tem muito espaço morto abaixo das duas colunas, visível na captura 1440×900).
+Para os testes da interface:
 
-## 6. Anthropic Frontend Design
+```bash
+cd server
+npm ci
+npx playwright install chromium
+npm run test:ui
+```
 
-Direção declarada em `docs/unslop-dispatch.md` (preciso, sóbrio, grafite) segue coerente com o produto. Pontos contra as próprias regras da skill: rótulos em caixa alta (6 ocorrências fora da apresentação), tipografia sem hierarquia clara nos cartões de KPI (rótulo, número, legenda no mesmo peso visual), e três telas com cartões idênticos lado a lado (kit "SaaS card"). O ponto memorável do sistema é a marca (duplo chevron) e a tabela de movimentações; vale deixar só um destaque por tela.
-
-## 7. Unslop
-
-O Dispatch já passou por uma rodada (`docs/unslop-dispatch.md`, 9 passes). Resíduos encontrados: 1 gradiente fora da apresentação, 2 textos com " — ", 3 setas "→", 6 `text-transform: uppercase`, apresentação (`apresentacao.css`) mantém grade/degradê de marca (aceito, documentado). Nenhum emoji nas telas operacionais.
-
-## Ordem sugerida de correção
-
-1. `aria-label` nos 3 `select` + `<main>` no login/cadastro + landmark do chat + wrapper do tabpanel (30 min, fecha todos os achados verificados do AccessLint).
-2. Alvos 44 px nas linhas de Colaboradores e Configurações no celular; `min-height` no menu lateral.
-3. Remover animação de cor na entrada e `aria-busy` correto (some o falso positivo de contraste).
-4. `Intl.DateTimeFormat`, `…`, `autocomplete`/`inputmode`, `translate="no"`, `touch-action`, `overscroll-behavior`.
-5. Dimensões das imagens da apresentação; extrair componentes repetidos das classes de tela.
-
-## Limitações
-
-Conformidade WCAG completa exige teste humano com leitor de tela e teclado (○). Contraste de login/cadastro e tema claro não foram reverificados após a carga. As skills de React (Composition Patterns) foram aplicadas só por analogia.
+Com Chromium já instalado, use `CHROMIUM_PATH=/caminho/do/chromium npm run test:ui`. Cada execução gera capturas e JSON em `server/test-ui/artifacts/` e remove seu banco temporário ao terminar.

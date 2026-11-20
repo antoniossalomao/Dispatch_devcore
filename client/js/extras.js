@@ -188,26 +188,38 @@ class RecursosCompartilhados {
   montarChatAjuda() {
     this.chat = document.createElement('div');
     this.chat.className = 'chat-caixa';
+    this.chat.setAttribute('role', 'complementary');
+    this.chat.setAttribute('aria-label', 'Ajuda do Dispatch');
     this.chat.innerHTML =
-      '<div class="chat-painel" hidden>' +
+      '<section id="painel-ajuda" class="chat-painel" aria-label="Conversa de ajuda" hidden>' +
       '<div class="chat-topo"><strong>Ajuda do Dispatch</strong><button type="button" class="chat-fechar" aria-label="Fechar ajuda">&times;</button></div>' +
-      '<div class="chat-msgs"><div class="chat-msg chat-bot">Tire dúvidas sobre cadastros, alojamentos e frota. Por exemplo: como registrar a saída de um veículo?</div></div>' +
-      '<form class="chat-form"><input type="text" maxlength="500" aria-label="Sua dúvida" placeholder="Sua dúvida" required><button type="submit">Enviar</button></form>' +
-      '</div>' +
-      '<button type="button" class="chat-botao" title="Ajuda" aria-label="Abrir ajuda">?</button>';
+      '<div class="chat-msgs" role="log" aria-label="Mensagens de ajuda" aria-live="polite"><div class="chat-msg chat-bot">Tire dúvidas sobre cadastros, alojamentos e frota. Por exemplo: como registrar a saída de um veículo?</div></div>' +
+      '<form class="chat-form"><input type="text" name="duvida" maxlength="500" aria-label="Sua dúvida" placeholder="Sua dúvida…" autocomplete="off" required><button type="submit">Enviar</button></form>' +
+      '</section>' +
+      '<button type="button" class="chat-botao" title="Ajuda" aria-label="Abrir ajuda" aria-expanded="false" aria-controls="painel-ajuda">?</button>';
     document.body.appendChild(this.chat);
 
     this.painelChat = this.chat.querySelector('.chat-painel');
     this.msgs = this.chat.querySelector('.chat-msgs');
     this.entrada = this.chat.querySelector('input');
 
-    this.chat.querySelector('.chat-botao').addEventListener('click', () => {
-      this.painelChat.hidden = !this.painelChat.hidden;
-      if (!this.painelChat.hidden) this.entrada.focus();
-    });
+    this.botaoChat = this.chat.querySelector('.chat-botao');
+    const mostrar = (aberto) => {
+      this.painelChat.hidden = !aberto;
+      this.botaoChat.setAttribute('aria-expanded', String(aberto));
+      if (aberto) this.entrada.focus();
+      else this.botaoChat.focus();
+    };
+    this.botaoChat.addEventListener('click', () => mostrar(this.painelChat.hidden));
 
     this.chat.querySelector('.chat-fechar').addEventListener('click', () => {
-      this.painelChat.hidden = true;
+      mostrar(false);
+    });
+    this.chat.addEventListener('keydown', (evento) => {
+      if (evento.key !== 'Escape' || this.painelChat.hidden) return;
+      evento.preventDefault();
+      evento.stopPropagation();
+      mostrar(false);
     });
 
     this.chat.querySelector('form').addEventListener('submit', this.enviarPerguntaChat.bind(this));

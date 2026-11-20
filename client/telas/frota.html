@@ -34,7 +34,7 @@
       <section class="bloco">
         <div class="bloco-cabecalho">
           <h2 class="bloco-titulo">Veículos</h2>
-          <select id="seletor-status" class="config-select select-curto">
+          <select id="seletor-status" class="config-select select-curto" aria-label="Filtrar veículos por situação" name="seletor-status">
             <option value="ativos">Apenas ativos</option>
             <option value="inativos">Apenas inativos</option>
             <option value="todos">Todos</option>
@@ -68,26 +68,26 @@
         <button type="button" class="modal-fechar" data-fechar="modal-veiculo">&times;</button>
       </div>
       <form id="form-veiculo">
-        <input type="hidden" id="veic-id">
+        <input type="hidden" id="veic-id" name="veic-id" autocomplete="off">
         <div class="modal-corpo">
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="veic-placa" class="campo-label">Placa *</label>
-              <input type="text" id="veic-placa" class="config-input" placeholder="ABC-1234" required>
+              <input type="text" id="veic-placa" class="config-input" placeholder="ABC-1234" required name="veic-placa" autocomplete="off" spellcheck="false" autocapitalize="none">
             </div>
             <div class="campo-grupo">
               <label for="veic-modelo" class="campo-label">Modelo *</label>
-              <input type="text" id="veic-modelo" class="config-input" placeholder="Ex: Toyota Hilux" required>
+              <input type="text" id="veic-modelo" class="config-input" placeholder="Ex: Toyota Hilux" required name="veic-modelo" autocomplete="off">
             </div>
           </div>
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="veic-lugares" class="campo-label">Lugares (com o motorista) *</label>
-              <input type="number" id="veic-lugares" class="config-input" min="1" required>
+              <input type="number" id="veic-lugares" class="config-input" min="1" required name="veic-lugares" autocomplete="off" inputmode="numeric">
             </div>
             <div class="campo-grupo">
               <label for="veic-categoria" class="campo-label">Categoria de CNH exigida *</label>
-              <select id="veic-categoria" class="config-select">
+              <select id="veic-categoria" class="config-select" name="veic-categoria">
                 <option value="B">B (carro)</option>
                 <option value="A">A (moto)</option>
                 <option value="C">C (caminhão)</option>
@@ -99,18 +99,18 @@
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="veic-km" class="campo-label">Km no cadastro</label>
-              <input type="number" id="veic-km" class="config-input" min="0" value="0">
+              <input type="number" id="veic-km" class="config-input" min="0" value="0" name="veic-km" autocomplete="off" inputmode="numeric">
             </div>
             <div class="campo-grupo"></div>
           </div>
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="veic-licenciamento" class="campo-label">Validade do licenciamento</label>
-              <input type="date" id="veic-licenciamento" class="config-input campo-data">
+              <input type="date" id="veic-licenciamento" class="config-input campo-data" name="veic-licenciamento" autocomplete="off">
             </div>
             <div class="campo-grupo">
               <label for="veic-seguro" class="campo-label">Validade do seguro</label>
-              <input type="date" id="veic-seguro" class="config-input campo-data">
+              <input type="date" id="veic-seguro" class="config-input campo-data" name="veic-seguro" autocomplete="off">
             </div>
           </div>
         </div>
@@ -137,21 +137,21 @@
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="saida-veiculo" class="campo-label">Veículo *</label>
-              <select id="saida-veiculo" class="config-select" required></select>
+              <select id="saida-veiculo" class="config-select" required name="saida-veiculo"></select>
             </div>
             <div class="campo-grupo">
               <label for="saida-motorista" class="campo-label">Motorista *</label>
-              <select id="saida-motorista" class="config-select" required></select>
+              <select id="saida-motorista" class="config-select" required name="saida-motorista"></select>
             </div>
           </div>
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="saida-destino" class="campo-label">Destino *</label>
-              <input type="text" id="saida-destino" class="config-input" placeholder="Ex: Obra Marília Norte" required>
+              <input type="text" id="saida-destino" class="config-input" placeholder="Ex: Obra Marília Norte" required name="saida-destino" autocomplete="off">
             </div>
             <div class="campo-grupo">
               <label for="saida-km" class="campo-label">Km de saída *</label>
-              <input type="number" id="saida-km" class="config-input" min="0" required>
+              <input type="number" id="saida-km" class="config-input" min="0" required name="saida-km" autocomplete="off" inputmode="numeric">
             </div>
           </div>
           <div class="campo-grupo">
@@ -178,11 +178,11 @@
         <button type="button" class="modal-fechar" data-fechar="modal-volta">&times;</button>
       </div>
       <form id="form-volta">
-        <input type="hidden" id="volta-uso-id">
+        <input type="hidden" id="volta-uso-id" name="volta-uso-id" autocomplete="off">
         <div class="modal-corpo">
           <div class="campo-grupo">
             <label for="volta-km" class="campo-label">Km de volta *</label>
-            <input type="number" id="volta-km" class="config-input" min="0" required>
+            <input type="number" id="volta-km" class="config-input" min="0" required name="volta-km" autocomplete="off" inputmode="numeric">
           </div>
         </div>
         <div class="modal-rodape">
@@ -208,19 +208,19 @@
           <div class="grade-campos duas-colunas">
             <div class="campo-grupo">
               <label for="manut-tipo" class="campo-label">Tipo *</label>
-              <select id="manut-tipo" class="config-select">
+              <select id="manut-tipo" class="config-select" name="manut-tipo">
                 <option value="preventiva">Preventiva</option>
                 <option value="corretiva">Corretiva</option>
               </select>
             </div>
             <div class="campo-grupo">
               <label for="manut-km" class="campo-label">Km</label>
-              <input type="number" id="manut-km" class="config-input" min="0">
+              <input type="number" id="manut-km" class="config-input" min="0" name="manut-km" autocomplete="off" inputmode="numeric">
             </div>
           </div>
           <div class="campo-grupo">
             <label for="manut-descricao" class="campo-label">Descrição *</label>
-            <input type="text" id="manut-descricao" class="config-input" placeholder="Ex: Troca de óleo e filtros" required>
+            <input type="text" id="manut-descricao" class="config-input" placeholder="Ex: Troca de óleo e filtros" required name="manut-descricao" autocomplete="off">
           </div>
         </div>
         <div class="modal-rodape">

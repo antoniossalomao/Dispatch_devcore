@@ -69,6 +69,7 @@ export class PaletaDeComandos {
     this.filtrados = [];
     this.indiceAtivo = 0;
     this.recentes = this.lerRecentes();
+    this.pedido = 0;
   }
 
   lerRecentes() {
@@ -101,32 +102,39 @@ export class PaletaDeComandos {
   async abrir() {
     if (this.aberta) return;
     this.aberta = true;
+    const pedido = ++this.pedido;
     this.focoAnterior = document.activeElement;
 
     this.overlay = document.createElement('div');
     this.overlay.className = 'cmdk-overlay';
     this.overlay.innerHTML =
-      '<div class="cmdk" role="dialog" aria-modal="true" aria-label="Paleta de comandos">' +
-      '<div class="cmdk-campo">' +
+      '<div class="cmdk">' +
+      '<search class="cmdk-campo" role="search" aria-label="Busca global">' +
       this.icone('busca') +
-      '<input type="text" class="cmdk-input" role="combobox" aria-expanded="true" aria-controls="cmdk-lista" aria-autocomplete="list" placeholder="Buscar telas, ações, pessoas ou veículos" autocomplete="off" spellcheck="false">' +
-      '<kbd>Esc</kbd></div>' +
+      '<input type="text" name="comando" class="cmdk-input" role="combobox" aria-label="Buscar telas, ações e cadastros" aria-expanded="true" aria-controls="cmdk-lista" aria-autocomplete="list" placeholder="Buscar telas, ações e cadastros…" autocomplete="off" spellcheck="false">' +
+      '<button type="button" class="cmdk-fechar modal-fechar" aria-label="Fechar busca"><span aria-hidden="true">×</span></button></search>' +
       '<div class="cmdk-lista" id="cmdk-lista" role="listbox" aria-label="Resultados"></div>' +
+      '<p class="cmdk-status" role="status"></p>' +
       '<div class="cmdk-rodape"><span><kbd>↑</kbd><kbd>↓</kbd> navegar</span><span><kbd>Enter</kbd> abrir</span><span><kbd>Ctrl</kbd>+<kbd>K</kbd> fechar</span></div>' +
       '</div>';
     document.body.appendChild(this.overlay);
-    document.body.classList.add('sem-rolagem');
+    this.overlay.setAttribute('aria-label', 'Buscar no Dispatch');
+    window.janelas.preparar(this.overlay);
 
     this.input = this.overlay.querySelector('.cmdk-input');
     this.lista = this.overlay.querySelector('.cmdk-lista');
+    this.status = this.overlay.querySelector('.cmdk-status');
+    this.overlay.querySelector('.cmdk-fechar').addEventListener('click', () => this.fechar());
     this.input.addEventListener('input', () => this.filtrar());
     this.input.addEventListener('keydown', (evento) => this.teclado(evento));
     this.overlay.addEventListener('mousedown', (evento) => {
       if (evento.target === this.overlay) this.fechar();
     });
 
-    this.input.focus();
+    this.input.focus({ preventScroll: true });
     this.comandos = this.comandosBase();
+    this.carregando = true;
+    this.falhaExtras = false;
     this.filtrar();
 
     let extras = [];
@@ -134,8 +142,10 @@ export class PaletaDeComandos {
       extras = await this.carregarExtras();
     } catch (_) {
       // Sem rede, a paleta continua útil com telas e ações.
+      if (pedido === this.pedido) this.falhaExtras = true;
     }
-    if (!this.aberta) return;
+    if (!this.aberta || pedido !== this.pedido) return;
+    this.carregando = false;
     this.comandos = this.comandosBase().concat(extras);
     this.filtrar();
   }
@@ -143,16 +153,13 @@ export class PaletaDeComandos {
   fechar() {
     if (!this.aberta) return;
     this.aberta = false;
+    ++this.pedido;
     const saindo = this.overlay;
+    window.janelas.aoFechar(saindo);
+    saindo.inert = true;
     saindo.classList.add('saindo');
     setTimeout(() => saindo.remove(), SAIDA_MS);
     this.overlay = null;
-    if (!document.querySelector('.modal-overlay:not([hidden]), .gaveta-overlay:not([hidden])')) {
-      document.body.classList.remove('sem-rolagem');
-    }
-    if (this.focoAnterior instanceof HTMLElement && document.body.contains(this.focoAnterior)) {
-      this.focoAnterior.focus();
-    }
   }
 
   filtrar() {
@@ -171,11 +178,17 @@ export class PaletaDeComandos {
 
   desenhar() {
     this.lista.replaceChildren();
+    const quantidade = this.filtrados.length;
+    this.status.textContent = this.carregando
+      ? 'Buscando cadastros… Telas e ações já estão disponíveis'
+      : this.falhaExtras
+        ? 'Cadastros indisponíveis. Feche e abra a busca para tentar novamente'
+        : quantidade + (quantidade === 1 ? ' resultado' : ' resultados') + (quantidade === MAX_RESULTADOS ? ' · Continue digitando para refinar' : '');
     if (this.filtrados.length === 0) {
       this.input.removeAttribute('aria-activedescendant');
       const vazio = document.createElement('div');
       vazio.className = 'cmdk-vazio';
-      vazio.textContent = 'Nada encontrado para "' + this.input.value + '".';
+      vazio.textContent = 'Nenhum resultado para “' + this.input.value + '”. Tente um nome, matrícula ou placa';
       this.lista.appendChild(vazio);
       return;
     }
@@ -186,6 +199,7 @@ export class PaletaDeComandos {
         grupoAtual = cmd.grupo;
         const cabecalho = document.createElement('div');
         cabecalho.className = 'cmdk-grupo';
+        cabecalho.setAttribute('role', 'presentation');
         cabecalho.textContent = cmd.grupo;
         this.lista.appendChild(cabecalho);
       }
@@ -213,6 +227,8 @@ export class PaletaDeComandos {
       // mousedown em vez de click para o campo de busca não perder o foco antes de executar.
       item.addEventListener('mousedown', (evento) => {
         evento.preventDefault();
+      });
+      item.addEventListener('click', () => {
         this.executar(cmd);
       });
       item.addEventListener('mousemove', () => {
@@ -254,6 +270,14 @@ export class PaletaDeComandos {
     } else if (evento.key === 'ArrowUp') {
       evento.preventDefault();
       this.indiceAtivo = (this.indiceAtivo - 1 + total) % total;
+      this.marcarAtivo();
+    } else if (evento.key === 'Home' && evento.ctrlKey) {
+      evento.preventDefault();
+      this.indiceAtivo = 0;
+      this.marcarAtivo();
+    } else if (evento.key === 'End' && evento.ctrlKey) {
+      evento.preventDefault();
+      this.indiceAtivo = total - 1;
       this.marcarAtivo();
     } else if (evento.key === 'Enter') {
       evento.preventDefault();

@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#111315">
   <link rel="icon" type="image/svg+xml" href="assets/dispatch-icone.svg">
   <title>Dispatch - Cadastro</title>
   <link rel="stylesheet" href="css/base.css">
@@ -12,12 +13,12 @@
 </head>
 <body>
 
-  <div class="login-pagina">
+  <main class="login-pagina" id="conteudo">
     <div class="login-card cadastro-card">
       <div class="login-lado">
         <div class="login-marca">
           <span class="login-marca-icone" aria-hidden="true"></span>
-          <h1 class="login-logo">Dispatch</h1>
+          <h1 class="login-logo" translate="no">Dispatch</h1>
           <p class="login-texto">Pessoas, alojamentos e frota da obra num lugar só</p>
 
           <ul class="login-recursos">
@@ -42,38 +43,38 @@
           <form id="form-cadastro" class="login-form cadastro-form" hidden>
 
             <label for="codigo">Código de convite</label>
-            <input type="text" id="codigo" aria-describedby="mensagem-erro" autocomplete="one-time-code" placeholder="Código fornecido pelo administrador">
+            <input type="text" id="codigo" aria-describedby="mensagem-erro" autocomplete="one-time-code" placeholder="Código fornecido pelo administrador" name="codigo" spellcheck="false" autocapitalize="none">
 
             <label for="nome">Nome completo</label>
-            <input type="text" id="nome" aria-describedby="mensagem-erro" autocomplete="name" maxlength="120" placeholder="Digite seu nome">
+            <input type="text" id="nome" aria-describedby="mensagem-erro" autocomplete="name" maxlength="120" placeholder="Digite seu nome" name="nome">
 
             <div class="campo-duplo">
               <div class="campo">
                 <label for="documento">CPF ou CNPJ</label>
-                <input type="text" id="documento" aria-describedby="mensagem-erro" inputmode="numeric" autocomplete="off" maxlength="18" placeholder="000.000.000-00">
+                <input type="text" id="documento" aria-describedby="mensagem-erro" inputmode="numeric" autocomplete="off" maxlength="18" placeholder="000.000.000-00" name="documento">
               </div>
               <div class="campo">
                 <label for="telefone">Telefone</label>
-                <input type="text" id="telefone" aria-describedby="mensagem-erro" inputmode="tel" autocomplete="tel-national" maxlength="15" placeholder="(14) 99999-9999">
+                <input type="text" id="telefone" aria-describedby="mensagem-erro" inputmode="tel" autocomplete="tel-national" maxlength="15" placeholder="(14) 99999-9999" name="telefone">
               </div>
             </div>
 
             <label for="email">E-mail</label>
-            <input type="text" id="email" aria-describedby="mensagem-erro" inputmode="email" autocomplete="email" maxlength="254" placeholder="voce@empresa.com.br">
+            <input type="text" id="email" aria-describedby="mensagem-erro" inputmode="email" autocomplete="email" maxlength="254" placeholder="voce@empresa.com.br" name="email" spellcheck="false" autocapitalize="none">
 
             <div class="campo-duplo">
               <div class="campo">
                 <label for="senha">Senha</label>
-                <input type="password" id="senha" aria-describedby="mensagem-erro" autocomplete="new-password" placeholder="Mínimo de 8 caracteres">
+                <input type="password" id="senha" aria-describedby="mensagem-erro" autocomplete="new-password" placeholder="Mínimo de 8 caracteres" name="senha">
               </div>
               <div class="campo">
                 <label for="confirmar-senha">Confirmar senha</label>
-                <input type="password" id="confirmar-senha" aria-describedby="mensagem-erro" autocomplete="new-password" placeholder="Repita a senha">
+                <input type="password" id="confirmar-senha" aria-describedby="mensagem-erro" autocomplete="new-password" placeholder="Repita a senha" name="confirmar-senha">
               </div>
             </div>
 
             <div class="login-mostrar">
-              <input type="checkbox" id="mostrar-senha">
+              <input type="checkbox" id="mostrar-senha" name="mostrar-senha" autocomplete="off">
               <label for="mostrar-senha">Mostrar senhas</label>
             </div>
 
@@ -96,7 +97,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <script src="js/api.js"></script>
   <script src="js/cadastro.js"></script>

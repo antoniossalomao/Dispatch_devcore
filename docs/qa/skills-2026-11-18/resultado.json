@@ -1,0 +1,140 @@
+{
+  "grupos": [
+    "Login e cadastro: semântica e validação com foco",
+    "Sete telas em dois temas e duas larguras: AccessLint e layout",
+    "Busca global por toque, teclado, seleção e retorno do foco",
+    "Modal aninhado: descartar, continuar editando e foco",
+    "Resumo: falha HTTP, recuperação e dados sem números inventados",
+    "Navegação rápida: URL, título e conteúdo seguem o último clique",
+    "Ajuda fecha com Escape e devolve o foco",
+    "Configurações: abas por teclado e proteção de alterações",
+    "Busca de colaboradores mantém a resposta do filtro mais recente"
+  ],
+  "auditorias": [
+    {
+      "nome": "cadastro",
+      "falhas": []
+    },
+    {
+      "nome": "login",
+      "falhas": []
+    },
+    {
+      "nome": "resumo-escuro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "colaboradores-escuro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "alojamentos-escuro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "frota-escuro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "movimentacoes-escuro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "relatorios-escuro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "configuracoes-escuro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "resumo-claro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "colaboradores-claro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "alojamentos-claro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "frota-claro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "movimentacoes-claro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "relatorios-claro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "configuracoes-claro-1440",
+      "falhas": []
+    },
+    {
+      "nome": "resumo-escuro-390",
+      "falhas": []
+    },
+    {
+      "nome": "colaboradores-escuro-390",
+      "falhas": []
+    },
+    {
+      "nome": "alojamentos-escuro-390",
+      "falhas": []
+    },
+    {
+      "nome": "frota-escuro-390",
+      "falhas": []
+    },
+    {
+      "nome": "movimentacoes-escuro-390",
+      "falhas": []
+    },
+    {
+      "nome": "relatorios-escuro-390",
+      "falhas": []
+    },
+    {
+      "nome": "configuracoes-escuro-390",
+      "falhas": []
+    },
+    {
+      "nome": "resumo-claro-390",
+      "falhas": []
+    },
+    {
+      "nome": "colaboradores-claro-390",
+      "falhas": []
+    },
+    {
+      "nome": "alojamentos-claro-390",
+      "falhas": []
+    },
+    {
+      "nome": "frota-claro-390",
+      "falhas": []
+    },
+    {
+      "nome": "movimentacoes-claro-390",
+      "falhas": []
+    },
+    {
+      "nome": "relatorios-claro-390",
+      "falhas": []
+    },
+    {
+      "nome": "configuracoes-claro-390",
+      "falhas": []
+    },
+    {
+      "nome": "busca-global",
+      "falhas": []
+    }
+  ],
+  "erros": []
+}
