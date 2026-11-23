@@ -47,16 +47,13 @@
         <div class="hero-fundo" id="hero-fundo" aria-hidden="true">
           <img src="assets/apresentacao/devcore-simbolo.svg" width="255" height="255" alt="">
         </div>
-        <div class="hero-grade" aria-hidden="true"></div>
+        <div class="hero-tela" aria-hidden="true"><img src="assets/apresentacao/tela-resumo.jpg" alt="" width="1440" height="900"></div>
         <div class="t t1" id="t1">
           <h1>
             <span class="nm"><img src="assets/apresentacao/devcore.svg" width="500" height="330" alt="DevCore"></span>
-            <span class="sb">Estúdio de ideias e tecnologia</span>
           </h1>
         </div>
-        <div class="t t2" id="t2"><div class="in"><p>Boas ideias. Novas perspectivas. Impacto real.</p></div></div>
-        <a class="t t3" id="t3" href="#essencia"><span>Conheça o DevCore</span><i></i></a>
-        <div class="coord">Ideia · Forma · Código</div>
+        <a class="t t3" id="t3" href="#essencia"><span>Conheça o DevCore</span></a>
       </div>
     </div>
 
@@ -69,13 +66,6 @@
         <p>Como tornar o dia a dia mais simples? É dessa inquietação que nasce o DevCore: sete pessoas com ideias diferentes e uma vontade em comum, desenvolver soluções úteis, claras e bem construídas.</p>
       </div>
     </section>
-
-    <!-- Números -->
-    <div class="numeros"><div class="wrap">
-      <div class="num"><b>7</b><span>pessoas no núcleo do DevCore</span></div>
-      <div class="num"><b>4</b><span>frentes conectadas no Dispatch</span></div>
-      <div class="num"><b>3</b><span>propostas de escopo para começar</span></div>
-    </div></div>
 
     <!-- Dispatch: telas em formato editorial -->
     <section class="projetos" id="dispatch" aria-labelledby="titulo-dispatch">
@@ -115,7 +105,7 @@
         <div class="processo-cabeca"><h2 id="titulo-frentes">Do primeiro registro ao histórico de auditoria</h2><p class="lede">Cada parte da operação encontra seu lugar, com as regras de quem trabalha em obra.</p></div>
         <div class="processo">
           <div><h3>Pessoas</h3><p>Cadastros, CNH e movimentações. Informações conectadas a cada colaborador.</p></div>
-          <div><h3>Alojamentos</h3><p>Quartos, leitos e estadias. Capacidade acompanhada com as regras da NR-24.</p></div>
+          <div><h3>Alojamentos</h3><p>Quartos, leitos e estadias. Capacidade acompanhada com as regras da NR&#8209;24.</p></div>
           <div><h3>Frota</h3><p>Saídas, retornos e quilometragem. Cada veículo com seu histórico completo.</p></div>
           <div><h3>Rastreio</h3><p>Relatórios e auditoria com hashes encadeados para conferir cada alteração.</p></div>
         </div>
@@ -126,10 +116,32 @@
     <section class="indice" id="planos" aria-labelledby="titulo-planos">
       <div class="wrap">
         <div class="cabeca"><h2 id="titulo-planos">O tamanho muda, o cuidado permanece</h2><p class="lede">Do essencial a uma operação mais ampla, conheça as propostas de escopo do Dispatch.</p></div>
-        <div class="ix-h" aria-hidden="true"><span>Plano</span><span>Para quem</span><span>Valor</span><span>Situação</span></div>
-        <div class="ix" tabindex="0" role="button" data-plano="essencial"><div class="nm"><h3>Essencial</h3><p>Organização para concentrar o que importa no dia a dia.</p></div><span class="onde">O primeiro passo</span><span class="vl">Sob consulta</span><span class="stc"><span class="st">Conceitual</span></span></div>
-        <div class="ix" tabindex="0" role="button" data-plano="profissional"><div class="nm"><h3>Profissional</h3><p>Mais contexto para acompanhar, analisar e decidir.</p></div><span class="onde">Mais profundidade</span><span class="vl">Sob consulta</span><span class="stc"><span class="st">Conceitual</span></span></div>
-        <div class="ix" tabindex="0" role="button" data-plano="sob-medida"><div class="nm"><h3>Sob medida</h3><p>Um ponto de partida para necessidades específicas.</p></div><span class="onde">Seu contexto no centro</span><span class="vl">Vamos conversar</span><span class="stc"><span class="st">Conceitual</span></span></div>
+        <div class="planos">
+        <article class="plano" data-plano="essencial">
+          <p class="plano-para">O primeiro passo</p>
+          <h3>Essencial</h3>
+          <p class="plano-desc">Organização para concentrar o que importa no dia a dia.</p>
+          <p class="plano-valor">Sob consulta<span>Conceitual</span></p>
+          <ul><li>Cadastro de colaboradores</li><li>Alojamentos, quartos e leitos</li><li>Frota e movimentações</li><li>Resumo operacional</li></ul>
+          <button class="btn" type="button">Ver detalhes <svg viewBox="0 0 18 10" aria-hidden="true"><path d="M0 5h17M12 1l5 4-5 4"/></svg></button>
+        </article>
+        <article class="plano destaque" data-plano="profissional">
+          <p class="plano-para">Mais profundidade</p>
+          <h3>Profissional</h3>
+          <p class="plano-desc">Mais contexto para acompanhar, analisar e decidir.</p>
+          <p class="plano-valor">Sob consulta<span>Conceitual</span></p>
+          <ul><li>Tudo do Essencial</li><li>Relatórios de ocupação e frota</li><li>Histórico e auditoria de alterações</li><li>Central de notificações</li></ul>
+          <button class="btn solido" type="button">Ver detalhes <svg viewBox="0 0 18 10" aria-hidden="true"><path d="M0 5h17M12 1l5 4-5 4"/></svg></button>
+        </article>
+        <article class="plano" data-plano="sob-medida">
+          <p class="plano-para">Seu contexto no centro</p>
+          <h3>Sob medida</h3>
+          <p class="plano-desc">Um ponto de partida para necessidades específicas.</p>
+          <p class="plano-valor">Vamos conversar<span>Conceitual</span></p>
+          <ul><li>Levantamento de necessidades</li><li>Definição conjunta do escopo</li><li>Análise de integrações</li><li>Planejamento de implantação</li></ul>
+          <button class="btn" type="button">Ver detalhes <svg viewBox="0 0 18 10" aria-hidden="true"><path d="M0 5h17M12 1l5 4-5 4"/></svg></button>
+        </article>
+        </div>
         <p class="nota">Planos conceituais de apresentação. Valores, disponibilidade, integrações e condições comerciais ainda não definidos.</p>
       </div>
     </section>
