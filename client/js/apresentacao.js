@@ -190,25 +190,17 @@ class TelaApresentacao {
   /* ===== seção Planos: cada linha abre a janela com os recursos ===== */
 
   configurarPlanos() {
-    const linhas = Array.from(document.querySelectorAll('.ix'));
-    const funcoesAbrir = linhas.map((linha) => () => this.mostrarPlano(this.planos[linha.dataset.plano]));
-
-    linhas.forEach((linha, posicao) => {
-      linha.addEventListener('click', () => this.irPara(funcoesAbrir, posicao));
-      // a linha funciona como botão também pelo teclado
-      linha.addEventListener('keydown', (evento) => {
-        if (evento.key === 'Enter' || evento.key === ' ') {
-          evento.preventDefault();
-          this.irPara(funcoesAbrir, posicao);
-        }
-      });
+    const cartoes = Array.from(document.querySelectorAll('.plano'));
+    const funcoesAbrir = cartoes.map((cartao) => () => this.mostrarPlano(this.planos[cartao.dataset.plano]));
+    cartoes.forEach((cartao, posicao) => {
+      cartao.querySelector('button').addEventListener('click', () => this.irPara(funcoesAbrir, posicao));
     });
   }
 
   mostrarPlano(plano) {
     this.janelaImagem.className = 'pic off';
     this.janelaImagem.replaceChildren();
-    const ficha = plano.recursos.map((recurso, i) => ['0' + (i + 1), recurso]);
+    const ficha = plano.recursos.map((recurso) => ['Inclui', recurso]);
     this.preencherJanela(
       plano.categoria,
       plano.nome,
@@ -314,7 +306,7 @@ class TelaApresentacao {
     if (this.reduzirMovimento) return;
 
     const blocos =
-      '.manifesto p, .num, .cabeca .lede, .processo-cabeca .lede, .proj .info > *:not(h3), .ix-h, .ix, .nota, .faixa .label, .sobre p, .pilares > div, .processo div, .integrantes li, .faq details, .contato .dentro > *:not(h2)';
+      '.manifesto p, .num, .cabeca .lede, .processo-cabeca .lede, .proj .info > *:not(h3), .plano, .nota, .faixa .label, .sobre p, .pilares > div, .processo div, .integrantes li, .faq details, .contato .dentro > *:not(h2)';
     const titulos =
       '.manifesto h2, .cabeca h2, .processo-cabeca h2, .proj .info h3, .faixa q, .sobre h2, .contato h2';
     const imagens = '.proj .frame, .sobre-arte, .manifesto .f';
