@@ -214,7 +214,7 @@ class TelaApresentacao {
         rosto.setAttribute('aria-current', distancia === 0 ? 'true' : 'false');
       });
       nome.textContent = rostos[atual].dataset.nome;
-      posicao.textContent = atual + 1 + ' de ' + rostos.length;
+      posicao.textContent = 'Integrante ' + (atual + 1) + ' de ' + rostos.length;
     };
     document.getElementById('rosto-prox').addEventListener('click', () => mostrar(atual + 1));
     document.getElementById('rosto-ant').addEventListener('click', () => mostrar(atual - 1));
