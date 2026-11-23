@@ -95,7 +95,7 @@ header.solido .acesso { background: var(--fg); color: var(--bg); border-color: v
 @keyframes afastar { from { scale: 1.12; } to { scale: 1; } }
 .hero-grade { position: absolute; inset: 0; background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px); background-size: 96px 96px; opacity: 0.35; mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 20%, transparent 75%); }
 .t { position: absolute; left: 0; right: 0; will-change: transform, opacity; }
-.t1 { top: max(20vh, 140px); display: flex; flex-direction: column; align-items: center; gap: 24px; padding-inline: var(--gl) var(--gr); text-align: center; pointer-events: none; }
+.t1 { top: max(16vh, 110px); display: flex; flex-direction: column; align-items: center; gap: 24px; padding-inline: var(--gl) var(--gr); text-align: center; pointer-events: none; }
 .t1 h1 { display: flex; flex-direction: column; align-items: center; gap: 28px; }
 .t1 .nm { display: block; line-height: 0; }
 .t1 .nm img { width: clamp(260px, 32vw, 480px); height: auto; }
@@ -104,10 +104,18 @@ header.solido .acesso { background: var(--fg); color: var(--bg); border-color: v
 .t2 { bottom: max(13vh, 140px); pointer-events: none; }
 .t2 .in { max-width: 1320px; margin: 0 auto; padding-inline: var(--gl) var(--gr); }
 .t2 p { max-width: 11em; margin: 0; font-family: var(--serif); font-size: clamp(30px, 4vw, 60px); line-height: 1.04; }
-.t3 { bottom: max(3.5vh, 28px); display: flex; flex-direction: column; align-items: center; gap: 16px; font-size: 14px; letter-spacing: 0.04em; color: var(--muted); }
-.t3 i { width: 1px; height: 48px; background: linear-gradient(rgba(237, 236, 230, 0.8), transparent); }
+.t3 { bottom: calc(max(22vh, 170px) + 28px); z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 16px; font-size: 14px; letter-spacing: 0.04em; color: var(--muted); }
+/* brilho, anéis e a tela do produto aparecendo na base da abertura */
+.hero-brilho { position: absolute; left: 50%; top: 38%; width: min(900px, 90vw); aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, rgba(237, 236, 230, 0.09), rgba(200, 169, 106, 0.04) 40%, transparent 68%); animation: respirar 7s ease-in-out infinite alternate; }
+@keyframes respirar { from { opacity: 0.6; scale: 0.94; } to { opacity: 1; scale: 1.04; } }
+.hero-aneis i { position: absolute; left: 50%; top: 38%; translate: -50% -50%; border: 1px solid var(--line); border-radius: 50%; }
+.hero-aneis i:nth-child(1) { width: min(640px, 70vw); aspect-ratio: 1; }
+.hero-aneis i:nth-child(2) { width: min(860px, 92vw); aspect-ratio: 1; opacity: 0.6; }
+.hero-aneis i:nth-child(3) { width: min(1100px, 120vw); aspect-ratio: 1; opacity: 0.3; }
+.hero-tela { position: absolute; left: 50%; bottom: 0; width: min(980px, 86vw); height: max(22vh, 170px); translate: -50% 0; overflow: hidden; border: 1px solid var(--line); border-bottom: 0; background: #111; -webkit-mask-image: linear-gradient(#000 35%, transparent); mask-image: linear-gradient(#000 35%, transparent); animation: subir 1.6s var(--curva) 1.6s backwards; }
+.hero-tela img { width: 100%; height: auto; opacity: 0.85; }
 .coord { position: absolute; left: max(var(--gl), calc((100vw - 1320px) / 2 + var(--gl))); bottom: 32px; color: var(--muted); font-size: 14px; letter-spacing: 0.04em; }
-@media (max-width: 700px) { .t3, .coord { display: none; } .t2 { bottom: max(14vh, 112px); } }
+@media (max-width: 700px) { .t3, .coord { display: none; } .hero-tela { height: 120px; } .t2 { bottom: max(14vh, 112px); } }
 
 /* seções */
 section { padding-block: clamp(110px, 14vw, 220px); }
@@ -294,7 +302,7 @@ dialog::backdrop { background: rgba(5, 4, 3, 0.88); transition: background-color
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .hero-fundo, .t1 .nm img, .t1 .sb, .t2 .in, .t3, .coord { animation: none; }
+  .hero-brilho, .hero-tela, .hero-fundo, .t1 .nm img, .t1 .sb, .t2 .in, .t3, .coord { animation: none; }
   .t1 .nm img { clip-path: none; }
   .js .split .sw > span, .js .rv { transform: none; }
   .js .rv { opacity: 1; }
