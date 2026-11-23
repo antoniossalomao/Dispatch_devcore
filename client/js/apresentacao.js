@@ -138,6 +138,7 @@ class TelaApresentacao {
 
   montarTelas() {
     const lista = document.getElementById('lista-telas');
+    if (!lista) return;
     const funcoesAbrir = [];
 
     this.telas.forEach((tela, posicao) => {
