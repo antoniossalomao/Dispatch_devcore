@@ -120,14 +120,15 @@ header.solido .acesso { background: var(--fg); color: var(--bg); border-color: v
 /* seções */
 section { padding-block: clamp(110px, 14vw, 220px); }
 .manifesto { position: relative; overflow: hidden; text-align: center; }
-.manifesto .txt { position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; }
+.manifesto .txt { position: relative; z-index: 2; max-width: 820px; margin: 0 auto; }
 .manifesto h2 { font-size: clamp(36px, 5.4vw, 76px); line-height: 1.1; }
 .manifesto p { max-width: 46ch; margin: 40px auto 0; color: var(--muted); font-size: 19px; text-wrap: balance; }
 .manifesto .f { position: absolute; z-index: 1; overflow: hidden; opacity: 0.85; border: 1px solid var(--line); }
 .manifesto .f img { width: 100%; height: 120%; object-fit: cover; object-position: 0 0; will-change: transform; }
-.manifesto .fa { left: var(--gl); top: 10%; width: clamp(140px, 17vw, 260px); aspect-ratio: 3 / 4; }
-.manifesto .fb { right: var(--gr); bottom: 8%; width: clamp(160px, 20vw, 300px); aspect-ratio: 4 / 5; }
-@media (max-width: 900px) { .manifesto .f { display: none; } }
+.manifesto .fa { left: var(--gl); top: 8%; width: clamp(140px, 14vw, 220px); aspect-ratio: 3 / 4; }
+.manifesto .fb { right: var(--gr); bottom: 6%; width: clamp(160px, 16vw, 250px); aspect-ratio: 4 / 5; }
+@media (max-width: 1180px) { .manifesto .f { display: none; } }
+.manifesto .f { opacity: 0.55; }
 
 .numeros { border-block: 1px solid var(--line); }
 .numeros .wrap { display: grid; grid-template-columns: repeat(3, 1fr); }
@@ -310,3 +311,21 @@ dialog::backdrop { background: rgba(5, 4, 3, 0.88); transition: background-color
   .js .wipe img { scale: 1; }
   dialog { transition: none; }
 }
+
+/* melhorias nas seções */
+.frame { box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(237, 236, 230, 0.04); }
+.frame::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(237, 236, 230, 0.05), transparent 30%); }
+.info .idx::after { content: ""; display: block; width: 40px; height: 1px; margin-top: 16px; background: var(--accent); }
+.processo div { transition: background 0.4s; }
+.processo div:hover { background: rgba(237, 236, 230, 0.03); }
+.processo div::before { color: var(--accent); }
+.ix-itens { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 16px 0 0; padding: 0; list-style: none; }
+.ix-itens li { padding: 3px 12px; border: 1px solid var(--line); border-radius: 99px; color: var(--muted); font-size: 13px; letter-spacing: 0.02em; }
+.ix:hover .ix-itens li { border-color: rgba(237, 236, 230, 0.3); }
+.ix:nth-of-type(2) { background: rgba(237, 236, 230, 0.025); }
+.integrantes li { position: relative; transition: padding 0.5s var(--curva), color 0.3s; }
+.integrantes li:not(.assinatura):hover { padding-left: 16px; }
+.integrantes li:not(.assinatura)::before { content: ""; position: absolute; left: 0; bottom: -1px; width: 100%; height: 1px; background: var(--accent); transform: scaleX(0); transform-origin: 0 50%; transition: transform 0.6s var(--curva); }
+.integrantes li:not(.assinatura):hover::before { transform: scaleX(1); }
+.faq summary:hover { color: #fff; padding-left: 8px; transition: padding 0.4s var(--curva); }
+.faq details[open] summary { color: var(--accent); }
