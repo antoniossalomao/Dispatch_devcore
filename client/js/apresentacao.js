@@ -118,6 +118,7 @@ class TelaApresentacao {
     this.montarTelas();
     this.configurarPlanos();
     this.configurarJanela();
+    this.configurarEquipe();
     this.configurarMenuCelular();
     this.prepararAnimacoes();
     this.configurarRolagemSuave();
@@ -195,6 +196,30 @@ class TelaApresentacao {
     cartoes.forEach((cartao, posicao) => {
       cartao.querySelector('button').addEventListener('click', () => this.irPara(funcoesAbrir, posicao));
     });
+  }
+
+  // Equipe: um grupo de rostos redondos. O da frente é o integrante atual; os outros ficam desfocados atrás.
+  configurarEquipe() {
+    const rostos = Array.from(document.querySelectorAll('.rosto'));
+    const nome = document.getElementById('rosto-nome');
+    const posicao = document.getElementById('rosto-pos');
+    if (!rostos.length) return;
+    let atual = 0;
+    const mostrar = (indice) => {
+      atual = (indice + rostos.length) % rostos.length;
+      rostos.forEach((rosto, i) => {
+        const distancia = (i - atual + rostos.length) % rostos.length;
+        rosto.dataset.p = distancia < 3 ? String(distancia) : 'fora';
+        rosto.tabIndex = distancia === 0 ? 0 : -1;
+        rosto.setAttribute('aria-current', distancia === 0 ? 'true' : 'false');
+      });
+      nome.textContent = rostos[atual].dataset.nome;
+      posicao.textContent = atual + 1 + ' de ' + rostos.length;
+    };
+    document.getElementById('rosto-prox').addEventListener('click', () => mostrar(atual + 1));
+    document.getElementById('rosto-ant').addEventListener('click', () => mostrar(atual - 1));
+    rostos.forEach((rosto, i) => rosto.addEventListener('click', () => { if (i !== atual) mostrar(i); }));
+    mostrar(0);
   }
 
   mostrarPlano(plano) {
@@ -306,7 +331,7 @@ class TelaApresentacao {
     if (this.reduzirMovimento) return;
 
     const blocos =
-      '.manifesto p, .num, .cabeca .lede, .processo-cabeca .lede, .proj .info > *:not(h3), .plano, .nota, .faixa .label, .sobre p, .pilares > div, .processo div, .integrantes li, .faq details, .contato .dentro > *:not(h2)';
+      '.manifesto p, .num, .cabeca .lede, .processo-cabeca .lede, .proj .info > *:not(h3), .plano, .nota, .faixa .label, .sobre p, .pilares > div, .processo div, .time-texto > *, .faq details, .contato .dentro > *:not(h2)';
     const titulos =
       '.manifesto h2, .cabeca h2, .processo-cabeca h2, .proj .info h3, .faixa q, .sobre h2, .contato h2';
     const imagens = '.proj .frame, .sobre-arte, .manifesto .f';
